@@ -8,7 +8,10 @@ import java.io.PipedOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import org.neo4j.command_line.Commands;
+import org.neo4j.command_line.Result;
 import org.neo4j.io.FileBasedStreamRecorder;
+import org.neo4j.io.DeferredStreamContents;
 import org.neo4j.io.StreamContents;
 
 public class MySqlSpike
@@ -19,40 +22,43 @@ public class MySqlSpike
 
     public static void main( String[] args )
     {
+
         try
         {
-//            new FileBasedStreamRecorder(  ).
+//            new FileBasedStreamRecorder(  )
 //            new InMemoryStreamRecorder(  ).
 
-            File file = new File( "/Users/iansrobinson/Desktop/out.txt" );
-
-            FileBasedStreamRecorder recorder = new FileBasedStreamRecorder( file );
-
-            PipedOutputStream output = new PipedOutputStream();
-            InputStream input = new PipedInputStream( output );
-
-            StreamContents contents = recorder.start( input );
-
-            OutputStreamWriter writer = new OutputStreamWriter( output );
-            writer.write( "name: ian robinson\n" );
-            writer.write( "age: 21\n" );
-            writer.write( "email: iansrobinson@gmail.com\n" );
-            writer.flush();
-            writer.close();
-
-            Thread.sleep( 100 );
-
-            System.out.println( contents.value() );
-
-//            Commands commands = Commands.forCommands()
-//                    .inheritWorkingDirectory()
-//                    .failOnNonZeroExitValue()
-//                    .noTimeout()
-//                    .inheritEnvironment()
-//                    .noRedirection()
-//                    .build();
+//            File file = new File( "/Users/iansrobinson/Desktop/out.txt" );
 //
-//            Result result = commands.execute();
+//            FileBasedStreamRecorder recorder = new FileBasedStreamRecorder( file );
+//
+//            PipedOutputStream output = new PipedOutputStream();
+//            InputStream input = new PipedInputStream( output );
+//
+//            StreamContents contents = recorder.start( input );
+//
+//            OutputStreamWriter writer = new OutputStreamWriter( output );
+//            writer.write( "name: ian robinson\n" );
+//            writer.write( "age: 21\n" );
+//            writer.write( "email: iansrobinson@gmail.com\n" );
+//            writer.flush();
+//            writer.close();
+//
+//            System.out.println( contents.value() );
+
+            FileBasedStreamRecorder stdout = new FileBasedStreamRecorder(
+                    new File( "/Users/iansrobinson/Desktop/iansrobinson.txt" ) );
+
+            Commands commands = Commands.forCommands( "curl", "-v", "http://iansrobinson.com" )
+                    .inheritWorkingDirectory()
+                    .failOnNonZeroExitValue()
+                    .noTimeout()
+                    .inheritEnvironment()
+                    .redirectStdOutTo( stdout )
+                    .build();
+
+            Result result = commands.execute();
+            System.out.println(result.toString());
 //
 //            SqlRunner sqlRunner = new SqlRunner( SQL );
 //            sqlRunner.start();

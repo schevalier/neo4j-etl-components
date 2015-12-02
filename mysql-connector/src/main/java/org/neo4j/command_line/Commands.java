@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.neo4j.io.StreamContents;
+import org.neo4j.io.StreamRecorder;
 
 import static java.lang.String.format;
 
@@ -30,8 +31,8 @@ public class Commands
     private final long timeoutMillis;
     private final Map<String, String> extraEnvironment;
     private final ProcessBuilder.Redirect stdInRedirect;
-    private final ProcessConfigurator stdOutConfigurator;
-    private final ProcessConfigurator stdErrConfigurator;
+    private final StreamRecorder stdOutRecorder;
+    private final StreamRecorder stdErrRecorder;
 
     Commands( File workingDirectory,
               List<String> commands,
@@ -39,8 +40,8 @@ public class Commands
               long timeoutMillis,
               Map<String, String> extraEnvironment,
               ProcessBuilder.Redirect stdInRedirect,
-              ProcessConfigurator stdOutConfigurator,
-              ProcessConfigurator stdErrConfigurator )
+              StreamRecorder stdOutRecorder,
+              StreamRecorder stdErrRecorder )
     {
         this.workingDirectory = workingDirectory;
         this.commands = commands;
@@ -48,8 +49,8 @@ public class Commands
         this.timeoutMillis = timeoutMillis;
         this.extraEnvironment = extraEnvironment;
         this.stdInRedirect = stdInRedirect;
-        this.stdOutConfigurator = stdOutConfigurator;
-        this.stdErrConfigurator = stdErrConfigurator;
+        this.stdOutRecorder = stdOutRecorder;
+        this.stdErrRecorder = stdErrRecorder;
     }
 
     public Result execute() throws Exception
@@ -64,15 +65,12 @@ public class Commands
             processBuilder.environment().putAll( extraEnvironment );
             processBuilder.redirectInput( stdInRedirect );
 
-            stdOutConfigurator.configure( processBuilder );
-            stdErrConfigurator.configure( processBuilder );
-
             long startTime = System.currentTimeMillis();
 
             process = processBuilder.start();
 
-            StreamContents stdout = stdOutConfigurator.start( process );
-            StreamContents stderr = stdErrConfigurator.start( process );
+            StreamContents stdout = stdOutRecorder.start( process.getInputStream() );
+            StreamContents stderr = stdErrRecorder.start( process.getErrorStream() );
 
             Timer timer = new Timer();
             DestroyProcessOnTimeout timerTask = new DestroyProcessOnTimeout( process );
@@ -166,38 +164,20 @@ public class Commands
 
         interface Environment
         {
-            RedirectingStdIn inheritEnvironment();
+            Redirection inheritEnvironment();
 
-            RedirectingStdIn augmentEnvironment( Map<String, String> extra );
+            Redirection augmentEnvironment( Map<String, String> extra );
         }
 
-        interface RedirectingStdIn
+        interface Redirection
         {
-            Builder noRedirection();
+            Redirection redirectStdInFrom( ProcessBuilder.Redirect redirection );
 
-            RedirectingStdOut doNotRedirectStdIn();
+            Redirection redirectStdOutTo( StreamRecorder streamRecorder );
 
-            RedirectingStdOut redirectStdInFrom( ProcessBuilder.Redirect redirection );
+            Redirection redirectStdErrTo( StreamRecorder streamRecorder );
+
+            Commands build();
         }
-
-        interface RedirectingStdOut
-        {
-            RedirectingStdErr doNotRedirectStdOut();
-
-            RedirectingStdErr redirectStdOutTo( File file );
-
-            RedirectingStdErr logStdOut( Logger log );
-        }
-
-        interface RedirectingStdErr
-        {
-            Builder doNotRedirectStdErr();
-
-            Builder redirectStdErrTo( File file );
-
-            Builder logStdErr( Logger log );
-        }
-
-        Commands build();
     }
 }

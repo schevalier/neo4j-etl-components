@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-
-import org.neo4j.io.FileBasedStreamRecorder;
 import org.neo4j.io.InMemoryStreamRecorder;
+import org.neo4j.io.StreamRecorder;
 
 import static java.util.Arrays.asList;
 
@@ -18,9 +16,7 @@ class CommandsBuilder
         Commands.Builder.ResultEvaluator,
         Commands.Builder.TimeoutMillis,
         Commands.Builder.Environment,
-        Commands.Builder.RedirectingStdIn,
-        Commands.Builder.RedirectingStdOut,
-        Commands.Builder.RedirectingStdErr,
+        Commands.Builder.Redirection,
         Commands.Builder
 {
     private final List<String> commands;
@@ -28,9 +24,9 @@ class CommandsBuilder
     private org.neo4j.command_line.Result.Evaluator resultEvaluator;
     private long timeoutMillis;
     private Map<String, String> extraEnvironment = Collections.emptyMap();
-    private ProcessConfigurator stdOutConfigurator;
-    private ProcessConfigurator stdErrConfigurator;
-    private ProcessBuilder.Redirect stdInRedirect;
+    private StreamRecorder stdOutRecorder = new InMemoryStreamRecorder();
+    private StreamRecorder stdErrRecorder = new InMemoryStreamRecorder();
+    private ProcessBuilder.Redirect stdInRedirect = ProcessBuilder.Redirect.PIPE;
 
     public CommandsBuilder( String... commands )
     {
@@ -86,89 +82,35 @@ class CommandsBuilder
     }
 
     @Override
-    public RedirectingStdIn inheritEnvironment()
+    public Redirection inheritEnvironment()
     {
         return this;
     }
 
     @Override
-    public RedirectingStdIn augmentEnvironment( Map<String, String> extra )
+    public Redirection augmentEnvironment( Map<String, String> extra )
     {
         this.extraEnvironment = extra;
         return this;
     }
-
     @Override
-    public Commands.Builder noRedirection()
-    {
-        return doNotRedirectStdIn().doNotRedirectStdOut().doNotRedirectStdErr();
-    }
-
-    @Override
-    public RedirectingStdOut doNotRedirectStdIn()
-    {
-        this.stdInRedirect = ProcessBuilder.Redirect.PIPE;
-        return this;
-    }
-
-    @Override
-    public RedirectingStdOut redirectStdInFrom( ProcessBuilder.Redirect redirection )
+    public Redirection redirectStdInFrom( ProcessBuilder.Redirect redirection )
     {
         this.stdInRedirect = redirection;
         return this;
     }
 
     @Override
-    public RedirectingStdErr doNotRedirectStdOut()
+    public Redirection redirectStdOutTo( StreamRecorder streamRecorder )
     {
-        this.stdOutConfigurator = new ProcessConfigurator(
-                new InMemoryStreamRecorder(),
-                InMemoryStreamRecorder.StreamType.StdOut );
+        this.stdOutRecorder = streamRecorder;
         return this;
     }
 
     @Override
-    public RedirectingStdErr redirectStdOutTo( File file )
+    public Redirection redirectStdErrTo( StreamRecorder streamRecorder )
     {
-        this.stdOutConfigurator = new ProcessConfigurator(
-                new FileBasedStreamRecorder( file ),
-                FileBasedStreamRecorder.StreamType.StdOut );
-        return this;
-    }
-
-    @Override
-    public RedirectingStdErr logStdOut( final Logger log )
-    {
-        this.stdOutConfigurator = new ProcessConfigurator(
-                new InMemoryStreamRecorder(),
-                InMemoryStreamRecorder.StreamType.StdOut );
-        return this;
-    }
-
-    @Override
-    public CommandsBuilder doNotRedirectStdErr()
-    {
-        this.stdErrConfigurator = new ProcessConfigurator(
-                new InMemoryStreamRecorder(),
-                InMemoryStreamRecorder.StreamType.StdErr );
-        return this;
-    }
-
-    @Override
-    public CommandsBuilder redirectStdErrTo( File file )
-    {
-        this.stdErrConfigurator = new ProcessConfigurator(
-                new FileBasedStreamRecorder( file ),
-                FileBasedStreamRecorder.StreamType.StdErr );
-        return this;
-    }
-
-    @Override
-    public CommandsBuilder logStdErr( final Logger log )
-    {
-        this.stdErrConfigurator = new ProcessConfigurator(
-                new InMemoryStreamRecorder(),
-                InMemoryStreamRecorder.StreamType.StdErr );
+        this.stdErrRecorder = streamRecorder;
         return this;
     }
 
@@ -182,7 +124,7 @@ class CommandsBuilder
                 timeoutMillis,
                 extraEnvironment,
                 stdInRedirect,
-                stdOutConfigurator,
-                stdErrConfigurator );
+                stdOutRecorder,
+                stdErrRecorder );
     }
 }
