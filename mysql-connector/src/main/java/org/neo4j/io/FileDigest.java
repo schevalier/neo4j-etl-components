@@ -7,25 +7,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import org.neo4j.utils.StringListBuilder;
 
-class FileContentsSummary implements StreamContents
+public class FileDigest
 {
     private static final int DEFAULT_SUMMARY_LINE_COUNT = 50;
 
     private final File file;
     private final int summaryLineCount;
 
-    public FileContentsSummary( File file )
+    FileDigest( File file )
     {
         this( file, DEFAULT_SUMMARY_LINE_COUNT );
     }
 
-    public FileContentsSummary( File file, int summaryLineCount )
+    FileDigest( File file, int summaryLineCount )
     {
         if ( summaryLineCount < 1 )
         {
@@ -36,14 +35,18 @@ class FileContentsSummary implements StreamContents
         this.summaryLineCount = summaryLineCount;
     }
 
-    @Override
-    public Optional<File> file()
+    public File file()
     {
-        return Optional.of( file );
+        return file;
     }
 
     @Override
-    public String value()
+    public String toString()
+    {
+        return value();
+    }
+
+    private String value()
     {
         List<String> lines = new ArrayList<>();
         List<String> endLines = new ArrayList<>();

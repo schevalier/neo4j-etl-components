@@ -1,46 +1,26 @@
 package org.neo4j.io;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
-public abstract class DeferredStreamContents implements StreamContents
+public class StreamContentsHandle<T>
 {
     private final CountDownLatch latch = new CountDownLatch( 1 );
+    private final Supplier<T> supplier;
     private volatile IOException ex;
 
-    abstract Optional<File> getFile() throws IOException;
-
-    abstract String getValue() throws IOException;
-
-    @Override
-    public Optional<File> file() throws IOException
+    public StreamContentsHandle( Supplier<T> supplier )
     {
-        try
-        {
-            latch.await( 5, TimeUnit.SECONDS );
-        }
-        catch ( InterruptedException e )
-        {
-            Thread.currentThread().interrupt();
-        }
-
-        if ( ex != null )
-        {
-            throw ex;
-        }
-
-        return getFile();
+        this.supplier = supplier;
     }
 
-    @Override
-    public String value() throws IOException
+    public T await( long timeout, TimeUnit unit ) throws IOException
     {
         try
         {
-            latch.await( 5, TimeUnit.SECONDS );
+            latch.await( timeout, unit );
         }
         catch ( InterruptedException e )
         {
@@ -52,7 +32,7 @@ public abstract class DeferredStreamContents implements StreamContents
             throw ex;
         }
 
-        return getValue();
+        return supplier.get();
     }
 
     void ready()

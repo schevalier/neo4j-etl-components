@@ -56,14 +56,14 @@ class CommandsBuilder
     @Override
     public TimeoutMillis failOnNonZeroExitValue()
     {
-        this.resultEvaluator = Result.Evaluator.FAIL_IF_EXIT_VALUE_IS_NOT_ZERO;
+        this.resultEvaluator = Result.Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
         return this;
     }
 
     @Override
     public TimeoutMillis ignoreFailures()
     {
-        this.resultEvaluator = Result.Evaluator.IGNORE_FALIURES;
+        this.resultEvaluator = Result.Evaluator.IGNORE_FAILURES;
         return this;
     }
 

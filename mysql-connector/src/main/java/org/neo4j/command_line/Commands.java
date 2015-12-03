@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.neo4j.io.StreamContents;
+import org.neo4j.io.StreamContentsHandle;
 import org.neo4j.io.StreamRecorder;
 
 import static java.lang.String.format;
@@ -69,8 +69,8 @@ public class Commands
 
             process = processBuilder.start();
 
-            StreamContents stdout = stdOutRecorder.start( process.getInputStream() );
-            StreamContents stderr = stdErrRecorder.start( process.getErrorStream() );
+            StreamContentsHandle stdout = stdOutRecorder.start( process.getInputStream() );
+            StreamContentsHandle stderr = stdErrRecorder.start( process.getErrorStream() );
 
             Timer timer = new Timer();
             DestroyProcessOnTimeout timerTask = new DestroyProcessOnTimeout( process );
@@ -86,8 +86,8 @@ public class Commands
 
             Result result = new Result(
                     exitValue,
-                    stdout.value(),
-                    stderr.value(),
+                    stdout.await( 5, TimeUnit.SECONDS ).toString(),
+                    stderr.await( 5, TimeUnit.SECONDS ).toString(),
                     endTime - startTime );
 
             if ( timerTask.timedOut() )

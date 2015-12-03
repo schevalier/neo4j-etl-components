@@ -1,39 +1,32 @@
 package org.neo4j.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
+import java.util.function.Supplier;
 
-public class InMemoryStreamRecorder implements StreamRecorder
+public class InMemoryStreamRecorder implements StreamRecorder<String>
 {
     private final StringBuilder stringBuilder = new StringBuilder();
-    private final DeferredStreamContents streamContents;
+    private final StreamContentsHandle<String> streamContentsHandle;
 
     public InMemoryStreamRecorder()
     {
-        streamContents = new DeferredStreamContents()
+        streamContentsHandle = new StreamContentsHandle<>( new Supplier<String>()
         {
             @Override
-            Optional<File> getFile() throws IOException
-            {
-                return Optional.empty();
-            }
-
-            @Override
-            String getValue() throws IOException
+            public String get()
             {
                 return stringBuilder.toString();
             }
-        };
+        } );
     }
 
     @Override
-    public DeferredStreamContents start( InputStream input )
+    public StreamContentsHandle<String> start( InputStream input )
     {
         new StreamSink( input, new EventHandler() ).start();
 
-        return streamContents;
+        return streamContentsHandle;
     }
 
     private class EventHandler implements StreamEventHandler
@@ -47,13 +40,13 @@ public class InMemoryStreamRecorder implements StreamRecorder
         @Override
         public void onException( IOException e )
         {
-            streamContents.addException( e );
+            streamContentsHandle.addException( e );
         }
 
         @Override
         public void onCompleted()
         {
-            streamContents.ready();
+            streamContentsHandle.ready();
         }
     }
 }

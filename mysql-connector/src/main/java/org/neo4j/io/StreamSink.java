@@ -31,7 +31,14 @@ public class StreamSink extends Thread
         }
         catch ( IOException e )
         {
-            if ( e.getMessage().equals( "Stream closed" ) )
+            try
+            {
+                if ( !e.getMessage().equals( "Stream closed" ) )
+                {
+                    eventHandler.onException( e );
+                }
+            }
+            finally
             {
                 try
                 {
@@ -41,10 +48,6 @@ public class StreamSink extends Thread
                 {
                     eventHandler.onException( ex );
                 }
-            }
-            else
-            {
-                eventHandler.onException( e );
             }
         }
     }

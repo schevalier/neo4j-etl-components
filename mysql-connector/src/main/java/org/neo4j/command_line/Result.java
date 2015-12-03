@@ -6,9 +6,9 @@ public class Result
 {
     public interface Evaluator
     {
-        Evaluator FAIL_IF_EXIT_VALUE_IS_NOT_ZERO = result -> result.exitValue() == 0;
+        Evaluator FAIL_ON_NON_ZERO_EXIT_VALUE = result -> result.exitValue() == 0;
 
-        Evaluator IGNORE_FALIURES = result -> true;
+        Evaluator IGNORE_FAILURES = result -> true;
 
         boolean isValid( Result result );
     }

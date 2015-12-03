@@ -1,18 +1,12 @@
 package org.neo4j.mysql;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.command_line.Result;
 import org.neo4j.io.FileBasedStreamRecorder;
-import org.neo4j.io.DeferredStreamContents;
-import org.neo4j.io.StreamContents;
 
 public class MySqlSpike
 {
@@ -58,7 +52,7 @@ public class MySqlSpike
                     .build();
 
             Result result = commands.execute();
-            System.out.println(result.toString());
+            System.out.println( result.toString() );
 //
 //            SqlRunner sqlRunner = new SqlRunner( SQL );
 //            sqlRunner.start();

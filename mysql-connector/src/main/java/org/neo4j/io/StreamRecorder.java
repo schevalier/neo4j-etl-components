@@ -2,7 +2,7 @@ package org.neo4j.io;
 
 import java.io.InputStream;
 
-public interface StreamRecorder
+public interface StreamRecorder<T>
 {
-    StreamContents start( InputStream input );
+    StreamContentsHandle<T> start( InputStream input );
 }

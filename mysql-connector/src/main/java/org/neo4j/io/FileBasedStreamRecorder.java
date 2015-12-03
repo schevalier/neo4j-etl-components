@@ -6,40 +6,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.util.Optional;
+import java.io.Writer;
 
-public class FileBasedStreamRecorder implements StreamRecorder
+public class FileBasedStreamRecorder implements StreamRecorder<FileDigest>
 {
     private final File file;
-    private final DeferredStreamContents streamContents;
+    private final StreamContentsHandle<FileDigest> streamContentsHandle;
 
     public FileBasedStreamRecorder( File file )
     {
         this.file = file;
-        this.streamContents = new DeferredStreamContents()
-        {
-            FileContentsSummary contents = new FileContentsSummary( file );
-
-            @Override
-            Optional<File> getFile() throws IOException
-            {
-                return contents.file();
-            }
-
-            @Override
-            String getValue() throws IOException
-            {
-                return contents.value();
-            }
-        };
+        this.streamContentsHandle = new StreamContentsHandle<>( () -> new FileDigest( file ) );
     }
 
     @Override
-    public StreamContents start( InputStream input )
+    public StreamContentsHandle<FileDigest> start( InputStream input )
     {
         new StreamSink( input, new EventHandler() ).start();
 
-        return streamContents;
+        return streamContentsHandle;
     }
 
     private class EventHandler implements StreamEventHandler
@@ -63,23 +48,25 @@ public class FileBasedStreamRecorder implements StreamRecorder
         @Override
         public void onException( IOException e )
         {
-            streamContents.addException( e );
+            streamContentsHandle.addException( e );
         }
 
         @Override
         public void onCompleted() throws IOException
         {
-            try
+            if ( writer == null )
             {
-                if ( writer != null )
-                {
-                    writer.flush();
-                    writer.close();
-                }
+                streamContentsHandle.ready();
+                return;
+            }
+
+            try ( Writer w = writer )
+            {
+                w.flush();
             }
             finally
             {
-                streamContents.ready();
+                streamContentsHandle.ready();
             }
         }
     }
