@@ -10,7 +10,7 @@ public class StreamSink extends Thread
     private final InputStream input;
     private final StreamEventHandler eventHandler;
 
-    StreamSink( InputStream input, StreamEventHandler eventHandler )
+    public StreamSink( InputStream input, StreamEventHandler eventHandler )
     {
         this.input = input;
         this.eventHandler = eventHandler;
@@ -20,13 +20,14 @@ public class StreamSink extends Thread
     {
         try
         {
-            InputStreamReader reader = new InputStreamReader( input );
-            BufferedReader bufferedReader = new BufferedReader( reader );
+            BufferedReader bufferedReader = new BufferedReader( new InputStreamReader( input ) );
+
             String line;
             while ( (line = bufferedReader.readLine()) != null )
             {
                 eventHandler.onLine( line );
             }
+
             eventHandler.onCompleted();
         }
         catch ( IOException e )

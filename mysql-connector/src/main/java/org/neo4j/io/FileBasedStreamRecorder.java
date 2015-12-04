@@ -3,6 +3,7 @@ package org.neo4j.io;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -38,7 +39,7 @@ public class FileBasedStreamRecorder implements StreamRecorder<FileDigest>
             {
                 //noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
-                writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file, true ) ) );
+                writer = new BufferedWriter( new FileWriter( file, true ) );
             }
 
             writer.write( line );
