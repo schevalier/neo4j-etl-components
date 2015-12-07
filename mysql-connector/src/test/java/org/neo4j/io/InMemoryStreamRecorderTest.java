@@ -108,4 +108,41 @@ public class InMemoryStreamRecorderTest
         // then
         assertEquals( "", result );
     }
+
+    @Test
+    public void shouldAbbreviateContentsIfNumberOfLinesExceedsConfiguredMaximum() throws IOException
+    {
+        // given
+        InMemoryStreamRecorder recorder = new InMemoryStreamRecorder( 5 );
+
+        PipedOutputStream output = new PipedOutputStream();
+        InputStream input = new PipedInputStream( output );
+
+        new StreamSink( input, recorder ).start();
+
+        Writer writer = new OutputStreamWriter( output );
+
+        for ( int i = 0; i < 10; i++ )
+        {
+            writer.write( String.valueOf( i ) );
+            writer.write( System.lineSeparator() );
+        }
+
+        writer.flush();
+        writer.close();
+
+        // when
+        String contents = recorder.awaitContents( 10, TimeUnit.MILLISECONDS );
+
+        // then
+        String expectedContents = "0" + NEWLINE
+                + "1" + NEWLINE
+                + "2" + NEWLINE
+                + "3" + NEWLINE
+                + "4" + NEWLINE
+                + "[...]" + NEWLINE
+                + "9" + NEWLINE;
+
+        assertEquals( expectedContents, contents );
+    }
 }

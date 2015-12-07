@@ -1,23 +1,39 @@
 package org.neo4j.io;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static java.lang.String.format;
+
 public class InMemoryStreamRecorder implements StreamEventHandler<String>
 {
+    private static final int DEFAULT_MAX_NUMBER_OF_LINES = 100;
+
+    private final int maxNumberOfLines;
     private final StringBuilder stringBuilder = new StringBuilder();
     private final StreamContentsHandle<String> streamContentsHandle;
 
+    private int numberOfLines;
+    private String lastLine;
+
+
     public InMemoryStreamRecorder()
     {
-        streamContentsHandle = new StreamContentsHandle<>( new Supplier<String>()
+        this( DEFAULT_MAX_NUMBER_OF_LINES );
+    }
+
+    public InMemoryStreamRecorder( int maxNumberOfLines )
+    {
+        this.maxNumberOfLines = maxNumberOfLines;
+        this.streamContentsHandle = new StreamContentsHandle<>( new Supplier<String>()
         {
             @Override
             public String get()
             {
-                return stringBuilder.toString();
+                return numberOfLines > maxNumberOfLines ?
+                        format( "%s[...]%n%s%n", stringBuilder, lastLine ) :
+                        stringBuilder.toString();
             }
         } );
     }
@@ -25,7 +41,14 @@ public class InMemoryStreamRecorder implements StreamEventHandler<String>
     @Override
     public void onLine( String line )
     {
-        stringBuilder.append( line ).append( System.lineSeparator() );
+        if ( ++numberOfLines <= maxNumberOfLines )
+        {
+            stringBuilder.append( line ).append( System.lineSeparator() );
+        }
+        else
+        {
+            lastLine = line;
+        }
     }
 
     @Override
