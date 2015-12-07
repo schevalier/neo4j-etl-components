@@ -186,6 +186,28 @@ public class CommandsTest
         assertEquals( tempDirectory.get().toPath().toRealPath(), new File( result.stdout() ).toPath() );
     }
 
+    @Test
+    public void shouldAllowRedirectingStdIn() throws Exception
+    {
+         // given
+        String script = createScript( "read a; echo $a;" );
+
+        Commands commands = Commands.forCommands( "sh", script )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .noTimeout()
+                .inheritEnvironment()
+                .redirectStdInFrom( ProcessBuilder.Redirect.from( tempFile.get() ) )
+                .build();
+
+        // when
+        Result result = commands.execute();
+
+        // then
+        assertEquals( 0, result.exitValue() );
+        assertEquals( "read a; echo $a;", result.stdout() );
+    }
+
     private String createScript( String script ) throws IOException
     {
         FileUtils.writeStringToFile( tempFile.get(), script );
