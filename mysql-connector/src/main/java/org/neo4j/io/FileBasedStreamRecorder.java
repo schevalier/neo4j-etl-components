@@ -2,74 +2,55 @@ package org.neo4j.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.concurrent.TimeUnit;
 
-public class FileBasedStreamRecorder implements StreamRecorder<FileDigest>
+public class FileBasedStreamRecorder implements StreamEventHandler<FileDigest>
 {
-    private final File file;
+    private final BufferedWriter writer;
     private final StreamContentsHandle<FileDigest> streamContentsHandle;
 
-    public FileBasedStreamRecorder( File file )
+    public FileBasedStreamRecorder( File file ) throws IOException
     {
-        this.file = file;
+        //noinspection ResultOfMethodCallIgnored
+        file.createNewFile();
+
+        this.writer = new BufferedWriter( new FileWriter( file, true ) );
         this.streamContentsHandle = new StreamContentsHandle<>( () -> new FileDigest( file ) );
     }
 
     @Override
-    public StreamContentsHandle<FileDigest> start( InputStream input )
+    public void onLine( String line ) throws IOException
     {
-        new StreamSink( input, new EventHandler() ).start();
-
-        return streamContentsHandle;
+        writer.write( line );
+        writer.newLine();
     }
 
-    private class EventHandler implements StreamEventHandler
+    @Override
+    public void onException( IOException e )
     {
-        BufferedWriter writer;
+        streamContentsHandle.addException( e );
+    }
 
-        @Override
-        public void onLine( String line ) throws IOException
+    @Override
+    public void onCompleted() throws IOException
+    {
+        try ( Writer w = writer )
         {
-            if ( writer == null )
-            {
-                //noinspection ResultOfMethodCallIgnored
-                file.createNewFile();
-                writer = new BufferedWriter( new FileWriter( file, true ) );
-            }
-
-            writer.write( line );
-            writer.newLine();
+            w.flush();
         }
-
-        @Override
-        public void onException( IOException e )
+        finally
         {
-            streamContentsHandle.addException( e );
+            streamContentsHandle.ready();
         }
+    }
 
-        @Override
-        public void onCompleted() throws IOException
-        {
-            if ( writer == null )
-            {
-                streamContentsHandle.ready();
-                return;
-            }
-
-            try ( Writer w = writer )
-            {
-                w.flush();
-            }
-            finally
-            {
-                streamContentsHandle.ready();
-            }
-        }
+    @Override
+    public FileDigest awaitContents( long timeout, TimeUnit unit ) throws IOException
+    {
+        return streamContentsHandle.await( timeout, unit );
     }
 }
 

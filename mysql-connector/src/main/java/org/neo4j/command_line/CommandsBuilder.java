@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.io.InMemoryStreamRecorder;
-import org.neo4j.io.StreamRecorder;
+import org.neo4j.io.StreamEventHandler;
 
 import static java.util.Arrays.asList;
 
@@ -24,8 +24,8 @@ class CommandsBuilder
     private org.neo4j.command_line.Result.Evaluator resultEvaluator;
     private long timeoutMillis;
     private Map<String, String> extraEnvironment = Collections.emptyMap();
-    private StreamRecorder stdOutRecorder = new InMemoryStreamRecorder();
-    private StreamRecorder stdErrRecorder = new InMemoryStreamRecorder();
+    private StreamEventHandler stdOutEventHandler = new InMemoryStreamRecorder();
+    private StreamEventHandler stdErrEventHandler = new InMemoryStreamRecorder();
     private ProcessBuilder.Redirect stdInRedirect = ProcessBuilder.Redirect.PIPE;
 
     public CommandsBuilder( String... commands )
@@ -93,6 +93,7 @@ class CommandsBuilder
         this.extraEnvironment = extra;
         return this;
     }
+
     @Override
     public Redirection redirectStdInFrom( ProcessBuilder.Redirect redirection )
     {
@@ -101,16 +102,16 @@ class CommandsBuilder
     }
 
     @Override
-    public Redirection redirectStdOutTo( StreamRecorder streamRecorder )
+    public Redirection redirectStdOutTo( StreamEventHandler streamEventHandler )
     {
-        this.stdOutRecorder = streamRecorder;
+        this.stdOutEventHandler = streamEventHandler;
         return this;
     }
 
     @Override
-    public Redirection redirectStdErrTo( StreamRecorder streamRecorder )
+    public Redirection redirectStdErrTo( StreamEventHandler streamEventHandler )
     {
-        this.stdErrRecorder = streamRecorder;
+        this.stdErrEventHandler = streamEventHandler;
         return this;
     }
 
@@ -118,13 +119,12 @@ class CommandsBuilder
     public Commands build()
     {
         return new Commands(
-                workingDirectory,
-                commands,
+                commands, workingDirectory,
                 resultEvaluator,
                 timeoutMillis,
                 extraEnvironment,
                 stdInRedirect,
-                stdOutRecorder,
-                stdErrRecorder );
+                stdOutEventHandler,
+                stdErrEventHandler );
     }
 }

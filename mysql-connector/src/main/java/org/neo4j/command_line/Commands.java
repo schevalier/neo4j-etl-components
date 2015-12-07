@@ -11,8 +11,8 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.neo4j.io.StreamContentsHandle;
-import org.neo4j.io.StreamRecorder;
+import org.neo4j.io.StreamEventHandler;
+import org.neo4j.io.StreamSink;
 
 import static java.lang.String.format;
 
@@ -25,32 +25,31 @@ public class Commands
         return new CommandsBuilder( commands );
     }
 
-    private final File workingDirectory;
     private final List<String> commands;
+    private final File workingDirectory;
     private final Result.Evaluator resultEvaluator;
     private final long timeoutMillis;
     private final Map<String, String> extraEnvironment;
     private final ProcessBuilder.Redirect stdInRedirect;
-    private final StreamRecorder stdOutRecorder;
-    private final StreamRecorder stdErrRecorder;
+    private final StreamEventHandler stdOutEventHandler;
+    private final StreamEventHandler stdErrEventHandler;
 
-    Commands( File workingDirectory,
-              List<String> commands,
+    Commands( List<String> commands, File workingDirectory,
               Result.Evaluator resultEvaluator,
               long timeoutMillis,
               Map<String, String> extraEnvironment,
               ProcessBuilder.Redirect stdInRedirect,
-              StreamRecorder stdOutRecorder,
-              StreamRecorder stdErrRecorder )
+              StreamEventHandler stdOutEventHandler,
+              StreamEventHandler stdErrEventHandler )
     {
-        this.workingDirectory = workingDirectory;
         this.commands = commands;
+        this.workingDirectory = workingDirectory;
         this.resultEvaluator = resultEvaluator;
         this.timeoutMillis = timeoutMillis;
         this.extraEnvironment = extraEnvironment;
         this.stdInRedirect = stdInRedirect;
-        this.stdOutRecorder = stdOutRecorder;
-        this.stdErrRecorder = stdErrRecorder;
+        this.stdOutEventHandler = stdOutEventHandler;
+        this.stdErrEventHandler = stdErrEventHandler;
     }
 
     public Result execute() throws Exception
@@ -69,8 +68,8 @@ public class Commands
 
             process = processBuilder.start();
 
-            StreamContentsHandle stdout = stdOutRecorder.start( process.getInputStream() );
-            StreamContentsHandle stderr = stdErrRecorder.start( process.getErrorStream() );
+            new StreamSink( process.getInputStream(), stdOutEventHandler ).start();
+            new StreamSink( process.getErrorStream(), stdErrEventHandler ).start();
 
             Timer timer = new Timer();
             DestroyProcessOnTimeout timerTask = new DestroyProcessOnTimeout( process );
@@ -86,8 +85,8 @@ public class Commands
 
             Result result = new Result(
                     exitValue,
-                    stdout.await( 5, TimeUnit.SECONDS ).toString(),
-                    stderr.await( 5, TimeUnit.SECONDS ).toString(),
+                    stdOutEventHandler.awaitContents( 5, TimeUnit.SECONDS ).toString(),
+                    stdErrEventHandler.awaitContents( 5, TimeUnit.SECONDS ).toString(),
                     endTime - startTime );
 
             if ( timerTask.timedOut() )
@@ -173,9 +172,9 @@ public class Commands
         {
             Redirection redirectStdInFrom( ProcessBuilder.Redirect redirection );
 
-            Redirection redirectStdOutTo( StreamRecorder streamRecorder );
+            Redirection redirectStdOutTo( StreamEventHandler streamEventHandler );
 
-            Redirection redirectStdErrTo( StreamRecorder streamRecorder );
+            Redirection redirectStdErrTo( StreamEventHandler streamEventHandler );
 
             Commands build();
         }

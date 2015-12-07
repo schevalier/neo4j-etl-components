@@ -4,8 +4,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static java.lang.Integer.min;
-
 public class ErrorThrowingInputStream extends FilterInputStream
 {
     private final IOException ex;

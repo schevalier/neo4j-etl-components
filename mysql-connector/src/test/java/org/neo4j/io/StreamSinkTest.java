@@ -61,9 +61,14 @@ public class StreamSinkTest
         StreamEventHandler eventHandler = mock( StreamEventHandler.class );
 
         PipedOutputStream output = new PipedOutputStream();
+        OutputStreamWriter writer = new OutputStreamWriter( output );
+
         InputStream input = new ErrorThrowingInputStream( new PipedInputStream( output ), expectedException );
 
         StreamSink streamSink = new StreamSink( input, eventHandler );
+
+        writer.write( System.lineSeparator() );
+        writer.close();
 
         // when
         streamSink.run();
@@ -83,9 +88,13 @@ public class StreamSinkTest
         StreamEventHandler eventHandler = mock( StreamEventHandler.class );
 
         PipedOutputStream output = new PipedOutputStream();
+        OutputStreamWriter writer = new OutputStreamWriter( output );
+
         InputStream input = new ErrorThrowingInputStream( new PipedInputStream( output ), expectedException );
 
         StreamSink streamSink = new StreamSink( input, eventHandler );
+
+        writer.close();
 
         // when
         streamSink.run();

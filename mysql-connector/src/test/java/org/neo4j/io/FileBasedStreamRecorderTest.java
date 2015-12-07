@@ -25,8 +25,8 @@ public class FileBasedStreamRecorderTest
 {
     /*
     A StreamSink's BufferedReader can throw an IOException from its readLine() method. In these tests we force the
-    reader inside the StreamSink used by a FileBasedStreamReader to throw an exception while the
-    FileBasedStreamRecorder is reading from a stream and writing to a file.
+    reader inside a StreamSink to throw an exception while its FileBasedStreamRecorder is reading from the stream
+    and writing to a file.
      */
 
     @Rule
@@ -43,7 +43,7 @@ public class FileBasedStreamRecorderTest
         PipedOutputStream output = new PipedOutputStream();
         InputStream input = new ErrorThrowingInputStream( new PipedInputStream( output ), expectedException );
 
-        StreamContentsHandle<FileDigest> contents = recorder.start( input );
+        new StreamSink( input, recorder ).start();
 
         Writer writer = new OutputStreamWriter( output );
 
@@ -61,7 +61,7 @@ public class FileBasedStreamRecorderTest
         {
             // when
             //noinspection ResultOfMethodCallIgnored
-            contents.await( 100, TimeUnit.MILLISECONDS ).file();
+            recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).file();
             fail( "Expected IOException" );
         }
         catch ( IOException e )
@@ -90,7 +90,7 @@ public class FileBasedStreamRecorderTest
                 new IOException( "Bad stream" ),
                 (bufferSize * expectedNumberOfLines) + 1 );
 
-        recorder.start( input );
+        new StreamSink( input, recorder ).start();
 
         try
         {
@@ -128,13 +128,13 @@ public class FileBasedStreamRecorderTest
         PipedOutputStream output = new PipedOutputStream();
         InputStream input = new PipedInputStream( output );
 
-        StreamContentsHandle<FileDigest> contents = recorder.start( input );
+        new StreamSink( input, recorder ).start();
 
         Writer writer = new OutputStreamWriter( output );
         writer.close();
 
         // when
-        String result = contents.await( 100, TimeUnit.MILLISECONDS ).toString();
+        String result = recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).toString();
 
         assertEquals( "", result );
 
