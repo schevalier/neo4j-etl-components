@@ -83,7 +83,7 @@ public class InMemoryStreamRecorderTest
         String contents = recorder.awaitContents( 10, TimeUnit.MILLISECONDS );
 
         // then
-        String expectedContents = "A" + NEWLINE + "B" + NEWLINE + "C" + NEWLINE;
+        String expectedContents = "A" + NEWLINE + "B" + NEWLINE + "C";
 
         assertEquals( expectedContents, contents );
     }
@@ -141,7 +141,7 @@ public class InMemoryStreamRecorderTest
                 + "3" + NEWLINE
                 + "4" + NEWLINE
                 + "[...]" + NEWLINE
-                + "9" + NEWLINE;
+                + "9";
 
         assertEquals( expectedContents, contents );
     }

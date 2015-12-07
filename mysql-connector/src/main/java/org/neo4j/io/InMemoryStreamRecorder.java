@@ -32,7 +32,7 @@ public class InMemoryStreamRecorder implements StreamEventHandler<String>
             public String get()
             {
                 return numberOfLines > maxNumberOfLines ?
-                        format( "%s[...]%n%s%n", stringBuilder, lastLine ) :
+                        format( "%s%n[...]%n%s", stringBuilder, lastLine ) :
                         stringBuilder.toString();
             }
         } );
@@ -43,7 +43,11 @@ public class InMemoryStreamRecorder implements StreamEventHandler<String>
     {
         if ( ++numberOfLines <= maxNumberOfLines )
         {
-            stringBuilder.append( line ).append( System.lineSeparator() );
+            if (numberOfLines > 1)
+            {
+                stringBuilder.append( System.lineSeparator() );
+            }
+            stringBuilder.append( line );
         }
         else
         {
