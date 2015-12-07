@@ -64,7 +64,7 @@ public class FileBasedStreamRecorderTest
         {
             // when
             //noinspection ResultOfMethodCallIgnored
-            recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).file();
+            recorder.awaitContents( 100, TimeUnit.MILLISECONDS );
             fail( "Expected IOException" );
         }
         catch ( IOException e )
@@ -139,15 +139,14 @@ public class FileBasedStreamRecorderTest
         // when
         String result = recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).toString();
 
+        // then
         assertEquals( "", result );
-
     }
 
     @Test
     public void shouldStoreStreamContentsInFile() throws IOException
     {
         // given
-
         FileBasedStreamRecorder recorder = new FileBasedStreamRecorder( tempFile.get() );
 
         PipedOutputStream output = new PipedOutputStream();
