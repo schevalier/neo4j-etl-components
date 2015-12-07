@@ -43,7 +43,6 @@ public class CommandsTest
                 .inheritEnvironment()
                 .build();
 
-
         // when
         Result result = commands.execute();
 
@@ -64,7 +63,6 @@ public class CommandsTest
                 .noTimeout()
                 .inheritEnvironment()
                 .build();
-
 
         // when
         Result result = commands.execute();
@@ -138,7 +136,6 @@ public class CommandsTest
                 .inheritEnvironment()
                 .build();
 
-
         // when
         Result result = commands.execute();
 
@@ -161,7 +158,6 @@ public class CommandsTest
                 .noTimeout()
                 .augmentEnvironment( envVars )
                 .build();
-
 
         // when
         Result result = commands.execute();

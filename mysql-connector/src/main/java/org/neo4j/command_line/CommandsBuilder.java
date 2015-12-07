@@ -11,6 +11,8 @@ import org.neo4j.io.StreamEventHandler;
 
 import static java.util.Arrays.asList;
 
+import static org.neo4j.command_line.Result.*;
+
 class CommandsBuilder
         implements Commands.Builder.WorkingDirectory,
         Commands.Builder.ResultEvaluator,
@@ -21,7 +23,7 @@ class CommandsBuilder
 {
     private final List<String> commands;
     private File workingDirectory;
-    private org.neo4j.command_line.Result.Evaluator resultEvaluator;
+    private Evaluator resultEvaluator;
     private long timeoutMillis;
     private Map<String, String> extraEnvironment = Collections.emptyMap();
     private StreamEventHandler stdOutEventHandler = new InMemoryStreamRecorder();
@@ -47,7 +49,7 @@ class CommandsBuilder
     }
 
     @Override
-    public TimeoutMillis commandResultEvaluator( Result.Evaluator resultEvaluator )
+    public TimeoutMillis commandResultEvaluator( Evaluator resultEvaluator )
     {
         this.resultEvaluator = resultEvaluator;
         return this;
@@ -56,14 +58,14 @@ class CommandsBuilder
     @Override
     public TimeoutMillis failOnNonZeroExitValue()
     {
-        this.resultEvaluator = Result.Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
+        this.resultEvaluator = Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
         return this;
     }
 
     @Override
     public TimeoutMillis ignoreFailures()
     {
-        this.resultEvaluator = Result.Evaluator.IGNORE_FAILURES;
+        this.resultEvaluator = Evaluator.IGNORE_FAILURES;
         return this;
     }
 
