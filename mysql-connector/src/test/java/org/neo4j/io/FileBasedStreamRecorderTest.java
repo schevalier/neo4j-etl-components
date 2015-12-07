@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -23,6 +24,8 @@ import static org.neo4j.utils.TemporaryFile.temporaryFile;
 
 public class FileBasedStreamRecorderTest
 {
+    private static final String NEWLINE = System.lineSeparator();
+
     /*
     A StreamSink's BufferedReader can throw an IOException from its readLine() method. In these tests we force the
     reader inside a StreamSink to throw an exception while its FileBasedStreamRecorder is reading from the stream
@@ -138,6 +141,39 @@ public class FileBasedStreamRecorderTest
 
         assertEquals( "", result );
 
+    }
+
+    @Test
+    public void shouldStoreStreamContentsInFile() throws IOException
+    {
+        // given
+
+        FileBasedStreamRecorder recorder = new FileBasedStreamRecorder( tempFile.get() );
+
+        PipedOutputStream output = new PipedOutputStream();
+        InputStream input = new PipedInputStream( output );
+
+        new StreamSink( input, recorder ).start();
+
+        Writer writer = new OutputStreamWriter( output );
+
+        writer.write( "A" );
+        writer.write( System.lineSeparator() );
+        writer.write( "B" );
+        writer.write( System.lineSeparator() );
+        writer.write( "C" );
+        writer.write( System.lineSeparator() );
+
+        writer.flush();
+        writer.close();
+
+        // when
+        File file = recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).file();
+
+        // then
+        String expectedContents = "A" + NEWLINE + "B" + NEWLINE + "C" + NEWLINE;
+
+        assertEquals( expectedContents, FileUtils.readFileToString( file ) );
     }
 
     private String createLine( int bufferSize, String a )
