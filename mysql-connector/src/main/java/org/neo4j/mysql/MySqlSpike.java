@@ -51,9 +51,9 @@ public class MySqlSpike
                     .redirectStdOutTo( stdout )
                     .build();
 
-            Result result = commands.execute();
-            System.out.println( result.toString() );
-//
+            //Result result = commands.execute();
+//            System.out.println( result.toString() );
+
 //            SqlRunner sqlRunner = new SqlRunner( SQL );
 //            sqlRunner.start();
 //

@@ -44,7 +44,7 @@ public class CommandsTest
                 .build();
 
         // when
-        Result result = commands.execute();
+        Result result = commands.execute().await();
 
         // then
         assertEquals( 0, result.exitValue() );
@@ -65,7 +65,7 @@ public class CommandsTest
                 .build();
 
         // when
-        Result result = commands.execute();
+        Result result = commands.execute().await();
 
         // then
         assertEquals( 1, result.exitValue() );
@@ -87,7 +87,7 @@ public class CommandsTest
         try
         {
             // when
-            commands.execute();
+            commands.execute().await();
             fail( "Expected Exception" );
         }
         catch ( Exception e )
@@ -113,7 +113,8 @@ public class CommandsTest
         try
         {
             // when
-            commands.execute();
+            commands.execute().await();
+            fail("Expected Exception");
         }
         catch ( Exception e )
         {
@@ -137,7 +138,7 @@ public class CommandsTest
                 .build();
 
         // when
-        Result result = commands.execute();
+        Result result = commands.execute().await();
 
         // then
         assertEquals( "An error", result.stderr() );
@@ -160,7 +161,7 @@ public class CommandsTest
                 .build();
 
         // when
-        Result result = commands.execute();
+        Result result = commands.execute().await();
 
         // then
         assertEquals( "env-var-value", result.stdout() );
@@ -180,7 +181,7 @@ public class CommandsTest
                 .build();
 
         // when
-        Result result = commands.execute();
+        Result result = commands.execute().await();
 
         // then
         assertEquals( tempDirectory.get().toPath().toRealPath(), new File( result.stdout() ).toPath() );
@@ -201,7 +202,7 @@ public class CommandsTest
                 .build();
 
         // when
-        Result result = commands.execute();
+        Result result = commands.execute().await();
 
         // then
         assertEquals( 0, result.exitValue() );
