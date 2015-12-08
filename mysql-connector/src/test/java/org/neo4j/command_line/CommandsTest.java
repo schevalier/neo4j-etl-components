@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.neo4j.utils.OperatingSystem;
 import org.neo4j.utils.ResourceRule;
 
+import static java.lang.String.format;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -32,11 +34,14 @@ public class CommandsTest
     @Rule
     public final ResourceRule<File> tempDirectory = new ResourceRule<>( temporaryDirectory() );
 
+    private static final CommandFactory COMMAND_FACTORY = new CommandFactory( OperatingSystem.isWindows() );
+
     @Test
     public void shouldExecuteCommands() throws Exception
     {
         // given
-        String script = createScript( "echo \"hello world\"" );
+        String expectedValue = "hello world";
+        String script = createScript( COMMAND_FACTORY.echo( expectedValue ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -50,14 +55,15 @@ public class CommandsTest
 
         // then
         assertEquals( 0, result.exitValue() );
-        assertEquals( "hello world", result.stdout() );
+        assertEquals( expectedValue, result.stdout() );
     }
 
     @Test
     public void shouldReturnExitCode() throws Exception
     {
         // given
-        String script = createScript( "exit 1" );
+        int expectedExitValue = 1;
+        String script = createScript( COMMAND_FACTORY.exit( expectedExitValue ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -70,14 +76,14 @@ public class CommandsTest
         Result result = commands.execute().await();
 
         // then
-        assertEquals( 1, result.exitValue() );
+        assertEquals( expectedExitValue, result.exitValue() );
     }
 
     @Test
     public void shouldThrowExceptionIfCommandResultEvaluatorIndicatesFailure() throws Exception
     {
         // given
-        String script = createScript( "exit 1" );
+        String script = createScript( COMMAND_FACTORY.exit( 1 ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -130,7 +136,7 @@ public class CommandsTest
     public void shouldCaptureStdErrOutput() throws Exception
     {
         // given
-        String script = createScript( "echo \"An error\" >&2" );
+        String script = createScript( COMMAND_FACTORY.echoToStdErr( "An error" ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -150,10 +156,11 @@ public class CommandsTest
     public void shouldAugmentEnvironment() throws Exception
     {
         // given
-        String script = createScript( "echo $MY_VAR" );
+        String expectedValue = "env-var-value";
+        String script = createScript( COMMAND_FACTORY.echoEnvVar( "MY_VAR" ) );
 
         Map<String, String> envVars = new HashMap<>();
-        envVars.put( "MY_VAR", "env-var-value" );
+        envVars.put( "MY_VAR", expectedValue );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -166,14 +173,14 @@ public class CommandsTest
         Result result = commands.execute().await();
 
         // then
-        assertEquals( "env-var-value", result.stdout() );
+        assertEquals( expectedValue, result.stdout() );
     }
 
     @Test
     public void shouldChangeWorkingDirectory() throws Exception
     {
         // given
-        String script = createScript( "pwd" );
+        String script = createScript( COMMAND_FACTORY.printWorkingDirectory() );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .workingDirectory( tempDirectory.get() )
@@ -186,29 +193,32 @@ public class CommandsTest
         Result result = commands.execute().await();
 
         // then
-        assertEquals( tempDirectory.get().toPath().toRealPath(), new File( result.stdout() ).toPath() );
+        assertEquals( tempDirectory.get().toPath().toRealPath(), new File( result.stdout() ).toPath().toRealPath() );
     }
 
     @Test
     public void shouldAllowRedirectingStdIn() throws Exception
     {
-        // given
-        String script = createScript( "read a; echo $a;" );
+        if ( !OperatingSystem.isWindows() )
+        {
+            // given
+            String script = createScript( "read a; echo $a;" );
 
-        Commands commands = Commands.forCommands( toCommands( script ) )
-                .inheritWorkingDirectory()
-                .failOnNonZeroExitValue()
-                .noTimeout()
-                .inheritEnvironment()
-                .redirectStdInFrom( ProcessBuilder.Redirect.from( tempFile.get() ) )
-                .build();
+            Commands commands = Commands.forCommands( toCommands( script ) )
+                    .inheritWorkingDirectory()
+                    .failOnNonZeroExitValue()
+                    .noTimeout()
+                    .inheritEnvironment()
+                    .redirectStdInFrom( ProcessBuilder.Redirect.from( tempFile.get() ) )
+                    .build();
 
-        // when
-        Result result = commands.execute().await();
+            // when
+            Result result = commands.execute().await();
 
-        // then
-        assertEquals( 0, result.exitValue() );
-        assertEquals( "read a; echo $a;", result.stdout() );
+            // then
+            assertEquals( 0, result.exitValue() );
+            assertEquals( "read a; echo $a;", result.stdout() );
+        }
     }
 
     private String createScript( String script ) throws IOException
@@ -226,6 +236,41 @@ public class CommandsTest
         else
         {
             return new String[]{"sh", script};
+        }
+    }
+
+    private static class CommandFactory
+    {
+        private final boolean isWindows;
+
+        private CommandFactory( boolean windows )
+        {
+            isWindows = windows;
+        }
+
+        public String echo( String value )
+        {
+            return isWindows ? format( "@ECHO %s", value ) : format( "echo %s", value );
+        }
+
+        public String echoToStdErr( String value )
+        {
+            return format( "echo %s>&2", value );
+        }
+
+        public String exit( int exitValue )
+        {
+            return format( "exit %s", exitValue );
+        }
+
+        public String echoEnvVar( String varName )
+        {
+            return isWindows ? "@ECHO %" + varName + "%" : format( "echo $%s", varName );
+        }
+
+        public String printWorkingDirectory()
+        {
+            return isWindows ? "@ECHO %cd%" : "pwd";
         }
     }
 }
