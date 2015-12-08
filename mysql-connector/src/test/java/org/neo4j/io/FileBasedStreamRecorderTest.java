@@ -91,7 +91,7 @@ public class FileBasedStreamRecorderTest
         InputStream input = new ErrorThrowingInputStream(
                 new PipedInputStream( output ),
                 new IOException( "Bad stream" ),
-                (bufferSize * expectedNumberOfLines) + 1 );
+                (bufferSize * expectedNumberOfLines) + (bufferSize / 8) );
 
         new StreamSink( input, recorder ).start();
 
