@@ -27,7 +27,7 @@ public class CommandLatchTest
     {
         // given
         String script = createScript( "#!/bin/bash\n" +
-                "        for i in `seq 1 10`;\n" +
+                "        for i in `seq 1 20`;\n" +
                 "        do\n" +
                 "                echo $i\n" +
                 "                sleep 0.1s\n" +
@@ -43,14 +43,18 @@ public class CommandLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        ResultHandle resultHandle = commands.execute();
+        long startTime = System.currentTimeMillis();
 
-        // when
-        CommandLatch.CommandLatchResult result = latch.awaitContents( 1, TimeUnit.SECONDS );
+        try ( ResultHandle ignored = commands.execute() )
+        {
+            // when
+            CommandLatch.CommandLatchResult result = latch.awaitContents( 1, TimeUnit.SECONDS );
+            long endTime = System.currentTimeMillis();
 
-        // then
-        assertTrue( result.ok() );
-        resultHandle.terminate();
+            // then
+            assertTrue( result.ok() );
+            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 1 ) );
+        }
     }
 
     @Test
@@ -74,14 +78,18 @@ public class CommandLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        ResultHandle resultHandle = commands.execute();
+        long startTime = System.currentTimeMillis();
 
-        // when
-        CommandLatch.CommandLatchResult result = latch.awaitContents( 2, TimeUnit.SECONDS );
+        try ( ResultHandle ignored = commands.execute() )
+        {
+            // when
+            CommandLatch.CommandLatchResult result = latch.awaitContents( 2, TimeUnit.SECONDS );
+            long endTime = System.currentTimeMillis();
 
-        // then
-        assertFalse( result.ok() );
-        resultHandle.terminate();
+            // then
+            assertFalse( result.ok() );
+            assertTrue( endTime - startTime >= TimeUnit.SECONDS.toMillis( 1 ) );
+        }
     }
 
     @Test
@@ -95,10 +103,12 @@ public class CommandLatchTest
                 "                sleep 0.1s\n" +
                 "        done" );
 
+        IOException expectedException = new IOException( "Illegal value: 5" );
+
         CommandLatch latch = new CommandLatch( l -> {
             if ( Integer.valueOf( l ) == 5 )
             {
-                throw new IOException( "Illegal value: 5" );
+                throw expectedException;
             }
             return Integer.valueOf( l ) == 6;
         } );
@@ -111,9 +121,9 @@ public class CommandLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        ResultHandle resultHandle = commands.execute();
+        long startTime = System.currentTimeMillis();
 
-        try
+        try ( ResultHandle ignored = commands.execute() )
         {
             // when
             latch.awaitContents( 2, TimeUnit.SECONDS );
@@ -122,11 +132,10 @@ public class CommandLatchTest
         catch ( IOException e )
         {
             // then
-            assertEquals( "Illegal value: 5", e.getMessage() );
-        }
-        finally
-        {
-            resultHandle.terminate();
+            assertEquals( expectedException, e );
+
+            long endTime = System.currentTimeMillis();
+            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 1 ) );
         }
     }
 

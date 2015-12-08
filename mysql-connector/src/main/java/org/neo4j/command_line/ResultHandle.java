@@ -12,7 +12,7 @@ import org.neo4j.io.StreamEventHandler;
 
 import static java.lang.String.format;
 
-public class ResultHandle
+public class ResultHandle implements AutoCloseable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResultHandle.class );
 
@@ -99,5 +99,11 @@ public class ResultHandle
     public void terminate()
     {
         process.destroy();
+    }
+
+    @Override
+    public void close() throws Exception
+    {
+        terminate();
     }
 }
