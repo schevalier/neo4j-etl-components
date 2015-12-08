@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.neo4j.utils.OperatingSystem;
 import org.neo4j.utils.ResourceRule;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -25,7 +26,8 @@ import static org.neo4j.utils.TemporaryFile.temporaryFile;
 public class CommandsTest
 {
     @Rule
-    public final ResourceRule<File> tempFile = new ResourceRule<>( temporaryFile( "tmp", ".sh" ) );
+    public final ResourceRule<File> tempFile = new ResourceRule<>(
+            temporaryFile( "tmp", OperatingSystem.isWindows() ? ".cmd" : ".sh" ) );
 
     @Rule
     public final ResourceRule<File> tempDirectory = new ResourceRule<>( temporaryDirectory() );
@@ -36,7 +38,7 @@ public class CommandsTest
         // given
         String script = createScript( "echo \"hello world\"" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -57,7 +59,7 @@ public class CommandsTest
         // given
         String script = createScript( "exit 1" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .commandResultEvaluator( Result.Evaluator.IGNORE_FAILURES )
                 .noTimeout()
@@ -77,7 +79,7 @@ public class CommandsTest
         // given
         String script = createScript( "exit 1" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -103,7 +105,7 @@ public class CommandsTest
         // given
         String script = createScript( "sleep 1s" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .timeout( 5, TimeUnit.MILLISECONDS )
@@ -114,7 +116,7 @@ public class CommandsTest
         {
             // when
             commands.execute().await();
-            fail("Expected Exception");
+            fail( "Expected Exception" );
         }
         catch ( Exception e )
         {
@@ -130,7 +132,7 @@ public class CommandsTest
         // given
         String script = createScript( "echo \"An error\" >&2" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -153,7 +155,7 @@ public class CommandsTest
         Map<String, String> envVars = new HashMap<>();
         envVars.put( "MY_VAR", "env-var-value" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -173,7 +175,7 @@ public class CommandsTest
         // given
         String script = createScript( "pwd" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .workingDirectory( tempDirectory.get() )
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -190,10 +192,10 @@ public class CommandsTest
     @Test
     public void shouldAllowRedirectingStdIn() throws Exception
     {
-         // given
+        // given
         String script = createScript( "read a; echo $a;" );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -213,5 +215,17 @@ public class CommandsTest
     {
         FileUtils.writeStringToFile( tempFile.get(), script );
         return tempFile.get().getAbsolutePath();
+    }
+
+    private String[] toCommands( String script )
+    {
+        if ( OperatingSystem.isWindows() )
+        {
+            return new String[]{script};
+        }
+        else
+        {
+            return new String[]{"sh", script};
+        }
     }
 }
