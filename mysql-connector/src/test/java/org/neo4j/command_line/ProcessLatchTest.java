@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.neo4j.utils.ExecutionTimer;
 import org.neo4j.utils.ResourceRule;
 
 import static org.junit.Assert.assertEquals;
@@ -41,17 +42,17 @@ public class ProcessLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        long startTime = System.currentTimeMillis();
+        ExecutionTimer timer = ExecutionTimer.newTimer();
 
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
             ProcessLatch.ProcessLatchResult result = latch.awaitContents( 5, TimeUnit.SECONDS );
-            long endTime = System.currentTimeMillis();
+            long duration = timer.duration();
 
             // then
             assertTrue( result.ok() );
-            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 3 ) );
+            assertTrue( duration < TimeUnit.SECONDS.toMillis( 3 ) );
         }
     }
 
@@ -78,17 +79,17 @@ public class ProcessLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        long startTime = System.currentTimeMillis();
+        ExecutionTimer timer = ExecutionTimer.newTimer();
 
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
             ProcessLatch.ProcessLatchResult result = latch.awaitContents( 3, TimeUnit.SECONDS );
-            long endTime = System.currentTimeMillis();
+            long duration = timer.duration();
 
             // then
             assertFalse( result.ok() );
-            assertTrue( endTime - startTime >= TimeUnit.SECONDS.toMillis( 3 ) );
+            assertTrue( duration >= TimeUnit.SECONDS.toMillis( 3 ) );
         }
     }
 
@@ -121,7 +122,7 @@ public class ProcessLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        long startTime = System.currentTimeMillis();
+        ExecutionTimer timer = ExecutionTimer.newTimer();
 
         try ( ResultHandle ignored = commands.execute() )
         {
@@ -134,8 +135,9 @@ public class ProcessLatchTest
             // then
             assertEquals( expectedException, e );
 
-            long endTime = System.currentTimeMillis();
-            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 2 ) );
+            long duration = timer.duration();
+
+            assertTrue( duration < TimeUnit.SECONDS.toMillis( 2 ) );
         }
     }
 }
