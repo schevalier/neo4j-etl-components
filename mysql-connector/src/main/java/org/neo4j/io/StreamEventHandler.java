@@ -7,9 +7,9 @@ public interface StreamEventHandler<T>
 {
     void onLine( String line ) throws IOException;
 
-    void onException( IOException e );
+    void onException( Exception e );
 
     void onCompleted() throws IOException;
 
-    T awaitContents(long timeout, TimeUnit unit) throws IOException;
+    T awaitContents(long timeout, TimeUnit unit) throws Exception;
 }

@@ -1,6 +1,5 @@
 package org.neo4j.io;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -56,7 +55,7 @@ public class InMemoryStreamRecorder implements StreamEventHandler<String>
     }
 
     @Override
-    public void onException( IOException e )
+    public void onException( Exception e )
     {
         streamContentsHandle.addException( e );
     }
@@ -68,7 +67,7 @@ public class InMemoryStreamRecorder implements StreamEventHandler<String>
     }
 
     @Override
-    public String awaitContents( long timeout, TimeUnit unit ) throws IOException
+    public String awaitContents( long timeout, TimeUnit unit ) throws Exception
     {
         return streamContentsHandle.await( timeout, unit );
     }

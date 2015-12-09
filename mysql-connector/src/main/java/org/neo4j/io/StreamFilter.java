@@ -25,7 +25,7 @@ public class StreamFilter<T> implements StreamEventHandler<T>
     }
 
     @Override
-    public void onException( IOException e )
+    public void onException( Exception e )
     {
         innerHandler.onException( e );
     }
@@ -37,7 +37,7 @@ public class StreamFilter<T> implements StreamEventHandler<T>
     }
 
     @Override
-    public T awaitContents( long timeout, TimeUnit unit ) throws IOException
+    public T awaitContents( long timeout, TimeUnit unit ) throws Exception
     {
         return innerHandler.awaitContents( timeout, unit );
     }

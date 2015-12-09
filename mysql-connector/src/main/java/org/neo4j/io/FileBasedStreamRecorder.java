@@ -29,7 +29,7 @@ public class FileBasedStreamRecorder implements StreamEventHandler<FileDigest>
     }
 
     @Override
-    public void onException( IOException e )
+    public void onException( Exception e )
     {
         streamContentsHandle.addException( e );
     }
@@ -48,7 +48,7 @@ public class FileBasedStreamRecorder implements StreamEventHandler<FileDigest>
     }
 
     @Override
-    public FileDigest awaitContents( long timeout, TimeUnit unit ) throws IOException
+    public FileDigest awaitContents( long timeout, TimeUnit unit ) throws Exception
     {
         return streamContentsHandle.await( timeout, unit );
     }

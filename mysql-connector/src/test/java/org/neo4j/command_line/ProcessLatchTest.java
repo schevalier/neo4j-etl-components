@@ -97,7 +97,7 @@ public class ProcessLatchTest
     public void shouldThrowExceptionWhenPredicateThrowsException() throws Exception
     {
         // given
-        IOException expectedException = new IOException( "Illegal value: 5" );
+        IllegalArgumentException expectedException = new IllegalArgumentException( "Illegal value: 5" );
 
         ProcessLatch latch = new ProcessLatch( l -> {
             try
@@ -128,16 +128,13 @@ public class ProcessLatchTest
         {
             // when
             latch.awaitContents( 4, TimeUnit.SECONDS );
-            fail( "Expected IOException" );
+            fail( "Expected IllegalArgumentException" );
         }
-        catch ( IOException e )
+        catch ( IllegalArgumentException e )
         {
             // then
             assertEquals( expectedException, e );
-
-            long duration = timer.duration();
-
-            assertTrue( duration < TimeUnit.SECONDS.toMillis( 2 ) );
+            assertTrue( timer.duration() < TimeUnit.SECONDS.toMillis( 2 ) );
         }
     }
 }

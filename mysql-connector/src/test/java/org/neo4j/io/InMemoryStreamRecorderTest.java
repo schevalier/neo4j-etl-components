@@ -54,10 +54,14 @@ public class InMemoryStreamRecorderTest
             // then
             assertEquals( expectedException, e );
         }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
     }
 
     @Test
-    public void shouldStoreStreamContentsInMemory() throws IOException
+    public void shouldStoreStreamContentsInMemory() throws Exception
     {
         // given
         InMemoryStreamRecorder recorder = new InMemoryStreamRecorder();
@@ -89,7 +93,7 @@ public class InMemoryStreamRecorderTest
     }
 
     @Test
-    public void shouldHandleEmptyStream() throws IOException
+    public void shouldHandleEmptyStream() throws Exception
     {
         // given
         InMemoryStreamRecorder recorder = new InMemoryStreamRecorder();
@@ -110,7 +114,7 @@ public class InMemoryStreamRecorderTest
     }
 
     @Test
-    public void shouldAbbreviateContentsIfNumberOfLinesExceedsConfiguredMaximum() throws IOException
+    public void shouldAbbreviateContentsIfNumberOfLinesExceedsConfiguredMaximum() throws Exception
     {
         // given
         InMemoryStreamRecorder recorder = new InMemoryStreamRecorder( 5 );

@@ -77,10 +77,24 @@ public class StreamFilterTest
         StreamFilter<String> streamFilter = new StreamFilter<>( handler, s -> s.startsWith( "A" ) );
 
         // when
-        streamFilter.awaitContents( 1, TimeUnit.SECONDS );
+        try
+        {
+            streamFilter.awaitContents( 1, TimeUnit.SECONDS );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
 
         // then
-        verify( handler ).awaitContents( 1, TimeUnit.SECONDS );
+        try
+        {
+            verify( handler ).awaitContents( 1, TimeUnit.SECONDS );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
         verifyNoMoreInteractions( handler );
     }
 }

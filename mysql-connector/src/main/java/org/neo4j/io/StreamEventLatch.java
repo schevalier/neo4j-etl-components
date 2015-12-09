@@ -7,14 +7,15 @@ import java.util.function.Supplier;
 
 public class StreamEventLatch implements StreamEventHandler<Boolean>
 {
-    private final StreamContentsHandle<Boolean> streamContentsHandle = new StreamContentsHandle<>( new Supplier<Boolean>()
-    {
-        @Override
-        public Boolean get()
-        {
-            return value.get();
-        }
-    } );
+    private final StreamContentsHandle<Boolean> streamContentsHandle = new StreamContentsHandle<>(
+            new Supplier<Boolean>()
+            {
+                @Override
+                public Boolean get()
+                {
+                    return value.get();
+                }
+            } );
 
     private AtomicBoolean value = new AtomicBoolean( false );
 
@@ -26,7 +27,7 @@ public class StreamEventLatch implements StreamEventHandler<Boolean>
     }
 
     @Override
-    public void onException( IOException e )
+    public void onException( Exception e )
     {
         streamContentsHandle.addException( e );
     }
@@ -38,7 +39,7 @@ public class StreamEventLatch implements StreamEventHandler<Boolean>
     }
 
     @Override
-    public Boolean awaitContents( long timeout, TimeUnit unit ) throws IOException
+    public Boolean awaitContents( long timeout, TimeUnit unit ) throws Exception
     {
         return streamContentsHandle.await( timeout, unit );
     }

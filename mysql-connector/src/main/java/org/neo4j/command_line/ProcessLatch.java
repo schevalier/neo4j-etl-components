@@ -30,7 +30,7 @@ public class ProcessLatch implements StreamEventHandler<ProcessLatch.ProcessLatc
                 streamEventLatch.onLine( line );
             }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             onException( e );
             onCompleted();
@@ -38,7 +38,7 @@ public class ProcessLatch implements StreamEventHandler<ProcessLatch.ProcessLatc
     }
 
     @Override
-    public void onException( IOException e )
+    public void onException( Exception e )
     {
         streamEventLatch.onException( e );
         streamRecorder.onException( e );
@@ -52,7 +52,7 @@ public class ProcessLatch implements StreamEventHandler<ProcessLatch.ProcessLatc
     }
 
     @Override
-    public ProcessLatchResult awaitContents( long timeout, TimeUnit unit ) throws IOException
+    public ProcessLatchResult awaitContents( long timeout, TimeUnit unit ) throws Exception
     {
         boolean ok = streamEventLatch.awaitContents( timeout, unit );
         String streamContents = streamRecorder.awaitContents( 0, TimeUnit.MILLISECONDS );
@@ -62,7 +62,7 @@ public class ProcessLatch implements StreamEventHandler<ProcessLatch.ProcessLatc
 
     public interface StreamPredicate
     {
-        boolean test( String line ) throws IOException;
+        boolean test( String line ) throws Exception;
     }
 
     public static class ProcessLatchResult

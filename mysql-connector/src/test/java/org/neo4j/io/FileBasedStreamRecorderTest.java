@@ -72,6 +72,10 @@ public class FileBasedStreamRecorderTest
             // then
             assertEquals( expectedException, e );
         }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -123,7 +127,7 @@ public class FileBasedStreamRecorderTest
     }
 
     @Test
-    public void shouldHandleEmptyStream() throws IOException
+    public void shouldHandleEmptyStream() throws Exception
     {
         // given
         FileBasedStreamRecorder recorder = new FileBasedStreamRecorder( tempFile.get() );
@@ -144,7 +148,7 @@ public class FileBasedStreamRecorderTest
     }
 
     @Test
-    public void shouldStoreStreamContentsInFile() throws IOException
+    public void shouldStoreStreamContentsInFile() throws Exception
     {
         // given
         FileBasedStreamRecorder recorder = new FileBasedStreamRecorder( tempFile.get() );
