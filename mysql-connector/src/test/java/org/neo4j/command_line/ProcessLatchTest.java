@@ -45,7 +45,7 @@ public class ProcessLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        ExecutionTimer timer = ExecutionTimer.newTimer();
+        ExecutionTimer timer = ExecutionTimer.startTimer();
 
         try ( ResultHandle ignored = commands.execute() )
         {
@@ -85,7 +85,7 @@ public class ProcessLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        ExecutionTimer timer = ExecutionTimer.newTimer();
+        ExecutionTimer timer = ExecutionTimer.startTimer();
 
         try ( ResultHandle ignored = commands.execute() )
         {
@@ -129,7 +129,7 @@ public class ProcessLatchTest
                 .redirectStdOutTo( latch )
                 .build();
 
-        ExecutionTimer timer = ExecutionTimer.newTimer();
+        ExecutionTimer timer = ExecutionTimer.startTimer();
 
         try ( ResultHandle ignored = commands.execute() )
         {

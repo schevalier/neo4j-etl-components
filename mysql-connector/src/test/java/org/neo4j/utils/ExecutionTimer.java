@@ -2,7 +2,7 @@ package org.neo4j.utils;
 
 public class ExecutionTimer
 {
-    public static ExecutionTimer newTimer()
+    public static ExecutionTimer startTimer()
     {
         return new ExecutionTimer( System.currentTimeMillis() );
     }
