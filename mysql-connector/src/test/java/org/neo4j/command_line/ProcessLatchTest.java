@@ -1,14 +1,11 @@
 package org.neo4j.command_line;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.neo4j.utils.OperatingSystem;
 import org.neo4j.utils.ResourceRule;
 
 import static org.junit.Assert.assertEquals;
@@ -16,20 +13,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import static org.neo4j.utils.TemporaryFile.temporaryFile;
-
 public class ProcessLatchTest
 {
     @Rule
-    public final ResourceRule<File> tempFile = new ResourceRule<>(
-            temporaryFile( "tmp", OperatingSystem.isWindows() ? ".bat" : ".sh" ) );
+    public final ResourceRule<CommandFactory> commandFactory = new ResourceRule<>( CommandFactory.newFactory() );
 
     @Test
     public void shouldReturnOkWhenPredicateSatisfied() throws Exception
     {
         // given
-        String script = createScript( CommandFactory.printNumbers( 10 ) );
-
         ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
@@ -41,7 +33,7 @@ public class ProcessLatchTest
             }
         } );
 
-        Commands commands = Commands.forCommands( toCommands( script ) )
+        Commands commands = Commands.forCommands( commandFactory.get().printNumbers( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -67,8 +59,6 @@ public class ProcessLatchTest
     public void shouldReturnNotOkWhenPredicateNotSatisfied() throws Exception
     {
         // given
-        String script = createScript( CommandFactory.printNumbers( 3 ) );
-
         ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
@@ -80,7 +70,7 @@ public class ProcessLatchTest
             }
         } );
 
-        Commands commands = Commands.forCommands( toCommands( script ) )
+        Commands commands = Commands.forCommands( commandFactory.get().printNumbers( 3 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -106,8 +96,6 @@ public class ProcessLatchTest
     public void shouldThrowExceptionWhenPredicateThrowsException() throws Exception
     {
         // given
-        String script = createScript( CommandFactory.printNumbers( 10 ) );
-
         IOException expectedException = new IOException( "Illegal value: 5" );
 
         ProcessLatch latch = new ProcessLatch( l -> {
@@ -125,7 +113,7 @@ public class ProcessLatchTest
             }
         } );
 
-        Commands commands = Commands.forCommands( toCommands( script ) )
+        Commands commands = Commands.forCommands( commandFactory.get().printNumbers( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -148,24 +136,6 @@ public class ProcessLatchTest
 
             long endTime = System.currentTimeMillis();
             assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 2 ) );
-        }
-    }
-
-    private String createScript( String script ) throws IOException
-    {
-        FileUtils.writeStringToFile( tempFile.get(), script );
-        return tempFile.get().getAbsolutePath();
-    }
-
-    private String[] toCommands( String script )
-    {
-        if ( OperatingSystem.isWindows() )
-        {
-            return new String[]{script};
-        }
-        else
-        {
-            return new String[]{"sh", script};
         }
     }
 }
