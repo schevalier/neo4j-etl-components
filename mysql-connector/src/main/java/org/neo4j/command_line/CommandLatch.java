@@ -33,12 +33,14 @@ public class CommandLatch implements StreamEventHandler<CommandLatch.CommandLatc
         catch ( IOException e )
         {
             onException( e );
+            onCompleted();
         }
     }
 
     @Override
     public void onException( IOException e )
     {
+        streamEventLatch.onException( e );
         streamRecorder.onException( e );
     }
 

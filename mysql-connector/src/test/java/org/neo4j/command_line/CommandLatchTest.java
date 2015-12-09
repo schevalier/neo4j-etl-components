@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.neo4j.utils.OperatingSystem;
 import org.neo4j.utils.ResourceRule;
 
 import static org.junit.Assert.assertEquals;
@@ -20,22 +21,27 @@ import static org.neo4j.utils.TemporaryFile.temporaryFile;
 public class CommandLatchTest
 {
     @Rule
-    public final ResourceRule<File> tempFile = new ResourceRule<>( temporaryFile( "tmp", ".sh" ) );
+    public final ResourceRule<File> tempFile = new ResourceRule<>(
+            temporaryFile( "tmp", OperatingSystem.isWindows() ? ".bat" : ".sh" ) );
 
     @Test
     public void shouldReturnOkWhenPredicateSatisfied() throws Exception
     {
         // given
-        String script = createScript( "#!/bin/bash\n" +
-                "        for i in `seq 1 20`;\n" +
-                "        do\n" +
-                "                echo $i\n" +
-                "                sleep 0.1s\n" +
-                "        done" );
+        String script = createScript( printNumbers( 10 ) );
 
-        CommandLatch latch = new CommandLatch( l -> Integer.valueOf( l ) == 5 );
+        CommandLatch latch = new CommandLatch( l -> {
+            try
+            {
+                return Integer.valueOf( l ) == 3;
+            }
+            catch ( NumberFormatException e )
+            {
+                return false;
+            }
+        } );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -48,12 +54,12 @@ public class CommandLatchTest
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
-            CommandLatch.CommandLatchResult result = latch.awaitContents( 1, TimeUnit.SECONDS );
+            CommandLatch.CommandLatchResult result = latch.awaitContents( 5, TimeUnit.SECONDS );
             long endTime = System.currentTimeMillis();
 
             // then
             assertTrue( result.ok() );
-            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 1 ) );
+            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 3 ) );
         }
     }
 
@@ -61,16 +67,20 @@ public class CommandLatchTest
     public void shouldReturnNotOkWhenPredicateNotSatisfied() throws Exception
     {
         // given
-        String script = createScript( "#!/bin/bash\n" +
-                "        for i in `seq 1 10`;\n" +
-                "        do\n" +
-                "                echo $i\n" +
-                "                sleep 0.1s\n" +
-                "        done" );
+        String script = createScript( printNumbers( 3 ) );
 
-        CommandLatch latch = new CommandLatch( l -> Integer.valueOf( l ) == 11 );
+        CommandLatch latch = new CommandLatch( l -> {
+            try
+            {
+                return l.equals( "X" );
+            }
+            catch ( NumberFormatException e )
+            {
+                return false;
+            }
+        } );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -83,12 +93,12 @@ public class CommandLatchTest
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
-            CommandLatch.CommandLatchResult result = latch.awaitContents( 2, TimeUnit.SECONDS );
+            CommandLatch.CommandLatchResult result = latch.awaitContents( 3, TimeUnit.SECONDS );
             long endTime = System.currentTimeMillis();
 
             // then
             assertFalse( result.ok() );
-            assertTrue( endTime - startTime >= TimeUnit.SECONDS.toMillis( 1 ) );
+            assertTrue( endTime - startTime >= TimeUnit.SECONDS.toMillis( 3 ) );
         }
     }
 
@@ -96,24 +106,26 @@ public class CommandLatchTest
     public void shouldThrowExceptionWhenPredicateThrowsException() throws Exception
     {
         // given
-        String script = createScript( "#!/bin/bash\n" +
-                "        for i in `seq 1 10`;\n" +
-                "        do\n" +
-                "                echo $i\n" +
-                "                sleep 0.1s\n" +
-                "        done" );
+        String script = createScript( printNumbers( 10 ) );
 
         IOException expectedException = new IOException( "Illegal value: 5" );
 
         CommandLatch latch = new CommandLatch( l -> {
-            if ( Integer.valueOf( l ) == 5 )
+            try
             {
-                throw expectedException;
+                if ( Integer.valueOf( l ) == 2 )
+                {
+                    throw expectedException;
+                }
+                return Integer.valueOf( l ) == 6;
             }
-            return Integer.valueOf( l ) == 6;
+            catch ( NumberFormatException e )
+            {
+                return false;
+            }
         } );
 
-        Commands commands = Commands.forCommands( "sh", script )
+        Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -126,7 +138,7 @@ public class CommandLatchTest
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
-            latch.awaitContents( 2, TimeUnit.SECONDS );
+            latch.awaitContents( 4, TimeUnit.SECONDS );
             fail( "Expected IOException" );
         }
         catch ( IOException e )
@@ -135,7 +147,7 @@ public class CommandLatchTest
             assertEquals( expectedException, e );
 
             long endTime = System.currentTimeMillis();
-            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 1 ) );
+            assertTrue( endTime - startTime < TimeUnit.SECONDS.toMillis( 2 ) );
         }
     }
 
@@ -143,5 +155,38 @@ public class CommandLatchTest
     {
         FileUtils.writeStringToFile( tempFile.get(), script );
         return tempFile.get().getAbsolutePath();
+    }
+
+    private String[] toCommands( String script )
+    {
+        if ( OperatingSystem.isWindows() )
+        {
+            return new String[]{script};
+        }
+        else
+        {
+            return new String[]{"sh", script};
+        }
+    }
+
+    private String printNumbers( int maxValue )
+    {
+        if ( OperatingSystem.isWindows() )
+        {
+            return "echo off" + System.lineSeparator() +
+                    "for /l %%x in (1, 1, " + maxValue + ") do (" + System.lineSeparator() +
+                    "   echo %%x" + System.lineSeparator() +
+                    "   ping -n 2 127.0.0.1 > nul" + System.lineSeparator() +
+                    ")";
+        }
+        else
+        {
+            return "#!/bin/bash\n" +
+                    "for i in `seq 1 " + maxValue + "`;\n" +
+                    "do\n" +
+                    "   echo $i\n" +
+                    "   sleep 1s\n" +
+                    "done";
+        }
     }
 }
