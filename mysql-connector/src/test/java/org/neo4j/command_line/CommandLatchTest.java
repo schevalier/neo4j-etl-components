@@ -28,7 +28,7 @@ public class CommandLatchTest
     public void shouldReturnOkWhenPredicateSatisfied() throws Exception
     {
         // given
-        String script = createScript( printNumbers( 10 ) );
+        String script = createScript( CommandFactory.printNumbers( 10 ) );
 
         CommandLatch latch = new CommandLatch( l -> {
             try
@@ -67,7 +67,7 @@ public class CommandLatchTest
     public void shouldReturnNotOkWhenPredicateNotSatisfied() throws Exception
     {
         // given
-        String script = createScript( printNumbers( 3 ) );
+        String script = createScript( CommandFactory.printNumbers( 3 ) );
 
         CommandLatch latch = new CommandLatch( l -> {
             try
@@ -106,7 +106,7 @@ public class CommandLatchTest
     public void shouldThrowExceptionWhenPredicateThrowsException() throws Exception
     {
         // given
-        String script = createScript( printNumbers( 10 ) );
+        String script = createScript( CommandFactory.printNumbers( 10 ) );
 
         IOException expectedException = new IOException( "Illegal value: 5" );
 
@@ -166,27 +166,6 @@ public class CommandLatchTest
         else
         {
             return new String[]{"sh", script};
-        }
-    }
-
-    private String printNumbers( int maxValue )
-    {
-        if ( OperatingSystem.isWindows() )
-        {
-            return "echo off" + System.lineSeparator() +
-                    "for /l %%x in (1, 1, " + maxValue + ") do (" + System.lineSeparator() +
-                    "   echo %%x" + System.lineSeparator() +
-                    "   ping -n 2 127.0.0.1 > nul" + System.lineSeparator() +
-                    ")";
-        }
-        else
-        {
-            return "#!/bin/bash\n" +
-                    "for i in `seq 1 " + maxValue + "`;\n" +
-                    "do\n" +
-                    "   echo $i\n" +
-                    "   sleep 1s\n" +
-                    "done";
         }
     }
 }

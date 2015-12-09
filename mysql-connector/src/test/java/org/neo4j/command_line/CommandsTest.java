@@ -34,14 +34,13 @@ public class CommandsTest
     @Rule
     public final ResourceRule<File> tempDirectory = new ResourceRule<>( temporaryDirectory() );
 
-    private static final CommandFactory COMMAND_FACTORY = new CommandFactory( OperatingSystem.isWindows() );
 
     @Test
     public void shouldExecuteCommands() throws Exception
     {
         // given
         String expectedValue = "hello world";
-        String script = createScript( COMMAND_FACTORY.echo( expectedValue ) );
+        String script = createScript( CommandFactory.echo( expectedValue ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -63,7 +62,7 @@ public class CommandsTest
     {
         // given
         int expectedExitValue = 1;
-        String script = createScript( COMMAND_FACTORY.exit( expectedExitValue ) );
+        String script = createScript( CommandFactory.exit( expectedExitValue ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -83,7 +82,7 @@ public class CommandsTest
     public void shouldThrowExceptionIfCommandResultEvaluatorIndicatesFailure() throws Exception
     {
         // given
-        String script = createScript( COMMAND_FACTORY.exit( 1 ) );
+        String script = createScript( CommandFactory.exit( 1 ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -136,7 +135,7 @@ public class CommandsTest
     public void shouldCaptureStdErrOutput() throws Exception
     {
         // given
-        String script = createScript( COMMAND_FACTORY.echoToStdErr( "An error" ) );
+        String script = createScript( CommandFactory.echoToStdErr( "An error" ) );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .inheritWorkingDirectory()
@@ -157,7 +156,7 @@ public class CommandsTest
     {
         // given
         String expectedValue = "env-var-value";
-        String script = createScript( COMMAND_FACTORY.echoEnvVar( "MY_VAR" ) );
+        String script = createScript( CommandFactory.echoEnvVar( "MY_VAR" ) );
 
         Map<String, String> envVars = new HashMap<>();
         envVars.put( "MY_VAR", expectedValue );
@@ -180,7 +179,7 @@ public class CommandsTest
     public void shouldChangeWorkingDirectory() throws Exception
     {
         // given
-        String script = createScript( COMMAND_FACTORY.printWorkingDirectory() );
+        String script = createScript( CommandFactory.printWorkingDirectory() );
 
         Commands commands = Commands.forCommands( toCommands( script ) )
                 .workingDirectory( tempDirectory.get() )
@@ -236,41 +235,6 @@ public class CommandsTest
         else
         {
             return new String[]{"sh", script};
-        }
-    }
-
-    private static class CommandFactory
-    {
-        private final boolean isWindows;
-
-        private CommandFactory( boolean windows )
-        {
-            isWindows = windows;
-        }
-
-        public String echo( String value )
-        {
-            return isWindows ? format( "@ECHO %s", value ) : format( "echo %s", value );
-        }
-
-        public String echoToStdErr( String value )
-        {
-            return format( "echo %s>&2", value );
-        }
-
-        public String exit( int exitValue )
-        {
-            return format( "exit %s", exitValue );
-        }
-
-        public String echoEnvVar( String varName )
-        {
-            return isWindows ? "@ECHO %" + varName + "%" : format( "echo $%s", varName );
-        }
-
-        public String printWorkingDirectory()
-        {
-            return isWindows ? "@ECHO %cd%" : "pwd";
         }
     }
 }
