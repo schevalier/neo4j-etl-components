@@ -7,13 +7,13 @@ import org.neo4j.io.InMemoryStreamRecorder;
 import org.neo4j.io.StreamEventHandler;
 import org.neo4j.io.StreamEventLatch;
 
-public class CommandLatch implements StreamEventHandler<CommandLatch.CommandLatchResult>
+public class ProcessLatch implements StreamEventHandler<ProcessLatch.ProcessLatchResult>
 {
-    private final CommandPredicate predicate;
+    private final StreamPredicate predicate;
     private final InMemoryStreamRecorder streamRecorder = new InMemoryStreamRecorder();
     private final StreamEventLatch streamEventLatch = new StreamEventLatch();
 
-    public CommandLatch( CommandPredicate predicate )
+    public ProcessLatch( StreamPredicate predicate )
     {
         this.predicate = predicate;
     }
@@ -52,25 +52,25 @@ public class CommandLatch implements StreamEventHandler<CommandLatch.CommandLatc
     }
 
     @Override
-    public CommandLatchResult awaitContents( long timeout, TimeUnit unit ) throws IOException
+    public ProcessLatchResult awaitContents( long timeout, TimeUnit unit ) throws IOException
     {
         boolean ok = streamEventLatch.awaitContents( timeout, unit );
         String streamContents = streamRecorder.awaitContents( 0, TimeUnit.MILLISECONDS );
 
-        return new CommandLatchResult( ok, streamContents );
+        return new ProcessLatchResult( ok, streamContents );
     }
 
-    public interface CommandPredicate
+    public interface StreamPredicate
     {
         boolean test( String line ) throws IOException;
     }
 
-    public static class CommandLatchResult
+    public static class ProcessLatchResult
     {
         private final boolean ok;
         private final String streamContents;
 
-        public CommandLatchResult( boolean ok, String streamContents )
+        public ProcessLatchResult( boolean ok, String streamContents )
         {
             this.ok = ok;
             this.streamContents = streamContents;

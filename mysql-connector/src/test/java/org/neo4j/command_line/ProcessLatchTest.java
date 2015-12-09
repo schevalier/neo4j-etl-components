@@ -18,7 +18,7 @@ import static org.junit.Assert.fail;
 
 import static org.neo4j.utils.TemporaryFile.temporaryFile;
 
-public class CommandLatchTest
+public class ProcessLatchTest
 {
     @Rule
     public final ResourceRule<File> tempFile = new ResourceRule<>(
@@ -30,7 +30,7 @@ public class CommandLatchTest
         // given
         String script = createScript( CommandFactory.printNumbers( 10 ) );
 
-        CommandLatch latch = new CommandLatch( l -> {
+        ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
                 return Integer.valueOf( l ) == 3;
@@ -54,7 +54,7 @@ public class CommandLatchTest
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
-            CommandLatch.CommandLatchResult result = latch.awaitContents( 5, TimeUnit.SECONDS );
+            ProcessLatch.ProcessLatchResult result = latch.awaitContents( 5, TimeUnit.SECONDS );
             long endTime = System.currentTimeMillis();
 
             // then
@@ -69,7 +69,7 @@ public class CommandLatchTest
         // given
         String script = createScript( CommandFactory.printNumbers( 3 ) );
 
-        CommandLatch latch = new CommandLatch( l -> {
+        ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
                 return l.equals( "X" );
@@ -93,7 +93,7 @@ public class CommandLatchTest
         try ( ResultHandle ignored = commands.execute() )
         {
             // when
-            CommandLatch.CommandLatchResult result = latch.awaitContents( 3, TimeUnit.SECONDS );
+            ProcessLatch.ProcessLatchResult result = latch.awaitContents( 3, TimeUnit.SECONDS );
             long endTime = System.currentTimeMillis();
 
             // then
@@ -110,7 +110,7 @@ public class CommandLatchTest
 
         IOException expectedException = new IOException( "Illegal value: 5" );
 
-        CommandLatch latch = new CommandLatch( l -> {
+        ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
                 if ( Integer.valueOf( l ) == 2 )
