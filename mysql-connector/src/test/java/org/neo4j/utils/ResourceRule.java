@@ -1,7 +1,5 @@
 package org.neo4j.utils;
 
-import java.util.function.Supplier;
-
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;

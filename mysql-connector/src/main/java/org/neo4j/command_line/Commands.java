@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.neo4j.io.StreamEventHandler;
 import org.neo4j.io.StreamSink;
 
-import static java.lang.String.format;
-
 public class Commands
 {
     private static final Logger LOG = LoggerFactory.getLogger( Commands.class );

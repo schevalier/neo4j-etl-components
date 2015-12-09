@@ -47,7 +47,7 @@ public class CommandFactory
 
     public ProgramAndArguments echo( String value ) throws IOException
     {
-        String script = isWindows ? format( "@ECHO %s", value ) : format( "echo %s", value );
+        String script = isWindows ? format( "@echo off" + NEWLINE + "echo %s", value ) : format( "echo %s", value );
         String[] commands = toCommands( writeToFile( script ) );
         return new ProgramAndArguments( file, script, commands );
     }
@@ -68,14 +68,14 @@ public class CommandFactory
 
     public ProgramAndArguments echoEnvVar( String varName ) throws IOException
     {
-        String script = isWindows ? "@ECHO %" + varName + "%" : format( "echo $%s", varName );
+        String script = isWindows ? "@echo off" + NEWLINE + "echo %" + varName + "%" : format( "echo $%s", varName );
         String[] commands = toCommands( writeToFile( script ) );
         return new ProgramAndArguments( file, script, commands );
     }
 
     public ProgramAndArguments printWorkingDirectory() throws IOException
     {
-        String script = isWindows ? "@ECHO %cd%" : "pwd";
+        String script = isWindows ? "@echo off" + NEWLINE + "echo %cd%" : "pwd";
         String[] commands = toCommands( writeToFile( script ) );
         return new ProgramAndArguments( file, script, commands );
     }

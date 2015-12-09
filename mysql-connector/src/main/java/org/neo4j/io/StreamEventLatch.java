@@ -7,17 +7,8 @@ import java.util.function.Supplier;
 
 public class StreamEventLatch implements StreamEventHandler<Boolean>
 {
-    private final StreamContentsHandle<Boolean> streamContentsHandle = new StreamContentsHandle<>(
-            new Supplier<Boolean>()
-            {
-                @Override
-                public Boolean get()
-                {
-                    return value.get();
-                }
-            } );
-
-    private AtomicBoolean value = new AtomicBoolean( false );
+    private final AtomicBoolean value = new AtomicBoolean( false );
+    private final StreamContentsHandle<Boolean> streamContentsHandle = new StreamContentsHandle<>( value::get );
 
     @Override
     public void onLine( String line ) throws IOException
