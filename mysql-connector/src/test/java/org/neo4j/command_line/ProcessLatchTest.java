@@ -1,6 +1,5 @@
 package org.neo4j.command_line;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
@@ -16,6 +15,8 @@ import static org.junit.Assert.fail;
 
 public class ProcessLatchTest
 {
+    private static final String NEWLINE = System.lineSeparator();
+
     @Rule
     public final ResourceRule<CommandFactory> commandFactory = new ResourceRule<>( CommandFactory.newFactory() );
 
@@ -23,6 +24,8 @@ public class ProcessLatchTest
     public void shouldReturnOkWhenPredicateSatisfied() throws Exception
     {
         // given
+        String expectedStreamContents = "1" + NEWLINE + "2" + NEWLINE + "3";
+
         ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
@@ -52,6 +55,7 @@ public class ProcessLatchTest
 
             // then
             assertTrue( result.ok() );
+            assertEquals( expectedStreamContents, result.streamContents() );
             assertTrue( duration < TimeUnit.SECONDS.toMillis( 3 ) );
         }
     }
@@ -60,6 +64,8 @@ public class ProcessLatchTest
     public void shouldReturnNotOkWhenPredicateNotSatisfied() throws Exception
     {
         // given
+        String expectedStreamContents = "1" + NEWLINE + "2" + NEWLINE + "3";
+
         ProcessLatch latch = new ProcessLatch( l -> {
             try
             {
@@ -89,12 +95,13 @@ public class ProcessLatchTest
 
             // then
             assertFalse( result.ok() );
+            assertEquals( expectedStreamContents, result.streamContents() );
             assertTrue( duration >= TimeUnit.SECONDS.toMillis( 3 ) );
         }
     }
 
     @Test
-    public void shouldThrowExceptionWhenPredicateThrowsException() throws Exception
+    public void shouldThrowExceptionIfPredicateThrowsException() throws Exception
     {
         // given
         IllegalArgumentException expectedException = new IllegalArgumentException( "Illegal value: 5" );
