@@ -4,6 +4,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.neo4j.command_line.Commands;
+import org.neo4j.utils.OperatingSystem;
 
 public class NamedPipe
 {
@@ -20,6 +21,11 @@ public class NamedPipe
 
     public Writer open() throws Exception
     {
+        if ( OperatingSystem.isWindows())
+        {
+            throw new IllegalStateException( "Named pipes not supported on Windows" );
+        }
+
         Commands.commands( "mkfifo", name ).execute().await();
         Commands.commands( "chmod", "666", name ).execute().await();
 

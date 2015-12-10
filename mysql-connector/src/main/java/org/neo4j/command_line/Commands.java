@@ -35,7 +35,8 @@ public class Commands
     private final StreamEventHandler stdOutEventHandler;
     private final StreamEventHandler stdErrEventHandler;
 
-    Commands( List<String> commands, File workingDirectory,
+    Commands( List<String> commands,
+              File workingDirectory,
               Result.Evaluator resultEvaluator,
               long timeoutMillis,
               Map<String, String> extraEnvironment,
@@ -43,6 +44,11 @@ public class Commands
               StreamEventHandler stdOutEventHandler,
               StreamEventHandler stdErrEventHandler )
     {
+        if (commands.isEmpty())
+        {
+            throw new IllegalArgumentException( "Commands cannot be empty" );
+        }
+
         this.commands = commands;
         this.workingDirectory = workingDirectory;
         this.resultEvaluator = resultEvaluator;
@@ -55,7 +61,6 @@ public class Commands
 
     public ResultHandle execute() throws Exception
     {
-
         LOG.debug( "Executing command '{}'", programAndArguments() );
 
         ProcessBuilder processBuilder = new ProcessBuilder( commands ).directory( workingDirectory );
