@@ -34,7 +34,7 @@ public class CommandsTest
         // given
         String expectedValue = "hello world";
 
-        Commands commands = Commands.forCommands( commandFactory.get().echo( expectedValue ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().echo( expectedValue ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -55,7 +55,7 @@ public class CommandsTest
         // given
         int expectedExitValue = 1;
 
-        Commands commands = Commands.forCommands( commandFactory.get().exit( expectedExitValue ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().exit( expectedExitValue ).commands() )
                 .inheritWorkingDirectory()
                 .commandResultEvaluator( Result.Evaluator.IGNORE_FAILURES )
                 .noTimeout()
@@ -73,7 +73,7 @@ public class CommandsTest
     public void shouldThrowExceptionIfCommandResultEvaluatorIndicatesFailure() throws Exception
     {
         // given
-        Commands commands = Commands.forCommands( commandFactory.get().exit( 1 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().exit( 1 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -97,7 +97,7 @@ public class CommandsTest
     public void shouldThrowExceptionIfCommandDurationExceedsTimeout() throws Exception
     {
         // given
-        Commands commands = Commands.forCommands( commandFactory.get().sleep( 1 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleep( 1 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .timeout( 5, TimeUnit.MILLISECONDS )
@@ -122,7 +122,7 @@ public class CommandsTest
     public void shouldCaptureStdErrOutput() throws Exception
     {
         // given
-        Commands commands = Commands.forCommands( commandFactory.get().echoToStdErr( "An error" ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().echoToStdErr( "An error" ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -145,7 +145,7 @@ public class CommandsTest
         Map<String, String> envVars = new HashMap<>();
         envVars.put( "MY_VAR", expectedValue );
 
-        Commands commands = Commands.forCommands( commandFactory.get().echoEnvVar( "MY_VAR" ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().echoEnvVar( "MY_VAR" ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -163,7 +163,7 @@ public class CommandsTest
     public void shouldChangeWorkingDirectory() throws Exception
     {
         // given
-        Commands commands = Commands.forCommands( commandFactory.get().printWorkingDirectory().commands() )
+        Commands commands = Commands.builder( commandFactory.get().printWorkingDirectory().commands() )
                 .workingDirectory( tempDirectory.get() )
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -185,7 +185,7 @@ public class CommandsTest
             // given
             CommandFactory.ProgramAndArguments programAndArguments = commandFactory.get().redirectStdInToStdOut();
 
-            Commands commands = Commands.forCommands( programAndArguments.commands() )
+            Commands commands = Commands.builder( programAndArguments.commands() )
                     .inheritWorkingDirectory()
                     .failOnNonZeroExitValue()
                     .noTimeout()

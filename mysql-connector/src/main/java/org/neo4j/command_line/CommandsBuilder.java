@@ -23,8 +23,8 @@ class CommandsBuilder
 {
     private final List<String> commands;
     private File workingDirectory;
-    private Evaluator resultEvaluator;
-    private long timeoutMillis;
+    private Evaluator resultEvaluator = Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
+    private long timeoutMillis = -1;
     private Map<String, String> extraEnvironment = Collections.emptyMap();
     private StreamEventHandler stdOutEventHandler = new InMemoryStreamRecorder();
     private StreamEventHandler stdErrEventHandler = new InMemoryStreamRecorder();

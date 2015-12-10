@@ -16,9 +16,14 @@ public class Commands
 {
     private static final Logger LOG = LoggerFactory.getLogger( Commands.class );
 
-    public static Builder.WorkingDirectory forCommands( String... commands )
+    public static Builder.WorkingDirectory builder( String... commands )
     {
         return new CommandsBuilder( commands );
+    }
+
+    public static Commands commands( String... commands )
+    {
+        return new CommandsBuilder( commands ).build();
     }
 
     private final List<String> commands;

@@ -37,7 +37,7 @@ public class ProcessLatchTest
             }
         } );
 
-        Commands commands = Commands.forCommands( commandFactory.get().printNumbers( 10 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().printNumbers( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -77,7 +77,7 @@ public class ProcessLatchTest
             }
         } );
 
-        Commands commands = Commands.forCommands( commandFactory.get().printNumbers( 3 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().printNumbers( 3 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
@@ -121,7 +121,7 @@ public class ProcessLatchTest
             }
         } );
 
-        Commands commands = Commands.forCommands( commandFactory.get().printNumbers( 10 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().printNumbers( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .noTimeout()
