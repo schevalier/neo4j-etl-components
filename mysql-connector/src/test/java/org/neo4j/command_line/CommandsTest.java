@@ -202,4 +202,19 @@ public class CommandsTest
         }
     }
 
+    @Test
+    public void shouldThrowExceptionIfListOfCommandsIsEmpty()
+    {
+        try
+        {
+            // when
+            Commands.commands();
+            fail( "Expected IllegalArgumentException" );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            // then
+            assertEquals( "Commands cannot be empty", e.getMessage() );
+        }
+    }
 }
