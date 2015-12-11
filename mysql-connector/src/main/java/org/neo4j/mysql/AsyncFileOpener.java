@@ -2,22 +2,23 @@ package org.neo4j.mysql;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
-class StreamOpener extends Thread implements Opener<OutputStream>, AutoCloseable
+class AsyncFileOpener extends Thread implements Opener<OutputStream>
 {
     private volatile BufferedOutputStream output = null;
     private volatile Exception ex;
-    private final String name;
+    private final File file;
     private final int size;
     private final Exceptions exceptions;
 
-    StreamOpener( String name, int size, Exceptions exceptions )
+    AsyncFileOpener( File file, int size, Exceptions exceptions )
     {
-        this.name = name;
+        this.file = file;
         this.size = size;
         this.exceptions = exceptions;
     }
@@ -38,7 +39,7 @@ class StreamOpener extends Thread implements Opener<OutputStream>, AutoCloseable
             catch ( Exception e )
             {
                 //noinspection EmptyTryBlock
-                try ( AutoCloseable tryClose = new BufferedInputStream( new FileInputStream( name ) ) )
+                try ( AutoCloseable tryClose = new BufferedInputStream( new FileInputStream( file ) ) )
                 {
                 }
                 finally
@@ -49,6 +50,11 @@ class StreamOpener extends Thread implements Opener<OutputStream>, AutoCloseable
             }
         }
 
+        if (ex != null)
+        {
+            throw ex;
+        }
+
         return output;
     }
 
@@ -56,20 +62,11 @@ class StreamOpener extends Thread implements Opener<OutputStream>, AutoCloseable
     {
         try
         {
-            output = new BufferedOutputStream( new FileOutputStream( name ), size );
+            output = new BufferedOutputStream( new FileOutputStream( file ), size );
         }
         catch ( Exception ex )
         {
             this.ex = ex;
-        }
-    }
-
-    @Override
-    public void close() throws Exception
-    {
-        if ( ex != null )
-        {
-            throw ex;
         }
     }
 }

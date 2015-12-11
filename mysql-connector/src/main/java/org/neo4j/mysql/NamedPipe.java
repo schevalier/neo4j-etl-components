@@ -1,5 +1,6 @@
 package org.neo4j.mysql;
 
+import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
@@ -26,14 +27,25 @@ public class NamedPipe
             throw new IllegalStateException( "Named pipes not supported on Windows" );
         }
 
+        createFifo();
+        openReaderAsync();
+
+        return createWriterForFifo();
+    }
+
+    private void createFifo() throws Exception
+    {
         Commands.commands( "mkfifo", name ).execute().await();
         Commands.commands( "chmod", "666", name ).execute().await();
+    }
 
+    private void openReaderAsync()
+    {
         new Thread( reader::open ).start();
+    }
 
-        try ( StreamOpener fifo = new StreamOpener( name, DEFAULT_BUFFER_SIZE, reader ) )
-        {
-            return new OutputStreamWriter( fifo.open() );
-        }
+    private OutputStreamWriter createWriterForFifo() throws Exception
+    {
+        return new OutputStreamWriter( new AsyncFileOpener( new File( name ), DEFAULT_BUFFER_SIZE, reader ).open() );
     }
 }

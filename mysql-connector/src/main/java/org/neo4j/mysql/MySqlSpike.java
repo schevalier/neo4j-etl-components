@@ -19,7 +19,7 @@ public class MySqlSpike
         {
             try ( Writer writer = new NamedPipe( pipe, reader ).open() )
             {
-                writer.write( "15\thello ian\n" );
+                writer.write( "16\thello alan\n" );
                 writer.flush();
 
                 Thread.sleep( 1000 );
