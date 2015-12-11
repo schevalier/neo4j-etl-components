@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.UUID;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class NamedPipeTest
 {
@@ -45,6 +47,48 @@ public class NamedPipeTest
 
         // then
         assertEquals( expectedResults, results.toString() );
+    }
+
+    @Test
+    public void shouldRethrowReaderExceptions() throws Exception
+    {
+        // given
+        Exception expectedException = new IOException( "Error opening reader" );
+
+        PipeReader reader = new PipeReader()
+        {
+            @Override
+            public void open() throws Exception
+            {
+                throw expectedException;
+            }
+
+            @Override
+            public void close() throws Exception
+            {
+                // Do nothing
+            }
+
+            @Override
+            public void rethrow() throws Exception
+            {
+                // Do nothing
+            }
+        };
+
+        NamedPipe pipe = new NamedPipe( UUID.randomUUID().toString(), reader );
+
+        try
+        {
+            // when
+            pipe.open();
+            fail( "Expected IOException" );
+        }
+        catch ( IOException e )
+        {
+            // then
+            assertEquals( expectedException, e );
+        }
     }
 
     private static class FileBasedPipeReader extends Thread implements PipeReader
