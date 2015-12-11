@@ -21,7 +21,7 @@ public class NamedPipe
 
     public Writer open() throws Exception
     {
-        if ( OperatingSystem.isWindows())
+        if ( OperatingSystem.isWindows() )
         {
             throw new IllegalStateException( "Named pipes not supported on Windows" );
         }
@@ -29,7 +29,7 @@ public class NamedPipe
         Commands.commands( "mkfifo", name ).execute().await();
         Commands.commands( "chmod", "666", name ).execute().await();
 
-        reader.open();
+        new Thread( reader::open ).start();
 
         try ( StreamOpener fifo = new StreamOpener( name, DEFAULT_BUFFER_SIZE, reader ) )
         {
