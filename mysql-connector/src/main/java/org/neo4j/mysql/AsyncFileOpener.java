@@ -1,9 +1,7 @@
 package org.neo4j.mysql;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
@@ -34,11 +32,11 @@ class AsyncFileOpener extends Thread implements Opener<OutputStream>
 
 //            try
 //            {
-                exceptions.rethrow();
+            exceptions.rethrow();
 //            }
 //            catch ( Exception e )
 //            {
-                //noinspection EmptyTryBlock
+            //noinspection EmptyTryBlock
 //                try ( AutoCloseable tryClose = new BufferedInputStream( new FileInputStream( file ) ) )
 //                {
 //                }
@@ -48,12 +46,12 @@ class AsyncFileOpener extends Thread implements Opener<OutputStream>
 //                }
 //                throw e;
 //            }
+            if ( ex != null )
+            {
+                throw ex;
+            }
         }
 
-        if (ex != null)
-        {
-            throw ex;
-        }
 
         return output;
     }
