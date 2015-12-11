@@ -10,6 +10,8 @@ import java.util.UUID;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class NamedPipeTest
 {
@@ -26,7 +28,8 @@ public class NamedPipeTest
         FileBasedPipeReader reader = new FileBasedPipeReader( new File( name ) );
 
         // when
-        try ( Writer writer = new NamedPipe( name, reader ).open() )
+        try ( NamedPipe pipe = new NamedPipe( name, reader );
+              Writer writer = pipe.open() )
         {
             writer.write( "line 1" );
             writer.write( NEWLINE );
@@ -45,6 +48,24 @@ public class NamedPipeTest
 
         // then
         assertEquals( expectedResults, results.toString() );
+    }
+    
+    @Test
+    public void shouldDeleteFileOnClose() throws Exception
+    {
+        // given
+        String name = UUID.randomUUID().toString();
+        File file = new File( name );
+
+        // when
+        try ( NamedPipe pipe = new NamedPipe( name, new FileBasedPipeReader( file ) );
+              Writer ignored = pipe.open() )
+        {
+            assertTrue(file.exists());
+        }
+
+        // then
+        assertFalse( file.exists() );
     }
 
     private static class FileBasedPipeReader implements PipeReader

@@ -13,13 +13,15 @@ public class MySqlSpike
 
     public static void main( String[] args )
     {
-        String pipe = UUID.randomUUID().toString();
+        String pipeName = UUID.randomUUID().toString();
 
-        try ( PipeReader reader = new SqlRunner( format( SQL, pipe ) ) )
+        try ( PipeReader reader = new SqlRunner( format( SQL, pipeName ) ) )
         {
-            try ( Writer writer = new NamedPipe( pipe, reader ).open() )
+
+            try ( NamedPipe pipe = new NamedPipe( pipeName, reader );
+                  Writer writer = pipe.open() )
             {
-                writer.write( "16\thello alan\n" );
+                writer.write( "17\thello alan\n" );
                 writer.flush();
 
                 Thread.sleep( 1000 );

@@ -3,11 +3,13 @@ package org.neo4j.mysql;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.utils.OperatingSystem;
 
-public class NamedPipe
+public class NamedPipe implements AutoCloseable
 {
     private static final int DEFAULT_BUFFER_SIZE = 1000;
 
@@ -47,5 +49,11 @@ public class NamedPipe
     private OutputStreamWriter createWriterForFifo() throws Exception
     {
         return new OutputStreamWriter( new AsyncFileOpener( new File( name ), DEFAULT_BUFFER_SIZE, reader ).open() );
+    }
+
+    @Override
+    public void close() throws Exception
+    {
+        Files.deleteIfExists( Paths.get( name ) );
     }
 }
