@@ -32,22 +32,22 @@ class AsyncFileOpener extends Thread implements Opener<OutputStream>
         {
             join( TimeUnit.MILLISECONDS.toMillis( 100 ) );
 
-            try
-            {
+//            try
+//            {
                 exceptions.rethrow();
-            }
-            catch ( Exception e )
-            {
+//            }
+//            catch ( Exception e )
+//            {
                 //noinspection EmptyTryBlock
-                try ( AutoCloseable tryClose = new BufferedInputStream( new FileInputStream( file ) ) )
-                {
-                }
-                finally
-                {
-                    join();
-                }
-                throw e;
-            }
+//                try ( AutoCloseable tryClose = new BufferedInputStream( new FileInputStream( file ) ) )
+//                {
+//                }
+//                finally
+//                {
+//                    join();
+//                }
+//                throw e;
+//            }
         }
 
         if (ex != null)

@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.UUID;
 
@@ -29,7 +31,7 @@ public class NamedPipeTest
 
         // when
         try ( NamedPipe pipe = new NamedPipe( name, reader );
-              Writer writer = pipe.open() )
+              Writer writer = new OutputStreamWriter( pipe.open() ) )
         {
             writer.write( "line 1" );
             writer.write( NEWLINE );
@@ -49,7 +51,7 @@ public class NamedPipeTest
         // then
         assertEquals( expectedResults, results.toString() );
     }
-    
+
     @Test
     public void shouldDeleteFileOnClose() throws Exception
     {
@@ -59,9 +61,9 @@ public class NamedPipeTest
 
         // when
         try ( NamedPipe pipe = new NamedPipe( name, new FileBasedPipeReader( file ) );
-              Writer ignored = pipe.open() )
+              OutputStream ignored = pipe.open() )
         {
-            assertTrue(file.exists());
+            assertTrue( file.exists() );
         }
 
         // then

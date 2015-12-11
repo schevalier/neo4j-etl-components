@@ -1,9 +1,22 @@
 package org.neo4j.mysql;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,11 +29,15 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import static org.neo4j.utils.TemporaryDirectory.temporaryDirectory;
+import static org.neo4j.utils.TemporaryFile.temporaryFile;
 
 public class AsyncFileOpenerTest
 {
     @Rule
     public final ResourceRule<File> tempDirectory = new ResourceRule<>( temporaryDirectory() );
+
+    @Rule
+    public final ResourceRule<File> tempFile = new ResourceRule<>( temporaryFile() );
 
     @Test
     public void shouldRethrowDependencyExceptions() throws Exception

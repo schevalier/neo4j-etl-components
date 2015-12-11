@@ -3,14 +3,14 @@ package org.neo4j.mysql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-class SqlRunner implements PipeReader
+public class SqlRunner implements PipeReader
 {
     private final String sql;
     private volatile boolean allowContinue = true;
 
     private volatile Exception ex;
 
-    SqlRunner( String sql )
+    public SqlRunner( String sql )
     {
         this.sql = sql;
     }

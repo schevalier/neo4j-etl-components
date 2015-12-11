@@ -1,8 +1,7 @@
 package org.neo4j.mysql;
 
 import java.io.File;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -22,7 +21,7 @@ public class NamedPipe implements AutoCloseable
         this.reader = reader;
     }
 
-    public Writer open() throws Exception
+    public OutputStream open() throws Exception
     {
         if ( OperatingSystem.isWindows() )
         {
@@ -32,13 +31,13 @@ public class NamedPipe implements AutoCloseable
         createFifo();
         openReaderAsync();
 
-        return createWriterForFifo();
+        return createStream();
     }
 
     private void createFifo() throws Exception
     {
         Commands.commands( "mkfifo", name ).execute().await();
-        Commands.commands( "chmod", "666", name ).execute().await();
+        //Commands.commands( "chmod", "666", name ).execute().await();
     }
 
     private void openReaderAsync()
@@ -46,9 +45,9 @@ public class NamedPipe implements AutoCloseable
         new Thread( reader::open ).start();
     }
 
-    private OutputStreamWriter createWriterForFifo() throws Exception
+    private OutputStream createStream() throws Exception
     {
-        return new OutputStreamWriter( new AsyncFileOpener( new File( name ), DEFAULT_BUFFER_SIZE, reader ).open() );
+        return new AsyncFileOpener( new File( name ), DEFAULT_BUFFER_SIZE, reader ).open();
     }
 
     @Override

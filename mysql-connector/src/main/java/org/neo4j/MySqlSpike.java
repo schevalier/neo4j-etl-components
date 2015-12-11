@@ -1,7 +1,12 @@
-package org.neo4j.mysql;
+package org.neo4j;
 
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.UUID;
+
+import org.neo4j.mysql.NamedPipe;
+import org.neo4j.mysql.PipeReader;
+import org.neo4j.mysql.SqlRunner;
 
 import static java.lang.String.format;
 
@@ -19,12 +24,9 @@ public class MySqlSpike
         {
 
             try ( NamedPipe pipe = new NamedPipe( pipeName, reader );
-                  Writer writer = pipe.open() )
+                  Writer writer = new OutputStreamWriter( pipe.open() ) )
             {
-                writer.write( "17\thello alan\n" );
-                writer.flush();
-
-                Thread.sleep( 1000 );
+                writer.write( "21\thello alan\n" );
             }
         }
         catch ( Exception e )
