@@ -3,7 +3,7 @@ package org.neo4j.mysql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class SqlRunner implements PipeReader
+public class SqlRunner extends Thread implements AutoCloseable
 {
     private final String sql;
     private volatile boolean allowContinue = true;
@@ -21,7 +21,7 @@ public class SqlRunner implements PipeReader
     }
 
     @Override
-    public void open()
+    public void run()
     {
         String url = "jdbc:mysql://localhost:3306/javabase";
         String username = "java";
@@ -45,13 +45,10 @@ public class SqlRunner implements PipeReader
         }
     }
 
-    @Override
-    public void rethrow() throws Exception
+
+    public void open()
     {
-        if ( ex != null )
-        {
-            throw ex;
-        }
+       start();
     }
 
     @Override
@@ -59,5 +56,13 @@ public class SqlRunner implements PipeReader
     {
         terminate();
         rethrow();
+    }
+
+    private void rethrow() throws Exception
+    {
+        if ( ex != null )
+        {
+            throw ex;
+        }
     }
 }

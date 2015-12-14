@@ -1,4 +1,4 @@
-package org.neo4j.pipes;
+package org.neo4j.mysql;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -19,15 +19,15 @@ public class Pipe implements AutoCloseable
 
     private final File file;
 
-    public Pipe( String name )
+    public Pipe( String name ) throws Exception
     {
         this.file = new File( name );
+
+        FifoFactory.Instance.create( file );
     }
 
     public CompletableFuture<InputStream> in() throws Exception
     {
-        FifoFactory.Instance.create( file );
-
         CompletableFuture<InputStream> future = new CompletableFuture<>();
 
         ForkJoinPool.commonPool().submit( () -> {
@@ -46,8 +46,6 @@ public class Pipe implements AutoCloseable
 
     public CompletableFuture<OutputStream> out() throws Exception
     {
-        FifoFactory.Instance.create( file );
-
         CompletableFuture<OutputStream> future = new CompletableFuture<>();
 
         ForkJoinPool.commonPool().submit( () -> {
