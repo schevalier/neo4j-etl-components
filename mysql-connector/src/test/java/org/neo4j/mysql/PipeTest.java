@@ -2,8 +2,6 @@ package org.neo4j.mysql;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -68,7 +66,7 @@ public class PipeTest
         File file = new File( name );
 
         // when
-        try ( Pipe ignored = new Pipe( name ))
+        try ( Pipe ignored = new Pipe( name ) )
         {
             assertTrue( file.exists() );
         }

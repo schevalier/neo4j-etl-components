@@ -5,67 +5,66 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
 
 import org.neo4j.command_line.Commands;
+import org.neo4j.utils.FutureUtils;
 
 public class Pipe implements AutoCloseable
 {
-    private static final int BUFFER_SIZE = 1000;
+    private static final int DEFAULT_BUFFER_SIZE = 1024;
 
     private final File file;
+    private final int bufferSize;
 
     public Pipe( String name ) throws Exception
     {
+        this( name, DEFAULT_BUFFER_SIZE );
+    }
+
+    public Pipe( String name, int bufferSize ) throws Exception
+    {
         this.file = new File( name );
+        this.bufferSize = bufferSize;
 
         FifoFactory.Instance.create( file );
     }
 
-    public CompletableFuture<InputStream> in() throws Exception
+    public CompletableFuture<InputStream> in( CompletableFuture<?>... exceptionables )
     {
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
-
-        ForkJoinPool.commonPool().submit( () -> {
-            try
-            {
-                future.complete( new BufferedInputStream( new FileInputStream( file ), BUFFER_SIZE ) );
-            }
-            catch ( Exception ex )
-            {
-                future.completeExceptionally( ex );
-            }
-        } );
-
-        return future;
+        return FutureUtils.failFastFuture( createInputStream(), exceptionables );
     }
 
-    public CompletableFuture<OutputStream> out() throws Exception
+    public CompletableFuture<OutputStream> out( CompletableFuture<?>... exceptionables )
     {
-        CompletableFuture<OutputStream> future = new CompletableFuture<>();
-
-        ForkJoinPool.commonPool().submit( () -> {
-            try
-            {
-                future.complete( new BufferedOutputStream( new FileOutputStream( file ), BUFFER_SIZE ) );
-            }
-            catch ( Exception ex )
-            {
-                future.completeExceptionally( ex );
-            }
-        } );
-
-        return future;
+        return FutureUtils.failFastFuture( createOutputStream(), exceptionables );
     }
 
     @Override
-    public void close() throws Exception
+    public void close() throws IOException
     {
         Files.deleteIfExists( file.toPath() );
+    }
+
+    public String name()
+    {
+        return file.getAbsolutePath();
+    }
+
+    private CompletableFuture<InputStream> createInputStream()
+    {
+        return FutureUtils.exceptionableFuture(
+                () -> new BufferedInputStream( new FileInputStream( file ), bufferSize ) );
+    }
+
+    private CompletableFuture<OutputStream> createOutputStream()
+    {
+        return FutureUtils.exceptionableFuture(
+                () -> new BufferedOutputStream( new FileOutputStream( file ), bufferSize ) );
     }
 
     private enum FifoFactory

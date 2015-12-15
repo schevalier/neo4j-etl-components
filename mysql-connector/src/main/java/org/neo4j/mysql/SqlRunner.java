@@ -2,8 +2,11 @@ package org.neo4j.mysql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.concurrent.CompletableFuture;
 
-public class SqlRunner extends Thread implements AutoCloseable
+import org.neo4j.utils.FutureUtils;
+
+public class SqlRunner implements AutoCloseable
 {
     private final String sql;
     private volatile boolean allowContinue = true;
@@ -20,49 +23,36 @@ public class SqlRunner extends Thread implements AutoCloseable
         allowContinue = false;
     }
 
-    @Override
-    public void run()
+    public CompletableFuture<Void> execute()
     {
-        String url = "jdbc:mysql://localhost:3306/javabase";
-        String username = "java";
-        String password = "password";
-
-        System.out.println( "Connecting to database..." );
-
-        try ( Connection connection = DriverManager.getConnection( url, username, password ) )
+        return FutureUtils.exceptionableFuture( () ->
         {
-            System.out.println( "Connected to database" );
-            connection.createStatement().execute( sql );
+            String url = "jdbc:mysql://localhost:3306/javabase";
+            String username = "java";
+            String password = "password";
 
-            while ( allowContinue )
+            System.out.println( "Connecting to database..." );
+
+            try ( Connection connection = DriverManager.getConnection( url, username, password ) )
             {
-                Thread.sleep( 100 );
+                System.out.println( "Connected to database" );
+                connection.createStatement().execute( sql );
+
+                while ( allowContinue )
+                {
+                    Thread.sleep( 100 );
+                }
             }
-        }
-        catch ( Exception e )
-        {
-            ex = e;
-        }
+
+            return null;
+
+        } );
     }
 
-
-    public void open()
-    {
-       start();
-    }
 
     @Override
     public void close() throws Exception
     {
         terminate();
-        rethrow();
-    }
-
-    private void rethrow() throws Exception
-    {
-        if ( ex != null )
-        {
-            throw ex;
-        }
     }
 }

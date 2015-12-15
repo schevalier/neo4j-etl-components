@@ -13,44 +13,65 @@ import static java.lang.String.format;
 
 public class MySqlSpike
 {
-    private static final String SQL = "LOAD DATA LOCAL INFILE '%s' INTO TABLE javabase.test FIELDS TERMINATED " +
+    private static final String EXPORT_SQL = "LOAD DATA INFILE '%s' INTO TABLE javabase.test FIELDS TERMINATED " +
             "BY " +
-            "'\\t' ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' STARTING BY ''";
+            "'\\t' OPTIONALLY ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' STARTING BY ''";
+
+    private static final String IMPORT_SQL = "SELECT id, data INTO OUTFILE '%s' FIELDS TERMINATED " +
+            "BY " +
+            "'\\t' OPTIONALLY ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' STARTING BY '' FROM javabase" +
+            ".test";
 
     public static void main( String[] args )
     {
-        String pipeName = UUID.randomUUID().toString();
+        String exportPipeName = UUID.randomUUID().toString();
+        String importPipeName = UUID.randomUUID().toString();
 
-//        try ( PipeReader reader = new SqlRunner( format( SQL, pipeName ) ) )
-//        {
-//
-//            try ( NamedPipe pipe = new NamedPipe( pipeName, reader );
-//                  Writer writer = new OutputStreamWriter( pipe.open() ) )
-//            {
-//                writer.write( "21\thello alan\n" );
-//            }
-//        }
-//        catch ( Exception e )
-//        {
-//            e.printStackTrace();
-//        }
-
-
-        try ( Pipe pipe = new Pipe( pipeName );
-              SqlRunner sqlRunner = new SqlRunner( format( SQL, pipeName ) ) )
+        try ( Pipe pipe = new Pipe( exportPipeName );
+              SqlRunner sqlRunner = new SqlRunner( format( EXPORT_SQL, pipe.name() ) ) )
         {
-            sqlRunner.open();
-            CompletableFuture<OutputStream> out = pipe.out();
+            CompletableFuture<OutputStream> out = pipe.out(sqlRunner.execute());
 
             try ( Writer writer = new OutputStreamWriter( out.get() ) )
             {
-                writer.write( "30\tsometext\n" );
+                writer.write( "36\tsometext\n" );
             }
         }
         catch ( Exception e )
         {
             e.printStackTrace();
         }
+
+//        File importFile = new File( importPipeName );
+//
+//        try ( //Pipe pipe = new Pipe( importPipeName );
+//              SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, importFile.getAbsolutePath() ) ) )
+//        {
+//            Commands.commands( "chmod", "0777", importFile.getAbsoluteFile().getParent() ).execute().await();
+//
+//            //CompletableFuture<InputStream> in = pipe.in();
+//            sqlRunner.execute();
+//
+//            while ( !importFile.exists() )
+//            {
+//                Thread.sleep( 100 );
+//            }
+//
+//            try ( BufferedReader reader =
+//                          new BufferedReader( new InputStreamReader( new FileInputStream( importFile ) ) ) )
+//            {
+//                String line;
+//
+//                while ( (line = reader.readLine()) != null && !line.equals( "" ) )
+//                {
+//                    System.out.println( line );
+//                }
+//            }
+//        }
+//        catch ( Exception e )
+//        {
+//            e.printStackTrace();
+//        }
     }
 
 
