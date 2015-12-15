@@ -1,4 +1,4 @@
-package org.neo4j.mysql;
+package org.neo4j.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.utils.FutureUtils;
+import org.neo4j.utils.OperatingSystem;
 
 public class Pipe implements AutoCloseable
 {
@@ -28,6 +29,11 @@ public class Pipe implements AutoCloseable
 
     public Pipe( String name, int bufferSize ) throws Exception
     {
+        if ( OperatingSystem.isWindows())
+        {
+            throw new IllegalStateException( "Not supported in Windows" );
+        }
+
         this.file = new File( name );
         this.bufferSize = bufferSize;
 

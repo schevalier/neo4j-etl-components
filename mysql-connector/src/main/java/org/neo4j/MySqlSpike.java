@@ -6,7 +6,7 @@ import java.io.Writer;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import org.neo4j.mysql.Pipe;
+import org.neo4j.io.Pipe;
 import org.neo4j.mysql.SqlRunner;
 
 import static java.lang.String.format;
