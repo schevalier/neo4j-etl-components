@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.utils.FutureUtils;
@@ -19,6 +21,7 @@ public class Pipe implements AutoCloseable
 {
     private static final int DEFAULT_BUFFER_SIZE = 1024;
 
+    private final ExecutorService executor = Executors.newFixedThreadPool( 3 );
     private final File file;
     private final int bufferSize;
 
@@ -42,18 +45,19 @@ public class Pipe implements AutoCloseable
 
     public CompletableFuture<InputStream> in( CompletableFuture<?>... exceptionables )
     {
-        return FutureUtils.failFastFuture( createInputStream(), exceptionables );
+        return FutureUtils.failFastFuture( executor, createInputStream(), exceptionables );
     }
 
     public CompletableFuture<OutputStream> out( CompletableFuture<?>... exceptionables )
     {
-        return FutureUtils.failFastFuture( createOutputStream(), exceptionables );
+        return FutureUtils.failFastFuture( executor, createOutputStream(), exceptionables );
     }
 
     @Override
     public void close() throws IOException
     {
         Files.deleteIfExists( file.toPath() );
+        executor.shutdownNow();
     }
 
     public String name()
@@ -64,13 +68,15 @@ public class Pipe implements AutoCloseable
     private CompletableFuture<InputStream> createInputStream()
     {
         return FutureUtils.exceptionableFuture(
-                () -> new BufferedInputStream( new FileInputStream( file ), bufferSize ) );
+                () -> new BufferedInputStream( new FileInputStream( file ), bufferSize ),
+                executor);
     }
 
     private CompletableFuture<OutputStream> createOutputStream()
     {
         return FutureUtils.exceptionableFuture(
-                () -> new BufferedOutputStream( new FileOutputStream( file ), bufferSize ) );
+                () -> new BufferedOutputStream( new FileOutputStream( file ), bufferSize ),
+                executor);
     }
 
     private enum FifoFactory

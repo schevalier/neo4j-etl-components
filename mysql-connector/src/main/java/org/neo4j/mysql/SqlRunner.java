@@ -11,8 +11,6 @@ public class SqlRunner implements AutoCloseable
     private final String sql;
     private volatile boolean allowContinue = true;
 
-    private volatile Exception ex;
-
     public SqlRunner( String sql )
     {
         this.sql = sql;
@@ -48,7 +46,6 @@ public class SqlRunner implements AutoCloseable
 
         } );
     }
-
 
     @Override
     public void close() throws Exception
