@@ -1,6 +1,7 @@
 package org.neo4j.utils;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
 public class FutureUtils
@@ -10,19 +11,52 @@ public class FutureUtils
     public static <T> CompletableFuture<T> failFastFuture( CompletableFuture<T> future,
                                                            CompletableFuture<?>... exceptionables )
     {
+        return failFastFuture( ForkJoinPool.commonPool(), future, exceptionables );
+    }
+
+    // Returns a future that either completes successfully or fails as soon as one of the exceptionable futures
+    // throws an exception.
+    public static <T> CompletableFuture<T> failFastFuture( Executor executor,
+                                                           CompletableFuture<T> future,
+                                                           CompletableFuture<?>... exceptionables )
+    {
         CompletableFuture<T> result = new CompletableFuture<>();
 
-        ForkJoinPool.commonPool().submit( () -> {
-            try
+        CompletableFuture.runAsync( () -> {
+
+            while ( !result.isDone() )
             {
-                CompletableFuture.anyOf( ArrayUtils.prepend( future, exceptionables ) ).get();
-                result.complete( future.get() );
+                if ( future.isDone() )
+                {
+                    try
+                    {
+                        result.complete( future.get() );
+                    }
+                    catch ( Exception e )
+                    {
+                        result.completeExceptionally( e );
+                    }
+                }
+                else
+                {
+                    for ( CompletableFuture<?> exceptionable : exceptionables )
+                    {
+                        if ( exceptionable.isCompletedExceptionally() )
+                        {
+                            try
+                            {
+                                exceptionable.get();
+                            }
+                            catch ( Exception e )
+                            {
+                                result.completeExceptionally( e );
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-            catch ( Exception ex )
-            {
-                result.completeExceptionally( ex );
-            }
-        } );
+        }, executor );
 
         return result;
     }
@@ -30,9 +64,15 @@ public class FutureUtils
     // Returns a future that either completes successfully or throws an exception.
     public static <T> CompletableFuture<T> exceptionableFuture( Supplier<T> supplier )
     {
+        return exceptionableFuture( supplier, ForkJoinPool.commonPool() );
+    }
+
+    // Returns a future that either completes successfully or throws an exception.
+    public static <T> CompletableFuture<T> exceptionableFuture( Supplier<T> supplier, Executor executor )
+    {
         CompletableFuture<T> future = new CompletableFuture<>();
 
-        ForkJoinPool.commonPool().submit( () -> {
+        CompletableFuture.runAsync( () -> {
             try
             {
                 future.complete( supplier.supply() );
@@ -41,7 +81,7 @@ public class FutureUtils
             {
                 future.completeExceptionally( ex );
             }
-        } );
+        }, executor );
 
         return future;
     }
