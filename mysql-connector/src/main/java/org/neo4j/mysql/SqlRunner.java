@@ -3,6 +3,7 @@ package org.neo4j.mysql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.neo4j.utils.FutureUtils;
 
@@ -44,7 +45,7 @@ public class SqlRunner implements AutoCloseable
 
             return null;
 
-        } );
+        }, r -> new Thread(r).start() );
     }
 
     @Override
