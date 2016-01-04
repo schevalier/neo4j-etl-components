@@ -37,7 +37,7 @@ public class MySqlSpike
         try ( Pipe pipe = new Pipe( exportId ) )
         {
             SqlRunner sqlRunner = new SqlRunner( format( EXPORT_SQL, pipe.name() ) );
-            CompletableFuture<OutputStream> out = pipe.out( sqlRunner.execute() );
+            CompletableFuture<OutputStream> out = pipe.out( sqlRunner.execute().toFuture() );
 
             try ( Writer writer = new OutputStreamWriter( out.get() ) )
             {
@@ -60,7 +60,7 @@ public class MySqlSpike
             SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, importFile.getAbsolutePath() ) );
             Commands.commands( "chmod", "0777", importFile.getAbsoluteFile().getParent() ).execute().await();
 
-            sqlRunner.execute().get();
+            sqlRunner.execute().await();
 
             try ( BufferedReader reader =
                           new BufferedReader( new InputStreamReader( new FileInputStream( importFile ) ) ) )

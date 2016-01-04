@@ -2,16 +2,20 @@ package org.neo4j.command_line;
 
 import java.io.IOException;
 import java.util.Timer;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import org.neo4j.io.AwaitHandle;
 import org.neo4j.io.StreamEventHandler;
+import org.neo4j.utils.FutureUtils;
 import org.neo4j.utils.Loggers;
 
 import static java.lang.String.format;
 
-public class ResultHandle implements AutoCloseable
+public class ResultHandle implements AwaitHandle<Result>, AutoCloseable
 {
     private final String programAndArguments;
     private final Process process;
@@ -44,6 +48,7 @@ public class ResultHandle implements AutoCloseable
         this.stdErrEventHandler = stdErrEventHandler;
     }
 
+    @Override
     public Result await() throws Exception
     {
         try
@@ -94,6 +99,30 @@ public class ResultHandle implements AutoCloseable
                 process.destroy();
             }
         }
+    }
+
+    @Override
+    public Result await( long timeout, TimeUnit unit ) throws Exception
+    {
+        try
+        {
+            return process.waitFor( timeout, unit ) ? await() : null ;
+        }
+        catch ( InterruptedException e )
+        {
+            Loggers.Default.log( Level.FINE, "Cancelling command [Command: {0}]", programAndArguments );
+            return null;
+        }
+        catch ( IOException | TimeoutException e )
+        {
+            throw new Exception( format( "Command failed [Command: '%s']", programAndArguments ), e );
+        }
+    }
+
+    @Override
+    public CompletableFuture<Result> toFuture()
+    {
+        return FutureUtils.exceptionableFuture( this::await );
     }
 
     public void terminate()

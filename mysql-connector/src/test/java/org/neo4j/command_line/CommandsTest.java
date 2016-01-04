@@ -15,6 +15,7 @@ import org.neo4j.utils.ResourceRule;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -115,6 +116,33 @@ public class CommandsTest
             // then
             assertThat( e.getCause(), instanceOf( TimeoutException.class ) );
             assertThat( e.getCause().getMessage(), startsWith( "Command failed to complete in a timely manner" ) );
+        }
+    }
+
+    @Test
+    public void shouldReturnNullIfCommandDurationExceedsAwaitTimeout() throws Exception
+    {
+        // given
+        Commands commands = Commands.builder( commandFactory.get().sleep( 5 ).commands() )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .timeout( 10, TimeUnit.MILLISECONDS )
+                .inheritEnvironment()
+                .build();
+
+        ResultHandle resultHandle = commands.execute();
+
+        try
+        {
+            // when
+            Result result = resultHandle.await( 2, TimeUnit.MILLISECONDS );
+
+            // then
+            assertNull( result );
+        }
+        finally
+        {
+            resultHandle.terminate();
         }
     }
 
