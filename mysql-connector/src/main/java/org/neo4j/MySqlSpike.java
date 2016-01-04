@@ -34,14 +34,18 @@ public class MySqlSpike
         String exportId = UUID.randomUUID().toString();
         String importId = UUID.randomUUID().toString();
 
-        try ( Pipe pipe = new Pipe( exportId );
-              SqlRunner sqlRunner = new SqlRunner( format( EXPORT_SQL, pipe.name() ) ) )
+        try ( Pipe pipe = new Pipe( exportId ) )
         {
+            SqlRunner sqlRunner = new SqlRunner( format( EXPORT_SQL, pipe.name() ) );
             CompletableFuture<OutputStream> out = pipe.out( sqlRunner.execute() );
 
             try ( Writer writer = new OutputStreamWriter( out.get() ) )
             {
-                writer.write( "37\tsometext\n" );
+                writer.write( "39\tsometext\n" );
+                Thread.sleep( 1000 );
+                writer.write( "40\tsometext\n" );
+                Thread.sleep( 1000 );
+                writer.write( "41\tsometext\n" );
             }
         }
         catch ( Exception e )
@@ -51,16 +55,12 @@ public class MySqlSpike
 
         File importFile = new File( importId );
 
-        try ( SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, importFile.getAbsolutePath() ) ) )
+        try
         {
+            SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, importFile.getAbsolutePath() ) );
             Commands.commands( "chmod", "0777", importFile.getAbsoluteFile().getParent() ).execute().await();
 
-            sqlRunner.execute();
-
-            while(!importFile.exists())
-            {
-                Thread.sleep( 1000 );
-            }
+            sqlRunner.execute().get();
 
             try ( BufferedReader reader =
                           new BufferedReader( new InputStreamReader( new FileInputStream( importFile ) ) ) )

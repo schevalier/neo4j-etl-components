@@ -7,19 +7,13 @@ import java.util.concurrent.CompletableFuture;
 import org.neo4j.utils.FutureUtils;
 import org.neo4j.utils.Loggers;
 
-public class SqlRunner implements AutoCloseable
+public class SqlRunner
 {
     private final String sql;
-    private volatile boolean allowContinue = true;
 
     public SqlRunner( String sql )
     {
         this.sql = sql;
-    }
-
-    public void terminate()
-    {
-        allowContinue = false;
     }
 
     public CompletableFuture<Void> execute()
@@ -37,21 +31,10 @@ public class SqlRunner implements AutoCloseable
             {
                 Loggers.Default.getLogger().info( "Connected to database" );
                 connection.createStatement().execute( sql );
-
-                while ( allowContinue )
-                {
-                    Thread.sleep( 100 );
-                }
             }
 
             return null;
 
         }, r -> new Thread( r ).start() );
-    }
-
-    @Override
-    public void close() throws Exception
-    {
-        terminate();
     }
 }
