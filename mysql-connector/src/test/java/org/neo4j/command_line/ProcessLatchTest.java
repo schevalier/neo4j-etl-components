@@ -47,7 +47,7 @@ public class ProcessLatchTest
 
         ExecutionTimer timer = ExecutionTimer.startTimer();
 
-        try ( ResultHandle ignored = commands.execute() )
+        try ( ProcessHandle ignored = commands.execute() )
         {
             // when
             ProcessLatch.ProcessLatchResult result = latch.awaitContents( 5, TimeUnit.SECONDS );
@@ -87,7 +87,7 @@ public class ProcessLatchTest
 
         ExecutionTimer timer = ExecutionTimer.startTimer();
 
-        try ( ResultHandle ignored = commands.execute() )
+        try ( ProcessHandle ignored = commands.execute() )
         {
             // when
             ProcessLatch.ProcessLatchResult result = latch.awaitContents( 3, TimeUnit.SECONDS );
@@ -131,7 +131,7 @@ public class ProcessLatchTest
 
         ExecutionTimer timer = ExecutionTimer.startTimer();
 
-        try ( ResultHandle ignored = commands.execute() )
+        try ( ProcessHandle ignored = commands.execute() )
         {
             // when
             latch.awaitContents( 4, TimeUnit.SECONDS );

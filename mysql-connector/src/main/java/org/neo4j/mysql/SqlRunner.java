@@ -18,7 +18,7 @@ public class SqlRunner
         this.sql = sql;
     }
 
-    public SqlRunnerAwaitHandle execute()
+    public AwaitHandle<Void> execute()
     {
         return new SqlRunnerAwaitHandle(
                 FutureUtils.exceptionableFuture( () ->
@@ -26,7 +26,6 @@ public class SqlRunner
                     String url = "jdbc:mysql://localhost:3306/javabase";
                     String username = "java";
                     String password = "password";
-
 
                     Loggers.Default.getLogger().info( "Connecting to database..." );
 
@@ -41,7 +40,7 @@ public class SqlRunner
                 }, r -> new Thread( r ).start() ) );
     }
 
-    public static class SqlRunnerAwaitHandle implements AwaitHandle<Void>
+    private static class SqlRunnerAwaitHandle implements AwaitHandle<Void>
     {
         private final CompletableFuture<Void> future;
 

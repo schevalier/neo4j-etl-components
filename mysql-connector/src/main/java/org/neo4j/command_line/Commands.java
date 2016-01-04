@@ -56,7 +56,7 @@ public class Commands
         this.stdErrEventHandler = stdErrEventHandler;
     }
 
-    public ResultHandle execute() throws Exception
+    public ProcessHandle execute() throws Exception
     {
         Loggers.Default.log( Level.FINE, "Executing command '{0}'", programAndArguments() );
 
@@ -79,7 +79,7 @@ public class Commands
             timer.schedule( timerTask, timeoutMillis );
         }
 
-        return new ResultHandle(
+        return new ProcessHandle(
                 programAndArguments(),
                 process,
                 resultEvaluator,

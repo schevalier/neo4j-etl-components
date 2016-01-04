@@ -87,7 +87,7 @@ public class CommandFactory
         return new ProgramAndArguments( file, script, commands );
     }
 
-    public ProgramAndArguments sleep( int seconds ) throws IOException
+    public ProgramAndArguments sleepSeconds( int seconds ) throws IOException
     {
         String script = isWindows ? format( "ping -n %s 127.0.0.1 > nul", seconds ) : format( "sleep %ss", seconds );
         String[] commands = toCommands( writeToFile( script ) );

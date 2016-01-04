@@ -3,6 +3,7 @@ package org.neo4j.command_line;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -17,6 +18,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import static org.neo4j.utils.TemporaryDirectory.temporaryDirectory;
@@ -98,7 +100,7 @@ public class CommandsTest
     public void shouldThrowExceptionIfCommandDurationExceedsTimeout() throws Exception
     {
         // given
-        Commands commands = Commands.builder( commandFactory.get().sleep( 1 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 1 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .timeout( 5, TimeUnit.MILLISECONDS )
@@ -123,27 +125,123 @@ public class CommandsTest
     public void shouldReturnNullIfCommandDurationExceedsAwaitTimeout() throws Exception
     {
         // given
-        Commands commands = Commands.builder( commandFactory.get().sleep( 5 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 5 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .timeout( 10, TimeUnit.MILLISECONDS )
                 .inheritEnvironment()
                 .build();
 
-        ResultHandle resultHandle = commands.execute();
+        ProcessHandle processHandle = commands.execute();
 
         try
         {
             // when
-            Result result = resultHandle.await( 2, TimeUnit.MILLISECONDS );
+            Result result = processHandle.await( 2, TimeUnit.MILLISECONDS );
 
             // then
             assertNull( result );
         }
         finally
         {
-            resultHandle.terminate();
+            processHandle.terminate();
         }
+    }
+
+    @Test
+    public void shouldReturnHandleThatCanBeConvertedToCompletableFuture() throws Exception
+    {
+        // given
+        String expectedValue = "hello world";
+
+        Commands commands = Commands.builder( commandFactory.get().echo( expectedValue ).commands() )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .noTimeout()
+                .inheritEnvironment()
+                .build();
+
+        // when
+        CompletableFuture<Result> future = commands.execute().toFuture();
+        Result result = future.get();
+
+        // then
+        assertEquals( 0, result.exitValue() );
+        assertEquals( expectedValue, result.stdout() );
+    }
+
+    @Test
+    public void shouldReturnHandleWhoseFutureThrowsExceptionIfCommandDurationExceedsTimeout() throws Exception
+    {
+        // given
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 1 ).commands() )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .timeout( 5, TimeUnit.MILLISECONDS )
+                .inheritEnvironment()
+                .build();
+
+        try
+        {
+            // when
+            CompletableFuture<Result> future = commands.execute().toFuture();
+            future.get();
+            fail( "Expected Exception" );
+        }
+        catch ( Exception e )
+        {
+            // then
+            Throwable rootCause = e.getCause().getCause();
+            assertThat( rootCause, instanceOf( TimeoutException.class ) );
+            assertThat( rootCause.getMessage(), startsWith( "Command failed to complete in a timely manner" ) );
+        }
+    }
+
+    @Test
+    public void shouldReturnHandleWhoseFutureThrowsTimeoutExceptionIfFutureTimesOut() throws Exception
+    {
+        // given
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 1 ).commands() )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .timeout( 900, TimeUnit.MILLISECONDS )
+                .inheritEnvironment()
+                .build();
+
+        try
+        {
+            // when
+            CompletableFuture<Result> future = commands.execute().toFuture();
+            future.get( 2, TimeUnit.MILLISECONDS );
+
+            fail( "Expected TimeoutException" );
+        }
+        catch ( TimeoutException e )
+        {
+            // then
+            assertThat( e, instanceOf( TimeoutException.class ) );
+        }
+    }
+
+    @Test
+    public void shouldDestroyProcessIfFutureIsCancelled() throws Exception
+    {
+        // given
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .timeout( 900, TimeUnit.MILLISECONDS )
+                .inheritEnvironment()
+                .build();
+
+        ProcessHandle processHandle = commands.execute();
+
+        // when
+        CompletableFuture<Result> future = processHandle.toFuture();
+        future.cancel( true );
+
+        // then
+        assertTrue( processHandle.isTerminated() );
     }
 
     @Test

@@ -5,7 +5,6 @@ import java.util.Timer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import org.neo4j.io.AwaitHandle;
@@ -15,7 +14,7 @@ import org.neo4j.utils.Loggers;
 
 import static java.lang.String.format;
 
-public class ResultHandle implements AwaitHandle<Result>, AutoCloseable
+public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
 {
     private final String programAndArguments;
     private final Process process;
@@ -27,15 +26,17 @@ public class ResultHandle implements AwaitHandle<Result>, AutoCloseable
     private final StreamEventHandler stdOutEventHandler;
     private final StreamEventHandler stdErrEventHandler;
 
-    ResultHandle( String programAndArguments,
-                  Process process,
-                  Result.Evaluator resultEvaluator,
-                  Timer timer,
-                  DestroyProcessOnTimeout timerTask,
-                  long timeoutMillis,
-                  long startTime,
-                  StreamEventHandler stdOutEventHandler,
-                  StreamEventHandler stdErrEventHandler )
+    private volatile boolean isTerminated = false;
+
+    ProcessHandle( String programAndArguments,
+                   Process process,
+                   Result.Evaluator resultEvaluator,
+                   Timer timer,
+                   DestroyProcessOnTimeout timerTask,
+                   long timeoutMillis,
+                   long startTime,
+                   StreamEventHandler stdOutEventHandler,
+                   StreamEventHandler stdErrEventHandler )
     {
         this.programAndArguments = programAndArguments;
         this.process = process;
@@ -94,10 +95,7 @@ public class ResultHandle implements AwaitHandle<Result>, AutoCloseable
         }
         finally
         {
-            if ( process != null )
-            {
-                process.destroy();
-            }
+            terminate();
         }
     }
 
@@ -106,7 +104,7 @@ public class ResultHandle implements AwaitHandle<Result>, AutoCloseable
     {
         try
         {
-            return process.waitFor( timeout, unit ) ? await() : null ;
+            return process.waitFor( timeout, unit ) ? await() : null;
         }
         catch ( InterruptedException e )
         {
@@ -122,12 +120,29 @@ public class ResultHandle implements AwaitHandle<Result>, AutoCloseable
     @Override
     public CompletableFuture<Result> toFuture()
     {
-        return FutureUtils.exceptionableFuture( this::await );
+        CompletableFuture<Result> future = FutureUtils.exceptionableFuture( this::await, r -> new Thread( r ).start() );
+        future.handle( ( result, throwable ) -> {
+            if ( future.isCancelled() )
+            {
+                terminate();
+            }
+            return null;
+        } );
+        return future;
     }
 
     public void terminate()
     {
-        process.destroy();
+        if ( process != null )
+        {
+            process.destroy();
+        }
+        isTerminated = true;
+    }
+
+    public boolean isTerminated()
+    {
+        return isTerminated;
     }
 
     @Override
