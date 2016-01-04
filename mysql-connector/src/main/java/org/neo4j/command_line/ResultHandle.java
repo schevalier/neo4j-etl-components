@@ -4,18 +4,15 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
 
 import org.neo4j.io.StreamEventHandler;
+import org.neo4j.utils.Loggers;
 
 import static java.lang.String.format;
 
 public class ResultHandle implements AutoCloseable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ResultHandle.class );
-
     private final String programAndArguments;
     private final Process process;
     private final Result.Evaluator resultEvaluator;
@@ -27,14 +24,14 @@ public class ResultHandle implements AutoCloseable
     private final StreamEventHandler stdErrEventHandler;
 
     ResultHandle( String programAndArguments,
-                         Process process,
-                         Result.Evaluator resultEvaluator,
-                         Timer timer,
-                         DestroyProcessOnTimeout timerTask,
-                         long timeoutMillis,
-                         long startTime,
-                         StreamEventHandler stdOutEventHandler,
-                         StreamEventHandler stdErrEventHandler )
+                  Process process,
+                  Result.Evaluator resultEvaluator,
+                  Timer timer,
+                  DestroyProcessOnTimeout timerTask,
+                  long timeoutMillis,
+                  long startTime,
+                  StreamEventHandler stdOutEventHandler,
+                  StreamEventHandler stdErrEventHandler )
     {
         this.programAndArguments = programAndArguments;
         this.process = process;
@@ -74,13 +71,16 @@ public class ResultHandle implements AutoCloseable
 
             }
 
-            LOG.trace( "Command finished [Command: '{}', {}]", programAndArguments, result );
+            Loggers.Default.log(
+                    Level.FINER,
+                    "Command finished [Command: '{0}', {1}]",
+                    new Object[]{programAndArguments, result} );
 
             return result;
         }
         catch ( InterruptedException e )
         {
-            LOG.info( "Cancelling command [Command: {}]", programAndArguments );
+            Loggers.Default.log( Level.FINE, "Cancelling command [Command: {0}]", programAndArguments );
             return null;
         }
         catch ( IOException | TimeoutException e )

@@ -5,17 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
 
 import org.neo4j.io.StreamEventHandler;
 import org.neo4j.io.StreamSink;
+import org.neo4j.utils.Loggers;
 
 public class Commands
 {
-    private static final Logger LOG = LoggerFactory.getLogger( Commands.class );
-
     public static Builder.WorkingDirectory builder( String... commands )
     {
         return new CommandsBuilder( commands );
@@ -44,7 +41,7 @@ public class Commands
               StreamEventHandler stdOutEventHandler,
               StreamEventHandler stdErrEventHandler )
     {
-        if (commands.isEmpty())
+        if ( commands.isEmpty() )
         {
             throw new IllegalArgumentException( "Commands cannot be empty" );
         }
@@ -61,7 +58,7 @@ public class Commands
 
     public ResultHandle execute() throws Exception
     {
-        LOG.debug( "Executing command '{}'", programAndArguments() );
+        Loggers.Default.log( Level.FINE, "Executing command '{0}'", programAndArguments() );
 
         ProcessBuilder processBuilder = new ProcessBuilder( commands ).directory( workingDirectory );
         processBuilder.environment().putAll( extraEnvironment );

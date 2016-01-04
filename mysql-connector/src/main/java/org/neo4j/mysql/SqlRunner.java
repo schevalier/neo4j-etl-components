@@ -3,9 +3,9 @@ package org.neo4j.mysql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 import org.neo4j.utils.FutureUtils;
+import org.neo4j.utils.Loggers;
 
 public class SqlRunner implements AutoCloseable
 {
@@ -30,11 +30,12 @@ public class SqlRunner implements AutoCloseable
             String username = "java";
             String password = "password";
 
-            System.out.println( "Connecting to database..." );
+
+            Loggers.Default.getLogger().info( "Connecting to database..." );
 
             try ( Connection connection = DriverManager.getConnection( url, username, password ) )
             {
-                System.out.println( "Connected to database" );
+                Loggers.Default.getLogger().info( "Connected to database" );
                 connection.createStatement().execute( sql );
 
                 while ( allowContinue )
@@ -45,7 +46,7 @@ public class SqlRunner implements AutoCloseable
 
             return null;
 
-        }, r -> new Thread(r).start() );
+        }, r -> new Thread( r ).start() );
     }
 
     @Override
