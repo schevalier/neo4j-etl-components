@@ -1,9 +1,9 @@
 package org.neo4j.io;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,15 +16,15 @@ public class FileDigest
 {
     private static final int DEFAULT_SUMMARY_LINE_COUNT = 50;
 
-    private final File file;
+    private final Path file;
     private final int summaryLineCount;
 
-    FileDigest( File file )
+    FileDigest( Path file )
     {
         this( file, DEFAULT_SUMMARY_LINE_COUNT );
     }
 
-    FileDigest( File file, int summaryLineCount )
+    FileDigest( Path file, int summaryLineCount )
     {
         if ( summaryLineCount < 1 )
         {
@@ -35,7 +35,7 @@ public class FileDigest
         this.summaryLineCount = summaryLineCount;
     }
 
-    public File file()
+    public Path file()
     {
         return file;
     }
@@ -57,7 +57,7 @@ public class FileDigest
         {
             int numberOfLinesToReadFromStartOfFile = summaryLineCount / 2;
 
-            try ( BufferedReader input = new BufferedReader( new FileReader( file ) ) )
+            try ( BufferedReader input = Files.newBufferedReader( file ) )
             {
                 String line;
 
@@ -84,7 +84,7 @@ public class FileDigest
 
             if ( numberOfLinesToReadFromEndOfFile > 0 )
             {
-                try ( ReversedLinesFileReader reader = new ReversedLinesFileReader( file ) )
+                try ( ReversedLinesFileReader reader = new ReversedLinesFileReader( file.toFile() ) )
                 {
                     for ( int i = 0; i < numberOfLinesToReadFromEndOfFile; i++ )
                     {

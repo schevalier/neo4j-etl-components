@@ -1,41 +1,39 @@
 package org.neo4j.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import org.apache.commons.io.FileUtils;
+import java.nio.file.Path;
 
 public class TemporaryFile
 {
-    public static Resource<File> temporaryFile()
+    public static Resource<Path> temporaryFile()
     {
         return temporaryFile( "tmp", "file" );
     }
 
-    public static Resource<File> temporaryFile( String prefix, String suffix )
+    public static Resource<Path> temporaryFile( String prefix, String suffix )
     {
-        return new LazyResource<>( new LazyResource.Lifecycle<File>()
+        return new LazyResource<>( new LazyResource.Lifecycle<Path>()
         {
             @Override
-            public File create() throws IOException
+            public Path create() throws IOException
             {
-                return Files.createTempFile( prefix, suffix ).toFile();
+                return Files.createTempFile( prefix, suffix );
             }
 
             @Override
-            public void destroy( File file ) throws IOException
+            public void destroy( Path file ) throws IOException
             {
                 try
                 {
-                    FileUtils.forceDelete( file );
+                    Files.deleteIfExists( file );
                 }
                 catch ( IOException e )
                 {
                     // Retry
                     try
                     {
-                        FileUtils.forceDelete( file );
+                        Files.deleteIfExists( file );
                     }
                     catch ( Exception ex )
                     {

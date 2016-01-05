@@ -1,6 +1,5 @@
 package org.neo4j.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -27,9 +26,9 @@ public class FileDigestTest
     public void shouldReturnFullContentsIfNumberOfLinesDoesNotExceedSummaryLineCount() throws IOException
     {
         // given
-        File file = new File( tempDirectory.get().toFile(), "stream-contents" );
+        Path file = tempDirectory.get().resolve( "stream-contents" );
 
-        writeLines( file, StandardCharsets.UTF_8.toString(), lines( 4 ) );
+        writeLines( file.toFile(), StandardCharsets.UTF_8.toString(), lines( 4 ) );
 
         // when
         String value = new FileDigest( file, 6 ).toString();
@@ -47,9 +46,9 @@ public class FileDigestTest
     public void shouldReturnSummaryContentsIfNumberOfLinesDoesExceedsSummaryLineCount() throws IOException
     {
         // given
-        File file = new File( tempDirectory.get().toFile(), "stream-contents" );
+        Path file = tempDirectory.get().resolve( "stream-contents" );
 
-        writeLines( file, StandardCharsets.UTF_8.toString(), lines( 8 ) );
+        writeLines( file.toFile(), StandardCharsets.UTF_8.toString(), lines( 8 ) );
 
         // when
         String value = new FileDigest( file, 6 ).toString();

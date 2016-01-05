@@ -1,10 +1,11 @@
 package org.neo4j.io;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.concurrent.TimeUnit;
 
 public class FileBasedStreamRecorder implements StreamEventHandler<FileDigest>
@@ -12,12 +13,9 @@ public class FileBasedStreamRecorder implements StreamEventHandler<FileDigest>
     private final BufferedWriter writer;
     private final StreamContentsHandle<FileDigest> streamContentsHandle;
 
-    public FileBasedStreamRecorder( File file ) throws IOException
+    public FileBasedStreamRecorder( Path file ) throws IOException
     {
-        //noinspection ResultOfMethodCallIgnored
-        file.createNewFile();
-
-        this.writer = new BufferedWriter( new FileWriter( file, true ) );
+        this.writer = Files.newBufferedWriter( file, StandardOpenOption.APPEND );
         this.streamContentsHandle = new StreamContentsHandle<>( () -> new FileDigest( file ) );
     }
 

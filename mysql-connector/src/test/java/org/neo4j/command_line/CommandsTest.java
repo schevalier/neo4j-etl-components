@@ -338,7 +338,7 @@ public class CommandsTest
                     .failOnNonZeroExitValue()
                     .noTimeout()
                     .inheritEnvironment()
-                    .redirectStdInFrom( ProcessBuilder.Redirect.from( programAndArguments.file() ) )
+                    .redirectStdInFrom( ProcessBuilder.Redirect.from( programAndArguments.file().toFile() ) )
                     .build();
 
             // when

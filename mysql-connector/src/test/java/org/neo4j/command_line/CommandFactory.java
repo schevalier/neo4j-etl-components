@@ -1,9 +1,8 @@
 package org.neo4j.command_line;
 
-import java.io.File;
 import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.neo4j.utils.LazyResource;
 import org.neo4j.utils.OperatingSystem;
@@ -16,8 +15,8 @@ public class CommandFactory
 {
     public static Resource<CommandFactory> newFactory()
     {
-        LazyResource<File> file =
-                (LazyResource<File>) TemporaryFile.temporaryFile( "cmd", OperatingSystem.isWindows() ? ".cmd" : ".sh" );
+        LazyResource<Path> file =
+                (LazyResource<Path>) TemporaryFile.temporaryFile( "cmd", OperatingSystem.isWindows() ? ".cmd" : ".sh" );
 
         return new LazyResource<>( new LazyResource.Lifecycle<CommandFactory>()
         {
@@ -37,10 +36,10 @@ public class CommandFactory
 
     private static final String NEWLINE = System.lineSeparator();
 
-    private final File file;
+    private final Path file;
     private final boolean isWindows = OperatingSystem.isWindows();
 
-    CommandFactory( File file )
+    CommandFactory( Path file )
     {
         this.file = file;
     }
@@ -115,18 +114,18 @@ public class CommandFactory
 
     public static class ProgramAndArguments
     {
-        private final File file;
+        private final Path file;
         private final String script;
         private final String[] commands;
 
-        public ProgramAndArguments( File file, String script, String[] commands )
+        public ProgramAndArguments( Path file, String script, String[] commands )
         {
             this.file = file;
             this.script = script;
             this.commands = commands;
         }
 
-        public File file()
+        public Path file()
         {
             return file;
         }
@@ -144,8 +143,8 @@ public class CommandFactory
 
     private String writeToFile( String script ) throws IOException
     {
-        FileUtils.writeStringToFile( file, script );
-        return file.getAbsolutePath();
+        Files.write( file, script.getBytes() );
+        return file.toAbsolutePath().toString();
     }
 
     private String[] toCommands( String script )

@@ -1,6 +1,5 @@
 package org.neo4j.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -8,14 +7,16 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.neo4j.utils.ResourceRule;
+
+import static java.util.Arrays.asList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -24,8 +25,6 @@ import static org.neo4j.utils.TemporaryFile.temporaryFile;
 
 public class FileBasedStreamRecorderTest
 {
-    private static final String NEWLINE = System.lineSeparator();
-
     /*
     A StreamSink's BufferedReader can throw an IOException from its readLine() method. In these tests we force the
     reader inside a StreamSink to throw an exception while its FileBasedStreamRecorder is reading from the stream
@@ -33,7 +32,7 @@ public class FileBasedStreamRecorderTest
      */
 
     @Rule
-    public final ResourceRule<File> tempFile = new ResourceRule<>( temporaryFile() );
+    public final ResourceRule<Path> tempFile = new ResourceRule<>( temporaryFile() );
 
     @Test
     public void shouldThrowExceptionWhenAccessingValueIfUnderlyingStreamThrowsException() throws IOException
@@ -119,7 +118,7 @@ public class FileBasedStreamRecorderTest
 
         // when
         // then
-        List<String> lines = Files.readAllLines( tempFile.get().toPath() );
+        List<String> lines = Files.readAllLines( tempFile.get() );
 
         assertEquals( expectedNumberOfLines, lines.size() );
         assertEquals( line1, lines.get( 0 ) );
@@ -171,12 +170,12 @@ public class FileBasedStreamRecorderTest
         writer.close();
 
         // when
-        File file = recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).file();
+        Path file = recorder.awaitContents( 100, TimeUnit.MILLISECONDS ).file();
 
         // then
-        String expectedContents = "A" + NEWLINE + "B" + NEWLINE + "C" + NEWLINE;
+        List<String> expectedContents = asList( "A", "B", "C" );
 
-        assertEquals( expectedContents, FileUtils.readFileToString( file ) );
+        assertEquals( expectedContents, Files.readAllLines( file ) );
     }
 
     private String createLine( int bufferSize, String a )
