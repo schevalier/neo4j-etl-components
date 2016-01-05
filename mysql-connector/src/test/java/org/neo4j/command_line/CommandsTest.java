@@ -1,6 +1,7 @@
 package org.neo4j.command_line;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +31,7 @@ public class CommandsTest
     public final ResourceRule<CommandFactory> commandFactory = new ResourceRule<>( CommandFactory.newFactory() );
 
     @Rule
-    public final ResourceRule<File> tempDirectory = new ResourceRule<>( temporaryDirectory() );
+    public final ResourceRule<Path> tempDirectory = new ResourceRule<>( temporaryDirectory() );
 
     @Test
     public void shouldExecuteCommands() throws Exception
@@ -321,7 +322,7 @@ public class CommandsTest
         Result result = commands.execute().await();
 
         // then
-        assertEquals( tempDirectory.get().toPath().toRealPath(), new File( result.stdout() ).toPath().toRealPath() );
+        assertEquals( tempDirectory.get().toRealPath(), new File( result.stdout() ).toPath().toRealPath() );
     }
 
     @Test

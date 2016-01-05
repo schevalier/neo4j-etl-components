@@ -1,9 +1,10 @@
 package org.neo4j.command_line;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.io.InMemoryStreamRecorder;
@@ -22,7 +23,7 @@ class CommandsBuilder
         Commands.Builder
 {
     final List<String> commands;
-    File workingDirectory;
+    Optional<Path> workingDirectory = Optional.empty();
     Evaluator resultEvaluator = Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
     long timeoutMillis = -1;
     Map<String, String> extraEnvironment = Collections.emptyMap();
@@ -36,9 +37,9 @@ class CommandsBuilder
     }
 
     @Override
-    public ResultEvaluator workingDirectory( File workingDirectory )
+    public ResultEvaluator workingDirectory( Path workingDirectory )
     {
-        this.workingDirectory = workingDirectory;
+        this.workingDirectory = Optional.ofNullable( workingDirectory );
         return this;
     }
 

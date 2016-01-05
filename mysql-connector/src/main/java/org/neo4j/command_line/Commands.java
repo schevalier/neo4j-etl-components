@@ -1,8 +1,9 @@
 package org.neo4j.command_line;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -24,7 +25,7 @@ public class Commands
     }
 
     private final List<String> commands;
-    private final File workingDirectory;
+    private final Optional<Path> workingDirectory;
     private final Result.Evaluator resultEvaluator;
     private final long timeoutMillis;
     private final Map<String, String> extraEnvironment;
@@ -32,7 +33,7 @@ public class Commands
     private final StreamEventHandler stdOutEventHandler;
     private final StreamEventHandler stdErrEventHandler;
 
-    Commands(CommandsBuilder builder)
+    Commands( CommandsBuilder builder )
     {
         if ( builder.commands.isEmpty() )
         {
@@ -53,7 +54,11 @@ public class Commands
     {
         Loggers.Default.log( Level.FINE, "Executing command '{0}'", programAndArguments() );
 
-        ProcessBuilder processBuilder = new ProcessBuilder( commands ).directory( workingDirectory );
+        ProcessBuilder processBuilder = new ProcessBuilder( commands );
+        if ( workingDirectory.isPresent() )
+        {
+            processBuilder.directory( workingDirectory.map( Path::toFile ).get() );
+        }
         processBuilder.environment().putAll( extraEnvironment );
         processBuilder.redirectInput( stdInRedirect );
 
@@ -107,7 +112,7 @@ public class Commands
     {
         interface WorkingDirectory
         {
-            ResultEvaluator workingDirectory( File workingDirectory );
+            ResultEvaluator workingDirectory( Path workingDirectory );
 
             ResultEvaluator inheritWorkingDirectory();
         }

@@ -3,6 +3,7 @@ package org.neo4j.io;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,13 +21,13 @@ import static org.neo4j.utils.TemporaryDirectory.temporaryDirectory;
 public class FileDigestTest
 {
     @Rule
-    public final ResourceRule<File> tempDirectory = new ResourceRule<>( temporaryDirectory() );
+    public final ResourceRule<Path> tempDirectory = new ResourceRule<>( temporaryDirectory() );
 
     @Test
     public void shouldReturnFullContentsIfNumberOfLinesDoesNotExceedSummaryLineCount() throws IOException
     {
         // given
-        File file = new File( tempDirectory.get(), "stream-contents" );
+        File file = new File( tempDirectory.get().toFile(), "stream-contents" );
 
         writeLines( file, StandardCharsets.UTF_8.toString(), lines( 4 ) );
 
@@ -46,7 +47,7 @@ public class FileDigestTest
     public void shouldReturnSummaryContentsIfNumberOfLinesDoesExceedsSummaryLineCount() throws IOException
     {
         // given
-        File file = new File( tempDirectory.get(), "stream-contents" );
+        File file = new File( tempDirectory.get().toFile(), "stream-contents" );
 
         writeLines( file, StandardCharsets.UTF_8.toString(), lines( 8 ) );
 
