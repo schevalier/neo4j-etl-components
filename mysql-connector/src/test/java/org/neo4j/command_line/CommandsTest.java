@@ -1,7 +1,7 @@
 package org.neo4j.command_line;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -322,7 +322,7 @@ public class CommandsTest
         Result result = commands.execute().await();
 
         // then
-        assertEquals( tempDirectory.get().toRealPath(), new File( result.stdout() ).toPath().toRealPath() );
+        assertEquals( tempDirectory.get().toRealPath(), Paths.get( result.stdout() ).toRealPath() );
     }
 
     @Test

@@ -1,13 +1,15 @@
 package org.neo4j.io;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -17,7 +19,6 @@ import org.junit.Test;
 import org.neo4j.utils.FutureUtils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -124,15 +125,15 @@ public class PipeTest
     {
         // given
         String name = UUID.randomUUID().toString();
-        File file = new File( name );
+        Path file = Paths.get( name );
 
         // when
         try ( Pipe ignored = new Pipe( name ) )
         {
-            assertTrue( file.exists() );
+            assertTrue( Files.exists( file ) );
         }
 
         // then
-        assertFalse( file.exists() );
+        assertTrue( Files.notExists( file ) );
     }
 }

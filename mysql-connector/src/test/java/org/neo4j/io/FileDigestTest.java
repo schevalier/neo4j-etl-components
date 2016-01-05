@@ -1,18 +1,17 @@
 package org.neo4j.io;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.neo4j.utils.ResourceRule;
+import org.neo4j.utils.StringListBuilder;
 
-import static org.apache.commons.io.FileUtils.writeLines;
 import static org.junit.Assert.assertEquals;
 
 import static org.neo4j.utils.TemporaryDirectory.temporaryDirectory;
@@ -28,7 +27,7 @@ public class FileDigestTest
         // given
         Path file = tempDirectory.get().resolve( "stream-contents" );
 
-        writeLines( file.toFile(), StandardCharsets.UTF_8.toString(), lines( 4 ) );
+        Files.write( file, lines( 4 ) );
 
         // when
         String value = new FileDigest( file, 6 ).toString();
@@ -48,7 +47,7 @@ public class FileDigestTest
         // given
         Path file = tempDirectory.get().resolve( "stream-contents" );
 
-        writeLines( file.toFile(), StandardCharsets.UTF_8.toString(), lines( 8 ) );
+        Files.write( file, lines( 8 ) );
 
         // when
         String value = new FileDigest( file, 6 ).toString();
@@ -65,13 +64,13 @@ public class FileDigestTest
         assertEquals( expectedValue, value );
     }
 
-    private Collection<String> lines( int size )
+    private byte[] lines( int size )
     {
         List<String> lines = new ArrayList<>();
         for ( int i = 1; i <= size; i++ )
         {
             lines.add( "line " + i );
         }
-        return lines;
+        return StringListBuilder.stringList( lines, System.lineSeparator() ).toString().getBytes();
     }
 }
