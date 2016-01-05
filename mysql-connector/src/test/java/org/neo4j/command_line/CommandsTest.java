@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -185,12 +186,12 @@ public class CommandsTest
             // when
             CompletableFuture<Result> future = commands.execute().toFuture();
             future.get();
-            fail( "Expected Exception" );
+            fail( "Expected ExecutionException" );
         }
-        catch ( Exception e )
+        catch ( ExecutionException e )
         {
             // then
-            Throwable rootCause = e.getCause().getCause();
+            Throwable rootCause = e.getCause();
             assertThat( rootCause, instanceOf( TimeoutException.class ) );
             assertThat( rootCause.getMessage(), startsWith( "Command failed to complete in a timely manner" ) );
         }

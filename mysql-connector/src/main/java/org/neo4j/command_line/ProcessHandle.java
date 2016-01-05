@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
 import org.neo4j.io.AwaitHandle;
@@ -142,7 +143,7 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
      *
      * <p>Calling the future's {@link CompletableFuture#get()} method will cause the future to block until the
      * underlying process completes. When the process completes, {@code get()} returns the process {@link Result}.
-     * If the process times out, {@code get()} throws an Exception whose root cause is a TimeoutException.
+     * If the process times out, {@code get()} throws an ExecutionException whose root cause is a TimeoutException.
      *
      * <p>Calling the future's {@link CompletableFuture#get(long, TimeUnit)} method will cause the future to block
      * until the underlying process completes or the specified waiting time elapses. If the specified waiting time
@@ -158,16 +159,11 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
     public CompletableFuture<Result> toFuture()
     {
         CompletableFuture<Result> future = FutureUtils.exceptionableFuture( this::await, r -> new Thread( r ).start() );
-        return future.handle( ( result, throwable ) -> {
+        return future.whenComplete( ( result, throwable ) -> {
             if ( future.isCancelled() )
             {
                 terminate();
             }
-            if (throwable != null)
-            {
-                throw new RuntimeException( throwable );
-            }
-            return result;
         } );
     }
 
@@ -191,6 +187,10 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
         return process == null || process.isAlive();
     }
 
+    /**
+     * Closes the handle and terminates the underlying process.
+     * @throws Exception
+     */
     @Override
     public void close() throws Exception
     {
