@@ -87,9 +87,9 @@ public class CommandsTest
         {
             // when
             commands.execute().await();
-            fail( "Expected Exception" );
+            fail( "Expected CommandFailedException" );
         }
-        catch ( Exception e )
+        catch ( CommandFailedException e )
         {
             // then
             assertThat( e.getMessage(), startsWith( "Command failed" ) );
@@ -111,13 +111,12 @@ public class CommandsTest
         {
             // when
             commands.execute().await();
-            fail( "Expected Exception" );
+            fail( "Expected TimeoutException" );
         }
-        catch ( Exception e )
+        catch ( TimeoutException e )
         {
             // then
-            assertThat( e.getCause(), instanceOf( TimeoutException.class ) );
-            assertThat( e.getCause().getMessage(), startsWith( "Command failed to complete in a timely manner" ) );
+            assertThat( e.getMessage(), startsWith( "Command failed to complete in a timely manner" ) );
         }
     }
 
@@ -174,7 +173,7 @@ public class CommandsTest
     public void shouldReturnHandleWhoseFutureThrowsExceptionIfCommandDurationExceedsTimeout() throws Exception
     {
         // given
-        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 1 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .timeout( 5, TimeUnit.MILLISECONDS )
@@ -201,10 +200,10 @@ public class CommandsTest
     public void shouldReturnHandleWhoseFutureThrowsTimeoutExceptionIfFutureTimesOut() throws Exception
     {
         // given
-        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 1 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
-                .timeout( 900, TimeUnit.MILLISECONDS )
+                .noTimeout()
                 .inheritEnvironment()
                 .build();
 
@@ -224,13 +223,13 @@ public class CommandsTest
     }
 
     @Test
-    public void shouldDestroyProcessIfFutureIsCancelled() throws Exception
+    public void shouldDestroyProcessIfFutureIsCancelledUsingForcibleInterrupt() throws Exception
     {
         // given
         Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
-                .timeout( 900, TimeUnit.MILLISECONDS )
+                .noTimeout()
                 .inheritEnvironment()
                 .build();
 
@@ -239,6 +238,27 @@ public class CommandsTest
         // when
         CompletableFuture<Result> future = processHandle.toFuture();
         future.cancel( true );
+
+        // then
+        assertTrue( processHandle.isTerminated() );
+    }
+
+    @Test
+    public void shouldDestroyProcessIfFutureIsCancelledWithoutUsingForcibleInterrupt() throws Exception
+    {
+        // given
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
+                .inheritWorkingDirectory()
+                .failOnNonZeroExitValue()
+                .noTimeout()
+                .inheritEnvironment()
+                .build();
+
+        ProcessHandle processHandle = commands.execute();
+
+        // when
+        CompletableFuture<Result> future = processHandle.toFuture();
+        future.cancel( false );
 
         // then
         assertTrue( processHandle.isTerminated() );

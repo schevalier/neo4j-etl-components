@@ -3,6 +3,7 @@ package org.neo4j.command_line;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -14,6 +15,9 @@ import org.neo4j.utils.Loggers;
 
 import static java.lang.String.format;
 
+/**
+ * An {@link AwaitHandle} to a running process.
+ */
 public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
 {
     private final String programAndArguments;
@@ -25,8 +29,6 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
     private final long startTime;
     private final StreamEventHandler stdOutEventHandler;
     private final StreamEventHandler stdErrEventHandler;
-
-    private volatile boolean isTerminated = false;
 
     ProcessHandle( String programAndArguments,
                    Process process,
@@ -49,6 +51,12 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
         this.stdErrEventHandler = stdErrEventHandler;
     }
 
+    /**
+     * Wait for the process to complete.
+     *
+     * @return {@link Result}
+     * @throws Exception if the process times out, the return value indicates failure, or an IO exception occurs
+     */
     @Override
     public Result await() throws Exception
     {
@@ -68,12 +76,13 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
             if ( timerTask.timedOut() )
             {
                 throw new TimeoutException( format( "Command failed to complete in a timely manner " +
-                        "[TimeoutMillis: %s, %s]", timeoutMillis, result ) );
+                        "[Command: %s, TimeoutMillis: %s, %s]", programAndArguments, timeoutMillis, result ) );
             }
 
             if ( !resultEvaluator.isValid( result ) )
             {
-                throw new Exception( format( "Command failed [Command: '%s', %s]", programAndArguments, result ) );
+                throw new CommandFailedException(
+                        format( "Command failed [Command: '%s', %s]", programAndArguments, result ) );
 
             }
 
@@ -89,9 +98,9 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
             Loggers.Default.log( Level.FINE, "Cancelling command [Command: {0}]", programAndArguments );
             return null;
         }
-        catch ( IOException | TimeoutException e )
+        catch ( IOException e )
         {
-            throw new Exception( format( "Command failed [Command: '%s']", programAndArguments ), e );
+            throw new CommandFailedException( format( "Command failed [Command: '%s']", programAndArguments ), e );
         }
         finally
         {
@@ -99,6 +108,14 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
         }
     }
 
+    /**
+     * Wait for the process to complete or until the specified waiting time elapses. If the specified waiting time
+     * elapses, this method will return null, and the process will continue executing.
+     *
+     * @return {@link Result} or null if the specified waiting time elapses
+     * @throws Exception if the process times out before the specified waiting time elapses,
+     *         the return value indicates failure, or an IO exception occurs
+     */
     @Override
     public Result await( long timeout, TimeUnit unit ) throws Exception
     {
@@ -111,38 +128,67 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
             Loggers.Default.log( Level.FINE, "Cancelling command [Command: {0}]", programAndArguments );
             return null;
         }
-        catch ( IOException | TimeoutException e )
+        catch ( IOException e )
         {
-            throw new Exception( format( "Command failed [Command: '%s']", programAndArguments ), e );
+            throw new CommandFailedException( format( "Command failed [Command: '%s']", programAndArguments ), e );
         }
     }
 
+    /**
+     * Returns a {@link CompletableFuture} that can be used to wait for the process to complete, poll the process, or
+     * terminate the process.
+     *
+     * <p>A new thread is created for each {@link CompletableFuture} returned by this method.
+     *
+     * <p>Calling the future's {@link CompletableFuture#get()} method will cause the future to block until the
+     * underlying process completes. When the process completes, {@code get()} returns the process {@link Result}.
+     * If the process times out, {@code get()} throws an Exception whose root cause is a TimeoutException.
+     *
+     * <p>Calling the future's {@link CompletableFuture#get(long, TimeUnit)} method will cause the future to block
+     * until the underlying process completes or the specified waiting time elapses. If the specified waiting time
+     * elapses before the underlying process completes, the underlying process continues executing, but
+     * {@code get(long, Timeunit)} throws a TimeoutException.
+     *
+     * <p>Calling the future's {@link CompletableFuture#cancel(boolean)} method will cause the future to be cancelled
+     * and the underlying process to be terminated.
+     *
+     * @return A {@link CompletableFuture<Result>}
+     */
     @Override
     public CompletableFuture<Result> toFuture()
     {
         CompletableFuture<Result> future = FutureUtils.exceptionableFuture( this::await, r -> new Thread( r ).start() );
-        future.handle( ( result, throwable ) -> {
+        return future.handle( ( result, throwable ) -> {
             if ( future.isCancelled() )
             {
                 terminate();
             }
-            return null;
+            if (throwable != null)
+            {
+                throw new RuntimeException( throwable );
+            }
+            return result;
         } );
-        return future;
     }
 
+    /**
+     * Terminate the underlying process.
+     */
     public void terminate()
     {
         if ( process != null )
         {
             process.destroy();
         }
-        isTerminated = true;
     }
 
+    /**
+     * Tests whether the underlying process has terminated.
+     * @return  true if the underlying process has terminated, false if it is still running
+     */
     public boolean isTerminated()
     {
-        return isTerminated;
+        return process == null || process.isAlive();
     }
 
     @Override
