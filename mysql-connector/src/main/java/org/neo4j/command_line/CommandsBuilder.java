@@ -11,7 +11,7 @@ import org.neo4j.io.StreamEventHandler;
 
 import static java.util.Arrays.asList;
 
-import static org.neo4j.command_line.Result.*;
+import static org.neo4j.command_line.Result.Evaluator;
 
 class CommandsBuilder
         implements Commands.Builder.WorkingDirectory,
@@ -21,14 +21,14 @@ class CommandsBuilder
         Commands.Builder.Redirection,
         Commands.Builder
 {
-    private final List<String> commands;
-    private File workingDirectory;
-    private Evaluator resultEvaluator = Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
-    private long timeoutMillis = -1;
-    private Map<String, String> extraEnvironment = Collections.emptyMap();
-    private StreamEventHandler stdOutEventHandler = new InMemoryStreamRecorder();
-    private StreamEventHandler stdErrEventHandler = new InMemoryStreamRecorder();
-    private ProcessBuilder.Redirect stdInRedirect = ProcessBuilder.Redirect.PIPE;
+    final List<String> commands;
+    File workingDirectory;
+    Evaluator resultEvaluator = Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
+    long timeoutMillis = -1;
+    Map<String, String> extraEnvironment = Collections.emptyMap();
+    StreamEventHandler stdOutEventHandler = new InMemoryStreamRecorder();
+    StreamEventHandler stdErrEventHandler = new InMemoryStreamRecorder();
+    ProcessBuilder.Redirect stdInRedirect = ProcessBuilder.Redirect.PIPE;
 
     public CommandsBuilder( String... commands )
     {
@@ -120,13 +120,6 @@ class CommandsBuilder
     @Override
     public Commands build()
     {
-        return new Commands(
-                commands, workingDirectory,
-                resultEvaluator,
-                timeoutMillis,
-                extraEnvironment,
-                stdInRedirect,
-                stdOutEventHandler,
-                stdErrEventHandler );
+        return new Commands( this );
     }
 }

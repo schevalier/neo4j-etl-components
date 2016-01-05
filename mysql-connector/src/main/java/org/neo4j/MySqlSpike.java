@@ -24,7 +24,7 @@ public class MySqlSpike
             "BY " +
             "'\\t' OPTIONALLY ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' STARTING BY ''";
 
-    private static final String IMPORT_SQL = "SELECT id, data INTO OUTFILE '%s' FIELDS TERMINATED " +
+    private static final String IMPORT_SQL = "%s SELECT id, data INTO OUTFILE '%s' FIELDS TERMINATED " +
             "BY " +
             "'\\t' OPTIONALLY ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' STARTING BY '' FROM javabase" +
             ".test";
@@ -57,7 +57,7 @@ public class MySqlSpike
 
         try
         {
-            SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, importFile.getAbsolutePath() ) );
+            SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, headers(), importFile.getAbsolutePath() ) );
             Commands.commands( "chmod", "0777", importFile.getAbsoluteFile().getParent() ).execute().await();
 
             sqlRunner.execute().await();
@@ -83,5 +83,8 @@ public class MySqlSpike
         }
     }
 
-
+    private static String headers()
+    {
+        return "SELECT 'ID', 'DATA' UNION ALL";
+    }
 }

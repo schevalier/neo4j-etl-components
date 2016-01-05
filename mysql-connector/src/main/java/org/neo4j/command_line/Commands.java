@@ -32,28 +32,21 @@ public class Commands
     private final StreamEventHandler stdOutEventHandler;
     private final StreamEventHandler stdErrEventHandler;
 
-    Commands( List<String> commands,
-              File workingDirectory,
-              Result.Evaluator resultEvaluator,
-              long timeoutMillis,
-              Map<String, String> extraEnvironment,
-              ProcessBuilder.Redirect stdInRedirect,
-              StreamEventHandler stdOutEventHandler,
-              StreamEventHandler stdErrEventHandler )
+    Commands(CommandsBuilder builder)
     {
-        if ( commands.isEmpty() )
+        if ( builder.commands.isEmpty() )
         {
             throw new IllegalArgumentException( "Commands cannot be empty" );
         }
 
-        this.commands = commands;
-        this.workingDirectory = workingDirectory;
-        this.resultEvaluator = resultEvaluator;
-        this.timeoutMillis = timeoutMillis;
-        this.extraEnvironment = extraEnvironment;
-        this.stdInRedirect = stdInRedirect;
-        this.stdOutEventHandler = stdOutEventHandler;
-        this.stdErrEventHandler = stdErrEventHandler;
+        this.commands = builder.commands;
+        this.workingDirectory = builder.workingDirectory;
+        this.resultEvaluator = builder.resultEvaluator;
+        this.timeoutMillis = builder.timeoutMillis;
+        this.extraEnvironment = builder.extraEnvironment;
+        this.stdInRedirect = builder.stdInRedirect;
+        this.stdOutEventHandler = builder.stdOutEventHandler;
+        this.stdErrEventHandler = builder.stdErrEventHandler;
     }
 
     public ProcessHandle execute() throws Exception
