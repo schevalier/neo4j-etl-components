@@ -1,10 +1,20 @@
 package org.neo4j.ingest;
 
-public class ImportConfigBuilder implements ImportConfig.Builder
+import java.nio.file.Path;
+
+class ImportConfigBuilder implements ImportConfig.Builder.Destination, ImportConfig.Builder
 {
+    Path destination;
     String delimiter = ",";
     String arrayDelimiter = ";";
     String quote = "\"";
+
+    @Override
+    public ImportConfig.Builder destination( Path directory )
+    {
+        this.destination = directory;
+        return this;
+    }
 
     @Override
     public ImportConfig.Builder delimiter( String delimiter )
