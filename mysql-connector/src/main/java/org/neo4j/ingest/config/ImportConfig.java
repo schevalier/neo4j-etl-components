@@ -1,4 +1,4 @@
-package org.neo4j.ingest;
+package org.neo4j.ingest.config;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -7,11 +7,12 @@ public class ImportConfig
 {
     public static final String TAB_DELIMITER = "TAB";
 
-    public static Builder.Destination builder()
+    public static Builder.SetImportToolDirectory builder()
     {
         return new ImportConfigBuilder();
     }
 
+    private final Path importToolDirectory;
     private final Path destination;
     private final String delimiter;
     private final String arrayDelimiter;
@@ -19,6 +20,7 @@ public class ImportConfig
 
     ImportConfig( ImportConfigBuilder builder )
     {
+        this.importToolDirectory = Objects.requireNonNull( builder.importToolDirectory, "Import tool directory cannot be null" );
         this.destination = Objects.requireNonNull( builder.destination, "Destination cannot be null" );
         this.delimiter = builder.delimiter;
         this.arrayDelimiter = builder.arrayDelimiter;
@@ -47,7 +49,12 @@ public class ImportConfig
 
     public interface Builder
     {
-        interface Destination
+        interface SetImportToolDirectory
+        {
+            SetDestination importToolDirectory(Path directory);
+        }
+
+        interface SetDestination
         {
             Builder destination( Path directory );
         }

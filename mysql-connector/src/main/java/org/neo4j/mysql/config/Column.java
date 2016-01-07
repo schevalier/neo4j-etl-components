@@ -1,6 +1,6 @@
-package org.neo4j.mysql;
+package org.neo4j.mysql.config;
 
-import org.neo4j.ingest.Field;
+import org.neo4j.ingest.config.Field;
 
 public class Column
 {
@@ -11,5 +11,15 @@ public class Column
     {
         this.name = name;
         this.field = field;
+    }
+
+    public String name()
+    {
+        return name;
+    }
+
+    public Field field()
+    {
+        return field;
     }
 }

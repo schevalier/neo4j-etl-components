@@ -1,6 +1,9 @@
-package org.neo4j.ingest;
+package org.neo4j.ingest.config;
 
 import org.junit.Test;
+
+import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.FieldType;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

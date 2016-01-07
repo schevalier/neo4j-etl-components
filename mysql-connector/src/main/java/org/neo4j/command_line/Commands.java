@@ -1,6 +1,7 @@
 package org.neo4j.command_line;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.logging.Level;
 import org.neo4j.io.StreamEventHandler;
 import org.neo4j.io.StreamSink;
 import org.neo4j.utils.Loggers;
+import org.neo4j.utils.Preconditions;
 
 public class Commands
 {
@@ -35,12 +37,8 @@ public class Commands
 
     Commands( CommandsBuilder builder )
     {
-        if ( builder.commands.isEmpty() )
-        {
-            throw new IllegalArgumentException( "Commands cannot be empty" );
-        }
-
-        this.commands = builder.commands;
+        this.commands = Collections.unmodifiableList(
+                Preconditions.requireNonEmptyList( builder.commands, "Commands cannot be empty" ));
         this.workingDirectory = builder.workingDirectory;
         this.resultEvaluator = builder.resultEvaluator;
         this.timeoutMillis = builder.timeoutMillis;

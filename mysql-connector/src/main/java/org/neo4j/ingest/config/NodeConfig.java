@@ -1,8 +1,10 @@
-package org.neo4j.ingest;
+package org.neo4j.ingest.config;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+
+import org.neo4j.utils.Preconditions;
 
 public class NodeConfig
 {
@@ -16,12 +18,8 @@ public class NodeConfig
 
     NodeConfig( NodeConfigBuilder builder )
     {
-        if (builder.files.isEmpty())
-        {
-            throw new IllegalArgumentException( "Files cannot be empty" );
-        }
-
-        this.files = Collections.unmodifiableCollection( builder.files );
+        this.files = Collections.unmodifiableCollection(
+                Preconditions.requireNonEmptyCollection( builder.files, "Files cannot be empty" ));
         this.labels = Collections.unmodifiableCollection( builder.labels );
     }
 

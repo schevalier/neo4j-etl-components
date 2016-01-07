@@ -1,4 +1,4 @@
-package org.neo4j.ingest;
+package org.neo4j.ingest.config;
 
 public class Label implements FieldType
 {

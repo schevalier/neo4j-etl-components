@@ -1,6 +1,9 @@
-package org.neo4j.ingest;
+package org.neo4j.ingest.config;
 
 import org.junit.Test;
+
+import org.neo4j.ingest.config.Data;
+import org.neo4j.ingest.config.DataType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
