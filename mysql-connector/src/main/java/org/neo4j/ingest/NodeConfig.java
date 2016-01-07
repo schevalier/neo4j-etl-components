@@ -6,7 +6,7 @@ import java.util.Collections;
 
 public class NodeConfig
 {
-    public static Builder.FirstInputFile builder()
+    public static Builder.SetFirstInputFile builder()
     {
         return new NodeConfigBuilder();
     }
@@ -37,7 +37,7 @@ public class NodeConfig
 
     public interface Builder
     {
-        interface FirstInputFile
+        interface SetFirstInputFile
         {
             Builder addInputFile( Path file );
         }

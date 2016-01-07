@@ -14,12 +14,27 @@ public class Field
 
     public Field( String name, FieldType type )
     {
-        this.name = Optional.ofNullable( name );
+        this.name = Optional.ofNullable( orNull( name ) );
         this.type = type;
     }
 
     public void validate()
     {
         type.validate( name.isPresent() );
+    }
+
+    private String orNull( String value )
+    {
+        if ( value == null )
+        {
+            return null;
+        }
+
+        if ( value.trim().isEmpty() )
+        {
+            return null;
+        }
+
+        return value;
     }
 }

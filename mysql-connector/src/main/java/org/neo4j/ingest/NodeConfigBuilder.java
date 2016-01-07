@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class NodeConfigBuilder implements NodeConfig.Builder.FirstInputFile, NodeConfig.Builder
+class NodeConfigBuilder implements NodeConfig.Builder.SetFirstInputFile, NodeConfig.Builder
 {
     Collection<Path> files = new ArrayList<>();
     Collection<String> labels = new ArrayList<>();

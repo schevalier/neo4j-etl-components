@@ -1,6 +1,7 @@
 package org.neo4j.ingest;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class ImportConfig
 {
@@ -18,12 +19,7 @@ public class ImportConfig
 
     ImportConfig( ImportConfigBuilder builder )
     {
-        if ( builder.destination == null )
-        {
-            throw new IllegalArgumentException( "Destination cannot be null" );
-        }
-
-        this.destination = builder.destination;
+        this.destination = Objects.requireNonNull( builder.destination, "Destination cannot be null" );
         this.delimiter = builder.delimiter;
         this.arrayDelimiter = builder.arrayDelimiter;
         this.quote = builder.quote;
@@ -53,14 +49,14 @@ public class ImportConfig
     {
         interface Destination
         {
-            Builder destination(Path directory);
+            Builder destination( Path directory );
         }
 
         Builder delimiter( String delimiter );
 
         Builder arrayDelimiter( String delimiter );
 
-        Builder quote(String quote);
+        Builder quote( String quote );
 
         ImportConfig build();
     }
