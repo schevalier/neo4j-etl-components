@@ -16,7 +16,12 @@ import org.neo4j.utils.Preconditions;
 
 public class Commands
 {
-    public static Builder.WorkingDirectory builder( String... commands )
+    public static Builder.SetCommands builder()
+    {
+        return new CommandsBuilder();
+    }
+
+    public static Builder.SetWorkingDirectory builder( String... commands )
     {
         return new CommandsBuilder( commands );
     }
@@ -38,7 +43,7 @@ public class Commands
     Commands( CommandsBuilder builder )
     {
         this.commands = Collections.unmodifiableList(
-                Preconditions.requireNonEmptyList( builder.commands, "Commands cannot be empty" ));
+                Preconditions.requireNonEmptyList( builder.commands, "Commands cannot be empty" ) );
         this.workingDirectory = builder.workingDirectory;
         this.resultEvaluator = builder.resultEvaluator;
         this.timeoutMillis = builder.timeoutMillis;
@@ -108,43 +113,52 @@ public class Commands
 
     public interface Builder
     {
-        interface WorkingDirectory
+        interface SetCommands
         {
-            ResultEvaluator workingDirectory( Path workingDirectory );
+            SetCommands addCommand( String command );
 
-            ResultEvaluator inheritWorkingDirectory();
+            SetResultEvaluator workingDirectory( Path workingDirectory );
+
+            SetResultEvaluator inheritWorkingDirectory();
         }
 
-        interface ResultEvaluator
+        interface SetWorkingDirectory
         {
-            TimeoutMillis commandResultEvaluator( Result.Evaluator resultEvaluator );
+            SetResultEvaluator workingDirectory( Path workingDirectory );
 
-            TimeoutMillis failOnNonZeroExitValue();
-
-            TimeoutMillis ignoreFailures();
+            SetResultEvaluator inheritWorkingDirectory();
         }
 
-        interface TimeoutMillis
+        interface SetResultEvaluator
         {
-            Environment timeout( long timeout, TimeUnit unit );
+            SetTimeout commandResultEvaluator( Result.Evaluator resultEvaluator );
 
-            Environment noTimeout();
+            SetTimeout failOnNonZeroExitValue();
+
+            SetTimeout ignoreFailures();
         }
 
-        interface Environment
+        interface SetTimeout
         {
-            Redirection inheritEnvironment();
+            SetEnvironment timeout( long timeout, TimeUnit unit );
 
-            Redirection augmentEnvironment( Map<String, String> extra );
+            SetEnvironment noTimeout();
         }
 
-        interface Redirection
+        interface SetEnvironment
         {
-            Redirection redirectStdInFrom( ProcessBuilder.Redirect redirection );
+            SetRedirection inheritEnvironment();
 
-            Redirection redirectStdOutTo( StreamEventHandler streamEventHandler );
+            SetRedirection augmentEnvironment( Map<String, String> extra );
+        }
 
-            Redirection redirectStdErrTo( StreamEventHandler streamEventHandler );
+        interface SetRedirection
+        {
+            SetRedirection redirectStdInFrom( ProcessBuilder.Redirect redirection );
+
+            SetRedirection redirectStdOutTo( StreamEventHandler streamEventHandler );
+
+            SetRedirection redirectStdErrTo( StreamEventHandler streamEventHandler );
 
             Commands build();
         }

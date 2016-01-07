@@ -33,6 +33,12 @@ public class Data implements FieldType
     }
 
     @Override
+    public String value()
+    {
+        return isArray ? format( ":%s[]", type.name().toLowerCase() ) : format( ":%s", type.name().toLowerCase() );
+    }
+
+    @Override
     public String toString()
     {
         return format( "%s%s", isArray ? "array of " : "", type );

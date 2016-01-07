@@ -9,12 +9,25 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.command_line.Commands;
+import org.neo4j.ingest.config.Data;
+import org.neo4j.ingest.config.DataType;
+import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.Formatting;
+import org.neo4j.ingest.config.Id;
 import org.neo4j.io.Pipe;
+import org.neo4j.mysql.Export;
 import org.neo4j.mysql.SqlRunner;
+import org.neo4j.mysql.config.Column;
+import org.neo4j.mysql.config.ExportConfig;
+import org.neo4j.mysql.config.MySqlConnectionConfig;
+import org.neo4j.mysql.config.Table;
 
 import static java.lang.String.format;
 
@@ -29,14 +42,51 @@ public class MySqlSpike
             "'\\t' OPTIONALLY ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' STARTING BY '' FROM javabase" +
             ".test";
 
-    public static void main( String[] args ) throws IOException
+    public static void main( String[] args ) throws Exception
+    {
+        doExport();
+    }
+
+    private static void doExport() throws Exception
+    {
+        MySqlConnectionConfig connectionConfig = new MySqlConnectionConfig(
+                "jdbc:mysql://localhost:3306/javabase",
+                "java",
+                "password" );
+
+        ExportConfig exportConfig = ExportConfig.builder()
+                .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
+                .mySqlConnectionConfig( connectionConfig )
+                .formatting( Formatting.DEFAULT )
+                .table( Table.builder()
+                        .name( "javabase.test" )
+                        .addColumn( new Column( "id", new Field( "personId", Id.ID ) ) )
+                        .addColumn( new Column( "data", new Field( "data", Data.ofType( DataType.String ) ) ) )
+                        .build() )
+                .build();
+
+        Export export = new Export( exportConfig );
+        Collection<Path> files = export.execute();
+
+        for ( Path file : files )
+        {
+            System.out.println(file.toString());
+        }
+    }
+
+    private static void originalTest() throws IOException
     {
         String exportId = UUID.randomUUID().toString();
         String importId = UUID.randomUUID().toString();
 
+        MySqlConnectionConfig connectionConfig = new MySqlConnectionConfig(
+                "jdbc:mysql://localhost:3306/javabase",
+                "java",
+                "password" );
+
         try ( Pipe pipe = new Pipe( exportId ) )
         {
-            SqlRunner sqlRunner = new SqlRunner( format( EXPORT_SQL, pipe.name() ) );
+            SqlRunner sqlRunner = new SqlRunner( connectionConfig, format( EXPORT_SQL, pipe.name() ) );
             CompletableFuture<OutputStream> out = pipe.out( sqlRunner.execute().toFuture() );
 
             try ( Writer writer = new OutputStreamWriter( out.get() ) )
@@ -57,7 +107,7 @@ public class MySqlSpike
 
         try
         {
-            SqlRunner sqlRunner = new SqlRunner( format( IMPORT_SQL, importFile.getAbsolutePath() ) );
+            SqlRunner sqlRunner = new SqlRunner( connectionConfig, format( IMPORT_SQL, importFile.getAbsolutePath() ) );
             Commands.commands( "chmod", "0777", importFile.getAbsoluteFile().getParent() ).execute().await();
 
             sqlRunner.execute().await();

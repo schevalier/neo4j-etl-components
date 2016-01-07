@@ -1,12 +1,14 @@
 package org.neo4j.ingest.config;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Objects;
 
-public class ImportConfig
-{
-    public static final String TAB_DELIMITER = "TAB";
+import org.neo4j.command_line.Commands;
+import org.neo4j.command_line.CommandsSupplier;
 
+public class ImportConfig implements CommandsSupplier
+{
     public static Builder.SetImportToolDirectory builder()
     {
         return new ImportConfigBuilder();
@@ -14,44 +16,51 @@ public class ImportConfig
 
     private final Path importToolDirectory;
     private final Path destination;
-    private final String delimiter;
-    private final String arrayDelimiter;
-    private final String quote;
+    private final Formatting formatting;
+    private final IdType idType;
+    private final Collection<NodeConfig> nodes;
 
     ImportConfig( ImportConfigBuilder builder )
     {
-        this.importToolDirectory = Objects.requireNonNull( builder.importToolDirectory, "Import tool directory cannot be null" );
+        this.importToolDirectory = Objects.requireNonNull(
+                builder.importToolDirectory, "Import tool directory cannot be null" );
         this.destination = Objects.requireNonNull( builder.destination, "Destination cannot be null" );
-        this.delimiter = builder.delimiter;
-        this.arrayDelimiter = builder.arrayDelimiter;
-        this.quote = builder.quote;
+        this.formatting = Objects.requireNonNull( builder.formatting, "Formatting cannot be null" );
+        this.idType = builder.idType;
+        this.nodes = builder.nodes;
     }
 
-    public Path getDestination()
+    @Override
+    public void addCommandsTo( Commands.Builder.SetCommands commands )
     {
-        return destination;
-    }
+        commands.addCommand( importToolDirectory.resolve( "neo4j-import" ).toString() );
 
-    public String delimiter()
-    {
-        return delimiter;
-    }
+        commands.addCommand( "--into");
+        commands.addCommand( destination.toAbsolutePath().toString() );
 
-    public String arrayDelimiter()
-    {
-        return arrayDelimiter;
-    }
+        commands.addCommand( "--delimiter" );
+        commands.addCommand( formatting.delimiter().description() );
 
-    public String quote()
-    {
-        return quote;
+        commands.addCommand( "--array-delimiter" );
+        commands.addCommand( formatting.arrayDelimiter().description() );
+
+        commands.addCommand( "--quote" );
+        commands.addCommand( formatting.quote() );
+
+        commands.addCommand( "--id-type" );
+        commands.addCommand( idType.name().toUpperCase() );
+
+        for ( NodeConfig node : nodes )
+        {
+            node.addCommandsTo( commands );
+        }
     }
 
     public interface Builder
     {
         interface SetImportToolDirectory
         {
-            SetDestination importToolDirectory(Path directory);
+            SetDestination importToolDirectory( Path directory );
         }
 
         interface SetDestination
@@ -59,11 +68,11 @@ public class ImportConfig
             Builder destination( Path directory );
         }
 
-        Builder delimiter( String delimiter );
+        Builder formatting( Formatting formatting );
 
-        Builder arrayDelimiter( String delimiter );
+        Builder idType(IdType idType);
 
-        Builder quote( String quote );
+        Builder addNodeConfig( NodeConfig nodeConfig );
 
         ImportConfig build();
     }

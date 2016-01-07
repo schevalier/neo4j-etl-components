@@ -5,48 +5,38 @@ import java.util.logging.Logger;
 
 public enum Loggers
 {
-    Default
-            {
-                private final Logger logger = Logger.getLogger( "Default" );
+    Default,
+    MySql;
 
-                @Override
-                public Logger getLogger()
-                {
-                    return logger;
-                }
+    private final Logger log;
 
-                @Override
-                public void log( Level level, String msg )
-                {
-                    logger.log( level, msg );
-                }
+    Loggers( )
+    {
+        this.log = Logger.getLogger( name() );
+    }
 
-                @Override
-                public void log( Level level, String msg, Object param1 )
-                {
-                    logger.log( level, msg, param1 );
-                }
+    public Logger log()
+    {
+        return log;
+    }
 
-                @Override
-                public void log( Level level, String msg, Object[] params )
-                {
-                    logger.log( level, msg, params );
-                }
+    public void log( Level level, String msg )
+    {
+        log.log( level, msg );
+    }
 
-                @Override
-                public void log( Level level, String msg, Throwable thrown )
-                {
-                    logger.log( level, msg, thrown );
-                }
-            };
+    public void log( Level level, String msg, Object param )
+    {
+        log.log( level, msg, param );
+    }
 
-    public abstract Logger getLogger();
+    public void log( Level level, String msg, Object[] params )
+    {
+        log.log( level, msg, params );
+    }
 
-    public abstract void log( Level level, String msg );
-
-    public abstract void log( Level level, String msg, Object param1 );
-
-    public abstract void log( Level level, String msg, Object[] params );
-
-    public abstract void log( Level level, String msg, Throwable thrown );
+    public void log( Level level, String msg, Throwable thrown )
+    {
+        log.log( level, msg, thrown );
+    }
 }

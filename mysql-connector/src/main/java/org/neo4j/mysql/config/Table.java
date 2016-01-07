@@ -32,6 +32,16 @@ public class Table implements FieldMappings
         return columns.stream().map( Column::field ).collect( Collectors.toList() );
     }
 
+    public Collection<String> columnNames()
+    {
+        return columns.stream().map( Column::name ).collect( Collectors.toList() );
+    }
+
+    public String name()
+    {
+        return name;
+    }
+
     public String simpleName()
     {
         return name.substring( name.lastIndexOf( "." ) + 1 );

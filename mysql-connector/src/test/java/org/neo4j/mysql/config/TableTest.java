@@ -8,7 +8,6 @@ import org.neo4j.ingest.config.Data;
 import org.neo4j.ingest.config.DataType;
 import org.neo4j.ingest.config.Field;
 import org.neo4j.ingest.config.Id;
-import org.neo4j.ingest.config.IdType;
 import org.neo4j.ingest.config.Label;
 
 import static java.util.Arrays.asList;
@@ -23,7 +22,7 @@ public class TableTest
         // given
         Table table = Table.builder()
                 .name( "example.Person" )
-                .addColumn( new Column( "id", new Field( Id.id( IdType.String ) ) ) )
+                .addColumn( new Column( "id", new Field( Id.ID ) ) )
                 .build();
 
         // when
@@ -39,7 +38,7 @@ public class TableTest
         // given
         Table table = Table.builder()
                 .name( "Person" )
-                .addColumn( new Column( "id", new Field( Id.id( IdType.String ) ) ) )
+                .addColumn( new Column( "id", new Field( Id.ID ) ) )
                 .build();
 
         // when
@@ -53,7 +52,7 @@ public class TableTest
     public void shouldReturnFieldMappingsForColumns()
     {
         // given
-        Field field1 = new Field( Id.id( IdType.Integer ) );
+        Field field1 = new Field( Id.ID );
         Field field2 = new Field( "name", Data.ofType( DataType.String ) );
         Field field3 = new Field( Label.label() );
 

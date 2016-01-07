@@ -6,15 +6,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.io.AwaitHandle;
+import org.neo4j.mysql.config.MySqlConnectionConfig;
 import org.neo4j.utils.FutureUtils;
 import org.neo4j.utils.Loggers;
 
 public class SqlRunner
 {
+    private final MySqlConnectionConfig connectionConfig;
     private final String sql;
 
-    public SqlRunner( String sql )
+    public SqlRunner( MySqlConnectionConfig connectionConfig, String sql )
     {
+        this.connectionConfig = connectionConfig;
         this.sql = sql;
     }
 
@@ -23,15 +26,16 @@ public class SqlRunner
         return new SqlRunnerAwaitHandle(
                 FutureUtils.exceptionableFuture( () ->
                 {
-                    String url = "jdbc:mysql://localhost:3306/javabase";
-                    String username = "java";
-                    String password = "password";
+                    Loggers.MySql.log().fine( "Connecting to database..." );
 
-                    Loggers.Default.getLogger().info( "Connecting to database..." );
-
-                    try ( Connection connection = DriverManager.getConnection( url, username, password ) )
+                    try ( Connection connection = DriverManager.getConnection(
+                            connectionConfig.uri(),
+                            connectionConfig.username(),
+                            connectionConfig.password() ) )
                     {
-                        Loggers.Default.getLogger().info( "Connected to database" );
+                        Loggers.MySql.log().fine( "Connected to database" );
+                        Loggers.MySql.log().finest( sql );
+
                         connection.createStatement().execute( sql );
                     }
 

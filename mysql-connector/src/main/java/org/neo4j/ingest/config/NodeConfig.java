@@ -4,9 +4,15 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.neo4j.command_line.Commands;
+import org.neo4j.command_line.CommandsSupplier;
 import org.neo4j.utils.Preconditions;
 
-public class NodeConfig
+import static java.lang.String.format;
+
+import static org.neo4j.utils.StringListBuilder.stringList;
+
+public class NodeConfig implements CommandsSupplier
 {
     public static Builder.SetFirstInputFile builder()
     {
@@ -19,7 +25,7 @@ public class NodeConfig
     NodeConfig( NodeConfigBuilder builder )
     {
         this.files = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( builder.files, "Files cannot be empty" ));
+                Preconditions.requireNonEmptyCollection( builder.files, "Files cannot be empty" ) );
         this.labels = Collections.unmodifiableCollection( builder.labels );
     }
 
@@ -31,6 +37,13 @@ public class NodeConfig
     public Collection<String> labels()
     {
         return labels;
+    }
+
+    @Override
+    public void addCommandsTo( Commands.Builder.SetCommands commands )
+    {
+        commands.addCommand( labels.isEmpty() ? "--nodes" : format( "--nodes[:%s]", stringList( labels, ":" ) ) );
+        commands.addCommand( format( "\"%s\"", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
     }
 
     public interface Builder

@@ -16,4 +16,10 @@ public class Label implements FieldType
     {
         // Do nothing
     }
+
+    @Override
+    public String value()
+    {
+        return ":LABEL";
+    }
 }

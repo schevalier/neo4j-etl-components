@@ -1,6 +1,8 @@
 package org.neo4j.ingest.config;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 
 class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory,
         ImportConfig.Builder.SetDestination,
@@ -8,9 +10,9 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
 {
     Path importToolDirectory;
     Path destination;
-    String delimiter = ",";
-    String arrayDelimiter = ";";
-    String quote = "\"";
+    Formatting formatting;
+    IdType idType = IdType.String;
+    Collection<NodeConfig> nodes = new ArrayList<>(  );
 
     @Override
     public SetDestination importToolDirectory( Path directory )
@@ -27,23 +29,23 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
     }
 
     @Override
-    public ImportConfig.Builder delimiter( String delimiter )
+    public ImportConfig.Builder formatting( Formatting formatting )
     {
-        this.delimiter = delimiter;
+        this.formatting = formatting;
         return this;
     }
 
     @Override
-    public ImportConfig.Builder arrayDelimiter( String delimiter )
+    public ImportConfig.Builder idType( IdType idType )
     {
-        this.arrayDelimiter = delimiter;
+        this.idType = idType;
         return this;
     }
 
     @Override
-    public ImportConfig.Builder quote( String quote )
+    public ImportConfig.Builder addNodeConfig( NodeConfig nodeConfig )
     {
-        this.quote = quote;
+        nodes.add( nodeConfig );
         return this;
     }
 

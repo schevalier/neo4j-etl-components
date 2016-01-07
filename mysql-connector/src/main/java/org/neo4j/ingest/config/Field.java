@@ -2,6 +2,8 @@ package org.neo4j.ingest.config;
 
 import java.util.Optional;
 
+import static java.lang.String.format;
+
 public class Field
 {
     private final Optional<String> name;
@@ -21,6 +23,11 @@ public class Field
     public void validate()
     {
         type.validate( name.isPresent() );
+    }
+
+    public String value()
+    {
+        return name.isPresent() ? format("%s%s", name.get(), type.value()) : type.value();
     }
 
     private String orNull( String value )

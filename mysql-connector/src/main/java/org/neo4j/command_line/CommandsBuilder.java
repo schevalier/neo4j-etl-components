@@ -15,11 +15,12 @@ import static java.util.Arrays.asList;
 import static org.neo4j.command_line.Result.Evaluator;
 
 class CommandsBuilder
-        implements Commands.Builder.WorkingDirectory,
-        Commands.Builder.ResultEvaluator,
-        Commands.Builder.TimeoutMillis,
-        Commands.Builder.Environment,
-        Commands.Builder.Redirection,
+        implements Commands.Builder.SetCommands,
+        Commands.Builder.SetWorkingDirectory,
+        Commands.Builder.SetResultEvaluator,
+        Commands.Builder.SetTimeout,
+        Commands.Builder.SetEnvironment,
+        Commands.Builder.SetRedirection,
         Commands.Builder
 {
     final List<String> commands;
@@ -37,82 +38,89 @@ class CommandsBuilder
     }
 
     @Override
-    public ResultEvaluator workingDirectory( Path workingDirectory )
+    public SetCommands addCommand( String command )
+    {
+        commands.add( command );
+        return this;
+    }
+
+    @Override
+    public SetResultEvaluator workingDirectory( Path workingDirectory )
     {
         this.workingDirectory = Optional.ofNullable( workingDirectory );
         return this;
     }
 
     @Override
-    public ResultEvaluator inheritWorkingDirectory()
+    public SetResultEvaluator inheritWorkingDirectory()
     {
         return workingDirectory( null );
     }
 
     @Override
-    public TimeoutMillis commandResultEvaluator( Evaluator resultEvaluator )
+    public SetTimeout commandResultEvaluator( Evaluator resultEvaluator )
     {
         this.resultEvaluator = resultEvaluator;
         return this;
     }
 
     @Override
-    public TimeoutMillis failOnNonZeroExitValue()
+    public SetTimeout failOnNonZeroExitValue()
     {
         this.resultEvaluator = Evaluator.FAIL_ON_NON_ZERO_EXIT_VALUE;
         return this;
     }
 
     @Override
-    public TimeoutMillis ignoreFailures()
+    public SetTimeout ignoreFailures()
     {
         this.resultEvaluator = Evaluator.IGNORE_FAILURES;
         return this;
     }
 
     @Override
-    public Environment timeout( long timeout, TimeUnit unit )
+    public SetEnvironment timeout( long timeout, TimeUnit unit )
     {
         timeoutMillis = unit.toMillis( timeout );
         return this;
     }
 
     @Override
-    public Environment noTimeout()
+    public SetEnvironment noTimeout()
     {
         this.timeoutMillis = -1;
         return this;
     }
 
     @Override
-    public Redirection inheritEnvironment()
+    public SetRedirection inheritEnvironment()
     {
         return this;
     }
 
     @Override
-    public Redirection augmentEnvironment( Map<String, String> extra )
+    public SetRedirection augmentEnvironment( Map<String, String> extra )
     {
         this.extraEnvironment = extra;
         return this;
     }
 
     @Override
-    public Redirection redirectStdInFrom( ProcessBuilder.Redirect redirection )
+    public SetRedirection redirectStdInFrom( ProcessBuilder.Redirect redirection )
     {
         this.stdInRedirect = redirection;
         return this;
     }
 
     @Override
-    public Redirection redirectStdOutTo( StreamEventHandler streamEventHandler )
+    public SetRedirection redirectStdOutTo( StreamEventHandler streamEventHandler )
     {
         this.stdOutEventHandler = streamEventHandler;
         return this;
     }
 
     @Override
-    public Redirection redirectStdErrTo( StreamEventHandler streamEventHandler )
+    public SetRedirection redirectStdErrTo( StreamEventHandler streamEventHandler )
     {
         this.stdErrEventHandler = streamEventHandler;
         return this;
