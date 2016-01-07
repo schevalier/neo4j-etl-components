@@ -60,8 +60,10 @@ public class MySqlSpike
                 .formatting( Formatting.DEFAULT )
                 .table( Table.builder()
                         .name( "javabase.test" )
-                        .addColumn( new Column( "id", new Field( "personId", Id.ID ) ) )
-                        .addColumn( new Column( "data", new Field( "data", Data.ofType( DataType.String ) ) ) )
+                        .addColumn( Column.withName( "id" )
+                                .mapsTo( new Field( "personId", Id.ID ) ) )
+                        .addColumn( Column.withName( "data")
+                                .mapsTo( new Field( "data", Data.ofType( DataType.String ) ) ) )
                         .build() )
                 .build();
 

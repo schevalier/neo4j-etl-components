@@ -22,7 +22,7 @@ public class TableTest
         // given
         Table table = Table.builder()
                 .name( "example.Person" )
-                .addColumn( new Column( "id", new Field( Id.ID ) ) )
+                .addColumn( Column.withName( "id" ).mapsTo( new Field( Id.ID ) ) )
                 .build();
 
         // when
@@ -38,7 +38,7 @@ public class TableTest
         // given
         Table table = Table.builder()
                 .name( "Person" )
-                .addColumn( new Column( "id", new Field( Id.ID ) ) )
+                .addColumn( Column.withName( "id" ).mapsTo( new Field( Id.ID ) ) )
                 .build();
 
         // when
@@ -58,9 +58,9 @@ public class TableTest
 
         Table table = Table.builder()
                 .name( "example.Person" )
-                .addColumn( new Column( "id", field1 ) )
-                .addColumn( new Column( "name", field2 ) )
-                .addColumn( new Column( "age", field3 ) )
+                .addColumn( Column.withName( "id" ).mapsTo( field1 ) )
+                .addColumn( Column.withName( "name" ).mapsTo( field2 ) )
+                .addColumn( Column.withName( "age" ).mapsTo( field3 ) )
                 .build();
 
         // when
