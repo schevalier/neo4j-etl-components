@@ -21,9 +21,9 @@ public class Table implements FieldMappings
 
     Table( TableBuilder builder )
     {
-        this.name = Preconditions.requireNonNullString( builder.name, "Table name cannot be null or empty string" );
+        this.name = Preconditions.requireNonNullString( builder.name, "Table name" );
         this.columns = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( builder.columns, "Columns cannot be empty" ) );
+                Preconditions.requireNonEmptyCollection( builder.columns, "Columns" ) );
     }
 
     @Override

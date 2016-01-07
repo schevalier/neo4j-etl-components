@@ -60,10 +60,14 @@ public class MySqlSpike
                 .formatting( Formatting.DEFAULT )
                 .table( Table.builder()
                         .name( "javabase.test" )
-                        .addColumn( Column.withName( "id" )
-                                .mapsTo( new Field( "personId", Id.ID ) ) )
-                        .addColumn( Column.withName( "data")
-                                .mapsTo( new Field( "data", Data.ofType( DataType.String ) ) ) )
+                        .addColumn( Column.builder()
+                                .name( "id" )
+                                .mapsTo( new Field( "personId", Id.ID ) )
+                                .build() )
+                        .addColumn( Column.builder()
+                                .name( "data" )
+                                .mapsTo( new Field( "data", Data.ofType( DataType.String ) ) )
+                                .build() )
                         .build() )
                 .build();
 
@@ -72,7 +76,7 @@ public class MySqlSpike
 
         for ( Path file : files )
         {
-            System.out.println(file.toString());
+            System.out.println( file.toString() );
         }
     }
 

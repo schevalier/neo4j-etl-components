@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import org.neo4j.ingest.config.Formatting;
+import org.neo4j.utils.Preconditions;
 
 public class ExportConfig
 {
@@ -19,10 +20,10 @@ public class ExportConfig
 
     public ExportConfig( ExportConfigBuilder builder )
     {
-        this.destination = Objects.requireNonNull( builder.destination, "Destination cannot be null" );
-        this.connectionConfig = Objects.requireNonNull( builder.connectionConfig, "Connection config cannot be null" );
-        this.formatting = Objects.requireNonNull( builder.formatting, "Formatting cannot be null" );
-        this.table = Objects.requireNonNull( builder.table, "Table cannot be null" );
+        this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
+        this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "Connection" );
+        this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
+        this.table = Preconditions.requireNonNull( builder.table, "Table" );
     }
 
     public Path destination()

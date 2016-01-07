@@ -2,20 +2,29 @@ package org.neo4j.mysql.config;
 
 import org.neo4j.ingest.config.Field;
 
-class ColumnBuilder implements Column.Builder
+class ColumnBuilder implements Column.Builder, Column.Builder.SetName, Column.Builder.SetField
 {
-    final String name;
+    String name;
     Field field;
 
-    public ColumnBuilder( String name )
+    @Override
+    public SetField name( String name )
     {
         this.name = name;
+        return this;
     }
 
     @Override
-    public Column mapsTo( Field field )
+    public Column.Builder mapsTo( Field field )
     {
         this.field = field;
+        return this;
+    }
+
+    @Override
+    public Column build()
+    {
+
         return new Column( this );
     }
 }

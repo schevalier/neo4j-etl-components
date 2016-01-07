@@ -2,10 +2,10 @@ package org.neo4j.ingest.config;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Objects;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.command_line.CommandsSupplier;
+import org.neo4j.utils.Preconditions;
 
 public class ImportConfig implements CommandsSupplier
 {
@@ -22,10 +22,9 @@ public class ImportConfig implements CommandsSupplier
 
     ImportConfig( ImportConfigBuilder builder )
     {
-        this.importToolDirectory = Objects.requireNonNull(
-                builder.importToolDirectory, "Import tool directory cannot be null" );
-        this.destination = Objects.requireNonNull( builder.destination, "Destination cannot be null" );
-        this.formatting = Objects.requireNonNull( builder.formatting, "Formatting cannot be null" );
+        this.importToolDirectory = Preconditions.requireNonNull( builder.importToolDirectory, "Import tool directory" );
+        this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
+        this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
         this.idType = builder.idType;
         this.nodes = builder.nodes;
     }
@@ -35,7 +34,7 @@ public class ImportConfig implements CommandsSupplier
     {
         commands.addCommand( importToolDirectory.resolve( "neo4j-import" ).toString() );
 
-        commands.addCommand( "--into");
+        commands.addCommand( "--into" );
         commands.addCommand( destination.toAbsolutePath().toString() );
 
         commands.addCommand( "--delimiter" );
@@ -70,7 +69,7 @@ public class ImportConfig implements CommandsSupplier
 
         Builder formatting( Formatting formatting );
 
-        Builder idType(IdType idType);
+        Builder idType( IdType idType );
 
         Builder addNodeConfig( NodeConfig nodeConfig );
 

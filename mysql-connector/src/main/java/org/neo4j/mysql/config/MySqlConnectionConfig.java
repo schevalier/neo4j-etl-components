@@ -10,9 +10,9 @@ public class MySqlConnectionConfig
 
     public MySqlConnectionConfig( String uri, String username, String password )
     {
-        this.uri = Preconditions.requireNonNullString( uri, "Uri cannot be null or empty string" );
-        this.username = Preconditions.requireNonNullString( username, "Username cannot be null or empty string" );
-        this.password = Preconditions.requireNonNullString( password, "Password cannot be null or empty string" );
+        this.uri = Preconditions.requireNonNullString( uri, "Uri" );
+        this.username = Preconditions.requireNonNullString( username, "Username" );
+        this.password = Preconditions.requireNonNullString( password, "Password" );
     }
 
     public String uri()

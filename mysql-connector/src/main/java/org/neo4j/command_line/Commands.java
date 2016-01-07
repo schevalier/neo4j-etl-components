@@ -43,7 +43,7 @@ public class Commands
     Commands( CommandsBuilder builder )
     {
         this.commands = Collections.unmodifiableList(
-                Preconditions.requireNonEmptyList( builder.commands, "Commands cannot be empty" ) );
+                Preconditions.requireNonEmptyList( builder.commands, "Commands" ) );
         this.workingDirectory = builder.workingDirectory;
         this.resultEvaluator = builder.resultEvaluator;
         this.timeoutMillis = builder.timeoutMillis;

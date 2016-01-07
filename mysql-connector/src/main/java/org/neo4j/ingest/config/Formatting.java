@@ -1,7 +1,5 @@
 package org.neo4j.ingest.config;
 
-import java.util.Objects;
-
 import org.neo4j.utils.Preconditions;
 
 public class Formatting
@@ -19,9 +17,9 @@ public class Formatting
 
     Formatting( FormattingConfigBuilder builder )
     {
-        this.delimiter = Objects.requireNonNull( builder.delimiter, "Delimiter cannot be null" );
-        this.arrayDelimiter = Objects.requireNonNull( builder.arrayDelimiter, "Array delimiter cannot be null" );
-        this.quote = Preconditions.requireNonNullString( builder.quote, "Quote cannot be null or empty string" );
+        this.delimiter = Preconditions.requireNonNull( builder.delimiter, "Delimiter" );
+        this.arrayDelimiter = Preconditions.requireNonNull( builder.arrayDelimiter, "Array delimiter" );
+        this.quote = Preconditions.requireNonNullString( builder.quote, "Quote" );
     }
 
     public Delimiter delimiter()

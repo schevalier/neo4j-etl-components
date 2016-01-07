@@ -25,7 +25,7 @@ public class NodeConfig implements CommandsSupplier
     NodeConfig( NodeConfigBuilder builder )
     {
         this.files = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( builder.files, "Files cannot be empty" ) );
+                Preconditions.requireNonEmptyCollection( builder.files, "Files" ) );
         this.labels = Collections.unmodifiableCollection( builder.labels );
     }
 
