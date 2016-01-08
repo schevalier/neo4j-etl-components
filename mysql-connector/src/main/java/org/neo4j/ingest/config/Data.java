@@ -2,22 +2,17 @@ package org.neo4j.ingest.config;
 
 import static java.lang.String.format;
 
-public class Data implements FieldType
+class Data implements FieldType
 {
-    public static Data ofType( DataType type )
-    {
-        return new Data( type, false );
-    }
-
-    public static Data arrayOfType( DataType type )
-    {
-        return new Data( type, true );
-    }
-
     private final DataType type;
     private final boolean isArray;
 
-    private Data( DataType type, boolean isArray )
+    Data( DataType type )
+    {
+        this(type, false);
+    }
+
+    Data( DataType type, boolean isArray )
     {
         this.type = type;
         this.isArray = isArray;

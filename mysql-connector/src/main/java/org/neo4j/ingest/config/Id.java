@@ -4,18 +4,16 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-public class Id implements FieldType
+class Id implements FieldType
 {
-    public static final Id ID = new Id( null );
+    private final Optional<IdSpace> idSpace;
 
-    public static Id id( String idSpace )
+    Id()
     {
-        return new Id( idSpace );
+        this( null );
     }
 
-    private final Optional<String> idSpace;
-
-    Id( String idSpace )
+    Id( IdSpace idSpace )
     {
         this.idSpace = Optional.ofNullable( idSpace );
     }
@@ -29,6 +27,6 @@ public class Id implements FieldType
     @Override
     public String value()
     {
-        return idSpace.isPresent() ? format( ":ID(%s)", idSpace.get() ) : ":ID";
+        return idSpace.isPresent() ? format( ":ID(%s)", idSpace.get().value() ) : ":ID";
     }
 }

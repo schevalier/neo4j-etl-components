@@ -4,11 +4,8 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import org.neo4j.ingest.config.Data;
 import org.neo4j.ingest.config.DataType;
 import org.neo4j.ingest.config.Field;
-import org.neo4j.ingest.config.Id;
-import org.neo4j.ingest.config.Label;
 
 import static java.util.Arrays.asList;
 
@@ -24,7 +21,7 @@ public class TableTest
                 .name( "example.Person" )
                 .addColumn( Column.builder()
                         .name( "id" )
-                        .mapsTo( new Field( Id.ID ) )
+                        .mapsTo( Field.id() )
                         .build() )
                 .build();
 
@@ -43,7 +40,7 @@ public class TableTest
                 .name( "Person" )
                 .addColumn( Column.builder()
                         .name( "id" )
-                        .mapsTo( new Field( Id.ID ) )
+                        .mapsTo( Field.id() )
                         .build() )
                 .build();
 
@@ -58,9 +55,9 @@ public class TableTest
     public void shouldReturnFieldMappingsForColumns()
     {
         // given
-        Field field1 = new Field( Id.ID );
-        Field field2 = new Field( "name", Data.ofType( DataType.String ) );
-        Field field3 = new Field( Label.label() );
+        Field field1 = Field.id();
+        Field field2 = Field.data( "name", DataType.String );
+        Field field3 = Field.label();
 
         Table table = Table.builder()
                 .name( "example.Person" )

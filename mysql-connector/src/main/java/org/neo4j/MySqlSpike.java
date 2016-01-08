@@ -16,11 +16,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.command_line.Commands;
-import org.neo4j.ingest.config.Data;
 import org.neo4j.ingest.config.DataType;
 import org.neo4j.ingest.config.Field;
 import org.neo4j.ingest.config.Formatting;
-import org.neo4j.ingest.config.Id;
 import org.neo4j.io.Pipe;
 import org.neo4j.mysql.ExportTableCommand;
 import org.neo4j.mysql.SqlRunner;
@@ -62,11 +60,11 @@ public class MySqlSpike
                         .name( "javabase.test" )
                         .addColumn( Column.builder()
                                 .name( "id" )
-                                .mapsTo( new Field( "personId", Id.ID ) )
+                                .mapsTo( Field.id( "personId" ) )
                                 .build() )
                         .addColumn( Column.builder()
                                 .name( "data" )
-                                .mapsTo( new Field( "data", Data.ofType( DataType.String ) ) )
+                                .mapsTo( Field.data( "data", DataType.String ) )
                                 .build() )
                         .build() )
                 .build();

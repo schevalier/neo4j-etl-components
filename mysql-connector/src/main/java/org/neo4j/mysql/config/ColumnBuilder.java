@@ -24,7 +24,6 @@ class ColumnBuilder implements Column.Builder, Column.Builder.SetName, Column.Bu
     @Override
     public Column build()
     {
-
         return new Column( this );
     }
 }

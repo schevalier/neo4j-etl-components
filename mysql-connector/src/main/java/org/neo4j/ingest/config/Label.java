@@ -1,13 +1,8 @@
 package org.neo4j.ingest.config;
 
-public class Label implements FieldType
+class Label implements FieldType
 {
-    public static Label label()
-    {
-        return new Label();
-    }
-
-    private Label()
+    Label()
     {
     }
 

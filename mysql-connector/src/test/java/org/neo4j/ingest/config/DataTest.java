@@ -2,9 +2,6 @@ package org.neo4j.ingest.config;
 
 import org.junit.Test;
 
-import org.neo4j.ingest.config.Data;
-import org.neo4j.ingest.config.DataType;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -14,7 +11,7 @@ public class DataTest
     public void shouldThrowExceptionIfNoFieldNameForPrimitiveType()
     {
         // given
-        Data data = Data.ofType( DataType.Int );
+        Data data = new Data( DataType.Int );
 
         try
         {
@@ -33,7 +30,7 @@ public class DataTest
     public void shouldThrowExceptionIfNoFieldNameForArrayType()
     {
         // given
-        Data data = Data.arrayOfType( DataType.Int );
+        Data data = new Data( DataType.Int, true );
 
         try
         {
