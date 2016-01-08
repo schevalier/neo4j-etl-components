@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class NodeConfigBuilder implements NodeConfig.Builder.SetFirstInputFile, NodeConfig.Builder
+class NodeConfigBuilder implements NodeConfig.Builder.SetInputFiles, NodeConfig.Builder
 {
     Collection<Path> files = new ArrayList<>();
     Collection<String> labels = new ArrayList<>();
@@ -13,6 +13,13 @@ class NodeConfigBuilder implements NodeConfig.Builder.SetFirstInputFile, NodeCon
     public NodeConfig.Builder addInputFile( Path file )
     {
         files.add( file );
+        return this;
+    }
+
+    @Override
+    public NodeConfig.Builder addInputFiles( Collection<Path> files )
+    {
+        this.files.addAll( files );
         return this;
     }
 

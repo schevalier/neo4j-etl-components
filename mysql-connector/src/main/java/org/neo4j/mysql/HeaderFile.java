@@ -3,9 +3,11 @@ package org.neo4j.mysql;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 
 import org.neo4j.ingest.config.Field;
-import org.neo4j.mysql.config.ExportConfig;
+import org.neo4j.mysql.config.ExportProperties;
+import org.neo4j.mysql.config.Table;
 
 import static java.lang.String.format;
 
@@ -13,21 +15,21 @@ import static org.neo4j.utils.StringListBuilder.stringList;
 
 public class HeaderFile
 {
-    private final ExportConfig config;
+    private final ExportProperties properties;
 
-    public HeaderFile( ExportConfig config )
+    public HeaderFile( ExportProperties properties )
     {
-        this.config = config;
+        this.properties = properties;
     }
 
-    public Path create(String exportId) throws IOException
+    public Path create(Table table, String exportId) throws IOException
     {
         String headers = stringList(
-                config.table().fieldMappings(),
-                config.formatting().delimiter().value(),
+                table.fieldMappings(),
+                properties.formatting().delimiter().value(),
                 Field::value ).toString();
 
-        Path headerFile = config.destination().resolve( format( "%s_headers", exportId ) );
+        Path headerFile = properties.destination().resolve( format( "%s_headers", exportId ) );
         Files.write( headerFile, headers.getBytes() );
 
         return headerFile;

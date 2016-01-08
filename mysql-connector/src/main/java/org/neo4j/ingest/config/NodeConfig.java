@@ -14,7 +14,7 @@ import static org.neo4j.utils.StringListBuilder.stringList;
 
 public class NodeConfig implements CommandsSupplier
 {
-    public static Builder.SetFirstInputFile builder()
+    public static Builder.SetInputFiles builder()
     {
         return new NodeConfigBuilder();
     }
@@ -48,12 +48,16 @@ public class NodeConfig implements CommandsSupplier
 
     public interface Builder
     {
-        interface SetFirstInputFile
+        interface SetInputFiles
         {
             Builder addInputFile( Path file );
+
+            Builder addInputFiles( Collection<Path> files );
         }
 
         Builder addInputFile( Path file );
+
+        Builder addInputFiles( Collection<Path> files );
 
         Builder addLabel( String label );
 

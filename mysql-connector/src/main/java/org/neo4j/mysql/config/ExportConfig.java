@@ -1,12 +1,11 @@
 package org.neo4j.mysql.config;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.neo4j.ingest.config.Formatting;
 import org.neo4j.utils.Preconditions;
 
-public class ExportConfig
+public class ExportConfig implements ExportProperties
 {
     public static Builder.SetDestination builder()
     {
@@ -26,16 +25,19 @@ public class ExportConfig
         this.table = Preconditions.requireNonNull( builder.table, "Table" );
     }
 
+    @Override
     public Path destination()
     {
         return destination;
     }
 
+    @Override
     public MySqlConnectionConfig connectionConfig()
     {
         return connectionConfig;
     }
 
+    @Override
     public Formatting formatting()
     {
         return formatting;

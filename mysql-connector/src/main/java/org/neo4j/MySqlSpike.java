@@ -22,7 +22,7 @@ import org.neo4j.ingest.config.Field;
 import org.neo4j.ingest.config.Formatting;
 import org.neo4j.ingest.config.Id;
 import org.neo4j.io.Pipe;
-import org.neo4j.mysql.Export;
+import org.neo4j.mysql.ExportTableCommand;
 import org.neo4j.mysql.SqlRunner;
 import org.neo4j.mysql.config.Column;
 import org.neo4j.mysql.config.ExportConfig;
@@ -54,7 +54,7 @@ public class MySqlSpike
                 "java",
                 "password" );
 
-        ExportConfig exportConfig = ExportConfig.builder()
+        ExportConfig config = ExportConfig.builder()
                 .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
                 .mySqlConnectionConfig( connectionConfig )
                 .formatting( Formatting.DEFAULT )
@@ -71,8 +71,8 @@ public class MySqlSpike
                         .build() )
                 .build();
 
-        Export export = new Export( exportConfig );
-        Collection<Path> files = export.execute();
+        ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
+        Collection<Path> files = exportTableCommand.execute();
 
         for ( Path file : files )
         {

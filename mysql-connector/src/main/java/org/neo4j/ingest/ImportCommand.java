@@ -4,11 +4,11 @@ import org.neo4j.command_line.Commands;
 import org.neo4j.command_line.Result;
 import org.neo4j.ingest.config.ImportConfig;
 
-public class Import
+public class ImportCommand
 {
     private final ImportConfig config;
 
-    public Import( ImportConfig config )
+    public ImportCommand( ImportConfig config )
     {
         this.config = config;
     }
