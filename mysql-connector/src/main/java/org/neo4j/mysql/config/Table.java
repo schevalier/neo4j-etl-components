@@ -57,6 +57,8 @@ public class Table implements FieldMappings
         interface SetName
         {
             SetId name( String name );
+
+            SetId name( TableName name );
         }
 
         interface SetId

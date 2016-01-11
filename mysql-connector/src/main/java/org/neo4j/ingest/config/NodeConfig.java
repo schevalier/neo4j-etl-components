@@ -12,7 +12,7 @@ import static java.lang.String.format;
 
 import static org.neo4j.utils.StringListBuilder.stringList;
 
-public class NodeConfig implements CommandsSupplier
+public class NodeConfig implements CommandsSupplier, ConfigSupplier
 {
     public static Builder.SetInputFiles builder()
     {
@@ -34,6 +34,12 @@ public class NodeConfig implements CommandsSupplier
     {
         commands.addCommand( labels.isEmpty() ? "--nodes" : format( "--nodes:%s", stringList( labels, ":" ) ) );
         commands.addCommand( format( "%s", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
+    }
+
+    @Override
+    public void addConfigTo( ImportConfig.Builder importConfig )
+    {
+        importConfig.addNodeConfig( this );
     }
 
     public interface Builder

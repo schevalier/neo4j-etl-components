@@ -8,7 +8,7 @@ public class TableName
 {
     private final String name;
 
-    TableName( String name )
+    public TableName( String name )
     {
         this.name = Preconditions.requireNonNullString( name, "Name" );
     }

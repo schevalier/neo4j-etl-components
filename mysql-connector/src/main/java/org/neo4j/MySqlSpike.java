@@ -11,27 +11,32 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.ingest.ImportCommand;
+import org.neo4j.ingest.config.ConfigSupplier;
 import org.neo4j.ingest.config.DataType;
 import org.neo4j.ingest.config.Field;
 import org.neo4j.ingest.config.Formatting;
 import org.neo4j.ingest.config.IdType;
 import org.neo4j.ingest.config.ImportConfig;
 import org.neo4j.ingest.config.NodeConfig;
+import org.neo4j.ingest.config.RelationshipConfig;
 import org.neo4j.io.Pipe;
+import org.neo4j.mysql.ExportJoinCommand;
 import org.neo4j.mysql.ExportTableCommand;
 import org.neo4j.mysql.SqlRunner;
 import org.neo4j.mysql.config.ExportConfig;
+import org.neo4j.mysql.config.Join;
 import org.neo4j.mysql.config.MySqlConnectionConfig;
 import org.neo4j.mysql.config.Table;
+import org.neo4j.mysql.config.TableName;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 public class MySqlSpike
 {
@@ -53,14 +58,12 @@ public class MySqlSpike
                 "java",
                 "password" );
 
-        NodeConfig personNodes = exportPerson( formatting, connectionConfig );
-        NodeConfig addressNodes = exportAddress( formatting, connectionConfig );
+        Collection<ConfigSupplier> configSuppliers = doExport( formatting, connectionConfig );
 
-
-        doImport( formatting, asList( personNodes, addressNodes ) );
+        doImport( formatting, configSuppliers );
     }
 
-    private static void doImport( Formatting formatting, Collection<NodeConfig> nodeConfigs ) throws Exception
+    private static void doImport( Formatting formatting, Collection<ConfigSupplier> configSuppliers ) throws Exception
     {
         ImportConfig.Builder builder = ImportConfig.builder()
                 .importToolDirectory( Paths.get( "/Users/iansrobinson/neo4j-enterprise-3.0.0-M02/bin" ) )
@@ -68,73 +71,66 @@ public class MySqlSpike
                 .formatting( formatting )
                 .idType( IdType.Integer );
 
-        for ( NodeConfig nodeConfig : nodeConfigs )
+        for ( ConfigSupplier configSupplier : configSuppliers )
         {
-            builder.addNodeConfig( nodeConfig );
+            configSupplier.addConfigTo( builder );
         }
 
         ImportCommand importCommand = new ImportCommand( builder.build() );
         importCommand.execute();
     }
 
-//    private static NodeConfig exportRelationships( Formatting formatting, MySqlConnectionConfig connectionConfig )
-//            throws Exception
-//    {
-//        ExportConfig config = ExportConfig.builder()
-//                .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
-//                .mySqlConnectionConfig( connectionConfig )
-//                .formatting( formatting )
-//                .table( Table.builder()
-//                        .name( "javabase.Person" )
-//                        .id( "id", "personId" )
-//                        .addColumn( "username", Field.data( "username", DataType.String ) )
-//                        .build() )
-//                .build();
-//
-//        ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
-//        Collection<Path> files = exportTableCommand.execute();
-//
-//        return NodeConfig.builder().addInputFiles( files ).addLabel( config.table().name().simpleName() ).build();
-//    }
-
-    private static NodeConfig exportPerson( Formatting formatting, MySqlConnectionConfig connectionConfig ) throws
-            Exception
+    private static Collection<ConfigSupplier> doExport( Formatting formatting, MySqlConnectionConfig connectionConfig )
+            throws Exception
     {
+        TableName personTable = new TableName( "javabase.Person" );
+        TableName addressTable = new TableName( "javabase.Address" );
+
         ExportConfig config = ExportConfig.builder()
                 .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
                 .mySqlConnectionConfig( connectionConfig )
                 .formatting( formatting )
-                .table( Table.builder()
-                        .name( "javabase.Person" )
-                        .id( "id", "personId" )
+                .addTable( Table.builder()
+                        .name( personTable )
+                        .id( "id" )
                         .addColumn( "username", Field.data( "username", DataType.String ) )
                         .build() )
-                .build();
-
-        ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
-        Collection<Path> files = exportTableCommand.execute();
-
-        return NodeConfig.builder().addInputFiles( files ).addLabel( config.table().name().simpleName() ).build();
-    }
-
-    private static NodeConfig exportAddress( Formatting formatting, MySqlConnectionConfig connectionConfig ) throws
-            Exception
-    {
-        ExportConfig config = ExportConfig.builder()
-                .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
-                .mySqlConnectionConfig( connectionConfig )
-                .formatting( formatting )
-                .table( Table.builder()
-                        .name( "javabase.Address" )
-                        .id( "id", "addressId" )
+                .addTable( Table.builder()
+                        .name( addressTable )
+                        .id( "id" )
                         .addColumn( "postcode", Field.data( "postcode", DataType.String ) )
+                        .build() )
+                .addJoin( Join.builder()
+                        .parent( personTable, "id" )
+                        .child( addressTable, "id" )
+                        .quote( formatting.quote() )
                         .build() )
                 .build();
 
-        ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
-        Collection<Path> files = exportTableCommand.execute();
+        Collection<ConfigSupplier> configSuppliers = new ArrayList<>();
 
-        return NodeConfig.builder().addInputFiles( files ).addLabel( config.table().name().simpleName() ).build();
+        for ( Table table : config.tables() )
+        {
+            ExportTableCommand exportTableCommand = new ExportTableCommand( config, table );
+            Collection<Path> files = exportTableCommand.execute();
+
+            configSuppliers.add( NodeConfig.builder()
+                    .addInputFiles( files )
+                    .addLabel( table.name().simpleName() )
+                    .build() );
+        }
+
+        for ( Join join : config.joins() )
+        {
+            ExportJoinCommand exportJoinCommand = new ExportJoinCommand( config, join );
+            Collection<Path> files = exportJoinCommand.execute();
+
+            configSuppliers.add( RelationshipConfig.builder()
+                    .addInputFiles( files )
+                    .build() );
+        }
+
+        return configSuppliers;
     }
 
     private static void originalTest() throws IOException

@@ -14,7 +14,7 @@ import static java.lang.String.format;
 
 import static org.neo4j.utils.StringListBuilder.stringList;
 
-public class RelationshipConfig implements CommandsSupplier
+public class RelationshipConfig implements CommandsSupplier, ConfigSupplier
 {
     public static Builder.SetInputFiles builder()
     {
@@ -36,6 +36,12 @@ public class RelationshipConfig implements CommandsSupplier
     {
         commands.addCommand( type.isPresent() ? format( "--relationships:%s", type.get() ) : "--relationships" );
         commands.addCommand( format( "%s", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
+    }
+
+    @Override
+    public void addConfigTo( ImportConfig.Builder importConfig )
+    {
+        importConfig.addRelationshipConfig( this );
     }
 
     public interface Builder

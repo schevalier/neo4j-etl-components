@@ -1,19 +1,21 @@
 package org.neo4j.mysql.config;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.neo4j.ingest.config.Formatting;
 
 class ExportConfigBuilder implements ExportConfig.Builder,
         ExportConfig.Builder.SetDestination,
         ExportConfig.Builder.SetMySqlConnectionConfig,
-        ExportConfig.Builder.SetFormatting,
-        ExportConfig.Builder.SetTable
+        ExportConfig.Builder.SetFormatting
 {
+    final Collection<Table> tables = new ArrayList<>();
+    final Collection<Join> joins = new ArrayList<>();
     Path destination;
     MySqlConnectionConfig connectionConfig;
     Formatting formatting;
-    Table table;
 
     @Override
     public SetMySqlConnectionConfig destination( Path directory )
@@ -30,16 +32,23 @@ class ExportConfigBuilder implements ExportConfig.Builder,
     }
 
     @Override
-    public SetTable formatting( Formatting formatting )
+    public ExportConfig.Builder formatting( Formatting formatting )
     {
         this.formatting = formatting;
         return this;
     }
 
     @Override
-    public ExportConfig.Builder table( Table table )
+    public ExportConfig.Builder addTable( Table table )
     {
-        this.table = table;
+        tables.add( table );
+        return this;
+    }
+
+    @Override
+    public ExportConfig.Builder addJoin( Join join )
+    {
+        joins.add( join );
         return this;
     }
 

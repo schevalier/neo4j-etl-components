@@ -10,11 +10,11 @@ import static java.lang.String.format;
 
 import static org.neo4j.utils.StringListBuilder.stringList;
 
-public class ExportDataCommand
+public class ExportTableContentsCommand
 {
     private final ExportProperties properties;
 
-    public ExportDataCommand( ExportProperties properties )
+    public ExportTableContentsCommand( ExportProperties properties )
     {
         this.properties = properties;
     }

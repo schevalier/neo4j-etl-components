@@ -9,7 +9,7 @@ import org.neo4j.utils.Preconditions;
 
 import static java.util.Arrays.asList;
 
-public class Join  implements FieldMappings
+public class Join implements FieldMappings
 {
     public static Builder.SetParent builder()
     {
@@ -22,20 +22,25 @@ public class Join  implements FieldMappings
 
     Join( JoinBuilder builder )
     {
-        this.parent = Preconditions.requireNonNull(builder.parent, "Parent");
-        this.child = Preconditions.requireNonNull(builder.child, "Child");
-        this.quote = Preconditions.requireNonNull(builder.quote, "Quote");
+        this.parent = Preconditions.requireNonNull( builder.parent, "Parent" );
+        this.child = Preconditions.requireNonNull( builder.child, "Child" );
+        this.quote = Preconditions.requireNonNull( builder.quote, "Quote" );
     }
 
     @Override
     public Collection<Field> fieldMappings()
     {
-        return asList(parent.field(), child.field(), Field.relationshipType());
+        return asList( parent.field(), child.field(), Field.relationshipType() );
     }
 
     public Collection<String> columns()
     {
-        return asList(parent.name(), child.name(), quote.enquote( child.table().simpleName() ));
+        return asList( parent.name(), child.name(), quote.enquote( child.table().simpleName() ) );
+    }
+
+    public Collection<TableName> tableNames()
+    {
+        return asList( parent.table(), child.table() );
     }
 
     public interface Builder

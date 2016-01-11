@@ -20,6 +20,13 @@ class TableBuilder implements Table.Builder.SetName, Table.Builder.SetId, Table.
     }
 
     @Override
+    public Table.Builder.SetId name( TableName name )
+    {
+        this.table = name;
+        return this;
+    }
+
+    @Override
     public Table.Builder addColumn( String column, Field field )
     {
         columns.add( Column.builder().table( table ).name( column ).mapsTo( field ).build() );

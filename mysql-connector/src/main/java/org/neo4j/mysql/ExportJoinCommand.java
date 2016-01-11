@@ -6,19 +6,19 @@ import java.util.UUID;
 
 import org.neo4j.ingest.HeaderFile;
 import org.neo4j.mysql.config.ExportProperties;
-import org.neo4j.mysql.config.Table;
+import org.neo4j.mysql.config.Join;
 
 import static java.util.Arrays.asList;
 
-public class ExportTableCommand
+public class ExportJoinCommand
 {
     private final ExportProperties properties;
-    private final Table table;
+    private final Join join;
 
-    public ExportTableCommand( ExportProperties properties, Table table )
+    public ExportJoinCommand( ExportProperties properties, Join join )
     {
         this.properties = properties;
-        this.table = table;
+        this.join = join;
     }
 
     public Collection<Path> execute() throws Exception
@@ -26,8 +26,8 @@ public class ExportTableCommand
         String exportId = UUID.randomUUID().toString();
 
         Path headerFile = new HeaderFile( properties.destination(), properties.formatting() )
-                .create( table.fieldMappings(), exportId );
-        Path exportFile = new ExportTableContentsCommand( properties ).execute( table, exportId );
+                .create( join.fieldMappings(), exportId );
+        Path exportFile = new ExportJoinContentsCommand( properties ).execute( join, exportId );
 
         return asList( headerFile, exportFile );
     }

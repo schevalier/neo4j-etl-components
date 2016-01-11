@@ -1,6 +1,8 @@
 package org.neo4j.mysql.config;
 
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.neo4j.ingest.config.Formatting;
 import org.neo4j.utils.Preconditions;
@@ -15,14 +17,16 @@ public class ExportConfig implements ExportProperties
     private final Path destination;
     private final MySqlConnectionConfig connectionConfig;
     private final Formatting formatting;
-    private final Table table;
+    private final Collection<Table> tables;
+    private final Collection<Join> joins;
 
     public ExportConfig( ExportConfigBuilder builder )
     {
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "Connection" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
-        this.table = Preconditions.requireNonNull( builder.table, "Table" );
+        this.tables = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.tables, "Tables" ) );
+        this.joins = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.joins, "Joins" ) );
     }
 
     @Override
@@ -43,9 +47,14 @@ public class ExportConfig implements ExportProperties
         return formatting;
     }
 
-    public Table table()
+    public Collection<Table> tables()
     {
-        return table;
+        return tables;
+    }
+
+    public Collection<Join> joins()
+    {
+        return joins;
     }
 
     public interface Builder
@@ -62,13 +71,13 @@ public class ExportConfig implements ExportProperties
 
         interface SetFormatting
         {
-            SetTable formatting( Formatting formatting );
+            Builder formatting( Formatting formatting );
         }
 
-        interface SetTable
-        {
-            Builder table( Table table );
-        }
+        Builder addTable( Table table );
+
+        Builder addJoin( Join join );
+
 
         ExportConfig build();
     }
