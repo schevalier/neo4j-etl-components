@@ -2,12 +2,11 @@ package org.neo4j.ingest.config;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.command_line.CommandsSupplier;
 import org.neo4j.utils.Preconditions;
-
-import static java.lang.String.format;
 
 public class ImportConfig implements CommandsSupplier
 {
@@ -21,14 +20,16 @@ public class ImportConfig implements CommandsSupplier
     private final Formatting formatting;
     private final IdType idType;
     private final Collection<NodeConfig> nodes;
+    private final Collection<RelationshipConfig> relationships;
 
     ImportConfig( ImportConfigBuilder builder )
     {
         this.importToolDirectory = Preconditions.requireNonNull( builder.importToolDirectory, "Import tool directory" );
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
-        this.idType = builder.idType;
-        this.nodes = builder.nodes;
+        this.idType = Preconditions.requireNonNull( builder.idType, "Id type" );
+        this.nodes = Collections.unmodifiableCollection( builder.nodes );
+        this.relationships = Collections.unmodifiableCollection( builder.relationships );
     }
 
     @Override
@@ -44,6 +45,11 @@ public class ImportConfig implements CommandsSupplier
             node.addCommandsTo( commands );
         }
 
+        for ( RelationshipConfig relationship : relationships )
+        {
+            relationship.addCommandsTo( commands );
+        }
+
         commands.addCommand( "--delimiter" );
         commands.addCommand( formatting.delimiter().description() );
 
@@ -51,7 +57,7 @@ public class ImportConfig implements CommandsSupplier
         commands.addCommand( formatting.arrayDelimiter().description() );
 
         commands.addCommand( "--quote" );
-        commands.addCommand( formatting.quote() );
+        commands.addCommand( formatting.quote().value() );
 
         commands.addCommand( "--id-type" );
         commands.addCommand( idType.name().toUpperCase() );
@@ -80,6 +86,8 @@ public class ImportConfig implements CommandsSupplier
         }
 
         Builder addNodeConfig( NodeConfig nodeConfig );
+
+        Builder addRelationshipConfig( RelationshipConfig relationshipConfig );
 
         ImportConfig build();
     }

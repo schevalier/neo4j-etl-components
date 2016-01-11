@@ -6,12 +6,12 @@ import java.util.Collection;
 class TableBuilder implements Table.Builder.SetName, Table.Builder.SetFirstColumn, Table.Builder
 {
     final Collection<Column> columns = new ArrayList<>();
-    String name;
+    TableName name;
 
     @Override
     public Table.Builder.SetFirstColumn name( String name )
     {
-        this.name = name;
+        this.name = new TableName( name );
         return this;
     }
 

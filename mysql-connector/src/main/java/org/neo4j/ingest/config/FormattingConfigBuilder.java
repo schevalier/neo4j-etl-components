@@ -4,7 +4,7 @@ class FormattingConfigBuilder implements Formatting.Builder
 {
     Delimiter delimiter = Delimiter.COMMA;
     Delimiter arrayDelimiter = Delimiter.SEMICOLON;
-    String quote = "\"";
+    QuoteChar quote = new QuoteChar( "\"" );
 
     @Override
     public Formatting.Builder delimiter( Delimiter delimiter )
@@ -23,7 +23,7 @@ class FormattingConfigBuilder implements Formatting.Builder
     @Override
     public Formatting.Builder quote( String quote )
     {
-        this.quote = quote;
+        this.quote = new QuoteChar( quote );
         return this;
     }
 

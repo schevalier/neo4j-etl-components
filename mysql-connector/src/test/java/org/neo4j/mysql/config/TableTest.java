@@ -26,7 +26,7 @@ public class TableTest
                 .build();
 
         // when
-        String simpleName = table.simpleName();
+        String simpleName = table.name().simpleValue();
 
         // then
         assertEquals( "Person", simpleName );
@@ -45,7 +45,7 @@ public class TableTest
                 .build();
 
         // when
-        String simpleName = table.simpleName();
+        String simpleName = table.name().simpleValue();
 
         // then
         assertEquals( "Person", simpleName );

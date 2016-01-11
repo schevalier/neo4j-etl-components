@@ -27,7 +27,7 @@ public class ExportDataCommand
         Commands.commands( "chmod", "0777", exportFile.getParent().toString() ).execute().await();
 
         String sql = "SELECT " +
-                stringList( table.columnNames(), delimiter ) +
+                stringList( table.columns(), delimiter ) +
                 " INTO OUTFILE '" +
                 exportFile.toString() +
                 "' FIELDS TERMINATED BY '" +

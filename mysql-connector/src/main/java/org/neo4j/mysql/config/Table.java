@@ -16,12 +16,12 @@ public class Table implements FieldMappings
         return new TableBuilder();
     }
 
-    private final String name;
+    private final TableName name;
     private final Collection<Column> columns;
 
     Table( TableBuilder builder )
     {
-        this.name = Preconditions.requireNonNullString( builder.name, "Table name" );
+        this.name = Preconditions.requireNonNull( builder.name, "Table name" );
         this.columns = Collections.unmodifiableCollection(
                 Preconditions.requireNonEmptyCollection( builder.columns, "Columns" ) );
     }
@@ -32,19 +32,14 @@ public class Table implements FieldMappings
         return columns.stream().map( Column::field ).collect( Collectors.toList() );
     }
 
-    public Collection<String> columnNames()
+    public Collection<String> columns()
     {
         return columns.stream().map( Column::name ).collect( Collectors.toList() );
     }
 
-    public String name()
+    public TableName name()
     {
         return name;
-    }
-
-    public String simpleName()
-    {
-        return name.substring( name.lastIndexOf( "." ) + 1 );
     }
 
     public interface Builder

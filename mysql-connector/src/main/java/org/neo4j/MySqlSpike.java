@@ -93,7 +93,7 @@ public class MySqlSpike
         ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
         Collection<Path> files = exportTableCommand.execute();
 
-        return NodeConfig.builder().addInputFiles(files).addLabel( config.table().simpleName() ).build();
+        return NodeConfig.builder().addInputFiles(files).addLabel( config.table().name().simpleValue() ).build();
     }
 
     private static void originalTest() throws IOException

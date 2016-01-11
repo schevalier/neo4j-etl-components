@@ -14,7 +14,8 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
     Path destination;
     Formatting formatting;
     IdType idType = IdType.String;
-    Collection<NodeConfig> nodes = new ArrayList<>(  );
+    final Collection<NodeConfig> nodes = new ArrayList<>(  );
+    final Collection<RelationshipConfig> relationships = new ArrayList<>(  );
 
     @Override
     public SetDestination importToolDirectory( Path directory )
@@ -48,6 +49,13 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
     public ImportConfig.Builder addNodeConfig( NodeConfig nodeConfig )
     {
         nodes.add( nodeConfig );
+        return this;
+    }
+
+    @Override
+    public ImportConfig.Builder addRelationshipConfig( RelationshipConfig relationshipConfig )
+    {
+        relationships.add( relationshipConfig );
         return this;
     }
 

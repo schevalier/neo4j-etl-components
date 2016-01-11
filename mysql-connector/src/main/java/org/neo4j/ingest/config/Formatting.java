@@ -13,13 +13,13 @@ public class Formatting
 
     private final Delimiter delimiter;
     private final Delimiter arrayDelimiter;
-    private final String quote;
+    private final QuoteChar quote;
 
     Formatting( FormattingConfigBuilder builder )
     {
         this.delimiter = Preconditions.requireNonNull( builder.delimiter, "Delimiter" );
         this.arrayDelimiter = Preconditions.requireNonNull( builder.arrayDelimiter, "Array delimiter" );
-        this.quote = Preconditions.requireNonNullString( builder.quote, "Quote" );
+        this.quote = Preconditions.requireNonNull( builder.quote, "Quote" );
     }
 
     public Delimiter delimiter()
@@ -32,7 +32,7 @@ public class Formatting
         return arrayDelimiter;
     }
 
-    public String quote()
+    public QuoteChar quote()
     {
         return quote;
     }

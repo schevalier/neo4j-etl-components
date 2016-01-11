@@ -2,10 +2,27 @@ package org.neo4j.ingest.config;
 
 import java.util.Optional;
 
+import org.neo4j.utils.Strings;
+
 import static java.lang.String.format;
 
 public class Field
 {
+    public static Field startId()
+    {
+        return new Field( new StartId() );
+    }
+
+    public static Field endId()
+    {
+        return new Field( new EndId() );
+    }
+
+    public static Field relationshipType()
+    {
+        return new Field( new RelationshipType() );
+    }
+
     public static Field id()
     {
         return new Field( new Id() );
@@ -56,7 +73,7 @@ public class Field
 
     Field( String name, FieldType type )
     {
-        this.name = Optional.ofNullable( orNull( name ) );
+        this.name = Optional.ofNullable( Strings.orNull( name ) );
         this.type = type;
 
         validate();
@@ -65,21 +82,6 @@ public class Field
     public String value()
     {
         return name.isPresent() ? format( "%s%s", name.get(), type.value() ) : type.value();
-    }
-
-    private String orNull( String value )
-    {
-        if ( value == null )
-        {
-            return null;
-        }
-
-        if ( value.trim().isEmpty() )
-        {
-            return null;
-        }
-
-        return value;
     }
 
     private void validate()

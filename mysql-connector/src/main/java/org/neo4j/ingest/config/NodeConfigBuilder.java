@@ -6,8 +6,8 @@ import java.util.Collection;
 
 class NodeConfigBuilder implements NodeConfig.Builder.SetInputFiles, NodeConfig.Builder
 {
-    Collection<Path> files = new ArrayList<>();
-    Collection<String> labels = new ArrayList<>();
+    final Collection<Path> files = new ArrayList<>();
+    final Collection<String> labels = new ArrayList<>();
 
     @Override
     public NodeConfig.Builder addInputFile( Path file )
