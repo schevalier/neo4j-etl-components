@@ -6,6 +6,8 @@ import org.neo4j.command_line.Commands;
 import org.neo4j.mysql.config.ExportProperties;
 import org.neo4j.mysql.config.Table;
 
+import static java.lang.String.format;
+
 import static org.neo4j.utils.StringListBuilder.stringList;
 
 public class ExportDataCommand
@@ -21,7 +23,7 @@ public class ExportDataCommand
     {
         String delimiter = properties.formatting().delimiter().value();
 
-        Path exportFile = properties.destination().resolve( exportId );
+        Path exportFile = properties.destination().resolve( format( "%s.csv", exportId ) );
         Commands.commands( "chmod", "0777", exportFile.getParent().toString() ).execute().await();
 
         String sql = "SELECT " +

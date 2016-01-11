@@ -29,21 +29,11 @@ public class NodeConfig implements CommandsSupplier
         this.labels = Collections.unmodifiableCollection( builder.labels );
     }
 
-    public Collection<Path> files()
-    {
-        return files;
-    }
-
-    public Collection<String> labels()
-    {
-        return labels;
-    }
-
     @Override
     public void addCommandsTo( Commands.Builder.SetCommands commands )
     {
-        commands.addCommand( labels.isEmpty() ? "--nodes" : format( "--nodes[:%s]", stringList( labels, ":" ) ) );
-        commands.addCommand( format( "\"%s\"", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
+        commands.addCommand( labels.isEmpty() ? "--nodes" : format( "--nodes:%s", stringList( labels, ":" ) ) );
+        commands.addCommand( format( "%s", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
     }
 
     public interface Builder

@@ -58,11 +58,8 @@ public class Field
     {
         this.name = Optional.ofNullable( orNull( name ) );
         this.type = type;
-    }
 
-    public void validate()
-    {
-        type.validate( name.isPresent() );
+        validate();
     }
 
     public String value()
@@ -83,5 +80,10 @@ public class Field
         }
 
         return value;
+    }
+
+    private void validate()
+    {
+        type.validate( name.isPresent() );
     }
 }

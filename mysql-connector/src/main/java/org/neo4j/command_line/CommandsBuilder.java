@@ -1,6 +1,7 @@
 package org.neo4j.command_line;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ class CommandsBuilder
 
     public CommandsBuilder( String... commands )
     {
-        this.commands = asList( commands );
+        this.commands = new ArrayList<>( asList( commands ) );
     }
 
     @Override

@@ -9,9 +9,9 @@ public class Delimiter
     private final String value;
     private final String description;
 
-    public Delimiter(String value)
+    public Delimiter( String value )
     {
-        this(value, value);
+        this( value, value );
     }
 
     public Delimiter( String value, String description )

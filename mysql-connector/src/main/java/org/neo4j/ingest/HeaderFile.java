@@ -25,14 +25,12 @@ public class HeaderFile
 
     public Path create( Collection<Field> fields, String filenamePrefix ) throws IOException
     {
-        fields.stream().forEach( Field::validate );
-
         String headers = stringList(
                 fields,
                 formatting.delimiter().value(),
                 Field::value ).toString();
 
-        Path headerFile = directory.resolve( format( "%s_headers", filenamePrefix ) );
+        Path headerFile = directory.resolve( format( "%s_headers.csv", filenamePrefix ) );
         Files.write( headerFile, headers.getBytes() );
 
         return headerFile;

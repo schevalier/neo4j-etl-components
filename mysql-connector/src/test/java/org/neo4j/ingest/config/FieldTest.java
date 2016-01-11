@@ -16,10 +16,9 @@ public class FieldTest
         // given
         FieldType fieldType = mock( FieldType.class );
 
-        Field field = new Field( null, fieldType );
 
         // when
-        field.validate();
+        new Field( null, fieldType );
 
         // then
         verify( fieldType ).validate( false );
@@ -31,10 +30,9 @@ public class FieldTest
         // given
         FieldType fieldType = mock( FieldType.class );
 
-        Field field = new Field( "", fieldType );
 
         // when
-        field.validate();
+        new Field( "", fieldType );
 
         // then
         verify( fieldType ).validate( false );
@@ -46,10 +44,9 @@ public class FieldTest
         // given
         FieldType fieldType = mock( FieldType.class );
 
-        Field field = new Field( " \t", fieldType );
 
         // when
-        field.validate();
+        new Field( " \t", fieldType );
 
         // then
         verify( fieldType ).validate( false );

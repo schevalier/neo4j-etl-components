@@ -7,6 +7,8 @@ import org.neo4j.command_line.Commands;
 import org.neo4j.command_line.CommandsSupplier;
 import org.neo4j.utils.Preconditions;
 
+import static java.lang.String.format;
+
 public class ImportConfig implements CommandsSupplier
 {
     public static Builder.SetImportToolDirectory builder()
@@ -37,6 +39,11 @@ public class ImportConfig implements CommandsSupplier
         commands.addCommand( "--into" );
         commands.addCommand( destination.toAbsolutePath().toString() );
 
+        for ( NodeConfig node : nodes )
+        {
+            node.addCommandsTo( commands );
+        }
+
         commands.addCommand( "--delimiter" );
         commands.addCommand( formatting.delimiter().description() );
 
@@ -48,11 +55,6 @@ public class ImportConfig implements CommandsSupplier
 
         commands.addCommand( "--id-type" );
         commands.addCommand( idType.name().toUpperCase() );
-
-        for ( NodeConfig node : nodes )
-        {
-            node.addCommandsTo( commands );
-        }
     }
 
     public interface Builder
@@ -64,12 +66,18 @@ public class ImportConfig implements CommandsSupplier
 
         interface SetDestination
         {
-            Builder destination( Path directory );
+            SetFormatting destination( Path directory );
         }
 
-        Builder formatting( Formatting formatting );
+        interface SetFormatting
+        {
+            SetIdType formatting( Formatting formatting );
+        }
 
-        Builder idType( IdType idType );
+        interface SetIdType
+        {
+            Builder idType( IdType idType );
+        }
 
         Builder addNodeConfig( NodeConfig nodeConfig );
 

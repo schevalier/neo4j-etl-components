@@ -16,9 +16,13 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.command_line.Commands;
+import org.neo4j.ingest.ImportCommand;
 import org.neo4j.ingest.config.DataType;
 import org.neo4j.ingest.config.Field;
 import org.neo4j.ingest.config.Formatting;
+import org.neo4j.ingest.config.IdType;
+import org.neo4j.ingest.config.ImportConfig;
+import org.neo4j.ingest.config.NodeConfig;
 import org.neo4j.io.Pipe;
 import org.neo4j.mysql.ExportTableCommand;
 import org.neo4j.mysql.SqlRunner;
@@ -42,10 +46,27 @@ public class MySqlSpike
 
     public static void main( String[] args ) throws Exception
     {
-        doExport();
+        Formatting formatting = Formatting.DEFAULT;
+
+        NodeConfig nodeConfig = doExport(formatting);
+        doImport( formatting, nodeConfig );
     }
 
-    private static void doExport() throws Exception
+    private static void doImport( Formatting formatting, NodeConfig nodeConfig ) throws Exception
+    {
+        ImportConfig importConfig = ImportConfig.builder()
+                .importToolDirectory( Paths.get( "/Users/iansrobinson/neo4j-enterprise-3.0.0-M02/bin" ) )
+                .destination( Paths.get( "/Users/iansrobinson/Desktop/graph.db" ) )
+                .formatting( formatting )
+                .idType( IdType.String )
+                .addNodeConfig( nodeConfig )
+                .build();
+
+        ImportCommand importCommand = new ImportCommand( importConfig );
+        importCommand.execute();
+    }
+
+    private static NodeConfig doExport(Formatting formatting) throws Exception
     {
         MySqlConnectionConfig connectionConfig = new MySqlConnectionConfig(
                 "jdbc:mysql://localhost:3306/javabase",
@@ -55,7 +76,7 @@ public class MySqlSpike
         ExportConfig config = ExportConfig.builder()
                 .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
                 .mySqlConnectionConfig( connectionConfig )
-                .formatting( Formatting.DEFAULT )
+                .formatting( formatting )
                 .table( Table.builder()
                         .name( "javabase.test" )
                         .addColumn( Column.builder()
@@ -72,10 +93,7 @@ public class MySqlSpike
         ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
         Collection<Path> files = exportTableCommand.execute();
 
-        for ( Path file : files )
-        {
-            System.out.println( file.toString() );
-        }
+        return NodeConfig.builder().addInputFiles(files).addLabel( config.table().simpleName() ).build();
     }
 
     private static void originalTest() throws IOException

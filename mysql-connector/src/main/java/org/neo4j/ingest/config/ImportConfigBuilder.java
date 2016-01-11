@@ -6,6 +6,8 @@ import java.util.Collection;
 
 class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory,
         ImportConfig.Builder.SetDestination,
+        ImportConfig.Builder.SetFormatting,
+        ImportConfig.Builder.SetIdType,
         ImportConfig.Builder
 {
     Path importToolDirectory;
@@ -22,14 +24,14 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
     }
 
     @Override
-    public ImportConfig.Builder destination( Path directory )
+    public ImportConfig.Builder.SetFormatting destination( Path directory )
     {
         this.destination = directory;
         return this;
     }
 
     @Override
-    public ImportConfig.Builder formatting( Formatting formatting )
+    public ImportConfig.Builder.SetIdType formatting( Formatting formatting )
     {
         this.formatting = formatting;
         return this;
