@@ -1,7 +1,9 @@
 package org.neo4j.mysql.config;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.neo4j.ingest.config.Field;
@@ -17,11 +19,13 @@ public class Table implements FieldMappings
     }
 
     private final TableName name;
+    private final Column id;
     private final Collection<Column> columns;
 
     Table( TableBuilder builder )
     {
-        this.name = Preconditions.requireNonNull( builder.name, "Table name" );
+        this.name = Preconditions.requireNonNull( builder.table, "Table name" );
+        this.id = Preconditions.requireNonNull( builder.id, "Ide" );
         this.columns = Collections.unmodifiableCollection(
                 Preconditions.requireNonEmptyCollection( builder.columns, "Columns" ) );
     }
@@ -29,12 +33,12 @@ public class Table implements FieldMappings
     @Override
     public Collection<Field> fieldMappings()
     {
-        return columns.stream().map( Column::field ).collect( Collectors.toList() );
+        return all( id.field(), columns.stream().map( Column::field ).collect( Collectors.toList() ) );
     }
 
     public Collection<String> columns()
     {
-        return columns.stream().map( Column::name ).collect( Collectors.toList() );
+        return all( id.name(), columns.stream().map( Column::name ).collect( Collectors.toList() ) );
     }
 
     public TableName name()
@@ -42,19 +46,32 @@ public class Table implements FieldMappings
         return name;
     }
 
+    private <T> Collection<T> all( T first, List<T> remaining )
+    {
+        remaining.add( 0, first );
+        return remaining;
+    }
+
     public interface Builder
     {
         interface SetName
         {
-            SetFirstColumn name( String name );
+            SetId name( String name );
+        }
+
+        interface SetId
+        {
+            SetFirstColumn id( String column );
+
+            SetFirstColumn id( String column, String fieldName );
         }
 
         interface SetFirstColumn
         {
-            Builder addColumn( Column column );
+            Builder addColumn( String column, Field field );
         }
 
-        Builder addColumn( Column column );
+        Builder addColumn( String column, Field field );
 
         Table build();
     }

@@ -5,23 +5,30 @@ import org.neo4j.utils.Preconditions;
 
 public class Column
 {
-    public static Builder.SetName builder()
+    public static Builder.SetTable builder()
     {
         return new ColumnBuilder();
     }
 
+    private final TableName table;
     private final String name;
     private final Field field;
 
     Column( ColumnBuilder builder )
     {
+        this.table = Preconditions.requireNonNull( builder.table, "Table" );
         this.name = Preconditions.requireNonNullString( builder.name, "Name" );
         this.field = Preconditions.requireNonNull( builder.field, "Field" );
     }
 
+    public TableName table()
+    {
+        return table;
+    }
+
     public String name()
     {
-        return name;
+        return table.formatColumn( name );
     }
 
     public Field field()
@@ -31,6 +38,11 @@ public class Column
 
     public interface Builder
     {
+        interface SetTable
+        {
+            SetName table( TableName table );
+        }
+
         interface SetName
         {
             SetField name( String name );

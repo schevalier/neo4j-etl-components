@@ -26,12 +26,12 @@ import org.neo4j.ingest.config.NodeConfig;
 import org.neo4j.io.Pipe;
 import org.neo4j.mysql.ExportTableCommand;
 import org.neo4j.mysql.SqlRunner;
-import org.neo4j.mysql.config.Column;
 import org.neo4j.mysql.config.ExportConfig;
 import org.neo4j.mysql.config.MySqlConnectionConfig;
 import org.neo4j.mysql.config.Table;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 public class MySqlSpike
 {
@@ -48,52 +48,93 @@ public class MySqlSpike
     {
         Formatting formatting = Formatting.DEFAULT;
 
-        NodeConfig nodeConfig = doExport(formatting);
-        doImport( formatting, nodeConfig );
-    }
-
-    private static void doImport( Formatting formatting, NodeConfig nodeConfig ) throws Exception
-    {
-        ImportConfig importConfig = ImportConfig.builder()
-                .importToolDirectory( Paths.get( "/Users/iansrobinson/neo4j-enterprise-3.0.0-M02/bin" ) )
-                .destination( Paths.get( "/Users/iansrobinson/Desktop/graph.db" ) )
-                .formatting( formatting )
-                .idType( IdType.String )
-                .addNodeConfig( nodeConfig )
-                .build();
-
-        ImportCommand importCommand = new ImportCommand( importConfig );
-        importCommand.execute();
-    }
-
-    private static NodeConfig doExport(Formatting formatting) throws Exception
-    {
         MySqlConnectionConfig connectionConfig = new MySqlConnectionConfig(
                 "jdbc:mysql://localhost:3306/javabase",
                 "java",
                 "password" );
 
+        NodeConfig personNodes = exportPerson( formatting, connectionConfig );
+        NodeConfig addressNodes = exportAddress( formatting, connectionConfig );
+
+
+        doImport( formatting, asList( personNodes, addressNodes ) );
+    }
+
+    private static void doImport( Formatting formatting, Collection<NodeConfig> nodeConfigs ) throws Exception
+    {
+        ImportConfig.Builder builder = ImportConfig.builder()
+                .importToolDirectory( Paths.get( "/Users/iansrobinson/neo4j-enterprise-3.0.0-M02/bin" ) )
+                .destination( Paths.get( "/Users/iansrobinson/Desktop/graph.db" ) )
+                .formatting( formatting )
+                .idType( IdType.Integer );
+
+        for ( NodeConfig nodeConfig : nodeConfigs )
+        {
+            builder.addNodeConfig( nodeConfig );
+        }
+
+        ImportCommand importCommand = new ImportCommand( builder.build() );
+        importCommand.execute();
+    }
+
+//    private static NodeConfig exportRelationships( Formatting formatting, MySqlConnectionConfig connectionConfig )
+//            throws Exception
+//    {
+//        ExportConfig config = ExportConfig.builder()
+//                .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
+//                .mySqlConnectionConfig( connectionConfig )
+//                .formatting( formatting )
+//                .table( Table.builder()
+//                        .name( "javabase.Person" )
+//                        .id( "id", "personId" )
+//                        .addColumn( "username", Field.data( "username", DataType.String ) )
+//                        .build() )
+//                .build();
+//
+//        ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
+//        Collection<Path> files = exportTableCommand.execute();
+//
+//        return NodeConfig.builder().addInputFiles( files ).addLabel( config.table().name().simpleName() ).build();
+//    }
+
+    private static NodeConfig exportPerson( Formatting formatting, MySqlConnectionConfig connectionConfig ) throws
+            Exception
+    {
         ExportConfig config = ExportConfig.builder()
                 .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
                 .mySqlConnectionConfig( connectionConfig )
                 .formatting( formatting )
                 .table( Table.builder()
-                        .name( "javabase.test" )
-                        .addColumn( Column.builder()
-                                .name( "id" )
-                                .mapsTo( Field.id( "personId" ) )
-                                .build() )
-                        .addColumn( Column.builder()
-                                .name( "data" )
-                                .mapsTo( Field.data( "data", DataType.String ) )
-                                .build() )
+                        .name( "javabase.Person" )
+                        .id( "id", "personId" )
+                        .addColumn( "username", Field.data( "username", DataType.String ) )
                         .build() )
                 .build();
 
         ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
         Collection<Path> files = exportTableCommand.execute();
 
-        return NodeConfig.builder().addInputFiles(files).addLabel( config.table().name().simpleValue() ).build();
+        return NodeConfig.builder().addInputFiles( files ).addLabel( config.table().name().simpleName() ).build();
+    }
+
+    private static NodeConfig exportAddress( Formatting formatting, MySqlConnectionConfig connectionConfig ) throws
+            Exception
+    {
+        ExportConfig config = ExportConfig.builder()
+                .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
+                .mySqlConnectionConfig( connectionConfig )
+                .formatting( formatting )
+                .table( Table.builder()
+                        .name( "javabase.Address" )
+                        .id( "id", "addressId" )
+                        .addColumn( "postcode", Field.data( "postcode", DataType.String ) )
+                        .build() )
+                .build();
+
+        ExportTableCommand exportTableCommand = new ExportTableCommand( config, config.table() );
+        Collection<Path> files = exportTableCommand.execute();
+
+        return NodeConfig.builder().addInputFiles( files ).addLabel( config.table().name().simpleName() ).build();
     }
 
     private static void originalTest() throws IOException

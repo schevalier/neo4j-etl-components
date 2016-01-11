@@ -36,7 +36,7 @@ public class ExportDataCommand
                 " ESCAPED BY '\\\\'" +
                 " LINES TERMINATED BY '\\n'" +
                 " STARTING BY ''" +
-                " FROM " + table.name();
+                " FROM " + table.name().fullName();
 
         SqlRunner sqlRunner = new SqlRunner( properties.connectionConfig(), sql );
         sqlRunner.execute().await();

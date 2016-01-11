@@ -13,9 +13,19 @@ public class Field
         return new Field( new StartId() );
     }
 
+    public static Field startId( IdSpace idSpace )
+    {
+        return new Field( new StartId( idSpace ) );
+    }
+
     public static Field endId()
     {
         return new Field( new EndId() );
+    }
+
+    public static Field endId( IdSpace idSpace )
+    {
+        return new Field( new EndId( idSpace ) );
     }
 
     public static Field relationshipType()

@@ -2,22 +2,29 @@ package org.neo4j.mysql.config;
 
 import org.neo4j.utils.Preconditions;
 
+import static java.lang.String.format;
+
 public class TableName
 {
-    private final String value;
+    private final String name;
 
-    TableName( String value )
+    TableName( String name )
     {
-        this.value = Preconditions.requireNonNullString( value, "Value" );
+        this.name = Preconditions.requireNonNullString( name, "Name" );
     }
 
-    public String simpleValue()
+    public String simpleName()
     {
-        return value.substring( value.lastIndexOf( "." ) + 1 );
+        return name.substring( name.lastIndexOf( "." ) + 1 );
     }
 
-    public String value()
+    public String fullName()
     {
-        return value;
+        return name;
+    }
+
+    public String formatColumn(String column)
+    {
+        return format("%s.%s", name, column);
     }
 }
