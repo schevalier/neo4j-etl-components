@@ -8,7 +8,7 @@ public interface ExportProperties
 {
     Path destination();
 
-    MySqlConnectionConfig connectionConfig();
+    ConnectionConfig connectionConfig();
 
     Formatting formatting();
 }

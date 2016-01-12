@@ -1,6 +1,6 @@
 package org.neo4j.mysql.config;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.IdSpace;
 import org.neo4j.ingest.config.QuoteChar;
 
@@ -16,7 +16,7 @@ class JoinBuilder implements Join.Builder, Join.Builder.SetParent, Join.Builder.
         parent = Column.builder()
                 .table( table )
                 .name( column )
-                .mapsTo( Field.startId( new IdSpace( table.simpleName() ) ) )
+                .mapsTo( CsvField.startId( new IdSpace( table.simpleName() ) ) )
                 .build();
         return this;
     }
@@ -27,13 +27,13 @@ class JoinBuilder implements Join.Builder, Join.Builder.SetParent, Join.Builder.
         child = Column.builder()
                 .table( table )
                 .name( column )
-                .mapsTo( Field.endId( new IdSpace( table.simpleName() ) ) )
+                .mapsTo( CsvField.endId( new IdSpace( table.simpleName() ) ) )
                 .build();
         return this;
     }
 
     @Override
-    public Join.Builder quote( QuoteChar quote )
+    public Join.Builder quoteCharacter( QuoteChar quote )
     {
         this.quote = quote;
         return this;

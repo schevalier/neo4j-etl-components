@@ -1,6 +1,6 @@
 package org.neo4j.ingest.config;
 
-class Label implements FieldType
+class Label implements CsvFieldType
 {
     Label()
     {

@@ -32,7 +32,7 @@ public class Formatting
         return arrayDelimiter;
     }
 
-    public QuoteChar quote()
+    public QuoteChar quoteCharacter()
     {
         return quote;
     }

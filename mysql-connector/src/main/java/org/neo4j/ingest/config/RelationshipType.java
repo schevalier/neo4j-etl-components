@@ -1,6 +1,6 @@
 package org.neo4j.ingest.config;
 
-class RelationshipType implements FieldType
+class RelationshipType implements CsvFieldType
 {
     @Override
     public void validate( boolean fieldHasName )

@@ -2,7 +2,7 @@ package org.neo4j.ingest.config;
 
 import static java.lang.String.format;
 
-class Data implements FieldType
+class Data implements CsvFieldType
 {
     private final DataType type;
     private final boolean isArray;

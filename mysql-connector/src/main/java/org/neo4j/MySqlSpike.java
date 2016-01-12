@@ -8,31 +8,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.command_line.Commands;
 import org.neo4j.ingest.ImportCommand;
-import org.neo4j.ingest.config.ConfigSupplier;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.DataType;
-import org.neo4j.ingest.config.Field;
 import org.neo4j.ingest.config.Formatting;
+import org.neo4j.ingest.config.GraphDataConfig;
+import org.neo4j.ingest.config.GraphDataConfigSupplier;
 import org.neo4j.ingest.config.IdType;
 import org.neo4j.ingest.config.ImportConfig;
-import org.neo4j.ingest.config.NodeConfig;
-import org.neo4j.ingest.config.RelationshipConfig;
 import org.neo4j.io.Pipe;
-import org.neo4j.mysql.ExportJoinCommand;
-import org.neo4j.mysql.ExportTableCommand;
+import org.neo4j.mysql.ExportCommand;
 import org.neo4j.mysql.SqlRunner;
-import org.neo4j.mysql.config.ExportConfig;
+import org.neo4j.mysql.config.ConnectionConfig;
 import org.neo4j.mysql.config.Join;
-import org.neo4j.mysql.config.MySqlConnectionConfig;
+import org.neo4j.mysql.config.RelationalDatabaseExportConfig;
 import org.neo4j.mysql.config.Table;
 import org.neo4j.mysql.config.TableName;
 
@@ -53,84 +50,58 @@ public class MySqlSpike
     {
         Formatting formatting = Formatting.DEFAULT;
 
-        MySqlConnectionConfig connectionConfig = new MySqlConnectionConfig(
-                "jdbc:mysql://localhost:3306/javabase",
+        ConnectionConfig connectionConfig = new ConnectionConfig(
+                URI.create( "jdbc:mysql://localhost:3306/javabase" ),
                 "java",
                 "password" );
 
-        Collection<ConfigSupplier> configSuppliers = doExport( formatting, connectionConfig );
+        GraphDataConfig graphDataConfig = doExport( formatting, connectionConfig );
 
-        doImport( formatting, configSuppliers );
+        doImport( formatting, graphDataConfig );
     }
 
-    private static void doImport( Formatting formatting, Collection<ConfigSupplier> configSuppliers ) throws Exception
+    private static void doImport( Formatting formatting,
+                                  GraphDataConfig graphDataConfig ) throws Exception
     {
-        ImportConfig.Builder builder = ImportConfig.builder()
+        ImportConfig importConfig = ImportConfig.builder()
                 .importToolDirectory( Paths.get( "/Users/iansrobinson/neo4j-enterprise-3.0.0-M02/bin" ) )
                 .destination( Paths.get( "/Users/iansrobinson/Desktop/graph.db" ) )
                 .formatting( formatting )
-                .idType( IdType.Integer );
+                .idType( IdType.Integer )
+                .graphDataConfig( graphDataConfig )
+                .build();
 
-        for ( ConfigSupplier configSupplier : configSuppliers )
-        {
-            configSupplier.addConfigTo( builder );
-        }
-
-        ImportCommand importCommand = new ImportCommand( builder.build() );
-        importCommand.execute();
+        new ImportCommand( importConfig ).execute();
     }
 
-    private static Collection<ConfigSupplier> doExport( Formatting formatting, MySqlConnectionConfig connectionConfig )
-            throws Exception
+    private static GraphDataConfig doExport( Formatting formatting,
+                                             ConnectionConfig connectionConfig ) throws Exception
     {
-        TableName personTable = new TableName( "javabase.Person" );
-        TableName addressTable = new TableName( "javabase.Address" );
+        TableName person = new TableName( "javabase.Person" );
+        TableName address = new TableName( "javabase.Address" );
 
-        ExportConfig config = ExportConfig.builder()
+        RelationalDatabaseExportConfig config = RelationalDatabaseExportConfig.builder()
                 .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
-                .mySqlConnectionConfig( connectionConfig )
+                .connectionConfig( connectionConfig )
                 .formatting( formatting )
                 .addTable( Table.builder()
-                        .name( personTable )
+                        .name( person )
                         .id( "id" )
-                        .addColumn( "username", Field.data( "username", DataType.String ) )
+                        .addColumn( "username", CsvField.data( "username", DataType.String ) )
                         .build() )
                 .addTable( Table.builder()
-                        .name( addressTable )
+                        .name( address )
                         .id( "id" )
-                        .addColumn( "postcode", Field.data( "postcode", DataType.String ) )
+                        .addColumn( "postcode", CsvField.data( "postcode", DataType.String ) )
                         .build() )
                 .addJoin( Join.builder()
-                        .parent( personTable, "id" )
-                        .child( addressTable, "id" )
-                        .quote( formatting.quote() )
+                        .parent( person, "id" )
+                        .child( address, "id" )
+                        .quoteCharacter( formatting.quoteCharacter() )
                         .build() )
                 .build();
 
-        Collection<ConfigSupplier> configSuppliers = new ArrayList<>();
-
-        for ( Table table : config.tables() )
-        {
-            ExportTableCommand exportTableCommand = new ExportTableCommand( config, table );
-            Collection<Path> files = exportTableCommand.execute();
-
-            configSuppliers.add( NodeConfig.builder()
-                    .addInputFiles( files )
-                    .addLabel( table.name().simpleName() )
-                    .build() );
-        }
-
-        for ( Join join : config.joins() )
-        {
-            ExportJoinCommand exportJoinCommand = new ExportJoinCommand( config, join );
-            Collection<Path> files = exportJoinCommand.execute();
-
-            configSuppliers.add( RelationshipConfig.builder()
-                    .addInputFiles( files )
-                    .build() );
-        }
-
-        return configSuppliers;
+        return new ExportCommand( config ).execute();
     }
 
     private static void originalTest() throws IOException
@@ -138,8 +109,8 @@ public class MySqlSpike
         String exportId = UUID.randomUUID().toString();
         String importId = UUID.randomUUID().toString();
 
-        MySqlConnectionConfig connectionConfig = new MySqlConnectionConfig(
-                "jdbc:mysql://localhost:3306/javabase",
+        ConnectionConfig connectionConfig = new ConnectionConfig(
+                URI.create( "jdbc:mysql://localhost:3306/javabase" ),
                 "java",
                 "password" );
 

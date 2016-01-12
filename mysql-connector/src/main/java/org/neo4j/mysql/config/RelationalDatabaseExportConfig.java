@@ -7,7 +7,7 @@ import java.util.Collections;
 import org.neo4j.ingest.config.Formatting;
 import org.neo4j.utils.Preconditions;
 
-public class ExportConfig implements ExportProperties
+public class RelationalDatabaseExportConfig implements ExportProperties
 {
     public static Builder.SetDestination builder()
     {
@@ -15,12 +15,12 @@ public class ExportConfig implements ExportProperties
     }
 
     private final Path destination;
-    private final MySqlConnectionConfig connectionConfig;
+    private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final Collection<Table> tables;
     private final Collection<Join> joins;
 
-    public ExportConfig( ExportConfigBuilder builder )
+    public RelationalDatabaseExportConfig( ExportConfigBuilder builder )
     {
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "Connection" );
@@ -36,7 +36,7 @@ public class ExportConfig implements ExportProperties
     }
 
     @Override
-    public MySqlConnectionConfig connectionConfig()
+    public ConnectionConfig connectionConfig()
     {
         return connectionConfig;
     }
@@ -66,7 +66,7 @@ public class ExportConfig implements ExportProperties
 
         interface SetMySqlConnectionConfig
         {
-            SetFormatting mySqlConnectionConfig( MySqlConnectionConfig config );
+            SetFormatting connectionConfig( ConnectionConfig config );
         }
 
         interface SetFormatting
@@ -79,6 +79,6 @@ public class ExportConfig implements ExportProperties
         Builder addJoin( Join join );
 
 
-        ExportConfig build();
+        RelationalDatabaseExportConfig build();
     }
 }

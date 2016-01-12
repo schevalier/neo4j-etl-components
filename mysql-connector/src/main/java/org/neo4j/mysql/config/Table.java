@@ -1,12 +1,11 @@
 package org.neo4j.mysql.config;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.FieldMappings;
 import org.neo4j.utils.Preconditions;
 
@@ -31,7 +30,7 @@ public class Table implements FieldMappings
     }
 
     @Override
-    public Collection<Field> fieldMappings()
+    public Collection<CsvField> fieldMappings()
     {
         return all( id.field(), columns.stream().map( Column::field ).collect( Collectors.toList() ) );
     }
@@ -70,10 +69,10 @@ public class Table implements FieldMappings
 
         interface SetFirstColumn
         {
-            Builder addColumn( String column, Field field );
+            Builder addColumn( String column, CsvField field );
         }
 
-        Builder addColumn( String column, Field field );
+        Builder addColumn( String column, CsvField field );
 
         Table build();
     }

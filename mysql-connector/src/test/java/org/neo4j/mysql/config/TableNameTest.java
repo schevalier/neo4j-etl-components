@@ -2,8 +2,6 @@ package org.neo4j.mysql.config;
 
 import org.junit.Test;
 
-import org.neo4j.ingest.config.Field;
-
 import static org.junit.Assert.*;
 
 public class TableNameTest

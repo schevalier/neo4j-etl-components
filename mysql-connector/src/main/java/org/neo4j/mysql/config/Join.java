@@ -2,7 +2,7 @@ package org.neo4j.mysql.config;
 
 import java.util.Collection;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.FieldMappings;
 import org.neo4j.ingest.config.QuoteChar;
 import org.neo4j.utils.Preconditions;
@@ -28,9 +28,9 @@ public class Join implements FieldMappings
     }
 
     @Override
-    public Collection<Field> fieldMappings()
+    public Collection<CsvField> fieldMappings()
     {
-        return asList( parent.field(), child.field(), Field.relationshipType() );
+        return asList( parent.field(), child.field(), CsvField.relationshipType() );
     }
 
     public Collection<String> columns()
@@ -57,7 +57,7 @@ public class Join implements FieldMappings
 
         interface SetQuote
         {
-            Builder quote( QuoteChar quote );
+            Builder quoteCharacter( QuoteChar quote );
         }
 
         Join build();

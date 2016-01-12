@@ -1,12 +1,12 @@
 package org.neo4j.mysql.config;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 
 class ColumnBuilder implements Column.Builder, Column.Builder.SetTable, Column.Builder.SetName, Column.Builder.SetField
 {
     TableName table;
     String name;
-    Field field;
+    CsvField field;
 
     @Override
     public SetName table( TableName table )
@@ -23,7 +23,7 @@ class ColumnBuilder implements Column.Builder, Column.Builder.SetTable, Column.B
     }
 
     @Override
-    public Column.Builder mapsTo( Field field )
+    public Column.Builder mapsTo( CsvField field )
     {
         this.field = field;
         return this;

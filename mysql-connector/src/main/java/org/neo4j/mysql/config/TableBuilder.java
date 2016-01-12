@@ -3,7 +3,7 @@ package org.neo4j.mysql.config;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.IdSpace;
 
 class TableBuilder implements Table.Builder.SetName, Table.Builder.SetId, Table.Builder.SetFirstColumn, Table.Builder
@@ -27,7 +27,7 @@ class TableBuilder implements Table.Builder.SetName, Table.Builder.SetId, Table.
     }
 
     @Override
-    public Table.Builder addColumn( String column, Field field )
+    public Table.Builder addColumn( String column, CsvField field )
     {
         columns.add( Column.builder().table( table ).name( column ).mapsTo( field ).build() );
         return this;
@@ -45,7 +45,7 @@ class TableBuilder implements Table.Builder.SetName, Table.Builder.SetId, Table.
         id = Column.builder()
                 .table( table )
                 .name( column )
-                .mapsTo( Field.id( new IdSpace( table.simpleName() ) ) )
+                .mapsTo( CsvField.id( new IdSpace( table.simpleName() ) ) )
                 .build();
         return this;
     }
@@ -56,7 +56,7 @@ class TableBuilder implements Table.Builder.SetName, Table.Builder.SetId, Table.
         id = Column.builder()
                 .table( table )
                 .name( column )
-                .mapsTo( Field.id( fieldName, new IdSpace( table.simpleName() ) ) )
+                .mapsTo( CsvField.id( fieldName, new IdSpace( table.simpleName() ) ) )
                 .build();
         return this;
     }

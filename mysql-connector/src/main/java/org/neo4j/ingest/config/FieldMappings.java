@@ -4,5 +4,5 @@ import java.util.Collection;
 
 public interface FieldMappings
 {
-    Collection<Field> fieldMappings();
+    Collection<CsvField> fieldMappings();
 }

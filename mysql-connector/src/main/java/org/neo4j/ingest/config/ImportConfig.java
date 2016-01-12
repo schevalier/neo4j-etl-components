@@ -57,7 +57,7 @@ public class ImportConfig implements CommandsSupplier
         commands.addCommand( formatting.arrayDelimiter().description() );
 
         commands.addCommand( "--quote" );
-        commands.addCommand( formatting.quote().value() );
+        commands.addCommand( formatting.quoteCharacter().value() );
 
         commands.addCommand( "--id-type" );
         commands.addCommand( idType.name().toUpperCase() );
@@ -84,6 +84,8 @@ public class ImportConfig implements CommandsSupplier
         {
             Builder idType( IdType idType );
         }
+
+        Builder graphDataConfig( GraphDataConfig graphDataConfig );
 
         Builder addNodeConfig( NodeConfig nodeConfig );
 

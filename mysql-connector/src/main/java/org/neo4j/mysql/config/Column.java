@@ -1,6 +1,6 @@
 package org.neo4j.mysql.config;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.utils.Preconditions;
 
 public class Column
@@ -12,7 +12,7 @@ public class Column
 
     private final TableName table;
     private final String name;
-    private final Field field;
+    private final CsvField field;
 
     Column( ColumnBuilder builder )
     {
@@ -31,7 +31,7 @@ public class Column
         return table.formatColumn( name );
     }
 
-    public Field field()
+    public CsvField field()
     {
         return field;
     }
@@ -50,7 +50,7 @@ public class Column
 
         interface SetField
         {
-            Builder mapsTo( Field field );
+            Builder mapsTo( CsvField field );
         }
 
         Column build();

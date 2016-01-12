@@ -12,7 +12,7 @@ import static java.lang.String.format;
 
 import static org.neo4j.utils.StringListBuilder.stringList;
 
-public class NodeConfig implements CommandsSupplier, ConfigSupplier
+public class NodeConfig implements CommandsSupplier, GraphDataConfigSupplier
 {
     public static Builder.SetInputFiles builder()
     {
@@ -37,7 +37,7 @@ public class NodeConfig implements CommandsSupplier, ConfigSupplier
     }
 
     @Override
-    public void addConfigTo( ImportConfig.Builder importConfig )
+    public void addGraphDataConfigTo( ImportConfig.Builder importConfig )
     {
         importConfig.addNodeConfig( this );
     }

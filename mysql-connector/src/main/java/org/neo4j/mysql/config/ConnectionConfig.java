@@ -1,21 +1,23 @@
 package org.neo4j.mysql.config;
 
+import java.net.URI;
+
 import org.neo4j.utils.Preconditions;
 
-public class MySqlConnectionConfig
+public class ConnectionConfig
 {
-    private final String uri;
+    private final URI uri;
     private final String username;
     private final String password;
 
-    public MySqlConnectionConfig( String uri, String username, String password )
+    public ConnectionConfig( URI uri, String username, String password )
     {
-        this.uri = Preconditions.requireNonNullString( uri, "Uri" );
+        this.uri = Preconditions.requireNonNull( uri, "Uri" );
         this.username = Preconditions.requireNonNullString( username, "Username" );
         this.password = Preconditions.requireNonNullString( password, "Password" );
     }
 
-    public String uri()
+    public URI uri()
     {
         return uri;
     }

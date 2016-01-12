@@ -1,6 +1,6 @@
 package org.neo4j.ingest.config;
 
-public interface FieldType
+public interface CsvFieldType
 {
     void validate(boolean fieldHasName);
 

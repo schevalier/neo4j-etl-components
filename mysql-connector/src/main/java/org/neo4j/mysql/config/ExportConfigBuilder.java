@@ -6,15 +6,15 @@ import java.util.Collection;
 
 import org.neo4j.ingest.config.Formatting;
 
-class ExportConfigBuilder implements ExportConfig.Builder,
-        ExportConfig.Builder.SetDestination,
-        ExportConfig.Builder.SetMySqlConnectionConfig,
-        ExportConfig.Builder.SetFormatting
+class ExportConfigBuilder implements RelationalDatabaseExportConfig.Builder,
+        RelationalDatabaseExportConfig.Builder.SetDestination,
+        RelationalDatabaseExportConfig.Builder.SetMySqlConnectionConfig,
+        RelationalDatabaseExportConfig.Builder.SetFormatting
 {
     final Collection<Table> tables = new ArrayList<>();
     final Collection<Join> joins = new ArrayList<>();
     Path destination;
-    MySqlConnectionConfig connectionConfig;
+    ConnectionConfig connectionConfig;
     Formatting formatting;
 
     @Override
@@ -25,36 +25,36 @@ class ExportConfigBuilder implements ExportConfig.Builder,
     }
 
     @Override
-    public SetFormatting mySqlConnectionConfig( MySqlConnectionConfig config )
+    public SetFormatting connectionConfig( ConnectionConfig config )
     {
         this.connectionConfig = config;
         return this;
     }
 
     @Override
-    public ExportConfig.Builder formatting( Formatting formatting )
+    public RelationalDatabaseExportConfig.Builder formatting( Formatting formatting )
     {
         this.formatting = formatting;
         return this;
     }
 
     @Override
-    public ExportConfig.Builder addTable( Table table )
+    public RelationalDatabaseExportConfig.Builder addTable( Table table )
     {
         tables.add( table );
         return this;
     }
 
     @Override
-    public ExportConfig.Builder addJoin( Join join )
+    public RelationalDatabaseExportConfig.Builder addJoin( Join join )
     {
         joins.add( join );
         return this;
     }
 
     @Override
-    public ExportConfig build()
+    public RelationalDatabaseExportConfig build()
     {
-        return new ExportConfig( this );
+        return new RelationalDatabaseExportConfig( this );
     }
 }

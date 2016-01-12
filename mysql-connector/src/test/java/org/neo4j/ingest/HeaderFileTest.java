@@ -11,7 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.neo4j.ingest.config.DataType;
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.Formatting;
 import org.neo4j.ingest.config.IdSpace;
 import org.neo4j.utils.ResourceRule;
@@ -34,11 +34,11 @@ public class HeaderFileTest
         HeaderFile headerFile = new HeaderFile( tempDirectory.get(), Formatting.DEFAULT );
 
         // when
-        Collection<Field> fields = new ArrayList<>();
-        fields.add( Field.id( "personId", new IdSpace( "person" ) ) );
-        fields.add( Field.label() );
-        fields.add( Field.data( "name", DataType.String ) );
-        fields.add( Field.array( "addresses", DataType.String ) );
+        Collection<CsvField> fields = new ArrayList<>();
+        fields.add( CsvField.id( "personId", new IdSpace( "person" ) ) );
+        fields.add( CsvField.label() );
+        fields.add( CsvField.data( "name", DataType.String ) );
+        fields.add( CsvField.array( "addresses", DataType.String ) );
 
         Path file = headerFile.create( fields, "nodes" );
 

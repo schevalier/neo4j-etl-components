@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import org.neo4j.ingest.config.Field;
+import org.neo4j.ingest.config.CsvField;
 import org.neo4j.ingest.config.Formatting;
 
 import static java.lang.String.format;
@@ -23,12 +23,12 @@ public class HeaderFile
         this.formatting = formatting;
     }
 
-    public Path create( Collection<Field> fields, String filenamePrefix ) throws IOException
+    public Path create( Collection<CsvField> fields, String filenamePrefix ) throws IOException
     {
         String headers = stringList(
                 fields,
                 formatting.delimiter().value(),
-                Field::value ).toString();
+                CsvField::value ).toString();
 
         Path headerFile = directory.resolve( format( "%s_headers.csv", filenamePrefix ) );
         Files.write( headerFile, headers.getBytes() );

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-class Id implements FieldType
+class Id implements CsvFieldType
 {
     private final Optional<IdSpace> idSpace;
 
