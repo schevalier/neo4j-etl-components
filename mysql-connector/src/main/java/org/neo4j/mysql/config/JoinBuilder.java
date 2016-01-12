@@ -11,22 +11,22 @@ class JoinBuilder implements Join.Builder, Join.Builder.SetParent, Join.Builder.
     QuoteChar quote;
 
     @Override
-    public SetChild parent( TableName table, String column )
+    public SetChild parent( TableName table, String foreignKey )
     {
         parent = Column.builder()
                 .table( table )
-                .name( column )
+                .name( foreignKey )
                 .mapsTo( CsvField.startId( new IdSpace( table.simpleName() ) ) )
                 .build();
         return this;
     }
 
     @Override
-    public SetQuote child( TableName table, String column )
+    public SetQuote child( TableName table, String primaryKey )
     {
         child = Column.builder()
                 .table( table )
-                .name( column )
+                .name( primaryKey )
                 .mapsTo( CsvField.endId( new IdSpace( table.simpleName() ) ) )
                 .build();
         return this;

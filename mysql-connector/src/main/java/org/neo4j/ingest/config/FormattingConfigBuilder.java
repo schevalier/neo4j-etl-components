@@ -4,7 +4,7 @@ class FormattingConfigBuilder implements Formatting.Builder
 {
     Delimiter delimiter = Delimiter.COMMA;
     Delimiter arrayDelimiter = Delimiter.SEMICOLON;
-    QuoteChar quote = new QuoteChar( "\"" );
+    QuoteChar quote = QuoteChar.DOUBLE_QUOTES;
 
     @Override
     public Formatting.Builder delimiter( Delimiter delimiter )

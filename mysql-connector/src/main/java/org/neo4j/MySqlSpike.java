@@ -95,7 +95,7 @@ public class MySqlSpike
                         .addColumn( "postcode", CsvField.data( "postcode", DataType.String ) )
                         .build() )
                 .addJoin( Join.builder()
-                        .parent( person, "id" )
+                        .parent( person, "addressId" )
                         .child( address, "id" )
                         .quoteCharacter( formatting.quoteCharacter() )
                         .build() )

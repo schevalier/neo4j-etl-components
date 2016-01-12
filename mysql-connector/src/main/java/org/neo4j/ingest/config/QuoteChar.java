@@ -4,6 +4,9 @@ import static java.lang.String.format;
 
 public class QuoteChar
 {
+    public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"" );
+    public static final QuoteChar SINGLE_QUOTES = new QuoteChar( "'" );
+
     private final String quote;
 
     QuoteChar( String quote )

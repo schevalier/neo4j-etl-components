@@ -53,7 +53,7 @@ public class Join implements FieldMappings, SqlSupplier
                 " FROM " + stringList( tableNames(), ", ", TableName::fullName );
     }
 
-    private Collection<TableName> tableNames()
+    public Collection<TableName> tableNames()
     {
         return asList( parent.table(), child.table() );
     }
@@ -67,12 +67,12 @@ public class Join implements FieldMappings, SqlSupplier
     {
         interface SetParent
         {
-            SetChild parent( TableName table, String column );
+            SetChild parent( TableName table, String foreignKey );
         }
 
         interface SetChild
         {
-            SetQuote child( TableName table, String column );
+            SetQuote child( TableName table, String primaryKey );
         }
 
         interface SetQuote
