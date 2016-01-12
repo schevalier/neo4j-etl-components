@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-class StartId implements CsvFieldType
+class StartId implements CsvField
 {
     private final Optional<IdSpace> idSpace;
 
@@ -16,12 +16,6 @@ class StartId implements CsvFieldType
     StartId( IdSpace idSpace )
     {
         this.idSpace = Optional.ofNullable( idSpace );
-    }
-
-    @Override
-    public void validate( boolean fieldIsNamed )
-    {
-        // Do nothing
     }
 
     @Override

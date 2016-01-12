@@ -1,36 +1,32 @@
 package org.neo4j.ingest.config;
 
+import org.neo4j.utils.Preconditions;
+
 import static java.lang.String.format;
 
-class Data implements CsvFieldType
+class Data implements CsvField
 {
+    private final String name;
     private final DataType type;
     private final boolean isArray;
 
-    Data( DataType type )
+    Data( String name, DataType type )
     {
-        this(type, false);
+        this(name, type, false);
     }
 
-    Data( DataType type, boolean isArray )
+    Data( String name, DataType type, boolean isArray )
     {
+        this.name = Preconditions.requireNonNullString( name, "Name" );
         this.type = type;
         this.isArray = isArray;
     }
 
     @Override
-    public void validate( boolean fieldIsNamed )
-    {
-        if ( !fieldIsNamed )
-        {
-            throw new IllegalStateException(
-                    format( "Name missing from field of type [%s%s]", isArray ? "array of " : "", type ) );
-        }
-    }
-
-    @Override
     public String value()
     {
-        return isArray ? format( ":%s[]", type.name().toLowerCase() ) : format( ":%s", type.name().toLowerCase() );
+        return isArray ?
+                format( "%s:%s[]", name, type.name().toLowerCase() ) :
+                format( "%s:%s", name, type.name().toLowerCase() );
     }
 }

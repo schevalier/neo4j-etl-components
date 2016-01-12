@@ -1,15 +1,9 @@
 package org.neo4j.ingest.config;
 
-class Label implements CsvFieldType
+class Label implements CsvField
 {
     Label()
     {
-    }
-
-    @Override
-    public void validate( boolean fieldIsNamed )
-    {
-        // Do nothing
     }
 
     @Override
