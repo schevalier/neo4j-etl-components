@@ -1,15 +1,19 @@
 package org.neo4j.mysql.config;
 
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.neo4j.ingest.config.CsvField;
+import org.neo4j.ingest.config.Delimiter;
 import org.neo4j.ingest.config.FieldMappings;
 import org.neo4j.ingest.config.QuoteChar;
 import org.neo4j.utils.Preconditions;
 
 import static java.util.Arrays.asList;
 
-public class Join implements FieldMappings
+import static org.neo4j.utils.StringListBuilder.stringList;
+
+public class Join implements FieldMappings, SqlSupplier
 {
     public static Builder.SetParent builder()
     {
@@ -33,14 +37,30 @@ public class Join implements FieldMappings
         return asList( parent.field(), child.field(), CsvField.relationshipType() );
     }
 
-    public Collection<String> columns()
+    @Override
+    public String sql( Path exportFile, Delimiter delimiter )
     {
-        return asList( parent.name(), child.name(), quote.enquote( child.table().simpleName() ) );
+        return "SELECT " +
+                stringList( columns(), delimiter.value() ) +
+                " INTO OUTFILE '" +
+                exportFile.toString() +
+                "' FIELDS TERMINATED BY '" +
+                delimiter.value() +
+                "' OPTIONALLY ENCLOSED BY ''" +
+                " ESCAPED BY '\\\\'" +
+                " LINES TERMINATED BY '\\n'" +
+                " STARTING BY ''" +
+                " FROM " + stringList( tableNames(), ", ", TableName::fullName );
     }
 
-    public Collection<TableName> tableNames()
+    private Collection<TableName> tableNames()
     {
         return asList( parent.table(), child.table() );
+    }
+
+    private Collection<String> columns()
+    {
+        return asList( parent.name(), child.name(), quote.enquote( child.table().simpleName() ) );
     }
 
     public interface Builder

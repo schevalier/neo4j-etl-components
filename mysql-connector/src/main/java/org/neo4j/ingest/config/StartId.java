@@ -19,7 +19,7 @@ class StartId implements CsvFieldType
     }
 
     @Override
-    public void validate( boolean fieldHasName )
+    public void validate( boolean fieldIsNamed )
     {
         // Do nothing
     }

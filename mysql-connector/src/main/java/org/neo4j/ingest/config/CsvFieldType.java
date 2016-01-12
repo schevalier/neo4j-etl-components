@@ -2,7 +2,7 @@ package org.neo4j.ingest.config;
 
 public interface CsvFieldType
 {
-    void validate(boolean fieldHasName);
+    void validate(boolean fieldIsNamed);
 
     String value();
 }

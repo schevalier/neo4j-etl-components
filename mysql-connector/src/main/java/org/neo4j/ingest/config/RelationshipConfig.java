@@ -24,7 +24,7 @@ public class RelationshipConfig implements CommandsSupplier, GraphDataConfigSupp
     private final Collection<Path> files;
     private final Optional<String> type;
 
-    public RelationshipConfig( RelationshipConfigBuilder builder )
+    RelationshipConfig( RelationshipConfigBuilder builder )
     {
         this.files = Collections.unmodifiableCollection(
                 Preconditions.requireNonEmptyCollection( builder.files, "Files" ) );

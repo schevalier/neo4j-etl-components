@@ -10,7 +10,7 @@ import org.neo4j.mysql.config.Table;
 
 import static java.util.Arrays.asList;
 
-public class ExportTableCommand
+class ExportTableCommand
 {
     private final ExportProperties properties;
     private final Table table;
@@ -27,7 +27,7 @@ public class ExportTableCommand
 
         Path headerFile = new HeaderFile( properties.destination(), properties.formatting() )
                 .create( table.fieldMappings(), exportId );
-        Path exportFile = new ExportTableContentsCommand( properties ).execute( table, exportId );
+        Path exportFile = new ExportDatabaseContentsCommand( properties ).execute( table, exportId );
 
         return asList( headerFile, exportFile );
     }

@@ -1,9 +1,11 @@
 package org.neo4j.mysql;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.neo4j.command_line.Commands;
 import org.neo4j.ingest.config.GraphDataConfig;
 import org.neo4j.ingest.config.GraphDataConfigSupplier;
 import org.neo4j.ingest.config.NodeConfig;
@@ -23,6 +25,13 @@ public class ExportCommand
 
     public GraphDataConfig execute() throws Exception
     {
+        if ( Files.notExists( exportConfig.destination() ))
+        {
+            Files.createDirectories( exportConfig.destination() );
+        }
+
+        Commands.commands( "chmod", "0777", exportConfig.destination().toString() ).execute().await();
+
         Collection<GraphDataConfigSupplier> graphDataConfigSuppliers = new ArrayList<>();
 
         for ( Table table : exportConfig.tables() )

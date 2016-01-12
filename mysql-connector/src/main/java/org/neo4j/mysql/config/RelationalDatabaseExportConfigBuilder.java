@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import org.neo4j.ingest.config.Formatting;
 
-class ExportConfigBuilder implements RelationalDatabaseExportConfig.Builder,
+class RelationalDatabaseExportConfigBuilder implements RelationalDatabaseExportConfig.Builder,
         RelationalDatabaseExportConfig.Builder.SetDestination,
         RelationalDatabaseExportConfig.Builder.SetMySqlConnectionConfig,
         RelationalDatabaseExportConfig.Builder.SetFormatting

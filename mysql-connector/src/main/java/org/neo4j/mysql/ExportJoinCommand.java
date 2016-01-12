@@ -10,7 +10,7 @@ import org.neo4j.mysql.config.Join;
 
 import static java.util.Arrays.asList;
 
-public class ExportJoinCommand
+class ExportJoinCommand
 {
     private final ExportProperties properties;
     private final Join join;
@@ -27,7 +27,7 @@ public class ExportJoinCommand
 
         Path headerFile = new HeaderFile( properties.destination(), properties.formatting() )
                 .create( join.fieldMappings(), exportId );
-        Path exportFile = new ExportJoinContentsCommand( properties ).execute( join, exportId );
+        Path exportFile = new ExportDatabaseContentsCommand( properties ).execute( join, exportId );
 
         return asList( headerFile, exportFile );
     }

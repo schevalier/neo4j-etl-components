@@ -11,7 +11,7 @@ public class RelationalDatabaseExportConfig implements ExportProperties
 {
     public static Builder.SetDestination builder()
     {
-        return new ExportConfigBuilder();
+        return new RelationalDatabaseExportConfigBuilder();
     }
 
     private final Path destination;
@@ -20,7 +20,7 @@ public class RelationalDatabaseExportConfig implements ExportProperties
     private final Collection<Table> tables;
     private final Collection<Join> joins;
 
-    public RelationalDatabaseExportConfig( ExportConfigBuilder builder )
+    RelationalDatabaseExportConfig( RelationalDatabaseExportConfigBuilder builder )
     {
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "Connection" );

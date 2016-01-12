@@ -1,16 +1,20 @@
 package org.neo4j.mysql.config;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.neo4j.ingest.config.CsvField;
+import org.neo4j.ingest.config.Delimiter;
 import org.neo4j.ingest.config.FieldMappings;
 import org.neo4j.utils.Preconditions;
 
+import static org.neo4j.utils.StringListBuilder.stringList;
 
-public class Table implements FieldMappings
+
+public class Table implements FieldMappings, SqlSupplier
 {
     public static Builder.SetName builder()
     {
@@ -24,7 +28,7 @@ public class Table implements FieldMappings
     Table( TableBuilder builder )
     {
         this.name = Preconditions.requireNonNull( builder.table, "Table name" );
-        this.id = Preconditions.requireNonNull( builder.id, "Ide" );
+        this.id = Preconditions.requireNonNull( builder.id, "Id" );
         this.columns = Collections.unmodifiableCollection(
                 Preconditions.requireNonEmptyCollection( builder.columns, "Columns" ) );
     }
@@ -35,14 +39,30 @@ public class Table implements FieldMappings
         return all( id.field(), columns.stream().map( Column::field ).collect( Collectors.toList() ) );
     }
 
-    public Collection<String> columns()
+    @Override
+    public String sql( Path exportFile, Delimiter delimiter )
     {
-        return all( id.name(), columns.stream().map( Column::name ).collect( Collectors.toList() ) );
+        return "SELECT " +
+                stringList( columns(), delimiter.value() ) +
+                " INTO OUTFILE '" +
+                exportFile.toString() +
+                "' FIELDS TERMINATED BY '" +
+                delimiter.value() +
+                "' OPTIONALLY ENCLOSED BY ''" +
+                " ESCAPED BY '\\\\'" +
+                " LINES TERMINATED BY '\\n'" +
+                " STARTING BY ''" +
+                " FROM " + name().fullName();
     }
 
     public TableName name()
     {
         return name;
+    }
+
+    private Collection<String> columns()
+    {
+        return all( id.name(), columns.stream().map( Column::name ).collect( Collectors.toList() ) );
     }
 
     private <T> Collection<T> all( T first, List<T> remaining )

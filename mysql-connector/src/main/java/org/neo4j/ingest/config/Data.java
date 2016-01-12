@@ -19,11 +19,12 @@ class Data implements CsvFieldType
     }
 
     @Override
-    public void validate( boolean fieldHasName )
+    public void validate( boolean fieldIsNamed )
     {
-        if ( !fieldHasName )
+        if ( !fieldIsNamed )
         {
-            throw new IllegalStateException( format( "Name missing from field of type [%s]", this ) );
+            throw new IllegalStateException(
+                    format( "Name missing from field of type [%s%s]", isArray ? "array of " : "", type ) );
         }
     }
 
@@ -31,11 +32,5 @@ class Data implements CsvFieldType
     public String value()
     {
         return isArray ? format( ":%s[]", type.name().toLowerCase() ) : format( ":%s", type.name().toLowerCase() );
-    }
-
-    @Override
-    public String toString()
-    {
-        return format( "%s%s", isArray ? "array of " : "", type );
     }
 }
