@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -52,6 +53,8 @@ public class MySqlSpike
                 URI.create( "jdbc:mysql://localhost:3306/javabase" ),
                 "java",
                 "password" );
+
+        printDbInfo( connectionConfig );
 
         GraphDataConfig graphDataConfig = doExport( formatting, connectionConfig );
 
@@ -102,6 +105,22 @@ public class MySqlSpike
         return new ExportCommand( config ).execute();
     }
 
+    private static void printDbInfo( ConnectionConfig connectionConfig ) throws Exception
+    {
+        try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
+        {
+            ResultSet resultSet = sqlRunner.execute( "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_KEY FROM " +
+                    "INFORMATION_SCHEMA" +
+                    ".COLUMNS WHERE TABLE_SCHEMA = 'javabase' AND TABLE_NAME ='Person';" ).await();
+
+            while ( resultSet.next() )
+            {
+
+                System.out.println( "Column: " + resultSet.getString( "COLUMN_NAME" ) );
+            }
+        }
+    }
+
     private static void originalTest() throws IOException
     {
         String exportId = UUID.randomUUID().toString();
@@ -112,10 +131,11 @@ public class MySqlSpike
                 "java",
                 "password" );
 
-        try ( Pipe pipe = new Pipe( exportId ) )
+        try ( Pipe pipe = new Pipe( exportId );
+              SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
         {
-            SqlRunner sqlRunner = new SqlRunner( connectionConfig, format( EXPORT_SQL, pipe.name() ) );
-            CompletableFuture<OutputStream> out = pipe.out( sqlRunner.execute().toFuture() );
+            CompletableFuture<OutputStream> out =
+                    pipe.out( sqlRunner.execute( format( EXPORT_SQL, pipe.name() ) ).toFuture() );
 
             try ( Writer writer = new OutputStreamWriter( out.get() ) )
             {
@@ -133,12 +153,11 @@ public class MySqlSpike
 
         File importFile = new File( importId );
 
-        try
+        try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
         {
-            SqlRunner sqlRunner = new SqlRunner( connectionConfig, format( IMPORT_SQL, importFile.getAbsolutePath() ) );
             Commands.commands( "chmod", "0777", importFile.getAbsoluteFile().getParent() ).execute().await();
 
-            sqlRunner.execute().await();
+            sqlRunner.execute( format( IMPORT_SQL, importFile.getAbsolutePath() ) ).await();
 
             try ( BufferedReader reader =
                           new BufferedReader( new InputStreamReader( new FileInputStream( importFile ) ) ) )
