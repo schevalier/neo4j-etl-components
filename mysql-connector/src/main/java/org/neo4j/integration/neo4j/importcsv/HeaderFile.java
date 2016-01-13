@@ -23,7 +23,7 @@ public class HeaderFile
         this.formatting = formatting;
     }
 
-    public Path create( Collection<CsvField> fields, String filenamePrefix ) throws IOException
+    public Path createHeaderFile( Collection<CsvField> fields, String filenamePrefix ) throws IOException
     {
         String headers = stringList(
                 fields,

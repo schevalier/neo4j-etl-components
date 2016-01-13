@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.neo4j.integration.mysql.exportcsv.config.SqlSupplier;
 import org.neo4j.integration.mysql.exportcsvnew.metadata.Column;
 import org.neo4j.integration.mysql.exportcsvnew.metadata.ColumnType;
 import org.neo4j.integration.mysql.exportcsvnew.metadata.Table;
@@ -16,7 +17,7 @@ import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 
 import static org.neo4j.integration.util.StringListBuilder.stringList;
 
-public class ColumnToCsvFieldMappings
+public class ColumnToCsvFieldMappings implements SqlSupplier
 {
     public static ColumnToCsvFieldMappings forTable( Table table, QuoteChar quote )
     {
@@ -62,6 +63,7 @@ public class ColumnToCsvFieldMappings
         return mappings.values();
     }
 
+    @Override
     public String sql( Path exportFile, Delimiter delimiter )
     {
         return "SELECT " +

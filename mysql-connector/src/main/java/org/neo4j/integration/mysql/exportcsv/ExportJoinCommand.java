@@ -26,7 +26,7 @@ class ExportJoinCommand
         String exportId = UUID.randomUUID().toString();
 
         Path headerFile = new HeaderFile( properties.destination(), properties.formatting() )
-                .create( join.fieldMappings(), exportId );
+                .createHeaderFile( join.fieldMappings(), exportId );
         Path exportFile = new ExportDatabaseContentsCommand( properties ).execute( join, exportId );
 
         return asList( headerFile, exportFile );

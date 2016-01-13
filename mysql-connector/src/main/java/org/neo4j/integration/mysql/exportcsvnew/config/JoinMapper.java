@@ -7,16 +7,10 @@ import org.neo4j.integration.neo4j.importcsv.config.CsvField;
 import org.neo4j.integration.neo4j.importcsv.config.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 
-public class JoinMapper
+public class JoinMapper implements Mapper<Join>
 {
-    private final QuoteChar quote;
-
-    public JoinMapper( QuoteChar quote )
-    {
-        this.quote = quote;
-    }
-
-    public ColumnToCsvFieldMappings createExportCsvConfigFor( Join join )
+    @Override
+    public ColumnToCsvFieldMappings createExportCsvConfigFor( Join join, QuoteChar quote )
     {
         ColumnToCsvFieldMappings config = new ColumnToCsvFieldMappings();
 

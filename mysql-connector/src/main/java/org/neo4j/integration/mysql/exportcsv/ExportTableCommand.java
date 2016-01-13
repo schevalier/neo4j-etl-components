@@ -26,7 +26,7 @@ class ExportTableCommand
         String exportId = UUID.randomUUID().toString();
 
         Path headerFile = new HeaderFile( properties.destination(), properties.formatting() )
-                .create( table.fieldMappings(), exportId );
+                .createHeaderFile( table.fieldMappings(), exportId );
         Path exportFile = new ExportDatabaseContentsCommand( properties ).execute( table, exportId );
 
         return asList( headerFile, exportFile );

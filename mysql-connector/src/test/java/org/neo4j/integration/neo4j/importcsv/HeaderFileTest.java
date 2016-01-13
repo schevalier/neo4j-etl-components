@@ -40,7 +40,7 @@ public class HeaderFileTest
         fields.add( CsvField.data( "name", DataType.String ) );
         fields.add( CsvField.array( "addresses", DataType.String ) );
 
-        Path file = headerFile.create( fields, "nodes" );
+        Path file = headerFile.createHeaderFile( fields, "nodes" );
 
         // then
         List<String> expectedLines = singletonList( "personId:ID(person),:LABEL,name:string,addresses:string[]" );
