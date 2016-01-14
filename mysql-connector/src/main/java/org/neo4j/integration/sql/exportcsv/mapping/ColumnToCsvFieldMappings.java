@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.util.Preconditions;
 
 public class ColumnToCsvFieldMappings
@@ -36,7 +36,8 @@ public class ColumnToCsvFieldMappings
 
     public Collection<String> tableNames()
     {
-        return mappings.keySet().stream().map( c -> c.table().fullName() ).collect( Collectors.toCollection(LinkedHashSet::new) );
+        return mappings.keySet().stream().map( c -> c.table().fullName() ).collect( Collectors.toCollection(
+                LinkedHashSet::new ) );
     }
 
     public interface Builder

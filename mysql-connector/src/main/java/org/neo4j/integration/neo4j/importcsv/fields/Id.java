@@ -1,4 +1,4 @@
-package org.neo4j.integration.neo4j.importcsv.config;
+package org.neo4j.integration.neo4j.importcsv.fields;
 
 import java.util.Optional;
 
@@ -51,5 +51,36 @@ class Id implements CsvField
         {
             return ":ID";
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return value();
+    }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        Id id = (Id) o;
+
+        return name.equals( id.name ) && idSpace.equals( id.idSpace );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = name.hashCode();
+        result = 31 * result + idSpace.hashCode();
+        return result;
     }
 }

@@ -5,14 +5,16 @@ import java.util.LinkedHashSet;
 
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
 
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class ColumnToCsvFieldMappingsTest
 {
@@ -80,6 +82,6 @@ public class ColumnToCsvFieldMappingsTest
         Collection<String> tableNames = mappings.tableNames();
 
         // then
-        assertEquals( new LinkedHashSet<>( asList( "test.Person", "test.Address" ) ), tableNames );
+        assertThat(tableNames, hasItems("test.Person", "test.Address"));
     }
 }

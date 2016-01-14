@@ -3,9 +3,9 @@ package org.neo4j.integration.sql.exportcsv.mapping;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Table;
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.IdSpace;
+import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 
 public class TableMapper implements Mapper<Table>
 {

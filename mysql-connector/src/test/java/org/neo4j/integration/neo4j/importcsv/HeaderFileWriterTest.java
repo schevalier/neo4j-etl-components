@@ -10,10 +10,10 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.config.DataType;
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.DataType;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.IdSpace;
+import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.util.ResourceRule;
 
 import static java.util.Collections.singletonList;

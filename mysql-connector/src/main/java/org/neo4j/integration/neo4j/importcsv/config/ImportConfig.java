@@ -6,6 +6,7 @@ import java.util.Collections;
 
 import org.neo4j.integration.cli.Commands;
 import org.neo4j.integration.cli.CommandsSupplier;
+import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.util.Preconditions;
 
 public class ImportConfig implements CommandsSupplier

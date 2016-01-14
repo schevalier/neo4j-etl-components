@@ -29,7 +29,7 @@ import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.ImportCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
-import org.neo4j.integration.neo4j.importcsv.config.IdType;
+import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 
 import static java.lang.String.format;

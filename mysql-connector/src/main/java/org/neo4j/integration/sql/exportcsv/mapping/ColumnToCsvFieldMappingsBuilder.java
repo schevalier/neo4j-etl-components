@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 
 class ColumnToCsvFieldMappingsBuilder implements ColumnToCsvFieldMappings.Builder
 {
