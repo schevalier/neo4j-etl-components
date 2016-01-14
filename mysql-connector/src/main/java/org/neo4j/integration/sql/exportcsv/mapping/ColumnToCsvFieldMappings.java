@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.exportcsv.mapping;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class ColumnToCsvFieldMappings
 
     public Collection<String> tableNames()
     {
-        return mappings.keySet().stream().map( c -> c.table().fullName() ).collect( Collectors.toSet() );
+        return mappings.keySet().stream().map( c -> c.table().fullName() ).collect( Collectors.toCollection(LinkedHashSet::new) );
     }
 
     public interface Builder
