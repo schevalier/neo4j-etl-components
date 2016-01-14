@@ -6,6 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.exportcsv.metadata.TableName;
+import org.neo4j.integration.mysql.exportcsv.metadata.Join;
+import org.neo4j.integration.mysql.exportcsv.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.util.Preconditions;
 
@@ -13,11 +17,11 @@ import static java.lang.String.format;
 
 import static org.neo4j.integration.util.StringListBuilder.stringList;
 
-public class RelationalDatabaseExportConfig implements ExportProperties
+public class ExportToCsvConfig implements ExportProperties
 {
     public static Builder.SetDestination builder()
     {
-        return new RelationalDatabaseExportConfigBuilder();
+        return new ExportToCsvConfigBuilder();
     }
 
     private final Path destination;
@@ -26,7 +30,7 @@ public class RelationalDatabaseExportConfig implements ExportProperties
     private final Collection<Table> tables;
     private final Collection<Join> joins;
 
-    RelationalDatabaseExportConfig( RelationalDatabaseExportConfigBuilder builder )
+    ExportToCsvConfig( ExportToCsvConfigBuilder builder )
     {
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "Connection" );
@@ -37,24 +41,7 @@ public class RelationalDatabaseExportConfig implements ExportProperties
         validate();
     }
 
-    private void validate()
-    {
-        List<TableName> allTableNames = tables.stream().map( Table::name ).collect( Collectors.toList() );
 
-        joins.forEach(
-                join -> join.tableNames().forEach(
-                        tableName ->
-                        {
-                            if ( !allTableNames.contains( tableName ) )
-                            {
-                                throw new IllegalStateException(
-                                        format( "Config is missing table definition '%s' for join [%s]",
-                                                tableName.fullName(),
-                                                stringList( join.tableNames(), " -> ", TableName::fullName ) ) );
-                            }
-                        } ) );
-
-    }
 
     @Override
     public Path destination()
@@ -84,6 +71,25 @@ public class RelationalDatabaseExportConfig implements ExportProperties
         return joins;
     }
 
+    private void validate()
+    {
+        List<TableName> allTableNames = tables.stream().map( Table::name ).collect( Collectors.toList() );
+
+        joins.forEach(
+                join -> join.tableNames().forEach(
+                        tableName ->
+                        {
+                            if ( !allTableNames.contains( tableName ) )
+                            {
+                                throw new IllegalStateException(
+                                        format( "Config is missing table definition '%s' for join [%s]",
+                                                tableName.fullName(),
+                                                stringList( join.tableNames(), " -> ", TableName::fullName ) ) );
+                            }
+                        } ) );
+
+    }
+
     public interface Builder
     {
         interface SetDestination
@@ -106,6 +112,6 @@ public class RelationalDatabaseExportConfig implements ExportProperties
         Builder addJoin( Join join );
 
 
-        RelationalDatabaseExportConfig build();
+        ExportToCsvConfig build();
     }
 }

@@ -1,6 +1,5 @@
-package org.neo4j.integration.mysql.exportcsvnew.config;
+package org.neo4j.integration.mysql.exportcsv.config;
 
-import org.neo4j.integration.mysql.exportcsvnew.metadata.Join;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 
 public interface Mapper<T>

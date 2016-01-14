@@ -1,6 +1,4 @@
-package org.neo4j.integration.mysql.exportcsvnew.metadata;
-
-import org.neo4j.integration.mysql.exportcsv.config.TableName;
+package org.neo4j.integration.mysql.exportcsv.metadata;
 
 class ColumnBuilder implements Column.Builder.SetTable, Column.Builder.SetName, Column.Builder.SetType, Column.Builder
 {
@@ -12,21 +10,21 @@ class ColumnBuilder implements Column.Builder.SetTable, Column.Builder.SetName, 
     public SetName table( TableName table )
     {
         this.table = table;
-        return null;
+        return this;
     }
 
     @Override
     public SetType name( String name )
     {
         this.name = name;
-        return null;
+        return this;
     }
 
     @Override
     public Column.Builder type( ColumnType type )
     {
         this.type = type;
-        return null;
+        return this;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.mysql.exportcsv.config.ConnectionConfig;
+import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
 import org.neo4j.integration.util.FutureUtils;
 import org.neo4j.integration.util.Loggers;
 
@@ -26,6 +26,8 @@ public class SqlRunner implements AutoCloseable
 
     public AwaitHandle<ResultSet> execute( String sql )
     {
+        System.out.println(sql);
+
         return new SqlRunnerAwaitHandle(
                 FutureUtils.exceptionableFuture( () ->
                 {

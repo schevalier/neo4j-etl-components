@@ -1,4 +1,4 @@
-package org.neo4j.integration.mysql.exportcsv.config;
+package org.neo4j.integration.mysql.exportcsv.metadata;
 
 import org.neo4j.integration.util.Preconditions;
 
@@ -23,7 +23,7 @@ public class TableName
         return name;
     }
 
-    public String formatColumn(String column)
+    public String fullyQualifiedColumnName( String column )
     {
         return format("%s.%s", name, column);
     }

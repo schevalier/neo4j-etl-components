@@ -4,15 +4,18 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
+import org.neo4j.integration.mysql.exportcsv.metadata.ColumnType;
+import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.exportcsv.metadata.Join;
+import org.neo4j.integration.mysql.exportcsv.metadata.Table;
+import org.neo4j.integration.mysql.exportcsv.metadata.TableName;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-public class RelationalDatabaseExportConfigTest
+public class ExportToCsvConfigTest
 {
     @Test
     public void shouldThrowExceptionIfParentOfJoinIsNotPresentInTables()
@@ -20,19 +23,20 @@ public class RelationalDatabaseExportConfigTest
         try
         {
             // when
-            RelationalDatabaseExportConfig.builder()
+            ExportToCsvConfig.builder()
                     .destination( Paths.get( "" ) )
                     .connectionConfig( mock( ConnectionConfig.class ) )
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( "test.Address" )
-                            .id( "id" )
-                            .addColumn( "postcode", CsvField.data( "postcode" ) )
+                            .addColumn( "id", ColumnType.PrimaryKey )
+                            .addColumn( "postcode", ColumnType.Data )
                             .build() )
                     .addJoin( Join.builder()
-                            .parent( new TableName( "test.Person" ), "addressId" )
-                            .child( new TableName( "test.Address" ), "id" )
-                            .quoteCharacter( QuoteChar.SINGLE_QUOTES )
+                            .parentTable( new TableName( "test.Person" ) )
+                            .primaryKey( "id" )
+                            .foreignKey( "addressId" )
+                            .childTable( new TableName( "test.Address" ) )
                             .build() )
                     .build();
             fail( "Expected IllegalStatException" );
@@ -51,19 +55,21 @@ public class RelationalDatabaseExportConfigTest
         try
         {
             // when
-            RelationalDatabaseExportConfig.builder()
+            ExportToCsvConfig.builder()
                     .destination( Paths.get( "" ) )
                     .connectionConfig( mock( ConnectionConfig.class ) )
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( "test.Person" )
-                            .id( "id" )
-                            .addColumn( "name", CsvField.data( "name" ) )
+                            .addColumn( "id", ColumnType.PrimaryKey )
+                            .addColumn( "username", ColumnType.Data )
+                            .addColumn( "addressId", ColumnType.ForeignKey )
                             .build() )
                     .addJoin( Join.builder()
-                            .parent( new TableName( "test.Person" ), "addressId" )
-                            .child( new TableName( "test.Address" ), "id" )
-                            .quoteCharacter( QuoteChar.SINGLE_QUOTES )
+                            .parentTable( new TableName( "test.Person" ) )
+                            .primaryKey( "id" )
+                            .foreignKey( "addressId" )
+                            .childTable( new TableName( "test.Address" ) )
                             .build() )
                     .build();
             fail( "Expected IllegalStatException" );

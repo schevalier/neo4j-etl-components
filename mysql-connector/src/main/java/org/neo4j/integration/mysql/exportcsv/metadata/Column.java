@@ -1,24 +1,23 @@
-package org.neo4j.integration.mysql.exportcsv.config;
+package org.neo4j.integration.mysql.exportcsv.metadata;
 
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
 import org.neo4j.integration.util.Preconditions;
 
 public class Column
 {
-    public static Builder.SetTable builder()
+    public static Column.Builder.SetTable builder()
     {
         return new ColumnBuilder();
     }
 
     private final TableName table;
     private final String name;
-    private final CsvField field;
+    private final ColumnType type;
 
     Column( ColumnBuilder builder )
     {
         this.table = Preconditions.requireNonNull( builder.table, "Table" );
         this.name = Preconditions.requireNonNullString( builder.name, "Name" );
-        this.field = Preconditions.requireNonNull( builder.field, "Field" );
+        this.type = Preconditions.requireNonNull( builder.type, "Type" );
     }
 
     public TableName table()
@@ -26,14 +25,24 @@ public class Column
         return table;
     }
 
-    public String name()
+    public String fullName()
     {
-        return table.formatColumn( name );
+        return table.fullyQualifiedColumnName( name );
     }
 
-    public CsvField field()
+    public String simpleName()
     {
-        return field;
+        return name;
+    }
+
+    public String name()
+    {
+        return type.name( this );
+    }
+
+    public ColumnType type()
+    {
+        return type;
     }
 
     public interface Builder
@@ -45,12 +54,12 @@ public class Column
 
         interface SetName
         {
-            SetField name( String name );
+            SetType name( String name );
         }
 
-        interface SetField
+        interface SetType
         {
-            Builder mapsTo( CsvField field );
+            Builder type( ColumnType type );
         }
 
         Column build();

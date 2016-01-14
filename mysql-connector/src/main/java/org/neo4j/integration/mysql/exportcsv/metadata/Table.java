@@ -1,13 +1,17 @@
-package org.neo4j.integration.mysql.exportcsvnew.metadata;
+package org.neo4j.integration.mysql.exportcsv.metadata;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import org.neo4j.integration.mysql.exportcsv.config.TableName;
 import org.neo4j.integration.util.Preconditions;
 
 public class Table
 {
+    public static Builder.SetName builder()
+    {
+        return new TableBuilder();
+    }
+
     private final TableName name;
     private final Collection<Column> columns;
 

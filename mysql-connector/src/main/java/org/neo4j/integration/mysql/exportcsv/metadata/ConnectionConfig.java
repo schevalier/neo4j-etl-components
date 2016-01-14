@@ -1,4 +1,4 @@
-package org.neo4j.integration.mysql.exportcsv.config;
+package org.neo4j.integration.mysql.exportcsv.metadata;
 
 import java.net.URI;
 

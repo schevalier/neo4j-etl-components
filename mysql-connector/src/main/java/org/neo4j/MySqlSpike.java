@@ -18,15 +18,15 @@ import java.util.concurrent.CompletableFuture;
 import org.neo4j.integration.cli.Commands;
 import org.neo4j.integration.io.Pipe;
 import org.neo4j.integration.mysql.SqlRunner;
+import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.exportcsv.metadata.TableName;
 import org.neo4j.integration.mysql.exportcsv.ExportCommand;
-import org.neo4j.integration.mysql.exportcsv.config.ConnectionConfig;
-import org.neo4j.integration.mysql.exportcsv.config.Join;
-import org.neo4j.integration.mysql.exportcsv.config.RelationalDatabaseExportConfig;
-import org.neo4j.integration.mysql.exportcsv.config.Table;
-import org.neo4j.integration.mysql.exportcsv.config.TableName;
+import org.neo4j.integration.mysql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.mysql.exportcsv.metadata.Column;
+import org.neo4j.integration.mysql.exportcsv.metadata.ColumnType;
+import org.neo4j.integration.mysql.exportcsv.metadata.Join;
+import org.neo4j.integration.mysql.exportcsv.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.ImportCommand;
-import org.neo4j.integration.neo4j.importcsv.config.CsvField;
-import org.neo4j.integration.neo4j.importcsv.config.DataType;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.neo4j.importcsv.config.IdType;
@@ -81,24 +81,26 @@ public class MySqlSpike
         TableName person = new TableName( "javabase.Person" );
         TableName address = new TableName( "javabase.Address" );
 
-        RelationalDatabaseExportConfig config = RelationalDatabaseExportConfig.builder()
+        ExportToCsvConfig config = ExportToCsvConfig.builder()
                 .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
                 .connectionConfig( connectionConfig )
                 .formatting( formatting )
                 .addTable( Table.builder()
                         .name( person )
-                        .id( "id" )
-                        .addColumn( "username", CsvField.data( "username", DataType.String ) )
+                        .addColumn( "id", ColumnType.PrimaryKey )
+                        .addColumn( "username", ColumnType.Data )
+                        .addColumn( "addressId", ColumnType.ForeignKey )
                         .build() )
                 .addTable( Table.builder()
                         .name( address )
-                        .id( "id" )
-                        .addColumn( "postcode", CsvField.data( "postcode", DataType.String ) )
+                        .addColumn( "id", ColumnType.PrimaryKey )
+                        .addColumn( "postcode", ColumnType.Data )
                         .build() )
                 .addJoin( Join.builder()
-                        .parent( person, "addressId" )
-                        .child( address, "id" )
-                        .quoteCharacter( formatting.quoteCharacter() )
+                        .parentTable( person )
+                        .primaryKey( "id" )
+                        .foreignKey( "addressId" )
+                        .childTable( address )
                         .build() )
                 .build();
 

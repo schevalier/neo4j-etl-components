@@ -1,8 +1,8 @@
-package org.neo4j.integration.mysql.exportcsvnew.config;
+package org.neo4j.integration.mysql.exportcsv.config;
 
-import org.neo4j.integration.mysql.exportcsvnew.metadata.Column;
-import org.neo4j.integration.mysql.exportcsvnew.metadata.ColumnType;
-import org.neo4j.integration.mysql.exportcsvnew.metadata.Table;
+import org.neo4j.integration.mysql.exportcsv.metadata.Column;
+import org.neo4j.integration.mysql.exportcsv.metadata.ColumnType;
+import org.neo4j.integration.mysql.exportcsv.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.config.CsvField;
 import org.neo4j.integration.neo4j.importcsv.config.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
@@ -12,17 +12,17 @@ public class TableMapper implements Mapper<Table>
     @Override
     public ColumnToCsvFieldMappings createExportCsvConfigFor( Table table, QuoteChar quote )
     {
-        ColumnToCsvFieldMappings config = new ColumnToCsvFieldMappings();
+        ColumnToCsvFieldMappings mappings = new ColumnToCsvFieldMappings();
 
         for ( Column column : table.columns() )
         {
             switch ( column.type() )
             {
                 case PrimaryKey:
-                    config.addMapping( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
+                    mappings.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
                     break;
                 case Data:
-                    config.addMapping( column, CsvField.data( column.name() ) );
+                    mappings.add( column, CsvField.data( column.simpleName() ) );
                     break;
                 default:
                     // Do nothing
@@ -30,7 +30,7 @@ public class TableMapper implements Mapper<Table>
             }
         }
 
-        config.addMapping(
+        mappings.add(
                 Column.builder()
                         .table( table.name() )
                         .name( quote.enquote( table.name().simpleName() ) )
@@ -38,6 +38,6 @@ public class TableMapper implements Mapper<Table>
                         .build(),
                 CsvField.label() );
 
-        return config;
+        return mappings;
     }
 }
