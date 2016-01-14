@@ -1,4 +1,4 @@
-package org.neo4j.integration.mysql.exportcsv.metadata;
+package org.neo4j.integration.mysql.metadata;
 
 class ColumnBuilder implements Column.Builder.SetTable, Column.Builder.SetName, Column.Builder.SetType, Column.Builder
 {

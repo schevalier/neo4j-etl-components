@@ -1,15 +1,19 @@
 package org.neo4j.integration.mysql.exportcsv.config;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
-import org.neo4j.integration.mysql.exportcsv.metadata.TableName;
-import org.neo4j.integration.mysql.exportcsv.metadata.Join;
-import org.neo4j.integration.mysql.exportcsv.metadata.Table;
+import com.sun.xml.internal.xsom.impl.scd.Iterators;
+
+import org.neo4j.integration.mysql.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.metadata.DatabaseObject;
+import org.neo4j.integration.mysql.metadata.TableName;
+import org.neo4j.integration.mysql.metadata.Join;
+import org.neo4j.integration.mysql.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.util.Preconditions;
 
@@ -69,6 +73,14 @@ public class ExportToCsvConfig implements ExportProperties
     public Collection<Join> joins()
     {
         return joins;
+    }
+
+    public Collection<DatabaseObject> databaseObjects()
+    {
+        Collection<DatabaseObject>  results = new ArrayList<>(  );
+        results.addAll( tables );
+        results.addAll( joins );
+        return results;
     }
 
     private void validate()

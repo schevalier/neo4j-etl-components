@@ -18,14 +18,13 @@ import java.util.concurrent.CompletableFuture;
 import org.neo4j.integration.cli.Commands;
 import org.neo4j.integration.io.Pipe;
 import org.neo4j.integration.mysql.SqlRunner;
-import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
-import org.neo4j.integration.mysql.exportcsv.metadata.TableName;
-import org.neo4j.integration.mysql.exportcsv.ExportCommand;
+import org.neo4j.integration.mysql.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.metadata.TableName;
+import org.neo4j.integration.mysql.exportcsv.ExportToCsv;
 import org.neo4j.integration.mysql.exportcsv.config.ExportToCsvConfig;
-import org.neo4j.integration.mysql.exportcsv.metadata.Column;
-import org.neo4j.integration.mysql.exportcsv.metadata.ColumnType;
-import org.neo4j.integration.mysql.exportcsv.metadata.Join;
-import org.neo4j.integration.mysql.exportcsv.metadata.Table;
+import org.neo4j.integration.mysql.metadata.ColumnType;
+import org.neo4j.integration.mysql.metadata.Join;
+import org.neo4j.integration.mysql.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.ImportCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
@@ -104,7 +103,7 @@ public class MySqlSpike
                         .build() )
                 .build();
 
-        return new ExportCommand( config ).execute();
+        return new ExportToCsv( config ).execute();
     }
 
     private static void printDbInfo( ConnectionConfig connectionConfig ) throws Exception

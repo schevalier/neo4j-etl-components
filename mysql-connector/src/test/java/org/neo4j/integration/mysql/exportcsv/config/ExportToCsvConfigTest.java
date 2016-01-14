@@ -4,11 +4,11 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-import org.neo4j.integration.mysql.exportcsv.metadata.ColumnType;
-import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
-import org.neo4j.integration.mysql.exportcsv.metadata.Join;
-import org.neo4j.integration.mysql.exportcsv.metadata.Table;
-import org.neo4j.integration.mysql.exportcsv.metadata.TableName;
+import org.neo4j.integration.mysql.metadata.ColumnType;
+import org.neo4j.integration.mysql.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.metadata.Join;
+import org.neo4j.integration.mysql.metadata.Table;
+import org.neo4j.integration.mysql.metadata.TableName;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 
 import static org.junit.Assert.assertEquals;

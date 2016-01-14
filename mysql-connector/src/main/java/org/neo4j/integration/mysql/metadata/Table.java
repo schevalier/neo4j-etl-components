@@ -1,11 +1,11 @@
-package org.neo4j.integration.mysql.exportcsv.metadata;
+package org.neo4j.integration.mysql.metadata;
 
 import java.util.Collection;
 import java.util.Collections;
 
 import org.neo4j.integration.util.Preconditions;
 
-public class Table
+public class Table implements DatabaseObject
 {
     public static Builder.SetName builder()
     {
@@ -30,6 +30,12 @@ public class Table
     public Collection<Column> columns()
     {
         return columns;
+    }
+
+    @Override
+    public String descriptor()
+    {
+        return name.fullName();
     }
 
     public interface Builder

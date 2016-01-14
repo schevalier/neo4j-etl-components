@@ -2,29 +2,31 @@ package org.neo4j.integration.mysql.exportcsv.sql;
 
 import java.nio.file.Path;
 
-import org.neo4j.integration.mysql.exportcsv.config.ColumnToCsvFieldMappings;
-import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
+import org.neo4j.integration.mysql.exportcsv.mapping.ColumnToCsvFieldMappings;
+import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 
 import static org.neo4j.integration.util.StringListBuilder.stringList;
 
-public class JoinSqlSupplier implements SqlSupplier
+public class TableExportSqlSupplier implements ExportSqlSupplier
 {
-    private final ColumnToCsvFieldMappings mappings;
+    private final Formatting formatting;
 
-    public JoinSqlSupplier( ColumnToCsvFieldMappings mappings )
+    public TableExportSqlSupplier( Formatting formatting )
     {
-        this.mappings = mappings;
+        this.formatting = formatting;
     }
 
     @Override
-    public String sql( Path exportFile, Delimiter delimiter )
+    public String sql( ColumnToCsvFieldMappings mappings, Path exportFile )
     {
+        String delimiter = formatting.delimiter().value();
+
         return "SELECT " +
-                stringList( mappings.columns(), delimiter.value() ) +
+                stringList( mappings.columns(), delimiter ) +
                 " INTO OUTFILE '" +
                 exportFile.toString() +
                 "' FIELDS TERMINATED BY '" +
-                delimiter.value() +
+                delimiter +
                 "' OPTIONALLY ENCLOSED BY ''" +
                 " ESCAPED BY '\\\\'" +
                 " LINES TERMINATED BY '\\n'" +

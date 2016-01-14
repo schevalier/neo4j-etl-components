@@ -1,12 +1,13 @@
-package org.neo4j.integration.mysql.exportcsv.metadata;
+package org.neo4j.integration.mysql.metadata;
 
 import java.util.Collection;
 
 import org.neo4j.integration.util.Preconditions;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-public class Join
+public class Join implements DatabaseObject
 {
     public static Builder.SetParentTable builder()
     {
@@ -42,6 +43,12 @@ public class Join
     public Collection<TableName> tableNames()
     {
         return asList( primaryKey.table(), childTable );
+    }
+
+    @Override
+    public String descriptor()
+    {
+        return format("%s_%s", primaryKey.table().fullName(), childTable.fullName());
     }
 
     public interface Builder

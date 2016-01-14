@@ -11,7 +11,6 @@ public class GraphDataConfig implements GraphDataConfigSupplier
         this.configSuppliers = configSuppliers;
     }
 
-
     @Override
     public void addGraphDataConfigTo( ImportConfig.Builder importConfig )
     {

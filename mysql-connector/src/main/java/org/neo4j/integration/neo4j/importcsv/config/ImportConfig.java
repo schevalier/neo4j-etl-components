@@ -57,7 +57,7 @@ public class ImportConfig implements CommandsSupplier
         commands.addCommand( formatting.arrayDelimiter().description() );
 
         commands.addCommand( "--quote" );
-        commands.addCommand( formatting.quoteCharacter().value() );
+        commands.addCommand( formatting.quote().value() );
 
         commands.addCommand( "--id-type" );
         commands.addCommand( idType.name().toUpperCase() );

@@ -1,4 +1,4 @@
-package org.neo4j.integration.mysql.exportcsv.metadata;
+package org.neo4j.integration.mysql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;

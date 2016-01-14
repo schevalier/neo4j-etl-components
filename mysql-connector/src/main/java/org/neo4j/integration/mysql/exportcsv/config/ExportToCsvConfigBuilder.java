@@ -4,9 +4,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.integration.mysql.exportcsv.metadata.ConnectionConfig;
-import org.neo4j.integration.mysql.exportcsv.metadata.Join;
-import org.neo4j.integration.mysql.exportcsv.metadata.Table;
+import org.neo4j.integration.mysql.metadata.ConnectionConfig;
+import org.neo4j.integration.mysql.metadata.Join;
+import org.neo4j.integration.mysql.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 
 class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
