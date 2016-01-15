@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.neo4j.integration.cli.Commands;
-import org.neo4j.integration.cli.CommandsSupplier;
+import org.neo4j.integration.process.Commands;
+import org.neo4j.integration.process.CommandsSupplier;
 import org.neo4j.integration.util.Preconditions;
 import org.neo4j.integration.util.Strings;
 

@@ -4,7 +4,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.integration.cli.Commands;
+import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.neo4j.importcsv.HeaderFileWriter;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfigSupplier;

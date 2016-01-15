@@ -1,4 +1,4 @@
-package org.neo4j.integration.cli;
+package org.neo4j.integration.process;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import org.neo4j.integration.io.StreamEventHandler;
 
 import static java.util.Arrays.asList;
 
-import static org.neo4j.integration.cli.Result.Evaluator;
+import static org.neo4j.integration.process.Result.Evaluator;
 
 class CommandsBuilder
         implements Commands.Builder.SetCommands,

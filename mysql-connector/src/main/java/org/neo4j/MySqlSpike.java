@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import org.neo4j.integration.cli.Commands;
+import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.io.Pipe;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;

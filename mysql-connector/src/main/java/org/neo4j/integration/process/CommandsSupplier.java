@@ -1,4 +1,4 @@
-package org.neo4j.integration.cli;
+package org.neo4j.integration.process;
 
 public interface CommandsSupplier
 {

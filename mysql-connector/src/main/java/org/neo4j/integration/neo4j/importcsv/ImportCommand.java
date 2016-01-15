@@ -1,7 +1,7 @@
 package org.neo4j.integration.neo4j.importcsv;
 
-import org.neo4j.integration.cli.Commands;
-import org.neo4j.integration.cli.Result;
+import org.neo4j.integration.process.Commands;
+import org.neo4j.integration.process.Result;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 
 public class ImportCommand

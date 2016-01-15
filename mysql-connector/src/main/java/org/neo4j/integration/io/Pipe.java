@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.neo4j.integration.cli.Commands;
+import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.util.FutureUtils;
 import org.neo4j.integration.util.OperatingSystem;
 

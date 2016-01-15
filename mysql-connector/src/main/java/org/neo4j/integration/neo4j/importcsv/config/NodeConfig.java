@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.neo4j.integration.cli.Commands;
-import org.neo4j.integration.cli.CommandsSupplier;
+import org.neo4j.integration.process.Commands;
+import org.neo4j.integration.process.CommandsSupplier;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
