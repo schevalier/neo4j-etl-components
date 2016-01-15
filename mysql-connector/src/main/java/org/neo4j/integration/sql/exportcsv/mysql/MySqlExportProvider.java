@@ -30,7 +30,6 @@ public class MySqlExportProvider implements DatabaseExportProvider
         if ( databaseObject instanceof Table )
         {
             return new ExportMySqlTable( (Table) databaseObject, headerFileWriter, exportFileWriter, config ).export();
-
         }
         else if ( databaseObject instanceof Join )
         {

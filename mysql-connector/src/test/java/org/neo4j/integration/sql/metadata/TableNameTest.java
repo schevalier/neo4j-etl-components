@@ -5,6 +5,7 @@ import java.util.IllegalFormatException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 public class TableNameTest
@@ -66,5 +67,23 @@ public class TableNameTest
             // then
             assertEquals( "Table name does not include schema: Person", e.getMessage() );
         }
+    }
+    
+    @Test
+    public void shouldImplementCaseInsensitiveEquality()
+    {
+         // given
+        TableName tableName1 = new TableName( "example.Person" );
+        TableName tableName2 = new TableName( "example.Person" );
+        TableName tableName3 = new TableName( "example.person" );
+        TableName tableName4 = new TableName( "EXAMPLE.PERSON" );
+        TableName tableName5 = new TableName( "test.Address" );
+
+         // then
+        assertEquals( tableName1, tableName2 );
+        assertEquals( tableName2, tableName1 );
+        assertEquals( tableName1, tableName3 );
+        assertEquals( tableName1, tableName4 );
+        assertNotEquals( tableName1, tableName5 );
     }
 }

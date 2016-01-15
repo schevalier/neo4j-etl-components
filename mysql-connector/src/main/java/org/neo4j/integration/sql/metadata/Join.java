@@ -51,6 +51,16 @@ public class Join implements DatabaseObject
         return format("%s_%s", primaryKey.table().fullName(), childTable.fullName());
     }
 
+    @Override
+    public String toString()
+    {
+        return "Join{" +
+                "primaryKey=" + primaryKey +
+                ", foreignKey=" + foreignKey +
+                ", childTable=" + childTable +
+                '}';
+    }
+
     public interface Builder
     {
         interface SetParentTable

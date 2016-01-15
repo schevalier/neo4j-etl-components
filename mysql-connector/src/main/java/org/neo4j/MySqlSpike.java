@@ -11,27 +11,27 @@ import java.io.Writer;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.io.Pipe;
-import org.neo4j.integration.sql.Results;
-import org.neo4j.integration.sql.SqlRunner;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
-import org.neo4j.integration.sql.metadata.ConnectionConfig;
-import org.neo4j.integration.sql.metadata.TableName;
-import org.neo4j.integration.sql.exportcsv.ExportToCsv;
-import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
-import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.ImportCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
-import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
+import org.neo4j.integration.neo4j.importcsv.fields.IdType;
+import org.neo4j.integration.process.Commands;
+import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.exportcsv.ExportToCsv;
+import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
+import org.neo4j.integration.sql.exportcsv.mysql.schema.GetJoinMetadata;
+import org.neo4j.integration.sql.exportcsv.mysql.schema.GetTableMetadata;
+import org.neo4j.integration.sql.metadata.ConnectionConfig;
+import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.Table;
+import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.lang.String.format;
 
@@ -82,44 +82,39 @@ public class MySqlSpike
         TableName person = new TableName( "javabase.Person" );
         TableName address = new TableName( "javabase.Address" );
 
-        ExportToCsvConfig config = ExportToCsvConfig.builder()
-                .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
-                .connectionConfig( connectionConfig )
-                .formatting( formatting )
-                .addTable( Table.builder()
-                        .name( person )
-                        .addColumn( "id", ColumnType.PrimaryKey )
-                        .addColumn( "username", ColumnType.Data )
-                        .addColumn( "addressId", ColumnType.ForeignKey )
-                        .build() )
-                .addTable( Table.builder()
-                        .name( address )
-                        .addColumn( "id", ColumnType.PrimaryKey )
-                        .addColumn( "postcode", ColumnType.Data )
-                        .build() )
-                .addJoin( Join.builder()
-                        .parentTable( person )
-                        .primaryKey( "id" )
-                        .foreignKey( "addressId" )
-                        .childTable( address )
-                        .build() )
-                .build();
+        try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
+        {
+            Table table1 = new GetTableMetadata( sqlRunner ).getMetadataFor( person );
+            Table table2 = new GetTableMetadata( sqlRunner ).getMetadataFor( address );
 
-        return new ExportToCsv( config, new MySqlExportProvider() ).execute();
+            Collection<Join> joins = new GetJoinMetadata( sqlRunner ).getMetadataFor( person, address );
+
+            ExportToCsvConfig config = ExportToCsvConfig.builder()
+                    .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
+                    .connectionConfig( connectionConfig )
+                    .formatting( formatting )
+                    .addTable( table1 )
+                    .addTable( table2 )
+                    .addJoins( joins )
+                    .build();
+
+            return new ExportToCsv( config, new MySqlExportProvider() ).execute();
+        }
     }
 
     private static void printDbInfo( ConnectionConfig connectionConfig ) throws Exception
     {
         try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
         {
-            Results results = sqlRunner.execute( "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_KEY FROM " +
-                    "INFORMATION_SCHEMA" +
-                    ".COLUMNS WHERE TABLE_SCHEMA = 'javabase' AND TABLE_NAME ='Person';" ).await();
+            Table table = new GetTableMetadata( sqlRunner ).getMetadataFor( new TableName( "javabase.Person" ) );
+            System.out.println( table );
 
-            while ( results.next() )
+            Collection<Join> joins = new GetJoinMetadata( sqlRunner )
+                    .getMetadataFor( new TableName( "javabase.Person" ), new TableName( "javabase.Address" ) );
+
+            for ( Join join : joins )
             {
-
-                System.out.println( "Column: " + results.getString( "COLUMN_NAME" ) );
+                System.out.println( join );
             }
         }
     }

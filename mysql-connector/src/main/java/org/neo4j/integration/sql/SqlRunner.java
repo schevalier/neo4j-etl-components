@@ -30,7 +30,6 @@ public class SqlRunner implements AutoCloseable
 
     public AwaitHandle<Results> execute( String sql )
     {
-
         return new SqlRunnerAwaitHandle(
                 FutureUtils.exceptionableFuture( () ->
                 {

@@ -8,7 +8,7 @@ public class IdSpace
 
     public IdSpace( String value )
     {
-        this.value = Preconditions.requireNonNullString( value, "Value" );
+        this.value = Preconditions.requireNonNullString( value, "Value" ).toLowerCase();
     }
 
     public String value()

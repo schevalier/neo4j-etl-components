@@ -7,10 +7,17 @@ import static java.lang.String.format;
 public class TableName
 {
     private final String name;
+    private final String lowercaseName;
 
-    public TableName( String name )
+    public TableName( String schema, String name )
     {
-        this.name = Preconditions.requireNonNullString( name, "Name" );
+        this( format( "%s.%s", schema, name ) );
+    }
+
+    public TableName( String fullName )
+    {
+        this.name = Preconditions.requireNonNullString( fullName, "Name" );
+        this.lowercaseName = name.toLowerCase();
     }
 
     public String schema()
@@ -41,6 +48,12 @@ public class TableName
     }
 
     @Override
+    public String toString()
+    {
+        return fullName();
+    }
+
+    @Override
     public boolean equals( Object o )
     {
         if ( this == o )
@@ -54,13 +67,13 @@ public class TableName
 
         TableName tableName = (TableName) o;
 
-        return name.equals( tableName.name );
+        return lowercaseName.equals( tableName.lowercaseName );
 
     }
 
     @Override
     public int hashCode()
     {
-        return name.hashCode();
+        return lowercaseName.hashCode();
     }
 }

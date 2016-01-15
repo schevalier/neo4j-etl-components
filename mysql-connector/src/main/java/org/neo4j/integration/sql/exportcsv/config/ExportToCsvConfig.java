@@ -121,6 +121,8 @@ public class ExportToCsvConfig implements ExportProperties
 
         Builder addJoin( Join join );
 
+        Builder addJoins( Collection<Join> joins );
+
         ExportToCsvConfig build();
     }
 }

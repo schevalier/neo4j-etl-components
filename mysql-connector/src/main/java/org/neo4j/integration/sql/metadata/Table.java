@@ -38,6 +38,15 @@ public class Table implements DatabaseObject
         return name.fullName();
     }
 
+    @Override
+    public String toString()
+    {
+        return "Table{" +
+                "name=" + name +
+                ", columns=" + columns +
+                '}';
+    }
+
     public interface Builder
     {
         interface SetName

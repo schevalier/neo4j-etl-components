@@ -46,6 +46,16 @@ public class Column
     }
 
     @Override
+    public String toString()
+    {
+        return "Column{" +
+                "table=" + table +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
     public boolean equals( Object o )
     {
         if ( this == o )
