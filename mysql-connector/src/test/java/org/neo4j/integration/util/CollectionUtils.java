@@ -10,4 +10,10 @@ public class CollectionUtils
         ArrayList<T> list = new ArrayList<>( collection );
         return list.isEmpty() ? null : list.get( list.size() - 1 );
     }
+
+    public static <T> T first(Collection<? extends T> collection)
+    {
+        ArrayList<T> list = new ArrayList<>( collection );
+        return list.isEmpty() ? null : list.get( 0 );
+    }
 }
