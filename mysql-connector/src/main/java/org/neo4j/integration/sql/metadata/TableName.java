@@ -13,6 +13,18 @@ public class TableName
         this.name = Preconditions.requireNonNullString( name, "Name" );
     }
 
+    public String schema()
+    {
+        int index = name.indexOf( "." );
+
+        if ( index < 0 )
+        {
+            throw new IllegalArgumentException( format( "Table name does not include schema: %s", name ) );
+        }
+
+        return name.substring( 0, index );
+    }
+
     public String simpleName()
     {
         return name.substring( name.lastIndexOf( "." ) + 1 );
@@ -25,7 +37,7 @@ public class TableName
 
     public String fullyQualifiedColumnName( String column )
     {
-        return format("%s.%s", name, column);
+        return format( "%s.%s", name, column );
     }
 
     @Override

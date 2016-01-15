@@ -45,6 +45,32 @@ public class Column
         return type;
     }
 
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        Column column = (Column) o;
+
+        return table.equals( column.table ) && name.equals( column.name ) && type == column.type;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = table.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
+    }
+
     public interface Builder
     {
         interface SetTable

@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.io.Pipe;
+import org.neo4j.integration.sql.Results;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
 import org.neo4j.integration.sql.metadata.ConnectionConfig;
@@ -111,14 +112,14 @@ public class MySqlSpike
     {
         try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
         {
-            ResultSet resultSet = sqlRunner.execute( "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_KEY FROM " +
+            Results results = sqlRunner.execute( "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_KEY FROM " +
                     "INFORMATION_SCHEMA" +
                     ".COLUMNS WHERE TABLE_SCHEMA = 'javabase' AND TABLE_NAME ='Person';" ).await();
 
-            while ( resultSet.next() )
+            while ( results.next() )
             {
 
-                System.out.println( "Column: " + resultSet.getString( "COLUMN_NAME" ) );
+                System.out.println( "Column: " + results.getString( "COLUMN_NAME" ) );
             }
         }
     }

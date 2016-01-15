@@ -28,14 +28,14 @@ public class SqlRunner implements AutoCloseable
         Loggers.MySql.log().fine( "Connected to database" );
     }
 
-    public AwaitHandle<ResultSet> execute( String sql )
+    public AwaitHandle<Results> execute( String sql )
     {
 
         return new SqlRunnerAwaitHandle(
                 FutureUtils.exceptionableFuture( () ->
                 {
                     Loggers.MySql.log().finest( sql );
-                    return connection.createStatement().executeQuery( sql );
+                    return new SqlResults( connection.createStatement().executeQuery( sql ) );
 
                 }, r -> new Thread( r ).start() ) );
     }
@@ -46,31 +46,59 @@ public class SqlRunner implements AutoCloseable
         connection.close();
     }
 
-    private static class SqlRunnerAwaitHandle implements AwaitHandle<ResultSet>
+    private static class SqlRunnerAwaitHandle implements AwaitHandle<Results>
     {
-        private final CompletableFuture<ResultSet> future;
+        private final CompletableFuture<Results> future;
 
-        private SqlRunnerAwaitHandle( CompletableFuture<ResultSet> future )
+        private SqlRunnerAwaitHandle( CompletableFuture<Results> future )
         {
             this.future = future;
         }
 
         @Override
-        public ResultSet await() throws Exception
+        public Results await() throws Exception
         {
             return future.get();
         }
 
         @Override
-        public ResultSet await( long timeout, TimeUnit unit ) throws Exception
+        public Results await( long timeout, TimeUnit unit ) throws Exception
         {
             return future.get( timeout, unit );
         }
 
         @Override
-        public CompletableFuture<ResultSet> toFuture()
+        public CompletableFuture<Results> toFuture()
         {
             return future;
+        }
+    }
+
+    private static class SqlResults implements Results
+    {
+        private final ResultSet results;
+
+        public SqlResults( ResultSet results )
+        {
+            this.results = results;
+        }
+
+        @Override
+        public boolean next() throws Exception
+        {
+            return results.next();
+        }
+
+        @Override
+        public String getString( String columnLabel ) throws Exception
+        {
+            return results.getString( columnLabel );
+        }
+
+        @Override
+        public void close() throws Exception
+        {
+            results.close();
         }
     }
 }
