@@ -6,8 +6,8 @@ import java.util.Collection;
 
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.neo4j.importcsv.HeaderFileWriter;
+import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfigSupplier;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
@@ -23,7 +23,7 @@ public class ExportToCsv
         this.databaseExportProvider = databaseExportProvider;
     }
 
-    public GraphDataConfig execute() throws Exception
+    public GraphConfig execute() throws Exception
     {
         if ( Files.notExists( config.destination() ) )
         {
@@ -32,7 +32,7 @@ public class ExportToCsv
 
         Commands.commands( "chmod", "0777", config.destination().toString() ).execute().await();
 
-        Collection<GraphDataConfigSupplier> graphDataConfigSuppliers = new ArrayList<>();
+        Collection<GraphDataConfig> graphDataConfig = new ArrayList<>();
 
         try ( SqlRunner sqlRunner = new SqlRunner( config.connectionConfig() ) )
         {
@@ -41,16 +41,16 @@ public class ExportToCsv
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
-                graphDataConfigSuppliers.add(
+                graphDataConfig.add(
                         databaseExportProvider.exportDatabaseObject(
                                 databaseObject,
-                                headerFileWriter, exportFileWriter, config
+                                headerFileWriter,
+                                exportFileWriter,
+                                config
                         ) );
             }
         }
 
-        return new GraphDataConfig( graphDataConfigSuppliers );
+        return new GraphConfig( graphDataConfig );
     }
-
-
 }

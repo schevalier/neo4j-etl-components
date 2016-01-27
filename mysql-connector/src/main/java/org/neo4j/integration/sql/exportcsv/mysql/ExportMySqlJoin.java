@@ -4,9 +4,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import org.neo4j.integration.neo4j.importcsv.HeaderFileWriter;
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfigSupplier;
+import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
-import org.neo4j.integration.sql.exportcsv.ExportDatabaseContentsToCsv;
+import org.neo4j.integration.sql.exportcsv.CsvWriter;
 import org.neo4j.integration.sql.exportcsv.ExportFileWriter;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.JoinMapper;
@@ -30,11 +30,11 @@ class ExportMySqlJoin
         this.config = config;
     }
 
-    public GraphDataConfigSupplier export() throws Exception
+    public GraphDataConfig export() throws Exception
     {
         Collection<Path> files =
-                new ExportDatabaseContentsToCsv<Join>( headerFileWriter, exportFileWriter )
-                        .execute( join,
+                new CsvWriter<Join>( headerFileWriter, exportFileWriter )
+                        .write( join,
                                 new JoinMapper( config.formatting() ),
                                 new MySqlJoinExportSqlSupplier( config.formatting() ) );
 

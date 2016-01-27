@@ -48,9 +48,9 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
     }
 
     @Override
-    public ImportConfig.Builder graphDataConfig( GraphDataConfig graphDataConfig )
+    public ImportConfig.Builder graphDataConfig( GraphConfig graphConfig )
     {
-        graphDataConfig.addGraphDataConfigTo( this );
+        graphConfig.addTo( this );
         return this;
     }
 

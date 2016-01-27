@@ -49,6 +49,13 @@ class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
     }
 
     @Override
+    public ExportToCsvConfig.Builder addTables( Collection<Table> tables )
+    {
+        this.tables.addAll( tables );
+        return this;
+    }
+
+    @Override
     public ExportToCsvConfig.Builder addJoin(  Join join )
     {
         joins.add( join );

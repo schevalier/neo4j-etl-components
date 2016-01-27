@@ -119,6 +119,8 @@ public class ExportToCsvConfig implements ExportProperties
 
         Builder addTable( Table table );
 
+        Builder addTables( Collection<Table> tables );
+
         Builder addJoin( Join join );
 
         Builder addJoins( Collection<Join> joins );

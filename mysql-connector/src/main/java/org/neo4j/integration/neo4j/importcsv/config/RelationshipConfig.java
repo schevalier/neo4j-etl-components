@@ -14,7 +14,7 @@ import static java.lang.String.format;
 
 import static org.neo4j.integration.util.StringListBuilder.stringList;
 
-public class RelationshipConfig implements CommandsSupplier, GraphDataConfigSupplier
+public class RelationshipConfig implements CommandsSupplier, GraphDataConfig
 {
     public static Builder.SetInputFiles builder()
     {
@@ -39,7 +39,7 @@ public class RelationshipConfig implements CommandsSupplier, GraphDataConfigSupp
     }
 
     @Override
-    public void addGraphDataConfigTo( ImportConfig.Builder importConfig )
+    public void addTo( ImportConfig.Builder importConfig )
     {
         importConfig.addRelationshipConfig( this );
     }

@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
+import java.util.Collection;
+
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
@@ -18,7 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GetTableMetadataTest
+public class TableMetadataProducerTest
 {
     @Test
     public void shouldReturnTableMetadata() throws Exception
@@ -34,17 +36,18 @@ public class GetTableMetadataTest
         SqlRunner sqlRunner = mock( SqlRunner.class );
         when( sqlRunner.execute( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
-        GetTableMetadata getTableMetadata = new GetTableMetadata( sqlRunner );
+        TableMetadataProducer getTableMetadata = new TableMetadataProducer( sqlRunner );
 
         // when
-        Table metadata = getTableMetadata.getMetadataFor( new TableName( "test.Person" ) );
+        Collection<Table> metadata = getTableMetadata.createMetadataFor( new TableName( "test.Person" ) );
 
         // then
         TableName expectedTableName = new TableName( "test.Person" );
+        Table table = metadata.stream().findFirst().get();
 
-        assertEquals( expectedTableName, metadata.name());
-        assertEquals( "test.Person", metadata.descriptor());
-        assertThat(metadata.columns(), contains(
+        assertEquals( expectedTableName, table.name() );
+        assertEquals( "test.Person", table.descriptor());
+        assertThat(table.columns(), contains(
                 Column.builder()
                         .table( expectedTableName )
                         .name( "id" ).type(ColumnType.PrimaryKey )

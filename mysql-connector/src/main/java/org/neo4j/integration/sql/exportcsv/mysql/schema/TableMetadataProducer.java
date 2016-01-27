@@ -1,31 +1,36 @@
 package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.neo4j.integration.sql.Results;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
-public class GetTableMetadata
+public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 {
     private final SqlRunner sqlRunner;
 
-    public GetTableMetadata( SqlRunner sqlRunner )
+    public TableMetadataProducer( SqlRunner sqlRunner )
     {
         this.sqlRunner = sqlRunner;
     }
 
-    public Table getMetadataFor( TableName tableName ) throws Exception
+    @Override
+    public Collection<Table> createMetadataFor( TableName source ) throws Exception
     {
         String sql = "SELECT " +
                 "COLUMN_NAME, " +
                 "DATA_TYPE, " +
                 "COLUMN_KEY " +
                 "FROM INFORMATION_SCHEMA.COLUMNS " +
-                "WHERE TABLE_SCHEMA = '" + tableName.schema() +
-                "' AND TABLE_NAME ='" + tableName.simpleName() + "';";
+                "WHERE TABLE_SCHEMA = '" + source.schema() +
+                "' AND TABLE_NAME ='" + source.simpleName() + "';";
 
-        Table.Builder builder = Table.builder().name( tableName );
+        Table.Builder builder = Table.builder().name( source );
 
         try ( Results results = sqlRunner.execute( sql ).await() )
         {
@@ -49,7 +54,6 @@ public class GetTableMetadata
             }
         }
 
-        return builder.build();
+        return Collections.singletonList(builder.build());
     }
-
 }

@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.neo4j.integration.io.Pipe;
 import org.neo4j.integration.neo4j.importcsv.ImportCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
+import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.process.Commands;
@@ -26,12 +26,13 @@ import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.ExportToCsv;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.GetJoinMetadata;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.GetTableMetadata;
+import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
+import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
 import org.neo4j.integration.sql.metadata.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
+import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static java.lang.String.format;
 
@@ -57,26 +58,26 @@ public class MySqlSpike
 
         printDbInfo( connectionConfig );
 
-        GraphDataConfig graphDataConfig = doExport( formatting, connectionConfig );
+        GraphConfig graphConfig = doExport( formatting, connectionConfig );
 
-        doImport( formatting, graphDataConfig );
+        doImport( formatting, graphConfig );
     }
 
     private static void doImport( Formatting formatting,
-                                  GraphDataConfig graphDataConfig ) throws Exception
+                                  GraphConfig graphConfig ) throws Exception
     {
         ImportConfig importConfig = ImportConfig.builder()
                 .importToolDirectory( Paths.get( "/Users/iansrobinson/neo4j-enterprise-3.0.0-M02/bin" ) )
                 .destination( Paths.get( "/Users/iansrobinson/Desktop/graph.db" ) )
                 .formatting( formatting )
                 .idType( IdType.Integer )
-                .graphDataConfig( graphDataConfig )
+                .graphDataConfig( graphConfig )
                 .build();
 
         new ImportCommand( importConfig ).execute();
     }
 
-    private static GraphDataConfig doExport( Formatting formatting,
+    private static GraphConfig doExport( Formatting formatting,
                                              ConnectionConfig connectionConfig ) throws Exception
     {
         TableName person = new TableName( "javabase.Person" );
@@ -84,17 +85,20 @@ public class MySqlSpike
 
         try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
         {
-            Table table1 = new GetTableMetadata( sqlRunner ).getMetadataFor( person );
-            Table table2 = new GetTableMetadata( sqlRunner ).getMetadataFor( address );
+            TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( sqlRunner );
 
-            Collection<Join> joins = new GetJoinMetadata( sqlRunner ).getMetadataFor( person, address );
+            Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( person );
+            Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( address );
+
+            Collection<Join> joins =
+                    new JoinMetadataProducer( sqlRunner ).createMetadataFor( new TableNamePair( person, address ) );
 
             ExportToCsvConfig config = ExportToCsvConfig.builder()
                     .destination( Paths.get( "/Users/iansrobinson/Desktop" ) )
                     .connectionConfig( connectionConfig )
                     .formatting( formatting )
-                    .addTable( table1 )
-                    .addTable( table2 )
+                    .addTables( tables1 )
+                    .addTables( tables2 )
                     .addJoins( joins )
                     .build();
 
@@ -106,11 +110,13 @@ public class MySqlSpike
     {
         try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
         {
-            Table table = new GetTableMetadata( sqlRunner ).getMetadataFor( new TableName( "javabase.Person" ) );
-            System.out.println( table );
+            Collection<Table> tables = new TableMetadataProducer( sqlRunner ).createMetadataFor( new TableName( "javabase.Person" ) );
+            System.out.println( tables );
 
-            Collection<Join> joins = new GetJoinMetadata( sqlRunner )
-                    .getMetadataFor( new TableName( "javabase.Person" ), new TableName( "javabase.Address" ) );
+            Collection<Join> joins = new JoinMetadataProducer( sqlRunner )
+                    .createMetadataFor( new TableNamePair(
+                            new TableName( "javabase.Person" ),
+                            new TableName( "javabase.Address" ) ) );
 
             for ( Join join : joins )
             {

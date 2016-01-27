@@ -13,6 +13,7 @@ import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.TableName;
+import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,7 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GetJoinMetadataTest
+public class JoinMetadataProducerTest
 {
     @Test
     public void shouldReturnJoinMetadata() throws Exception
@@ -40,11 +41,13 @@ public class GetJoinMetadataTest
         SqlRunner sqlRunner = mock( SqlRunner.class );
         when( sqlRunner.execute( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
-        GetJoinMetadata getJoinMetadata = new GetJoinMetadata( sqlRunner );
+        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( sqlRunner );
 
         // when
         Collection<Join> joins = getJoinMetadata
-                .getMetadataFor( new TableName( "test.Person" ), new TableName( "test.Address" ) );
+                .createMetadataFor( new TableNamePair(
+                        new TableName( "test.Person" ),
+                        new TableName( "test.Address" ) ) );
 
         // then
         Iterator<Join> iterator = joins.iterator();

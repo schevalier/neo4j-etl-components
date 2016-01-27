@@ -6,20 +6,25 @@ import java.util.Collection;
 import org.neo4j.integration.sql.Results;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.TableName;
+import org.neo4j.integration.sql.metadata.TableNamePair;
 
-public class GetJoinMetadata
+public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Join>
 {
     private final SqlRunner sqlRunner;
 
-    public GetJoinMetadata( SqlRunner sqlRunner )
+    public JoinMetadataProducer( SqlRunner sqlRunner )
     {
         this.sqlRunner = sqlRunner;
     }
 
-    public Collection<Join> getMetadataFor( TableName t1, TableName t2 ) throws Exception
+    @Override
+    public Collection<Join> createMetadataFor( TableNamePair source ) throws Exception
     {
-        String sql = select( t1, t2 ) + " UNION " + select( t2, t1 );
+        String sql = select( source.table1(), source.table2() ) +
+                " UNION " +
+                select( source.table2(), source.table1() );
 
         Collection<Join> joins = new ArrayList<>();
 
