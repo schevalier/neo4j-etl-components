@@ -23,7 +23,9 @@ import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.exportcsv.ExportResultsToImportConfigMapper;
 import org.neo4j.integration.sql.exportcsv.ExportToCsv;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
@@ -102,7 +104,9 @@ public class MySqlSpike
                     .addJoins( joins )
                     .build();
 
-            return new ExportToCsv( config, new MySqlExportProvider() ).execute();
+            ExportToCsvResults exportResults = new ExportToCsv( config, new MySqlExportProvider() ).execute();
+
+            return new ExportResultsToImportConfigMapper( exportResults ).createImportConfig();
         }
     }
 

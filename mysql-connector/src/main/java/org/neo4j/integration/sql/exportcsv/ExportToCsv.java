@@ -23,7 +23,7 @@ public class ExportToCsv
         this.databaseExportProvider = databaseExportProvider;
     }
 
-    public GraphConfig execute() throws Exception
+    public ExportToCsvResults execute() throws Exception
     {
         if ( Files.notExists( config.destination() ) )
         {
@@ -32,7 +32,7 @@ public class ExportToCsv
 
         Commands.commands( "chmod", "0777", config.destination().toString() ).execute().await();
 
-        Collection<GraphDataConfig> graphDataConfig = new ArrayList<>();
+        Collection<ExportToCsvResult> results = new ArrayList<>();
 
         try ( SqlRunner sqlRunner = new SqlRunner( config.connectionConfig() ) )
         {
@@ -41,7 +41,7 @@ public class ExportToCsv
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
-                graphDataConfig.add(
+                results.add(
                         databaseExportProvider.exportDatabaseObject(
                                 databaseObject,
                                 headerFileWriter,
@@ -51,6 +51,6 @@ public class ExportToCsv
             }
         }
 
-        return new GraphConfig( graphDataConfig );
+        return new ExportToCsvResults( results );
     }
 }

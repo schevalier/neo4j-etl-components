@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
 import org.neo4j.integration.sql.exportcsv.CsvWriter;
 import org.neo4j.integration.sql.exportcsv.ExportFileWriter;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvResult;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.TableMapper;
 import org.neo4j.integration.sql.metadata.Table;
@@ -30,7 +31,7 @@ class ExportMySqlTable
         this.config = config;
     }
 
-    public GraphDataConfig export() throws Exception
+    public ExportToCsvResult export() throws Exception
     {
         Collection<Path> files =
                 new CsvWriter<Table>( headerFileWriter, exportFileWriter )
@@ -38,9 +39,11 @@ class ExportMySqlTable
                                 new TableMapper( config.formatting() ),
                                 new MySqlTableExportSqlSupplier( config.formatting() ) );
 
-        return NodeConfig.builder()
-                .addInputFiles( files )
-                .addLabel( table.name().simpleName() )
-                .build();
+        return new ExportToCsvResult(table, files);
+
+//        return NodeConfig.builder()
+//                .addInputFiles( files )
+//                .addLabel( table.name().simpleName() )
+//                .build();
     }
 }

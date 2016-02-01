@@ -10,7 +10,7 @@ public interface DatabaseExportProvider
 {
     ExportFileWriter createExportFileWriter( ExportToCsvConfig config, SqlRunner sqlRunner );
 
-    GraphDataConfig exportDatabaseObject( DatabaseObject databaseObject,
+    ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
                                                   HeaderFileWriter headerFileWriter,
                                                   ExportFileWriter exportFileWriter,
                                                   ExportToCsvConfig config ) throws Exception;

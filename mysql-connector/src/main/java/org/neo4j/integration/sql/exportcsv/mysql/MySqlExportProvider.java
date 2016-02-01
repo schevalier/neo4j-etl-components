@@ -5,6 +5,7 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportProvider;
 import org.neo4j.integration.sql.exportcsv.ExportFileWriter;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvResult;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.sql.metadata.Join;
@@ -21,7 +22,7 @@ public class MySqlExportProvider implements DatabaseExportProvider
     }
 
     @Override
-    public GraphDataConfig exportDatabaseObject( DatabaseObject databaseObject,
+    public ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
                                                          HeaderFileWriter headerFileWriter,
                                                          ExportFileWriter exportFileWriter,
                                                          ExportToCsvConfig config ) throws Exception
