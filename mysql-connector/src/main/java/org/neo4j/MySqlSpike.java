@@ -16,15 +16,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.neo4j.integration.io.Pipe;
-import org.neo4j.integration.neo4j.importcsv.ImportCommand;
+import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.SqlRunner;
-import org.neo4j.integration.sql.exportcsv.ExportResultsToImportConfigMapper;
-import org.neo4j.integration.sql.exportcsv.ExportToCsv;
+import org.neo4j.integration.SqlToGraphConfigMapper;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
@@ -60,8 +60,8 @@ public class MySqlSpike
 
         printDbInfo( connectionConfig );
 
-        GraphConfig graphConfig = doExport( formatting, connectionConfig );
-
+        ExportToCsvResults exportResults = doExport( formatting, connectionConfig );
+        GraphConfig graphConfig = new SqlToGraphConfigMapper( exportResults ).createGraphConfig();
         doImport( formatting, graphConfig );
     }
 
@@ -76,11 +76,11 @@ public class MySqlSpike
                 .graphDataConfig( graphConfig )
                 .build();
 
-        new ImportCommand( importConfig ).execute();
+        new ImportFromCsvCommand( importConfig ).execute();
     }
 
-    private static GraphConfig doExport( Formatting formatting,
-                                             ConnectionConfig connectionConfig ) throws Exception
+    private static ExportToCsvResults doExport( Formatting formatting,
+                                                ConnectionConfig connectionConfig ) throws Exception
     {
         TableName person = new TableName( "javabase.Person" );
         TableName address = new TableName( "javabase.Address" );
@@ -104,9 +104,7 @@ public class MySqlSpike
                     .addJoins( joins )
                     .build();
 
-            ExportToCsvResults exportResults = new ExportToCsv( config, new MySqlExportProvider() ).execute();
-
-            return new ExportResultsToImportConfigMapper( exportResults ).createImportConfig();
+            return new ExportToCsvCommand( config, new MySqlExportProvider() ).execute();
         }
     }
 

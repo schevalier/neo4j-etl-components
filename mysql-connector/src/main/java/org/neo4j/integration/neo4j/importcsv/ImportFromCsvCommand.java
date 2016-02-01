@@ -4,11 +4,11 @@ import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.Result;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 
-public class ImportCommand
+public class ImportFromCsvCommand
 {
     private final ImportConfig config;
 
-    public ImportCommand( ImportConfig config )
+    public ImportFromCsvCommand( ImportConfig config )
     {
         this.config = config;
     }

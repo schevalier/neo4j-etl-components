@@ -1,24 +1,25 @@
-package org.neo4j.integration.sql.exportcsv;
+package org.neo4j.integration.sql.exportcsv.io;
 
 import java.nio.file.Path;
 import java.util.Collection;
 
+import org.neo4j.integration.sql.exportcsv.ExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.Mapper;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
-import org.neo4j.integration.neo4j.importcsv.HeaderFileWriter;
+import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 
 import static java.util.Arrays.asList;
 
-public class CsvWriter<T extends DatabaseObject>
+public class CsvFilesWriter<T extends DatabaseObject>
 {
     private final HeaderFileWriter headerFileWriter;
-    private final ExportFileWriter exportFileWriter;
+    private final CsvFileWriter csvFileWriter;
 
-    public CsvWriter( HeaderFileWriter headerFileWriter, ExportFileWriter exportFileWriter )
+    public CsvFilesWriter( HeaderFileWriter headerFileWriter, CsvFileWriter csvFileWriter )
     {
         this.headerFileWriter = headerFileWriter;
-        this.exportFileWriter = exportFileWriter;
+        this.csvFileWriter = csvFileWriter;
     }
 
     public Collection<Path> write( T source,
@@ -28,7 +29,7 @@ public class CsvWriter<T extends DatabaseObject>
         ColumnToCsvFieldMappings mappings = mapper.createMappings( source );
 
         Path headerFile = headerFileWriter.writeHeaderFile( mappings.fields(), source.descriptor() );
-        Path exportFile = exportFileWriter.writeExportFile( mappings, sqlSupplier, source.descriptor() );
+        Path exportFile = csvFileWriter.writeExportFile( mappings, sqlSupplier, source.descriptor() );
 
         return asList( headerFile, exportFile );
     }

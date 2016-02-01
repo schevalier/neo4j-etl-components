@@ -5,19 +5,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.neo4j.integration.process.Commands;
-import org.neo4j.integration.neo4j.importcsv.HeaderFileWriter;
-import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
+import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 
-public class ExportToCsv
+public class ExportToCsvCommand
 {
     private final ExportToCsvConfig config;
     private final DatabaseExportProvider databaseExportProvider;
 
-    public ExportToCsv( ExportToCsvConfig config, DatabaseExportProvider databaseExportProvider )
+    public ExportToCsvCommand( ExportToCsvConfig config, DatabaseExportProvider databaseExportProvider )
     {
         this.config = config;
         this.databaseExportProvider = databaseExportProvider;
@@ -37,7 +36,7 @@ public class ExportToCsv
         try ( SqlRunner sqlRunner = new SqlRunner( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
-            ExportFileWriter exportFileWriter = databaseExportProvider.createExportFileWriter( config, sqlRunner );
+            CsvFileWriter csvFileWriter = databaseExportProvider.createExportFileWriter( config, sqlRunner );
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
@@ -45,7 +44,7 @@ public class ExportToCsv
                         databaseExportProvider.exportDatabaseObject(
                                 databaseObject,
                                 headerFileWriter,
-                                exportFileWriter,
+                                csvFileWriter,
                                 config
                         ) );
             }

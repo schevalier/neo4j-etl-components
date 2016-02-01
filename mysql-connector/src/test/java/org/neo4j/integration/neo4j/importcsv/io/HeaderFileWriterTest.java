@@ -1,4 +1,4 @@
-package org.neo4j.integration.neo4j.importcsv;
+package org.neo4j.integration.neo4j.importcsv.io;
 
 import java.io.IOException;
 import java.nio.file.Files;

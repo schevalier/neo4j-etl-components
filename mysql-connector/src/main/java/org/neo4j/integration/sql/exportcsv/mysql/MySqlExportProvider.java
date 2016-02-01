@@ -1,12 +1,17 @@
 package org.neo4j.integration.sql.exportcsv.mysql;
 
-import org.neo4j.integration.neo4j.importcsv.HeaderFileWriter;
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
+import java.nio.file.Path;
+import java.util.Collection;
+
+import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportProvider;
-import org.neo4j.integration.sql.exportcsv.ExportFileWriter;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResult;
+import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.mapping.JoinMapper;
+import org.neo4j.integration.sql.exportcsv.mapping.TableMapper;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
@@ -16,24 +21,40 @@ import static java.lang.String.format;
 public class MySqlExportProvider implements DatabaseExportProvider
 {
     @Override
-    public ExportFileWriter createExportFileWriter( ExportToCsvConfig config, SqlRunner sqlRunner )
+    public CsvFileWriter createExportFileWriter( ExportToCsvConfig config, SqlRunner sqlRunner )
     {
-        return new MySqlExportFileWriter( config, sqlRunner );
+        return new CsvFileWriter( config, sqlRunner );
     }
 
     @Override
     public ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
                                                          HeaderFileWriter headerFileWriter,
-                                                         ExportFileWriter exportFileWriter,
+                                                         CsvFileWriter csvFileWriter,
                                                          ExportToCsvConfig config ) throws Exception
     {
         if ( databaseObject instanceof Table )
         {
-            return new ExportMySqlTable( (Table) databaseObject, headerFileWriter, exportFileWriter, config ).export();
+            Table table = (Table) databaseObject;
+
+            Collection<Path> files =
+                    new CsvFilesWriter<Table>( headerFileWriter, csvFileWriter )
+                            .write( table,
+                                    new TableMapper( config.formatting() ),
+                                    new MySqlTableExportSqlSupplier( config.formatting() ) );
+
+            return new ExportToCsvResult(table, files);
         }
         else if ( databaseObject instanceof Join )
         {
-            return new ExportMySqlJoin( (Join) databaseObject, headerFileWriter, exportFileWriter, config ).export();
+            Join join = (Join) databaseObject;
+
+            Collection<Path> files =
+                    new CsvFilesWriter<Join>( headerFileWriter, csvFileWriter )
+                            .write( join,
+                                    new JoinMapper( config.formatting() ),
+                                    new MySqlJoinExportSqlSupplier( config.formatting() ) );
+
+            return new ExportToCsvResult( join, files );
         }
         else
         {

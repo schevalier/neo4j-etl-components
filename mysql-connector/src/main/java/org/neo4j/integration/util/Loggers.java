@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 public enum Loggers
 {
     Default,
+    Cli,
     MySql;
 
     private final Logger log;

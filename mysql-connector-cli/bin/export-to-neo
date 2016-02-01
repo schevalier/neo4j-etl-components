@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+jar=$(find . -name neo-integration.jar)
+
+java -jar ${jar} "$@"
