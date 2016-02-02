@@ -1,9 +1,11 @@
 package org.neo4j.integration.commands;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.logging.Level;
 
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
@@ -27,7 +29,6 @@ import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
-import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
@@ -74,21 +75,14 @@ public class ExportFromMySqlCommand implements Runnable
 
     @Option(type = OptionType.COMMAND,
             name = {"--import-tool"},
-            description = "Path to directory containing the Neo4j import tool.",
+            description = "Path to directory containing Neo4j import tool.",
             title = "directory",
             required = true)
     private String importToolPath;
 
     @Option(type = OptionType.COMMAND,
-            name = {"--csv-directory"},
-            description = "Path to CSV export directory.",
-            title = "directory",
-            required = true)
-    private String csvExportPath;
-
-    @Option(type = OptionType.COMMAND,
             name = {"--destination"},
-            description = "Path to destination Neo4j store.",
+            description = "Path to destination directory.",
             title = "directory",
             required = true)
     private String destinationPath;
@@ -112,6 +106,12 @@ public class ExportFromMySqlCommand implements Runnable
     {
         try
         {
+            OutputDirectories outputDirectories = OutputDirectories.create( Paths.get( destinationPath ) );
+
+            System.err.println( "Creating output directories..." );
+            System.err.println( format( "  %s", outputDirectories.csvDirectory() ) );
+            System.err.println( format( "  %s", outputDirectories.storeDirectory() ) );
+
             Formatting formatting = Formatting.DEFAULT;
 
             ConnectionConfig connectionConfig = new ConnectionConfig(
@@ -120,23 +120,33 @@ public class ExportFromMySqlCommand implements Runnable
                     user,
                     password );
 
-            ExportToCsvResults exportResults = doExport( formatting, connectionConfig );
+            System.err.println( "Exporting from MySQL to CSV..." );
+
+            ExportToCsvResults exportResults = doExport( outputDirectories, formatting, connectionConfig );
             GraphConfig graphConfig = new SqlToGraphConfigMapper( exportResults ).createGraphConfig();
-            doImport( formatting, graphConfig );
+
+            System.err.println( "Creating Neo4j store from CSV..." );
+
+            doImport( outputDirectories, formatting, graphConfig );
+
+            System.err.println( "Done" );
+            System.out.println( outputDirectories.storeDirectory() );
         }
         catch ( Exception e )
         {
-            Loggers.Cli.log( Level.SEVERE, "Error while importing from MySQL", e );
+            System.err.println( "Error while exporting from MySQL" );
+            e.printStackTrace( System.err );
             System.exit( -1 );
         }
     }
 
-    private void doImport( Formatting formatting,
+    private void doImport( OutputDirectories outputDirectories,
+                           Formatting formatting,
                            GraphConfig graphConfig ) throws Exception
     {
         ImportConfig importConfig = ImportConfig.builder()
                 .importToolDirectory( Paths.get( importToolPath ) )
-                .destination( Paths.get( destinationPath ) )
+                .destination( outputDirectories.storeDirectory() )
                 .formatting( formatting )
                 .idType( IdType.Integer )
                 .graphDataConfig( graphConfig )
@@ -145,7 +155,8 @@ public class ExportFromMySqlCommand implements Runnable
         new ImportFromCsvCommand( importConfig ).execute();
     }
 
-    private ExportToCsvResults doExport( Formatting formatting,
+    private ExportToCsvResults doExport( OutputDirectories outputDirectories,
+                                         Formatting formatting,
                                          ConnectionConfig connectionConfig ) throws Exception
     {
         TableName person = new TableName( database, parentTable );
@@ -162,7 +173,7 @@ public class ExportFromMySqlCommand implements Runnable
                     new JoinMetadataProducer( sqlRunner ).createMetadataFor( new TableNamePair( person, address ) );
 
             ExportToCsvConfig config = ExportToCsvConfig.builder()
-                    .destination( Paths.get( csvExportPath ) )
+                    .destination( outputDirectories.csvDirectory() )
                     .connectionConfig( connectionConfig )
                     .formatting( formatting )
                     .addTables( tables1 )
@@ -171,6 +182,52 @@ public class ExportFromMySqlCommand implements Runnable
                     .build();
 
             return new ExportToCsvCommand( config, new MySqlExportProvider() ).execute();
+        }
+    }
+
+    private static class OutputDirectories
+    {
+        public static OutputDirectories create( Path rootDirectory ) throws IOException
+        {
+            Files.createDirectories( rootDirectory );
+
+            int index = 1;
+
+            Path outputDirectory = rootDirectory.resolve( format( "output-%03d", index++ ) );
+
+            while ( Files.exists( outputDirectory ) )
+            {
+                outputDirectory = rootDirectory.resolve( format( "output-%03d", index++ ) );
+            }
+
+            Files.createDirectories( outputDirectory );
+
+            Path csvDirectory = outputDirectory.resolve( "csv" );
+            Path storeDirectory = outputDirectory.resolve( "graph.db" );
+
+            Files.createDirectories( csvDirectory );
+            Files.createDirectories( storeDirectory );
+
+            return new OutputDirectories( csvDirectory, storeDirectory );
+        }
+
+        private final Path csvDirectory;
+        private final Path storeDirectory;
+
+        private OutputDirectories( Path csvDirectory, Path storeDirectory )
+        {
+            this.csvDirectory = csvDirectory;
+            this.storeDirectory = storeDirectory;
+        }
+
+        public Path csvDirectory()
+        {
+            return csvDirectory;
+        }
+
+        public Path storeDirectory()
+        {
+            return storeDirectory;
         }
     }
 }

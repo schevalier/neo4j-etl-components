@@ -9,8 +9,8 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>mysql-connector</module>
-    <module>mysql-connector-cli</module>
+    <module>neo-integration</module>
+    <module>neo-integration-cli</module>
   </modules>
 
   <properties>
