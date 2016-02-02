@@ -7,6 +7,7 @@ import java.util.Collections;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.CommandsSupplier;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
+import org.neo4j.integration.util.OperatingSystem;
 import org.neo4j.integration.util.Preconditions;
 
 public class ImportConfig implements CommandsSupplier
@@ -15,6 +16,8 @@ public class ImportConfig implements CommandsSupplier
     {
         return new ImportConfigBuilder();
     }
+
+    private static final String IMPORT_TOOL = OperatingSystem.isWindows() ? "Neo4jImport.bat" : "neo4j-import";
 
     private final Path importToolDirectory;
     private final Path destination;
@@ -36,7 +39,7 @@ public class ImportConfig implements CommandsSupplier
     @Override
     public void addCommandsTo( Commands.Builder.SetCommands commands )
     {
-        commands.addCommand( importToolDirectory.resolve( "neo4j-import" ).toString() );
+        commands.addCommand( importToolDirectory.resolve( IMPORT_TOOL ).toString() );
 
         commands.addCommand( "--into" );
         commands.addCommand( destination.toAbsolutePath().toString() );

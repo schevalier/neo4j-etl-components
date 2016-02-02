@@ -31,7 +31,7 @@ public class SqlRunner implements AutoCloseable
     public AwaitHandle<Results> execute( String sql )
     {
         return new SqlRunnerAwaitHandle(
-                FutureUtils.exceptionableFuture( () ->
+                FutureUtils.<Results>exceptionableFuture( () ->
                 {
                     Loggers.MySql.log().finest( sql );
                     return new SqlResults( connection.createStatement().executeQuery( sql ) );

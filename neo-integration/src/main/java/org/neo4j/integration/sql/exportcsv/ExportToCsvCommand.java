@@ -4,12 +4,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
+import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
+import org.neo4j.integration.util.OperatingSystem;
 
 public class ExportToCsvCommand
 {
@@ -29,7 +30,10 @@ public class ExportToCsvCommand
             Files.createDirectories( config.destination() );
         }
 
-        Commands.commands( "chmod", "0777", config.destination().toString() ).execute().await();
+        if ( !OperatingSystem.isWindows() )
+        {
+            Commands.commands( "chmod", "0777", config.destination().toString() ).execute().await();
+        }
 
         Collection<ExportToCsvResult> results = new ArrayList<>();
 
