@@ -75,7 +75,7 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
             if ( timerTask.timedOut() )
             {
                 throw new TimeoutException( format( "Command failed to complete in a timely manner " +
-                        "[Command: %s, TimeoutMillis: %s, %s]", programAndArguments, timeoutMillis, result ) );
+                        "[Command: '%s', TimeoutMillis: %s, %s]", programAndArguments, timeoutMillis, result ) );
             }
 
             if ( !resultEvaluator.isValid( result ) )
@@ -87,14 +87,14 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
 
             Loggers.Default.log(
                     Level.FINER,
-                    "Command finished [Command: '{0}', {1}]",
+                    "Command finished [Command: ''{0}'', {1}]",
                     new Object[]{programAndArguments, result} );
 
             return result;
         }
         catch ( InterruptedException e )
         {
-            Loggers.Default.log( Level.FINE, "Cancelling command [Command: {0}]", programAndArguments );
+            Loggers.Default.log( Level.FINE, "Cancelling command [Command: ''{0}'']", programAndArguments );
             return null;
         }
         catch ( IOException e )
@@ -124,7 +124,7 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
         }
         catch ( InterruptedException e )
         {
-            Loggers.Default.log( Level.FINE, "Cancelling command [Command: {0}]", programAndArguments );
+            Loggers.Default.log( Level.FINE, "Cancelling command [Command: ''{0}'']", programAndArguments );
             return null;
         }
         catch ( IOException e )

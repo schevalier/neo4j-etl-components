@@ -55,7 +55,7 @@ public class Commands
 
     public ProcessHandle execute() throws Exception
     {
-        Loggers.Default.log( Level.FINE, "Executing command '{0}'", programAndArguments() );
+        Loggers.Default.log( Level.FINE, "Executing command ''{0}''", programAndArguments() );
 
         ProcessBuilder processBuilder = new ProcessBuilder( commands );
         if ( workingDirectory.isPresent() )
