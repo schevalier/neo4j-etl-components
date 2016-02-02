@@ -84,7 +84,7 @@ public class InMemoryStreamRecorderTest
         writer.close();
 
         // when
-        String contents = recorder.awaitContents( 10, TimeUnit.MILLISECONDS );
+        String contents = recorder.awaitContents( 30, TimeUnit.MILLISECONDS );
 
         // then
         String expectedContents = "A" + NEWLINE + "B" + NEWLINE + "C";
