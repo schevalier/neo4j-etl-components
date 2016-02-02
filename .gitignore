@@ -20,3 +20,4 @@ import-bundle/
 *.tar.gz
 Vagrantfile
 git.properties
+temp
