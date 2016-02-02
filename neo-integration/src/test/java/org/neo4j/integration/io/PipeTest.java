@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Test;
 
 import org.neo4j.integration.util.FutureUtils;
+import org.neo4j.integration.util.OperatingSystem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +30,11 @@ public class PipeTest
     @Test
     public void shouldCreateNamedPipeForWriting() throws Exception
     {
+        if ( OperatingSystem.isWindows())
+        {
+            return;
+        }
+
         // given
         String expectedResults = "line 1" + NEWLINE + "line 2" + NEWLINE;
         StringBuilder results = new StringBuilder();
@@ -67,6 +73,11 @@ public class PipeTest
     @Test
     public void shouldFailOutStreamFastWhenExceptionableThrowsAnException() throws Exception
     {
+        if ( OperatingSystem.isWindows())
+        {
+            return;
+        }
+
         // given
         try ( Pipe pipe = new Pipe( UUID.randomUUID().toString() ) )
         {
@@ -95,6 +106,11 @@ public class PipeTest
     @Test
     public void shouldFailInStreamFastWhenExceptionableThrowsAnException() throws Exception
     {
+        if ( OperatingSystem.isWindows())
+        {
+            return;
+        }
+
         // given
         try ( Pipe pipe = new Pipe( UUID.randomUUID().toString() ) )
         {
@@ -123,6 +139,11 @@ public class PipeTest
     @Test
     public void shouldDeleteFileOnClose() throws Exception
     {
+        if ( OperatingSystem.isWindows())
+        {
+            return;
+        }
+
         // given
         String name = UUID.randomUUID().toString();
         Path file = Paths.get( name );
