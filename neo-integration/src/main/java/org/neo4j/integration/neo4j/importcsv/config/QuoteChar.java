@@ -1,10 +1,12 @@
 package org.neo4j.integration.neo4j.importcsv.config;
 
+import org.neo4j.integration.util.OperatingSystem;
+
 import static java.lang.String.format;
 
 public class QuoteChar
 {
-    public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"", "\\\"" );
+    public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"", OperatingSystem.isWindows() ? "\\\"" : "\"" );
     public static final QuoteChar SINGLE_QUOTES = new QuoteChar( "'", "'" );
 
     private final String quote;
