@@ -96,12 +96,12 @@ public class CommandFactory
     public ProgramAndArguments printNumbers( int maxValue ) throws IOException
     {
         String script = isWindows ?
-                "echo off" + System.lineSeparator() +
+                "@echo off" + NEWLINE +
                         "for /l %%x in (1, 1, " + maxValue + ") do (" + NEWLINE +
                         "   echo %%x" + System.lineSeparator() +
                         "   ping -n 2 127.0.0.1 > nul" + NEWLINE +
                         ")" :
-                "#!/bin/bash\n" +
+                "#!/bin/bash" + NEWLINE +
                         "for i in `seq 1 " + maxValue + "`;" + NEWLINE +
                         "do" + NEWLINE +
                         "   echo $i" + NEWLINE +
