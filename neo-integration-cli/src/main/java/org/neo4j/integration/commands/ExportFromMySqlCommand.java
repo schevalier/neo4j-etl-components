@@ -108,9 +108,9 @@ public class ExportFromMySqlCommand implements Runnable
         {
             OutputDirectories outputDirectories = OutputDirectories.create( Paths.get( destinationPath ) );
 
-            System.err.println( "Creating output directories..." );
-            System.err.println( format( "  %s", outputDirectories.csvDirectory() ) );
-            System.err.println( format( "  %s", outputDirectories.storeDirectory() ) );
+            print( "Creating output directories..." );
+            print( format( "  %s", outputDirectories.csvDirectory() ) );
+            print( format( "  %s", outputDirectories.storeDirectory() ) );
 
             Formatting formatting = Formatting.DEFAULT;
 
@@ -120,21 +120,21 @@ public class ExportFromMySqlCommand implements Runnable
                     user,
                     password );
 
-            System.err.println( "Exporting from MySQL to CSV..." );
+            print( "Exporting from MySQL to CSV..." );
 
             ExportToCsvResults exportResults = doExport( outputDirectories, formatting, connectionConfig );
             GraphConfig graphConfig = new SqlToGraphConfigMapper( exportResults ).createGraphConfig();
 
-            System.err.println( "Creating Neo4j store from CSV..." );
+            print( "Creating Neo4j store from CSV..." );
 
             doImport( outputDirectories, formatting, graphConfig );
 
-            System.err.println( "Done" );
-            System.out.println( outputDirectories.storeDirectory() );
+            print( "Done" );
+            printResult( outputDirectories.storeDirectory() );
         }
         catch ( Exception e )
         {
-            System.err.println( "Error while exporting from MySQL" );
+            print( "Error while exporting from MySQL" );
             e.printStackTrace( System.err );
             System.exit( -1 );
         }
@@ -183,6 +183,16 @@ public class ExportFromMySqlCommand implements Runnable
 
             return new ExportToCsvCommand( config, new MySqlExportProvider() ).execute();
         }
+    }
+
+    private void print( Object message )
+    {
+        System.err.println( message );
+    }
+
+    private void printResult( Object message )
+    {
+        System.out.println( message );
     }
 
     private static class OutputDirectories
