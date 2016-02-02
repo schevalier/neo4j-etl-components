@@ -21,9 +21,9 @@ class FormattingConfigBuilder implements Formatting.Builder
     }
 
     @Override
-    public Formatting.Builder quote( String quote )
+    public Formatting.Builder quote( QuoteChar quote )
     {
-        this.quote = new QuoteChar( quote );
+        this.quote = quote;
         return this;
     }
 

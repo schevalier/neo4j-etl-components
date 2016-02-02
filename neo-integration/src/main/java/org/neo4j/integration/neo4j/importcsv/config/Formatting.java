@@ -43,7 +43,7 @@ public class Formatting
 
         Builder arrayDelimiter( Delimiter delimiter );
 
-        Builder quote( String quote );
+        Builder quote( QuoteChar quote );
 
         Formatting build();
     }
