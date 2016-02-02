@@ -4,19 +4,26 @@ import static java.lang.String.format;
 
 public class QuoteChar
 {
-    public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"" );
-    public static final QuoteChar SINGLE_QUOTES = new QuoteChar( "'" );
+    public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"", "\\\"" );
+    public static final QuoteChar SINGLE_QUOTES = new QuoteChar( "'", "'" );
 
     private final String quote;
+    private final String argValue;
 
-    QuoteChar( String quote )
+    QuoteChar( String quote, String argValue )
     {
         this.quote = quote;
+        this.argValue = argValue;
     }
 
     public String value()
     {
         return quote;
+    }
+
+    public String argValue()
+    {
+        return argValue;
     }
 
     public String enquote( String value )
