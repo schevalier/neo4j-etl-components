@@ -41,7 +41,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>org.neo4j.integration.MySqlConnectorCli</mainClass>
+              <mainClass>org.neo4j.integration.NeoIntegrationCli</mainClass>
             </manifest>
           </archive>
         </configuration>

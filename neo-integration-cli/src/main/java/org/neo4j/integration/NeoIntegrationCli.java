@@ -9,14 +9,14 @@ import io.airlift.airline.help.Help;
 import org.neo4j.integration.commands.ExportFromMySqlCommand;
 import org.neo4j.integration.util.CliRunner;
 
-public class MySqlConnectorCli
+public class NeoIntegrationCli
 {
     static
     {
         try
         {
             LogManager.getLogManager().readConfiguration(
-                    MySqlConnectorCli.class.getResourceAsStream( "/logging.properties" ) );
+                    NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
         }
         catch ( IOException e )
         {
