@@ -10,12 +10,11 @@ public class MySqlConnectorCli
 {
     public static void main( String[] args )
     {
-        Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder( "export-to-neo" )
-                .withDescription( "Export tools." )
+        Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder( "neo-integration" )
+                .withDescription( "Neo4j integration tools." )
                 .withDefaultCommand( Help.class )
                 .withCommand( ExportFromMySqlCommand.class )
                 .withCommand( Help.class );
         CliRunner.run( builder.build(), args );
-
     }
 }

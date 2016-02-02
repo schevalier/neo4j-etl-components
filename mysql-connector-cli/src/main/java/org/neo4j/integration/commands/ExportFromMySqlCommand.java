@@ -31,7 +31,7 @@ import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
-@Command(name = "mysql",
+@Command(name = "mysql-export",
         description = "Export from MySQL.")
 public class ExportFromMySqlCommand implements Runnable
 {
@@ -74,22 +74,22 @@ public class ExportFromMySqlCommand implements Runnable
 
     @Option(type = OptionType.COMMAND,
             name = {"--import-tool"},
-            description = "Path to Neo4j import tool.",
-            title = "path",
+            description = "Path to directory containing the Neo4j import tool.",
+            title = "directory",
             required = true)
     private String importToolPath;
 
     @Option(type = OptionType.COMMAND,
             name = {"--csv-directory"},
             description = "Path to CSV export directory.",
-            title = "path",
+            title = "directory",
             required = true)
     private String csvExportPath;
 
     @Option(type = OptionType.COMMAND,
             name = {"--destination"},
             description = "Path to destination Neo4j store.",
-            title = "path",
+            title = "directory",
             required = true)
     private String destinationPath;
 
