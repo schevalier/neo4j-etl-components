@@ -11,6 +11,7 @@
   <modules>
     <module>neo-integration</module>
     <module>neo-integration-cli</module>
+    <module>neo-integration-it</module>
   </modules>
 
   <properties>
