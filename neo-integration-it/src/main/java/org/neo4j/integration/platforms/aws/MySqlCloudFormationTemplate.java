@@ -17,19 +17,20 @@ import com.amazonaws.services.cloudformation.model.Parameter;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.util.IOUtils;
 
+import org.neo4j.integration.platforms.StartupScript;
 import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
 public class MySqlCloudFormationTemplate
 {
-    public static final String KEY_NAME = "KeyName";
-    public static final String AMI = "AMI";
-    public static final String DB_NAME = "DBName";
-    public static final String DB_USER = "DBUser";
-    public static final String DB_PASSWORD = "DBPassword";
-    public static final String DB_ROOT_PASSWORD = "DBRootPassword";
+    private enum Parameters
+    {
+        KeyName, AMI, UserData
+    }
 
+    private static final String ON_UPGRADED_SCRIPT = "apt-get -y install python-setuptools\n" +
+            "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz";
     private static final String IMAGE_ID = "ami-bdfbccca";
 
     public AutoCloseable provisionStack() throws IOException
@@ -41,18 +42,21 @@ public class MySqlCloudFormationTemplate
 
         String stackName = "mysql-integration-test";
 
+        StartupScript startupScript = new StartupScript(
+                "password",
+                "neo",
+                "password",
+                MySqlCloudFormationTemplate.ON_UPGRADED_SCRIPT );
+
         cloudFormation.createStack( new CreateStackRequest()
                 .withStackName( stackName )
                 .withCapabilities( Capability.CAPABILITY_IAM )
                 .withOnFailure( OnFailure.DELETE )
                 .withTemplateBody( template )
                 .withParameters(
-                        new Parameter().withParameterKey( KEY_NAME ).withParameterValue( "iansrobinson" ),
-                        new Parameter().withParameterKey( AMI ).withParameterValue( IMAGE_ID ),
-                        new Parameter().withParameterKey( DB_NAME ).withParameterValue( "NeoTestDatabase" ),
-                        new Parameter().withParameterKey( DB_ROOT_PASSWORD ).withParameterValue( "password" ),
-                        new Parameter().withParameterKey( DB_USER ).withParameterValue( "neo" ),
-                        new Parameter().withParameterKey( DB_PASSWORD ).withParameterValue( "password" )
+                        parameter( Parameters.KeyName, "iansrobinson" ),
+                        parameter( Parameters.AMI, IMAGE_ID ),
+                        parameter( Parameters.UserData, startupScript.value() )
                 ) );
 
         while ( !Thread.currentThread().isInterrupted() )
@@ -89,6 +93,11 @@ public class MySqlCloudFormationTemplate
         }
 
         return new StackedRequestHandler( cloudFormation, stackName );
+    }
+
+    private Parameter parameter( Parameters key, String value )
+    {
+        return new Parameter().withParameterKey( key.name() ).withParameterValue( value );
     }
 
     private static class StackedRequestHandler implements AutoCloseable
