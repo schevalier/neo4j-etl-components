@@ -1,28 +1,31 @@
 package org.neo4j.integration.platforms;
 
-import java.io.File;
+import java.nio.file.Paths;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class VagrantTest
 {
     @Test
+    @Ignore
     public void shouldStartVagrantBox() throws Exception
     {
         StartupScript startupScript = new StartupScript( "password", "neo", "password" );
 
-        String ip = new Vagrant().up(
-                new File( "/Users/iansrobinson/Desktop/integration" ),
+        Vagrant.VagrantHandle handle = new Vagrant(  ).up(
+                Paths.get( "/Users/iansrobinson/Desktop/integration" ),
                 startupScript.value() );
 
-        System.out.println( ip );
+        System.out.println( handle.ipAddress() );
     }
 
     @Test
+    @Ignore
     public void shouldDestroyVagrantBox() throws Exception
     {
-        new Vagrant().destroy(
-                new File( "/Users/iansrobinson/Desktop/integration" ) );
+        new Vagrant(  ).destroy(
+                Paths.get( "/Users/iansrobinson/Desktop/integration" ) );
     }
 }
 

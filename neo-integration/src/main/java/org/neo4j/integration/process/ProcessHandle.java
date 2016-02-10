@@ -113,7 +113,7 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
      *
      * @return {@link Result} or null if the specified waiting time elapses
      * @throws Exception if the process times out before the specified waiting time elapses,
-     *         the return value indicates failure, or an IO exception occurs
+     *                   the return value indicates failure, or an IO exception occurs
      */
     @Override
     public Result await( long timeout, TimeUnit unit ) throws Exception
@@ -136,18 +136,18 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
     /**
      * Returns a {@link CompletableFuture} that can be used to wait for the process to complete, poll the process, or
      * terminate the process.
-     *
+     * <p/>
      * <p>A new thread is created for each {@link CompletableFuture} returned by this method.
-     *
+     * <p/>
      * <p>Calling the future's {@link CompletableFuture#get()} method will cause the future to block until the
      * underlying process completes. When the process completes, {@code get()} returns the process {@link Result}.
      * If the process times out, {@code get()} throws an ExecutionException whose root cause is a TimeoutException.
-     *
+     * <p/>
      * <p>Calling the future's {@link CompletableFuture#get(long, TimeUnit)} method will cause the future to block
      * until the underlying process completes or the specified waiting time elapses. If the specified waiting time
      * elapses before the underlying process completes, the underlying process continues executing, but
      * {@code get(long, Timeunit)} throws a TimeoutException.
-     *
+     * <p/>
      * <p>Calling the future's {@link CompletableFuture#cancel(boolean)} method will cause the future to be cancelled
      * and the underlying process to be terminated.
      *
@@ -178,7 +178,8 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
 
     /**
      * Tests whether the underlying process has terminated.
-     * @return  true if the underlying process has terminated, false if it is still running
+     *
+     * @return true if the underlying process has terminated, false if it is still running
      */
     public boolean isTerminated()
     {
@@ -187,6 +188,7 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
 
     /**
      * Closes the handle and terminates the underlying process.
+     *
      * @throws Exception
      */
     @Override

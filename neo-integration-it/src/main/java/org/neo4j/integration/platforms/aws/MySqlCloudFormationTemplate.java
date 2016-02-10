@@ -33,7 +33,7 @@ public class MySqlCloudFormationTemplate
             "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz";
     private static final String IMAGE_ID = "ami-bdfbccca";
 
-    public AutoCloseable provisionStack() throws IOException
+    public StackHandle createStack() throws IOException
     {
         String template = IOUtils.toString( getClass().getResourceAsStream( "/mysql-template.json" ) );
 
@@ -74,7 +74,7 @@ public class MySqlCloudFormationTemplate
                 switch ( status )
                 {
                     case "CREATE_COMPLETE":
-                        return new StackedRequestHandler( cloudFormation, stackName );
+                        return new StackHandle( cloudFormation, stackName );
                     case "FAILED":
                     case "ROLLBACK":
                         throw new IOException(
@@ -92,7 +92,7 @@ public class MySqlCloudFormationTemplate
             }
         }
 
-        return new StackedRequestHandler( cloudFormation, stackName );
+        return new StackHandle( cloudFormation, stackName );
     }
 
     private Parameter parameter( Parameters key, String value )
@@ -100,12 +100,12 @@ public class MySqlCloudFormationTemplate
         return new Parameter().withParameterKey( key.name() ).withParameterValue( value );
     }
 
-    private static class StackedRequestHandler implements AutoCloseable
+    private static class StackHandle implements AutoCloseable
     {
         private final AmazonCloudFormation cloudFormation;
         private final String stackName;
 
-        private StackedRequestHandler( AmazonCloudFormation cloudFormation, String stackName )
+        private StackHandle( AmazonCloudFormation cloudFormation, String stackName )
         {
             this.cloudFormation = cloudFormation;
             this.stackName = stackName;

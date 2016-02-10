@@ -13,7 +13,7 @@ public class MySqlCloudFormationTemplateTest
     {
         // given
         MySqlCloudFormationTemplate template = new MySqlCloudFormationTemplate();
-        template.provisionStack();
+        template.createStack();
 
         // when
 
