@@ -21,5 +21,5 @@ mysql -u root --password='<DBRootPassword>' \< /tmp/setup.mysql
 # Update MySQL config
 echo [server] >> /etc/mysql/my.cnf
 echo "bind-address = *" >> /etc/mysql/my.cnf
-/etc/init.d/mysql restart
-
+service mysql restart
+update-rc.d mysql defaults

@@ -69,7 +69,7 @@ public class MySqlCloudFormationTemplate
             if ( stack.isPresent() )
             {
                 String status = stack.get().getStackStatus();
-                Loggers.Default.log().info( status );
+                Loggers.Default.log().fine( status );
 
                 switch ( status )
                 {

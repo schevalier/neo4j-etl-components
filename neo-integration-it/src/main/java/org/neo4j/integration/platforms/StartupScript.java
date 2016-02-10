@@ -19,6 +19,13 @@ public class StartupScript
 
     public StartupScript( String dbRootPassword,
                           String dbUser,
+                          String dbPassword )
+    {
+        this( dbRootPassword, dbUser, dbPassword, "" );
+    }
+
+    public StartupScript( String dbRootPassword,
+                          String dbUser,
                           String dbPassword,
                           String onUpgraded )
     {
