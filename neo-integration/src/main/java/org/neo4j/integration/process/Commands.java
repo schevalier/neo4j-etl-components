@@ -156,6 +156,8 @@ public class Commands
         {
             SetRedirection redirectStdInFrom( ProcessBuilder.Redirect redirection );
 
+            SetRedirection redirectStdInFrom( Path path );
+
             SetRedirection redirectStdOutTo( StreamEventHandler streamEventHandler );
 
             SetRedirection redirectStdErrTo( StreamEventHandler streamEventHandler );

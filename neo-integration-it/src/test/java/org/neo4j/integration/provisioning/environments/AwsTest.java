@@ -14,7 +14,7 @@ public class AwsTest
     {
         // given
         Aws template = new Aws( "MySQL Database Server", "iansrobinson", 3306 );
-        Server server = template.createServer( new MySql() );
+        Server server = template.createServer( MySql.startupScript() );
 
         System.out.println(server.ipAddress());
     }

@@ -15,7 +15,7 @@ import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.ProcessHandle;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFactory;
-import org.neo4j.integration.provisioning.StartupScript;
+import org.neo4j.integration.provisioning.Script;
 
 import static java.lang.String.format;
 
@@ -54,7 +54,7 @@ public class Vagrant implements ServerFactory
     }
 
     @Override
-    public Server createServer( StartupScript script ) throws Exception
+    public Server createServer( Script script ) throws Exception
     {
         Files.createDirectories( directory );
 

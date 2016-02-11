@@ -20,7 +20,7 @@ import com.amazonaws.util.IOUtils;
 
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFactory;
-import org.neo4j.integration.provisioning.StartupScript;
+import org.neo4j.integration.provisioning.Script;
 import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
@@ -46,7 +46,7 @@ public class Aws implements ServerFactory
     }
 
     @Override
-    public Server createServer( StartupScript script ) throws Exception
+    public Server createServer( Script script ) throws Exception
     {
         String template = IOUtils.toString( getClass().getResourceAsStream( "/cloudformation-template.json" ) );
 

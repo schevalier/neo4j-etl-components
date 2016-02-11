@@ -114,6 +114,12 @@ class CommandsBuilder
     }
 
     @Override
+    public SetRedirection redirectStdInFrom( Path path )
+    {
+        return redirectStdInFrom( ProcessBuilder.Redirect.from( path.toFile() ) );
+    }
+
+    @Override
     public SetRedirection redirectStdOutTo( StreamEventHandler streamEventHandler )
     {
         this.stdOutEventHandler = streamEventHandler;

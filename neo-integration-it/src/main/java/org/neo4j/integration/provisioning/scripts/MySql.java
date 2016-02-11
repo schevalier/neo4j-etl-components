@@ -5,9 +5,9 @@ import java.io.IOException;
 import com.amazonaws.util.IOUtils;
 import org.stringtemplate.v4.ST;
 
-import org.neo4j.integration.provisioning.StartupScript;
+import org.neo4j.integration.provisioning.Script;
 
-public class MySql implements StartupScript
+public class MySql
 {
     public enum Parameters
     {
@@ -26,18 +26,36 @@ public class MySql implements StartupScript
         }
     }
 
-    @Override
-    public String value() throws IOException
+    public static Script startupScript()
     {
-        String script = IOUtils.toString( getClass().getResourceAsStream( "/scripts/mysql-startup.sh" ) );
-
-        ST template = new ST( script );
-
-        for ( Parameters parameter : Parameters.values() )
-        {
-            template.add( parameter.name(), parameter.value() );
-        }
-
-        return template.render();
+        return createScript( "/scripts/mysql-startup.sh" );
     }
+
+    public static Script setupDatabaseScript()
+    {
+        return createScript( "/scripts/setup-db.sql" );
+    }
+
+    private static Script createScript(String path)
+    {
+        return new Script()
+        {
+            @Override
+            public String value() throws IOException
+            {
+                String script = IOUtils.toString( getClass().getResourceAsStream( path ) );
+
+                ST template = new ST( script );
+
+                for ( Parameters parameter : Parameters.values() )
+                {
+                    template.add( parameter.name(), parameter.value() );
+                }
+
+                return template.render();
+            }
+        };
+    }
+
+
 }

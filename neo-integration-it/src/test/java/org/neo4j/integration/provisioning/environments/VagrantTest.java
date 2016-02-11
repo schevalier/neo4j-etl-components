@@ -16,7 +16,7 @@ public class VagrantTest
     public void shouldStartVagrantBox() throws Exception
     {
         Path directory = Paths.get( "/Users/iansrobinson/Desktop/neo-mysql" );
-        Server server = new Vagrant( directory ).createServer( new MySql() );
+        Server server = new Vagrant( directory ).createServer( MySql.startupScript() );
 
         System.out.println( server.ipAddress() );
     }
