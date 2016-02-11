@@ -3,8 +3,6 @@
 apt-get update
 apt-get -y dist-upgrade
 
-<OnUpgraded>
-
 # Install MySQL
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install mysql-server
 apt-get -y install mysql-client

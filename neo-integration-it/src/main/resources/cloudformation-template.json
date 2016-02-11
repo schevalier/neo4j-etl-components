@@ -24,6 +24,11 @@
       "Type": "String"
     },
 
+    "InstanceDescription": {
+      "Description" : "Description of the instance",
+      "Type": "String"
+    },
+
     "ClientLocation" : {
       "Description" : "The IP address range that can be used to connect to the EC2 instances",
       "Type": "String",
@@ -37,21 +42,24 @@
 
   "Resources" : {
 
-    "DatabaseServerInstance": {
+    "ServerInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "ImageId" : {"Ref" : "AMI"},
         "InstanceType"   : "m3.medium",
-        "SecurityGroups" : [ {"Ref" : "DatabaseServerSecurityGroup"} ],
+        "SecurityGroups" : [ {"Ref" : "ServerSecurityGroup"} ],
         "KeyName"        : { "Ref" : "KeyName" },
-        "Tags"           : [ { "Key" : "Name", "Value" : "MySQL Database Server" } ],
+        "Tags"           : [ { "Key" : "Name", "Value" : {"Ref" : "InstanceDescription"} } ],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
           { "Ref" : "UserData" }, "\n",
+
+          "apt-get -y install python-setuptools\n",
+          "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
 
           "# Signal the status from cfn-init\n",
           "/usr/local/bin/cfn-signal -e $? ",
           "         --stack ", { "Ref" : "AWS::StackName" },
-          "         --resource DatabaseServerInstance ",
+          "         --resource ServerInstance ",
           "         --region ", { "Ref" : "AWS::Region" }, "\n"
         ]]}}
       },
@@ -62,7 +70,7 @@
       }
     },
 
-    "DatabaseServerSecurityGroup" : {
+    "ServerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
         "GroupDescription" : "Enable remote access",
@@ -71,6 +79,13 @@
           {"IpProtocol" : "tcp", "FromPort" : "3306", "ToPort" : "3306", "CidrIp" : { "Ref" : "ClientLocation"}}
         ]
       }
+    }
+  },
+
+  "Outputs" : {
+    "PublicIpAddress" : {
+      "Description": "Public IP address of the server",
+      "Value" : { "Fn::GetAtt" : [ "ServerInstance", "PublicIp" ]}
     }
   }
 }

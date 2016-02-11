@@ -1,7 +1,8 @@
-package org.neo4j.integration.platforms.aws;
+package org.neo4j.integration.provisioning.environments;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -17,36 +18,40 @@ import com.amazonaws.services.cloudformation.model.Parameter;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.util.IOUtils;
 
-import org.neo4j.integration.platforms.StartupScript;
+import org.neo4j.integration.provisioning.Server;
+import org.neo4j.integration.provisioning.ServerFactory;
+import org.neo4j.integration.provisioning.StartupScript;
 import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
-public class MySqlCloudFormationTemplate
+public class Aws implements ServerFactory
 {
     private enum Parameters
     {
-        KeyName, AMI, UserData
+        KeyName, AMI, InstanceDescription, UserData
     }
 
-    private static final String ON_UPGRADED_SCRIPT = "apt-get -y install python-setuptools\n" +
-            "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz";
     private static final String IMAGE_ID = "ami-bdfbccca";
 
-    public StackHandle createStack() throws IOException
+    private final String instanceDescription;
+    private final String keyName;
+
+    public Aws( String instanceDescription, String keyName )
     {
-        String template = IOUtils.toString( getClass().getResourceAsStream( "/mysql-template.json" ) );
+        this.instanceDescription = instanceDescription;
+        this.keyName = keyName;
+    }
+
+    @Override
+    public Server createServer( StartupScript script ) throws Exception
+    {
+        String template = IOUtils.toString( getClass().getResourceAsStream( "/cloudformation-template.json" ) );
 
         AmazonCloudFormation cloudFormation = new AmazonCloudFormationClient();
         cloudFormation.setRegion( Region.getRegion( Regions.EU_WEST_1 ) );
 
-        String stackName = "mysql-integration-test";
-
-        StartupScript startupScript = new StartupScript(
-                "password",
-                "neo",
-                "password",
-                MySqlCloudFormationTemplate.ON_UPGRADED_SCRIPT );
+        String stackName = createStackName();
 
         cloudFormation.createStack( new CreateStackRequest()
                 .withStackName( stackName )
@@ -54,12 +59,13 @@ public class MySqlCloudFormationTemplate
                 .withOnFailure( OnFailure.DELETE )
                 .withTemplateBody( template )
                 .withParameters(
-                        parameter( Parameters.KeyName, "iansrobinson" ),
+                        parameter( Parameters.KeyName, keyName ),
                         parameter( Parameters.AMI, IMAGE_ID ),
-                        parameter( Parameters.UserData, startupScript.value() )
+                        parameter( Parameters.InstanceDescription, instanceDescription ),
+                        parameter( Parameters.UserData, script.value() )
                 ) );
 
-        while ( !Thread.currentThread().isInterrupted() )
+        while ( true )
         {
             DescribeStacksResult stacks = cloudFormation.describeStacks(
                     new DescribeStacksRequest().withStackName( stackName ) );
@@ -74,25 +80,32 @@ public class MySqlCloudFormationTemplate
                 switch ( status )
                 {
                     case "CREATE_COMPLETE":
-                        return new StackHandle( cloudFormation, stackName );
+                        return new StackHandle( publicIpAddress( stack ), cloudFormation, stackName );
                     case "FAILED":
                     case "ROLLBACK":
                         throw new IOException(
                                 format( "Stack creation failed: %s", stack.get().getStackStatusReason() ) );
                     default:
-                        try
-                        {
-                            Thread.sleep( 5000 );
-                        }
-                        catch ( InterruptedException e )
-                        {
-                            Thread.currentThread().interrupt();
-                        }
+                        Thread.sleep( 5000 );
                 }
             }
         }
+    }
 
-        return new StackHandle( cloudFormation, stackName );
+    private String createStackName()
+    {
+        return format( "%s-%s",
+                instanceDescription.toLowerCase().replace( " ", "-" ),
+                UUID.randomUUID().toString().substring( 0, 5 ) );
+    }
+
+    private String publicIpAddress( Optional<Stack> stack )
+    {
+        return stack.get().getOutputs().stream()
+                .filter( o -> o.getOutputKey().equals( "PublicIpAddress" ) )
+                .findFirst()
+                .orElseThrow( () -> new IllegalStateException( "Public IP address not available for EC2 instance" ) )
+                .getOutputValue();
     }
 
     private Parameter parameter( Parameters key, String value )
@@ -100,15 +113,23 @@ public class MySqlCloudFormationTemplate
         return new Parameter().withParameterKey( key.name() ).withParameterValue( value );
     }
 
-    private static class StackHandle implements AutoCloseable
+    private static class StackHandle implements Server
     {
+        private final String ipAddress;
         private final AmazonCloudFormation cloudFormation;
         private final String stackName;
 
-        private StackHandle( AmazonCloudFormation cloudFormation, String stackName )
+        private StackHandle( String ipAddress, AmazonCloudFormation cloudFormation, String stackName )
         {
+            this.ipAddress = ipAddress;
             this.cloudFormation = cloudFormation;
             this.stackName = stackName;
+        }
+
+        @Override
+        public String ipAddress()
+        {
+            return ipAddress;
         }
 
         @Override

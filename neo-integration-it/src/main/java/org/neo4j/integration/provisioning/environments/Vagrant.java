@@ -1,4 +1,4 @@
-package org.neo4j.integration.platforms;
+package org.neo4j.integration.provisioning.environments;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +13,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.ProcessHandle;
+import org.neo4j.integration.provisioning.Server;
+import org.neo4j.integration.provisioning.ServerFactory;
+import org.neo4j.integration.provisioning.StartupScript;
 
 import static java.lang.String.format;
 
-public class Vagrant
+public class Vagrant implements ServerFactory
 {
     private static final String VAGRANT_FILENAME = "vagrantfile.mysql";
 
@@ -37,27 +40,30 @@ public class Vagrant
             "ifconfig eth1 | grep 'inet addr' | cut --delimiter=' ' --fields=12 | cut --delimiter=':' --fields=2";
 
     private final URI boxUri;
+    private final Path directory;
 
-    public Vagrant()
+    public Vagrant( Path directory )
     {
-        this( null );
+        this( null, directory );
     }
 
-    public Vagrant( URI boxUri )
+    public Vagrant( URI boxUri, Path directory )
     {
         this.boxUri = boxUri;
+        this.directory = directory;
     }
 
-    public VagrantHandle up( Path directory, String script ) throws Exception
+    @Override
+    public Server createServer( StartupScript script ) throws Exception
     {
         Files.createDirectories( directory );
 
         write( directory, VAGRANT_FILENAME, vagrantFileContent() );
-        write( directory, "script", script );
+        write( directory, "script", script.value() );
 
-        up( directory );
+        createServer( directory );
 
-        return new VagrantHandle( ssh( directory, GET_IP_COMMAND ), directory );
+        return new VagrantHandle( ssh( directory, GET_IP_COMMAND ), this );
     }
 
     private String vagrantFileContent()
@@ -74,7 +80,7 @@ public class Vagrant
         }
     }
 
-    public void destroy( Path directory ) throws Exception
+    public void destroy() throws Exception
     {
         vagrant( directory, "destroy", "--force" );
     }
@@ -84,7 +90,7 @@ public class Vagrant
         return vagrant( directory, "ssh", "--command", command );
     }
 
-    private void up( Path directory ) throws Exception
+    private void createServer( Path directory ) throws Exception
     {
         vagrant( directory, "up" );
     }
@@ -118,17 +124,18 @@ public class Vagrant
         Files.write( directory.resolve( filename ), content.getBytes() );
     }
 
-    public class VagrantHandle implements AutoCloseable
+    private class VagrantHandle implements Server
     {
         private final String ipAddress;
-        private final Path directory;
+        private final Vagrant vagrant;
 
-        public VagrantHandle( String ipAddress, Path directory )
+        public VagrantHandle( String ipAddress, Vagrant vagrant )
         {
             this.ipAddress = ipAddress;
-            this.directory = directory;
+            this.vagrant = vagrant;
         }
 
+        @Override
         public String ipAddress()
         {
             return ipAddress;
@@ -137,7 +144,7 @@ public class Vagrant
         @Override
         public void close() throws Exception
         {
-            destroy( directory );
+            vagrant.destroy();
         }
     }
 }
