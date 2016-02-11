@@ -11,7 +11,7 @@ public class MySql implements StartupScript
 {
     public enum Parameters
     {
-        DBRootPassword(  "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "sadsa786da8s7f6" );
+        DBRootPassword(  "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" );
 
         private final String value;
 

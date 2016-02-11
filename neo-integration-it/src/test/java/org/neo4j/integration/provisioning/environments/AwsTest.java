@@ -13,7 +13,7 @@ public class AwsTest
     public void shouldStartCloudFormationStack() throws Exception
     {
         // given
-        Aws template = new Aws( "MySQL Database Server", "iansrobinson" );
+        Aws template = new Aws( "MySQL Database Server", "iansrobinson", 3306 );
         Server server = template.createServer( new MySql() );
 
         System.out.println(server.ipAddress());

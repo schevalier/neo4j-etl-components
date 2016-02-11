@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
-  "Description" : "AWS CloudFormation Template: Create a single EC2 instance and a local MySQL database for storage. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template.",
+  "Description" : "Integration testing third-party server.",
 
   "Parameters" : {
 
@@ -27,6 +27,11 @@
     "InstanceDescription": {
       "Description" : "Description of the instance",
       "Type": "String"
+    },
+
+    "Port": {
+      "Description" : "Port to be opened",
+      "Type": "Number"
     },
 
     "ClientLocation" : {
@@ -76,7 +81,7 @@
         "GroupDescription" : "Enable remote access",
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "ClientLocation"}},
-          {"IpProtocol" : "tcp", "FromPort" : "3306", "ToPort" : "3306", "CidrIp" : { "Ref" : "ClientLocation"}}
+          {"IpProtocol" : "tcp", "FromPort" : { "Ref" : "Port"}, "ToPort" : { "Ref" : "Port"}, "CidrIp" : { "Ref" : "ClientLocation"}}
         ]
       }
     }

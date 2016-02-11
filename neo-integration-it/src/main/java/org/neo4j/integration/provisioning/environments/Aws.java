@@ -29,18 +29,20 @@ public class Aws implements ServerFactory
 {
     private enum Parameters
     {
-        KeyName, AMI, InstanceDescription, UserData
+        KeyName, AMI, InstanceDescription, UserData, Port
     }
 
     private static final String IMAGE_ID = "ami-bdfbccca";
 
     private final String instanceDescription;
     private final String keyName;
+    private final int port;
 
-    public Aws( String instanceDescription, String keyName )
+    public Aws( String instanceDescription, String keyName, int port )
     {
         this.instanceDescription = instanceDescription;
         this.keyName = keyName;
+        this.port = port;
     }
 
     @Override
@@ -62,7 +64,8 @@ public class Aws implements ServerFactory
                         parameter( Parameters.KeyName, keyName ),
                         parameter( Parameters.AMI, IMAGE_ID ),
                         parameter( Parameters.InstanceDescription, instanceDescription ),
-                        parameter( Parameters.UserData, script.value() )
+                        parameter( Parameters.UserData, script.value() ),
+                        parameter( Parameters.Port, String.valueOf( port ) )
                 ) );
 
         while ( true )
