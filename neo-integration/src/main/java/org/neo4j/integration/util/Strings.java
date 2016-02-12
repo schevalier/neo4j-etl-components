@@ -1,7 +1,16 @@
 package org.neo4j.integration.util;
 
+import static java.util.Arrays.asList;
+
 public class Strings
 {
+    private static final String NEWLINE = System.lineSeparator();
+
+    public static String lineSeparated( String... lines )
+    {
+        return StringListBuilder.stringList( asList(lines), NEWLINE ).toString();
+    }
+
     public static String orNull( String value )
     {
         if ( value == null )

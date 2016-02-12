@@ -3,13 +3,17 @@ package org.neo4j.integration.neo4j;
 import java.io.File;
 import java.net.URI;
 
+import sun.reflect.misc.FieldUtil;
+
+import org.neo4j.integration.util.FileUtils;
+
 public class Neo4jPackage
 {
     private static final String prefix = "neo4j";
 
     public static Neo4jPackage from( URI packageUri )
     {
-        String filename = new File( packageUri.getPath() ).getName();
+        String filename = FileUtils.filenameFromUri( packageUri );
 
         if ( !filename.startsWith( prefix ) )
         {
