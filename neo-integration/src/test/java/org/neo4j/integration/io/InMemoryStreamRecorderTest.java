@@ -33,11 +33,11 @@ public class InMemoryStreamRecorderTest
         Writer writer = new OutputStreamWriter( output );
 
         writer.write( "A" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "B" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "C" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
 
         writer.flush();
         writer.close();
@@ -74,11 +74,11 @@ public class InMemoryStreamRecorderTest
         Writer writer = new OutputStreamWriter( output );
 
         writer.write( "A" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "B" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "C" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
 
         writer.flush();
         writer.close();
@@ -129,7 +129,7 @@ public class InMemoryStreamRecorderTest
         for ( int i = 0; i < 10; i++ )
         {
             writer.write( String.valueOf( i ) );
-            writer.write( System.lineSeparator() );
+            writer.write( NEWLINE );
         }
 
         writer.flush();

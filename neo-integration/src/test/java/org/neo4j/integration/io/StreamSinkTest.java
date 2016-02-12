@@ -14,6 +14,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class StreamSinkTest
 {
+    private static final String NEWLINE = System.lineSeparator();
+
     @Test
     public void shouldCallOnLineForEachLineInStreamAndThenOnCompleted() throws IOException
     {
@@ -32,11 +34,11 @@ public class StreamSinkTest
         StreamSink streamSink = new StreamSink( input, eventHandler );
 
         writer.write( line1 );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( line2 );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( line3 );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
 
         writer.flush();
         writer.close();
@@ -67,7 +69,7 @@ public class StreamSinkTest
 
         StreamSink streamSink = new StreamSink( input, eventHandler );
 
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.close();
 
         // when

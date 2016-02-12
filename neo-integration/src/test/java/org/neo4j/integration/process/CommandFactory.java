@@ -98,7 +98,7 @@ public class CommandFactory
         String script = isWindows ?
                 "@echo off" + NEWLINE +
                         "for /l %%x in (1, 1, " + maxValue + ") do (" + NEWLINE +
-                        "   echo %%x" + System.lineSeparator() +
+                        "   echo %%x" + NEWLINE +
                         "   ping -n 2 127.0.0.1 > nul" + NEWLINE +
                         ")" :
                 "#!/bin/bash" + NEWLINE +

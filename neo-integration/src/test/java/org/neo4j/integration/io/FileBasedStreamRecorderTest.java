@@ -25,6 +25,8 @@ import static org.neo4j.integration.util.TemporaryFile.temporaryFile;
 
 public class FileBasedStreamRecorderTest
 {
+    private static final String NEWLINE = System.lineSeparator();
+
     /*
     A StreamSink's BufferedReader can throw an IOException from its readLine() method. In these tests we force the
     reader inside a StreamSink to throw an exception while its FileBasedStreamRecorder is reading from the stream
@@ -50,11 +52,11 @@ public class FileBasedStreamRecorderTest
         Writer writer = new OutputStreamWriter( output );
 
         writer.write( "A" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "B" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "C" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
 
         writer.flush();
         writer.close();
@@ -102,11 +104,11 @@ public class FileBasedStreamRecorderTest
         {
             Writer writer = new OutputStreamWriter( output );
             writer.write( line1 );
-            writer.write( System.lineSeparator() );
+            writer.write( NEWLINE );
             writer.write( line2 );
-            writer.write( System.lineSeparator() );
+            writer.write( NEWLINE );
             writer.write( line3 );
-            writer.write( System.lineSeparator() );
+            writer.write( NEWLINE );
 
             writer.flush();
             writer.close();
@@ -160,11 +162,11 @@ public class FileBasedStreamRecorderTest
         Writer writer = new OutputStreamWriter( output );
 
         writer.write( "A" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "B" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
         writer.write( "C" );
-        writer.write( System.lineSeparator() );
+        writer.write( NEWLINE );
 
         writer.flush();
         writer.close();

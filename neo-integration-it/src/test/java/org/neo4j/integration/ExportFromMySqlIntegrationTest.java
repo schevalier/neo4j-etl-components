@@ -15,8 +15,12 @@ import org.neo4j.integration.provisioning.scripts.MySql;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
-public class ExampleIntegrationTest
+import static org.junit.Assert.assertEquals;
+
+public class ExportFromMySqlIntegrationTest
 {
+    private static final String NEWLINE = System.lineSeparator();
+
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
@@ -29,8 +33,20 @@ public class ExampleIntegrationTest
     {
         String ipAddress = mySqlServer.get().ipAddress();
 
-        System.out.println( executeSql( ipAddress, MySql.setupDatabaseScript().value() ) );
-        System.out.println( executeSql( ipAddress, "select * from javabase.Person;" ) );
+        executeSql( ipAddress, MySql.setupDatabaseScript().value() );
+
+        String expectedResults = "id\tusername\taddressId\n" +
+                "1\tuser-1\t1" + NEWLINE +
+                "2\tuser-2\t1" + NEWLINE +
+                "3\tuser-3\t1" + NEWLINE +
+                "4\tuser-4\t2" + NEWLINE +
+                "5\tuser-5\t2" + NEWLINE +
+                "6\tuser-6\t2" + NEWLINE +
+                "7\tuser-7\t3" + NEWLINE +
+                "8\tuser-8\t3" + NEWLINE +
+                "9\tuser-9\t3";
+
+        assertEquals( expectedResults, executeSql( ipAddress, "select * from javabase.Person;" ).stdout() );
     }
 
     private Result executeSql( String host, String sql ) throws Exception

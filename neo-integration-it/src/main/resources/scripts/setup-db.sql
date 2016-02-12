@@ -1,8 +1,9 @@
+DROP DATABASE IF EXISTS javabase;
 CREATE DATABASE javabase DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 GRANT ALL ON javabase.* TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
 
-DROP TABLE IF EXISTS javabase.Person;
-DROP TABLE IF EXISTS javabase.Address;
+# DROP TABLE IF EXISTS javabase.Person;
+# DROP TABLE IF EXISTS javabase.Address;
 
 CREATE TABLE javabase.Address
   (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

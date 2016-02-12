@@ -14,6 +14,7 @@ import org.neo4j.integration.util.StringListBuilder;
 
 public class FileDigest
 {
+    private static final String NEWLINE = System.lineSeparator();
     private static final int DEFAULT_SUMMARY_LINE_COUNT = 50;
 
     private final Path file;
@@ -101,7 +102,7 @@ public class FileDigest
         Collections.reverse( endLines );
         lines.addAll( endLines );
 
-        return StringListBuilder.stringList( lines, System.lineSeparator() ).toString();
+        return StringListBuilder.stringList( lines, NEWLINE ).toString();
     }
 }
 

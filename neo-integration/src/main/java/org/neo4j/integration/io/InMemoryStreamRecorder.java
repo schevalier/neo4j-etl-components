@@ -6,6 +6,7 @@ import static java.lang.String.format;
 
 public class InMemoryStreamRecorder implements StreamEventHandler<String>
 {
+    private static final String NEWLINE = System.lineSeparator();
     private static final int DEFAULT_MAX_NUMBER_OF_LINES = 100;
 
     private final int maxNumberOfLines;
@@ -36,7 +37,7 @@ public class InMemoryStreamRecorder implements StreamEventHandler<String>
         {
             if ( numberOfLines > 1 )
             {
-                stringBuilder.append( System.lineSeparator() );
+                stringBuilder.append( NEWLINE );
             }
             stringBuilder.append( line );
         }

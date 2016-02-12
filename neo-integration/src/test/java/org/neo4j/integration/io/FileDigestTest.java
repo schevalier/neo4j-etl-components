@@ -18,6 +18,8 @@ import static org.neo4j.integration.util.TemporaryDirectory.temporaryDirectory;
 
 public class FileDigestTest
 {
+    private static final String NEWLINE = System.lineSeparator();
+
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( temporaryDirectory() );
 
@@ -33,9 +35,9 @@ public class FileDigestTest
         String value = new FileDigest( file, 6 ).toString();
 
         // then
-        String expectedValue = "line 1" + System.lineSeparator() +
-                "line 2" + System.lineSeparator() +
-                "line 3" + System.lineSeparator() +
+        String expectedValue = "line 1" + NEWLINE +
+                "line 2" + NEWLINE +
+                "line 3" + NEWLINE +
                 "line 4";
 
         assertEquals( expectedValue, value );
@@ -53,12 +55,12 @@ public class FileDigestTest
         String value = new FileDigest( file, 6 ).toString();
 
         // then
-        String expectedValue = "line 1" + System.lineSeparator() +
-                "line 2" + System.lineSeparator() +
-                "line 3" + System.lineSeparator() +
-                "..." + System.lineSeparator() +
-                "line 6" + System.lineSeparator() +
-                "line 7" + System.lineSeparator() +
+        String expectedValue = "line 1" + NEWLINE +
+                "line 2" + NEWLINE +
+                "line 3" + NEWLINE +
+                "..." + NEWLINE +
+                "line 6" + NEWLINE +
+                "line 7" + NEWLINE +
                 "line 8";
 
         assertEquals( expectedValue, value );
@@ -71,6 +73,6 @@ public class FileDigestTest
         {
             lines.add( "line " + i );
         }
-        return StringListBuilder.stringList( lines, System.lineSeparator() ).toString().getBytes();
+        return StringListBuilder.stringList( lines, NEWLINE ).toString().getBytes();
     }
 }
