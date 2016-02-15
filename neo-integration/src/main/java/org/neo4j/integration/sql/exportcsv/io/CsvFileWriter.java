@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.io;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,28 +30,55 @@ public class CsvFileWriter
                                  ExportSqlSupplier sqlSupplier,
                                  String filenamePrefix ) throws Exception
     {
-        Path exportFile = config.destination().resolve( format( "%s.csv", filenamePrefix ) );
-        Results results = sqlRunner.execute( sqlSupplier.sql( mappings, exportFile ) ).await();
+        Path exportFile = createExportFile( filenamePrefix );
+        Results results = executeSql( sqlSupplier.sql( mappings, exportFile ) );
 
+        writeResultsToFile( results, exportFile, mappings );
+
+        return exportFile;
+    }
+
+    private Path createExportFile( String filenamePrefix ) throws IOException
+    {
+        Path exportFile = config.destination().resolve( format( "%s.csv", filenamePrefix ) );
+        Files.createFile( exportFile );
+
+        return exportFile;
+    }
+
+    private Results executeSql( String sql ) throws Exception
+    {
+        return sqlRunner.execute( sql ).await();
+    }
+
+    private void writeResultsToFile( Results results, Path file, ColumnToCsvFieldMappings mappings ) throws Exception
+    {
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
         int maxIndex = columns.length - 1;
 
-        Files.createFile( exportFile );
-
-        try ( BufferedWriter writer = Files.newBufferedWriter( exportFile, Charset.forName( "UTF8" ) ) )
+        try ( BufferedWriter writer = Files.newBufferedWriter( file, Charset.forName( "UTF8" ) ) )
         {
             while ( results.next() )
             {
                 for ( int i = 0; i < maxIndex; i++ )
                 {
-                    writer.write( results.getString( columns[i].alias() ) );
-                    writer.write( config.formatting().delimiter().value() );
+                    writeFieldValueAndDelimiter( results.getString( columns[i].alias() ), writer );
                 }
-                writer.write( results.getString( columns[(maxIndex)].alias() ) );
-                writer.newLine();
+
+                writeFieldValueAndNewLine( results.getString( columns[(maxIndex)].alias() ), writer );
             }
         }
+    }
 
-        return exportFile;
+    private void writeFieldValueAndNewLine( String string, BufferedWriter writer ) throws Exception
+    {
+        writer.write( string );
+        writer.newLine();
+    }
+
+    private void writeFieldValueAndDelimiter( String string, BufferedWriter writer ) throws Exception
+    {
+        writer.write( string );
+        writer.write( config.formatting().delimiter().value() );
     }
 }
