@@ -20,6 +20,11 @@ public class Neo4j implements AutoCloseable
         return directory.resolve( "bin" );
     }
 
+    public Path databasesDirectory()
+    {
+        return directory.resolve( "data/databases" );
+    }
+
     public void start() throws Exception
     {
         Result.Evaluator resultEvaluator = r ->
@@ -46,6 +51,20 @@ public class Neo4j implements AutoCloseable
                 .build()
                 .execute()
                 .await();
+    }
+
+    public String execute(String command) throws Exception
+    {
+        Result result = Commands.builder( "bin/neo4j-shell", "-c", command )
+                .workingDirectory( directory )
+                .failOnNonZeroExitValue()
+                .timeout( 10, TimeUnit.SECONDS )
+                .inheritEnvironment()
+                .build()
+                .execute()
+                .await();
+
+        return result.stdout();
     }
 
     @Override

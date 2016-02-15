@@ -1,6 +1,9 @@
 package org.neo4j.integration;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,10 +19,13 @@ import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.Strings;
 import org.neo4j.integration.util.TemporaryDirectory;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertThat;
 
 public class ExportFromMySqlIntegrationTest
 {
+    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M03;
+
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
@@ -29,49 +35,54 @@ public class ExportFromMySqlIntegrationTest
 
     @Rule
     public final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
-            Neo4jFixture.neo4j( tempDirectory.get(), Neo4jVersion.v2_3_2 ) );
+            Neo4jFixture.neo4j( tempDirectory.get(), NEO4J_VERSION ) );
 
     @Test
-    public void shouldExportFromMySqlAndImportIntoNeo4j() throws Exception
+    public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
-        String ipAddress = mySqlServer.get().ipAddress();
-        MySqlClient client = new MySqlClient( tempDirectory.get(), ipAddress );
+        String expectedResults = Strings.lineSeparated(
+                "+-------------------------------+",
+                "| n                             |",
+                "+-------------------------------+",
+                "| Node[0]{username:\"user-1\"}    |",
+                "| Node[1]{username:\"user-2\"}    |",
+                "| Node[2]{username:\"user-3\"}    |",
+                "| Node[3]{username:\"user-4\"}    |",
+                "| Node[4]{username:\"user-5\"}    |",
+                "| Node[5]{username:\"user-6\"}    |",
+                "| Node[6]{username:\"user-7\"}    |",
+                "| Node[7]{username:\"user-8\"}    |",
+                "| Node[8]{username:\"user-9\"}    |",
+                "| Node[9]{postcode:\"AB12 1XY\"}  |",
+                "| Node[10]{postcode:\"XY98 9BA\"} |",
+                "| Node[11]{postcode:\"ZZ1 0MN\"}  |",
+                "+-------------------------------+" );
 
-        client.execute( MySqlScripts.setupDatabaseScript().value() );
+        populateMySqlDatabase();
 
-        NeoIntegrationCli.main( new String[]{"mysql-export",
-                "--host", ipAddress,
-                "--user", MySqlClient.Parameters.DBUser.value(),
-                "--password", MySqlClient.Parameters.DBPassword.value(),
-                "--database", "javabase",
-                "--import-tool", neo4j.get().binDirectory().toString(),
-                "--destination", tempDirectory.get().toString(),
-                "--parent", "Person",
-                "--child", "Address"} );
+        Collection<String> paths = NeoIntegrationCli.executeMainReturnSysOut(
+                new String[]{"mysql-export",
+                        "--host", mySqlServer.get().ipAddress(),
+                        "--user", MySqlClient.Parameters.DBUser.value(),
+                        "--password", MySqlClient.Parameters.DBPassword.value(),
+                        "--database", "javabase",
+                        "--import-tool", neo4j.get().binDirectory().toString(),
+                        "--destination", tempDirectory.get().toString(),
+                        "--parent", "Person",
+                        "--child", "Address"} );
 
-        System.out.println( "Finished" );
+        Files.move(
+                Paths.get( paths.stream().findFirst().get() ),
+                neo4j.get().databasesDirectory().resolve( "graph.db" ) );
+
+        neo4j.get().start();
+
+        assertThat( neo4j.get().execute( "MATCH (n) RETURN n;" ), startsWith( expectedResults ) );
     }
 
-    @Test
-    public void shouldCreateDatabaseOnDatabaseServer() throws Exception
+    private void populateMySqlDatabase() throws Exception
     {
         MySqlClient client = new MySqlClient( tempDirectory.get(), mySqlServer.get().ipAddress() );
-
         client.execute( MySqlScripts.setupDatabaseScript().value() );
-
-        String expectedResults = Strings.lineSeparated( "id\tusername\taddressId",
-                "1\tuser-1\t1",
-                "2\tuser-2\t1",
-                "3\tuser-3\t1",
-                "4\tuser-4\t2",
-                "5\tuser-5\t2",
-                "6\tuser-6\t2",
-                "7\tuser-7\t3",
-                "8\tuser-8\t3",
-                "9\tuser-9\t3" );
-
-        assertEquals( expectedResults, client.execute( "select * from javabase.Person;" ).stdout() );
     }
-
-
 }

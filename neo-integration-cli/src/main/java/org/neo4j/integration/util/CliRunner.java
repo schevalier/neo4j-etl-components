@@ -7,19 +7,46 @@ import io.airlift.airline.ParseException;
 
 public class CliRunner
 {
+    public enum OnCommandFinished
+    {
+        DestroyJVM
+                {
+                    @Override
+                    public void apply( int status )
+                    {
+                        System.exit( status );
+                    }
+                },
+        DoNothing
+                {
+                    @Override
+                    public void apply( int status )
+                    {
+                        // Do nothing
+                    }
+                };
+
+        public abstract void apply( int status );
+    }
+
     public static void run( Cli<Runnable> parser, String[] args )
+    {
+        run( parser, args, OnCommandFinished.DestroyJVM );
+    }
+
+    public static void run( Cli<Runnable> parser, String[] args, OnCommandFinished onCommandFinished )
     {
         try
         {
             parser.parse( args ).run();
-            System.exit( 0 );
+            onCommandFinished.apply( 0 );
         }
         catch ( ParseException e )
         {
             Loggers.Cli.log( Level.SEVERE, "Illegal command", e );
 
             parser.parse( "help" ).run();
-            System.exit( -1 );
+            onCommandFinished.apply( -1 );
         }
     }
 }
