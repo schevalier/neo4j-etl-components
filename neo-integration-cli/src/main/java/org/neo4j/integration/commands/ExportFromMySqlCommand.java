@@ -114,11 +114,12 @@ public class ExportFromMySqlCommand implements Runnable
 
             Formatting formatting = Formatting.DEFAULT;
 
-            ConnectionConfig connectionConfig = new ConnectionConfig(
-                    URI.create(
-                            format( "jdbc:mysql://%s:%s/%s?autoReconnect=true&useSSL=false", host, port, database ) ),
-                    user,
-                    password );
+            ConnectionConfig connectionConfig =  ConnectionConfig.forMySql()
+                    .uri( URI.create(
+                            format( "jdbc:mysql://%s:%s/%s?autoReconnect=true&useSSL=false", host, port, database ) ) )
+                    .username( user )
+                    .password( password )
+                    .build();
 
             print( "Exporting from MySQL to CSV..." );
 
