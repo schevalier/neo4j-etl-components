@@ -25,7 +25,8 @@ class JoinBuilder implements Join.Builder.SetParentTable,
     {
         this.primaryKey = Column.builder()
                 .table( parentTable )
-                .name( primaryKey )
+                .name( parentTable.fullyQualifiedColumnName( primaryKey ) )
+                .alias( primaryKey )
                 .type( ColumnType.PrimaryKey )
                 .build();
         return this;
@@ -36,7 +37,8 @@ class JoinBuilder implements Join.Builder.SetParentTable,
     {
         this.foreignKey = Column.builder()
                 .table( parentTable )
-                .name( foreignKey )
+                .name( parentTable.fullyQualifiedColumnName( foreignKey ) )
+                .alias( foreignKey )
                 .type( ColumnType.ForeignKey )
                 .build();
         return this;

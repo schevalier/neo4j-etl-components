@@ -29,15 +29,16 @@ public class ColumnToCsvFieldMappings
         return mappings.values();
     }
 
-    public Collection<String> columns()
+    public Collection<Column> columns()
     {
-        return mappings.keySet().stream().map( Column::name ).collect( Collectors.toList() );
+        return mappings.keySet();
     }
 
     public Collection<String> tableNames()
     {
-        return mappings.keySet().stream().map( c -> c.table().fullName() ).collect( Collectors.toCollection(
-                LinkedHashSet::new ) );
+        return mappings.keySet().stream()
+                .map( c -> c.table().fullName() )
+                .collect( Collectors.toCollection( LinkedHashSet::new ) );
     }
 
     public interface Builder

@@ -1,7 +1,6 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 
 import org.junit.Test;
 
@@ -10,10 +9,7 @@ import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.TableName;
 
-import static java.util.Arrays.asList;
-
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ColumnToCsvFieldMappingsTest
@@ -24,19 +20,21 @@ public class ColumnToCsvFieldMappingsTest
         // given
         Column column1 = Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "id" )
+                .name( "test.Person.id" )
+                .alias( "id" )
                 .type( ColumnType.PrimaryKey ).build();
 
         Column column2 = Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "username" )
+                .name( "test.Person.username" )
+                .alias( "username" )
                 .type( ColumnType.Data ).build();
 
         Column column3 = Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "age" )
+                .name( "test.Person.age" )
+                .alias( "age" )
                 .type( ColumnType.Data ).build();
-
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -44,12 +42,11 @@ public class ColumnToCsvFieldMappingsTest
                 .add( column3, CsvField.data( "age" ) )
                 .build();
 
-
         // when
-        Collection<String> columns = mappings.columns();
+        Collection<Column> columns = mappings.columns();
 
         // then
-        assertEquals( asList( "test.Person.id", "test.Person.username", "test.Person.age" ), columns );
+        assertThat( columns, hasItems( column1, column2, column3 ) );
     }
 
     @Test
@@ -58,17 +55,20 @@ public class ColumnToCsvFieldMappingsTest
         // given
         Column column1 = Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "id" )
+                .name( "test.Person.id" )
+                .alias( "id" )
                 .type( ColumnType.PrimaryKey ).build();
 
         Column column2 = Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "username" )
+                .name( "test.Person.username" )
+                .alias( "username" )
                 .type( ColumnType.Data ).build();
 
         Column column3 = Column.builder()
                 .table( new TableName( "test.Address" ) )
-                .name( "id" )
+                .name( "test.Address.id" )
+                .alias( "id" )
                 .type( ColumnType.PrimaryKey ).build();
 
 
@@ -82,6 +82,6 @@ public class ColumnToCsvFieldMappingsTest
         Collection<String> tableNames = mappings.tableNames();
 
         // then
-        assertThat(tableNames, hasItems("test.Person", "test.Address"));
+        assertThat( tableNames, hasItems( "test.Person", "test.Address" ) );
     }
 }

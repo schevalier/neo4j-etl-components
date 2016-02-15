@@ -50,15 +50,21 @@ public class TableMetadataProducerTest
         assertThat(table.columns(), contains(
                 Column.builder()
                         .table( expectedTableName )
-                        .name( "id" ).type(ColumnType.PrimaryKey )
+                        .name( expectedTableName.fullyQualifiedColumnName( "id" ) )
+                        .alias( "id" )
+                        .type( ColumnType.PrimaryKey )
                         .build(),
                 Column.builder()
                         .table( expectedTableName )
-                        .name( "username" ).type(ColumnType.Data )
+                        .name( expectedTableName.fullyQualifiedColumnName( "username" ) )
+                        .alias( "username" )
+                        .type( ColumnType.Data )
                         .build(),
                 Column.builder()
                         .table( expectedTableName )
-                        .name( "addressId" ).type(ColumnType.ForeignKey )
-                        .build()));
+                        .name( expectedTableName.fullyQualifiedColumnName( "addressId" ) )
+                        .alias( "addressId" )
+                        .type( ColumnType.ForeignKey )
+                        .build() ));
     }
 }

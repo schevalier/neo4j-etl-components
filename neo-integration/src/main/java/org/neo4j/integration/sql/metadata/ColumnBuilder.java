@@ -1,9 +1,14 @@
 package org.neo4j.integration.sql.metadata;
 
-class ColumnBuilder implements Column.Builder.SetTable, Column.Builder.SetName, Column.Builder.SetType, Column.Builder
+class ColumnBuilder implements Column.Builder.SetTable,
+        Column.Builder.SetName,
+        Column.Builder.SetAlias,
+        Column.Builder.SetType,
+        Column.Builder
 {
     TableName table;
     String name;
+    String alias;
     ColumnType type;
 
     @Override
@@ -14,9 +19,16 @@ class ColumnBuilder implements Column.Builder.SetTable, Column.Builder.SetName, 
     }
 
     @Override
-    public SetType name( String name )
+    public SetAlias name( String name )
     {
         this.name = name;
+        return this;
+    }
+
+    @Override
+    public SetType alias( String alias )
+    {
+        this.alias = alias;
         return this;
     }
 

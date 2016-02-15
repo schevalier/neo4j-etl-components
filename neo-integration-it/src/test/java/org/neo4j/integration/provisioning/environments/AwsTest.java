@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.provisioning.Server;
-import org.neo4j.integration.provisioning.scripts.MySql;
+import org.neo4j.integration.provisioning.scripts.MySqlScripts;
 
 public class AwsTest
 {
@@ -14,7 +14,7 @@ public class AwsTest
     {
         // given
         Aws template = new Aws( "MySQL Database Server", "iansrobinson", 3306 );
-        Server server = template.createServer( MySql.startupScript() );
+        Server server = template.createServer( MySqlScripts.startupScript() );
 
         System.out.println(server.ipAddress());
     }

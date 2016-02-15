@@ -1,11 +1,11 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Table;
-import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 
 public class TableMapper implements Mapper<Table>
 {
@@ -29,7 +29,7 @@ public class TableMapper implements Mapper<Table>
                     builder.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
                     break;
                 case Data:
-                    builder.add( column, CsvField.data( column.simpleName() ) );
+                    builder.add( column, CsvField.data( column.alias() ) );
                     break;
                 default:
                     // Do nothing
@@ -41,6 +41,7 @@ public class TableMapper implements Mapper<Table>
                 Column.builder()
                         .table( table.name() )
                         .name( formatting.quote().enquote( table.name().simpleName() ) )
+                        .alias( table.name().simpleName() )
                         .type( ColumnType.Literal )
                         .build(),
                 CsvField.label() );

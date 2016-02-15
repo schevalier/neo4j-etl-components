@@ -54,6 +54,6 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
             }
         }
 
-        return Collections.singletonList(builder.build());
+        return Collections.singletonList( builder.build() );
     }
 }

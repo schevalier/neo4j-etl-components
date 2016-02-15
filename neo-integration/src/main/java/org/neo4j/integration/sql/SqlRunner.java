@@ -16,9 +16,13 @@ public class SqlRunner implements AutoCloseable
 {
     private final Connection connection;
 
-    public SqlRunner( ConnectionConfig connectionConfig ) throws SQLException
+    public SqlRunner( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
         Loggers.MySql.log().fine( "Connecting to database..." );
+
+        // TODO: Make driver configurable
+        String dbClass = "com.mysql.jdbc.Driver";
+        Class.forName( dbClass );
 
         connection = DriverManager.getConnection(
                 connectionConfig.uri().toString(),

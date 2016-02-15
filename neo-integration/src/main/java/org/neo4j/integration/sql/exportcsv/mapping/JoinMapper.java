@@ -27,6 +27,7 @@ public class JoinMapper implements Mapper<Join>
                 Column.builder()
                         .table( join.primaryKey().table() )
                         .name( formatting.quote().enquote( join.childTable().simpleName() ) )
+                        .alias( join.childTable().simpleName() )
                         .type( ColumnType.Literal ).build(),
                 CsvField.relationshipType() );
 

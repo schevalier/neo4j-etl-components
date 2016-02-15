@@ -56,13 +56,15 @@ public class JoinMetadataProducerTest
 
         assertEquals( Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "id" )
+                .name( "test.Person.id" )
+                .alias( "id" )
                 .type( ColumnType.PrimaryKey )
                 .build(), join1.primaryKey() );
 
         assertEquals( Column.builder()
                 .table( new TableName( "test.Person" ) )
-                .name( "addressId" )
+                .name( "test.Person.addressId" )
+                .alias( "addressId" )
                 .type( ColumnType.ForeignKey )
                 .build(), join1.foreignKey() );
 
@@ -72,13 +74,15 @@ public class JoinMetadataProducerTest
 
         assertEquals( Column.builder()
                 .table( new TableName( "test.Address" ) )
-                .name( "id" )
+                .name( "test.Address.id" )
+                .alias( "id" )
                 .type( ColumnType.PrimaryKey )
                 .build(), join2.primaryKey() );
 
         assertEquals( Column.builder()
                 .table( new TableName( "test.Address" ) )
-                .name( "ownerId" )
+                .name( "test.Address.ownerId" )
+                .alias( "ownerId" )
                 .type( ColumnType.ForeignKey )
                 .build(), join2.foreignKey() );
 

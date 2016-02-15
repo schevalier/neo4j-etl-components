@@ -11,12 +11,14 @@ public class Column
 
     private final TableName table;
     private final String name;
+    private final String alias;
     private final ColumnType type;
 
     Column( ColumnBuilder builder )
     {
         this.table = Preconditions.requireNonNull( builder.table, "Table" );
         this.name = Preconditions.requireNonNullString( builder.name, "Name" );
+        this.alias = Preconditions.requireNonNullString( builder.alias, "Alias" );
         this.type = Preconditions.requireNonNull( builder.type, "Type" );
     }
 
@@ -25,19 +27,16 @@ public class Column
         return table;
     }
 
-    public String fullName()
-    {
-        return table.fullyQualifiedColumnName( name );
-    }
-
-    public String simpleName()
+    // Fully-qualified column name, or literal value
+    public String name()
     {
         return name;
     }
 
-    public String name()
+    // Column alias
+    public String alias()
     {
-        return type.name( this );
+        return alias;
     }
 
     public ColumnType type()
@@ -51,6 +50,7 @@ public class Column
         return "Column{" +
                 "table=" + table +
                 ", name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
                 ", type=" + type +
                 '}';
     }
@@ -69,7 +69,11 @@ public class Column
 
         Column column = (Column) o;
 
-        return table.equals( column.table ) && name.equals( column.name ) && type == column.type;
+        return table.equals( column.table ) &&
+                name.equals( column.name ) &&
+                alias.equals( column.alias ) &&
+                type == column.type;
+
     }
 
     @Override
@@ -77,6 +81,7 @@ public class Column
     {
         int result = table.hashCode();
         result = 31 * result + name.hashCode();
+        result = 31 * result + alias.hashCode();
         result = 31 * result + type.hashCode();
         return result;
     }
@@ -90,7 +95,12 @@ public class Column
 
         interface SetName
         {
-            SetType name( String name );
+            SetAlias name( String name );
+        }
+
+        interface SetAlias
+        {
+            SetType alias( String alias );
         }
 
         interface SetType

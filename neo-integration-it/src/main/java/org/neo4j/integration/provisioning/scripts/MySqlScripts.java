@@ -5,26 +5,11 @@ import java.io.IOException;
 import com.amazonaws.util.IOUtils;
 import org.stringtemplate.v4.ST;
 
+import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.provisioning.Script;
 
-public class MySql
+public class MySqlScripts
 {
-    public enum Parameters
-    {
-        DBRootPassword(  "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" );
-
-        private final String value;
-
-        Parameters( String value )
-        {
-            this.value = value;
-        }
-
-        public String value()
-        {
-            return value;
-        }
-    }
 
     public static Script startupScript()
     {
@@ -47,7 +32,7 @@ public class MySql
 
                 ST template = new ST( script );
 
-                for ( Parameters parameter : Parameters.values() )
+                for ( MySqlClient.Parameters parameter : MySqlClient.Parameters.values() )
                 {
                     template.add( parameter.name(), parameter.value() );
                 }
