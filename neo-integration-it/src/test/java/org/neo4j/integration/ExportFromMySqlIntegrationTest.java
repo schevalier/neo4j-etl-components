@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,6 +15,7 @@ import org.neo4j.integration.provisioning.Neo4jFixture;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFixture;
 import org.neo4j.integration.provisioning.scripts.MySqlScripts;
+import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.Strings;
 import org.neo4j.integration.util.TemporaryDirectory;
@@ -26,7 +26,6 @@ import static org.junit.Assert.assertThat;
 public class ExportFromMySqlIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M03;
-    private static final int MYSQL_PORT = 3306;
 
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
@@ -35,7 +34,7 @@ public class ExportFromMySqlIntegrationTest
     public final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
                     "mysql-integration-test",
-                    MYSQL_PORT,
+                    DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
                     tempDirectory.get() ) );
 

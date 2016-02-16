@@ -17,6 +17,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
+import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.SqlRunner;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
@@ -114,9 +115,10 @@ public class ExportFromMySqlCommand implements Runnable
 
             Formatting formatting = Formatting.DEFAULT;
 
-            ConnectionConfig connectionConfig =  ConnectionConfig.forMySql()
-                    .uri( URI.create(
-                            format( "jdbc:mysql://%s:%s/%s?autoReconnect=true&useSSL=false", host, port, database ) ) )
+            ConnectionConfig connectionConfig =  ConnectionConfig.forDatabase( DatabaseType.MySQL)
+                    .host( host )
+                    .port( port )
+                    .database( database )
                     .username( user )
                     .password( password )
                     .build();

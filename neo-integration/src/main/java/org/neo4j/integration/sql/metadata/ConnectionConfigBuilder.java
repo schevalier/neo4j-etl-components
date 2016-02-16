@@ -1,27 +1,45 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.net.URI;
+import org.neo4j.integration.sql.DatabaseType;
 
-class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetUri,
+class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetHost,
+        ConnectionConfig.Builder.SetPort,
+        ConnectionConfig.Builder.SetDatabase,
         ConnectionConfig.Builder.SetUsername,
         ConnectionConfig.Builder.SetPassword,
         ConnectionConfig.Builder
 
 {
-    final String driverClassName;
-    URI uri;
+    final DatabaseType databaseType;
+    String host;
+    int port;
+    String database;
     String username;
     String password;
 
-    public ConnectionConfigBuilder( String driverClassName )
+    public ConnectionConfigBuilder( DatabaseType databaseType )
     {
-        this.driverClassName = driverClassName;
+        this.databaseType = databaseType;
     }
 
     @Override
-    public ConnectionConfig.Builder.SetUsername uri( URI uri )
+    public ConnectionConfig.Builder.SetPort host( String host )
     {
-        this.uri = uri;
+        this.host = host;
+        return this;
+    }
+
+    @Override
+    public SetDatabase port( int port )
+    {
+        this.port = port;
+        return this;
+    }
+
+    @Override
+    public SetUsername database( String database )
+    {
+        this.database = database;
         return this;
     }
 

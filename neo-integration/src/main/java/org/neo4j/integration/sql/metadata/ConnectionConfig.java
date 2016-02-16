@@ -2,41 +2,41 @@ package org.neo4j.integration.sql.metadata;
 
 import java.net.URI;
 
+import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.util.Preconditions;
 
 public class ConnectionConfig
 {
-    public static Builder.SetUri forMySql()
+    public static Builder.SetHost forDatabase(DatabaseType databaseType)
     {
-        return new ConnectionConfigBuilder("com.mysql.jdbc.Driver");
+        return new ConnectionConfigBuilder(databaseType);
     }
 
-    private final String driverClassName;
-    private final URI uri;
+    private final DatabaseType databaseType;
+    private final String host;
+    private final int port;
+    private final String database;
     private final String username;
     private final String password;
 
     ConnectionConfig( ConnectionConfigBuilder builder )
     {
-        this.driverClassName = Preconditions.requireNonNullString( builder.driverClassName, "Driver class name" );
-        this.uri = Preconditions.requireNonNull( builder.uri, "Uri" );
+        this.databaseType = Preconditions.requireNonNull( builder.databaseType, "DatabaseType" );
+        this.host = Preconditions.requireNonNullString( builder.host, "Host" );
+        this.port = builder.port;
+        this.database = Preconditions.requireNonNullString( builder.database, "Database" );
         this.username = Preconditions.requireNonNullString( builder.username, "Username" );
         this.password = Preconditions.requireNonNullString( builder.password, "Password" );
     }
 
     public String driverClassName()
     {
-        return driverClassName;
-    }
-
-    public URI getUri()
-    {
-        return uri;
+        return databaseType.driverClassName();
     }
 
     public URI uri()
     {
-        return uri;
+        return databaseType.createUri( host, port, database );
     }
 
     public String username()
@@ -51,9 +51,19 @@ public class ConnectionConfig
 
     public interface Builder
     {
-        interface SetUri
+        interface SetHost
         {
-            SetUsername uri(URI uri);
+            SetPort host( String host );
+        }
+
+        interface SetPort
+        {
+            SetDatabase port( int port );
+        }
+
+        interface SetDatabase
+        {
+            SetUsername database( String database );
         }
 
         interface SetUsername
