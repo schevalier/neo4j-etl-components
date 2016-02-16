@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -22,20 +23,26 @@ import org.neo4j.integration.util.TemporaryDirectory;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class ExportFromMySqlIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M03;
+    private static final int MYSQL_PORT = 3306;
 
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
     @Rule
     public final ResourceRule<Server> mySqlServer = new ResourceRule<>(
-            ServerFixture.server( tempDirectory.get(), MySqlScripts.startupScript() ) );
+            ServerFixture.server(
+                    "mysql-integration-test",
+                    MYSQL_PORT,
+                    MySqlScripts.startupScript(),
+                    tempDirectory.get() ) );
 
     @Rule
     public final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
-            Neo4jFixture.neo4j( tempDirectory.get(), NEO4J_VERSION ) );
+            Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
 
     @Test
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception

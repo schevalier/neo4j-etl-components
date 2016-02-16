@@ -1,4 +1,4 @@
-package org.neo4j.integration.provisioning.environments;
+package org.neo4j.integration.provisioning.platforms;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,12 +10,15 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.ProcessHandle;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFactory;
 import org.neo4j.integration.provisioning.Script;
+import org.neo4j.integration.util.Loggers;
+import org.neo4j.integration.util.Strings;
 
 import static java.lang.String.format;
 
@@ -23,16 +26,16 @@ public class Vagrant implements ServerFactory
 {
     private static final String VAGRANT_FILENAME = "vagrantfile.mysql";
 
-    private static final String VAGRANT_FILE_TEMPLATE = "" +
-            "Vagrant.configure('2') do |config|\n" +
-            "  config.vm.box = '%s'\n" +
-            "  %s\n" +
-            "  config.vm.network 'private_network', type: 'dhcp'\n" +
-            "  config.vm.provision 'shell', path: 'script'\n" +
-            "  config.vm.provider 'virtualbox' do |vb|\n" +
-            "    vb.memory = 2048\n" +
-            "  end\n" +
-            "end\n";
+    private static final String VAGRANT_FILE_TEMPLATE = Strings.lineSeparated(
+            "Vagrant.configure('2') do |config|",
+            "  config.vm.box = '%s'",
+            "  %s",
+            "  config.vm.network 'private_network', type: 'dhcp'",
+            "  config.vm.provision 'shell', path: 'script'",
+            "  config.vm.provider 'virtualbox' do |vb|",
+            "    vb.memory = 2048",
+            "  end",
+            "end");
 
     private static final String DEFAULT_BOX = "ubuntu/trusty64";
 
@@ -68,16 +71,21 @@ public class Vagrant implements ServerFactory
 
     private String vagrantFileContent()
     {
+        String fileContent;
         if ( boxUri == null )
         {
-            return format( VAGRANT_FILE_TEMPLATE, DEFAULT_BOX, "" );
+            fileContent = format( VAGRANT_FILE_TEMPLATE, DEFAULT_BOX, "" );
         }
         else
         {
             String boxName = new File( boxUri.getPath() ).getName();
             String boxUrlConfig = format( "config.vm.box_url = '%s'", boxUri );
-            return format( VAGRANT_FILE_TEMPLATE, boxName, boxUrlConfig );
+            fileContent = format( VAGRANT_FILE_TEMPLATE, boxName, boxUrlConfig );
         }
+
+        Loggers.Default.log( Level.FINE, "Vagrantfile: {0}", fileContent );
+
+        return fileContent;
     }
 
     public void destroy() throws Exception

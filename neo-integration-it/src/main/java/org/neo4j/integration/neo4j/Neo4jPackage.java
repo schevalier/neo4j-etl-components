@@ -3,8 +3,6 @@ package org.neo4j.integration.neo4j;
 import java.io.File;
 import java.net.URI;
 
-import sun.reflect.misc.FieldUtil;
-
 import org.neo4j.integration.util.FileUtils;
 
 public class Neo4jPackage

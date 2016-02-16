@@ -1,4 +1,4 @@
-package org.neo4j.integration.provisioning.environments;
+package org.neo4j.integration.provisioning.platforms;
 
 import java.io.IOException;
 import java.util.Optional;

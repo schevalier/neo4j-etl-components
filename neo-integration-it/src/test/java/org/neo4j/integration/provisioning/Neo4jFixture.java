@@ -15,7 +15,7 @@ import org.neo4j.integration.util.Resource;
 
 public class Neo4jFixture
 {
-    public static Resource<Neo4j> neo4j( Path directory, Neo4jVersion version )
+    public static Resource<Neo4j> neo4j( Neo4jVersion version, Path directory )
     {
         return new LazyResource<>( new LazyResource.Lifecycle<Neo4j>()
         {

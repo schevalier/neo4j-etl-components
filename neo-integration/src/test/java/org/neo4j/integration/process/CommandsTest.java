@@ -102,7 +102,7 @@ public class CommandsTest
     public void shouldThrowExceptionIfCommandDurationExceedsTimeout() throws Exception
     {
         // given
-        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 1 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 5 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
                 .timeout( 5, TimeUnit.MILLISECONDS )
