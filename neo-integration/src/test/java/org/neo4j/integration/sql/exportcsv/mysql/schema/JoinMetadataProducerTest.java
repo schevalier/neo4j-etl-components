@@ -6,9 +6,9 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.Results;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.StubResults;
+import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
@@ -27,7 +27,7 @@ public class JoinMetadataProducerTest
     public void shouldReturnJoinMetadata() throws Exception
     {
         // given
-        Results results = StubResults.builder()
+        QueryResults results = StubQueryResults.builder()
                 .columns( "TABLE_SCHEMA",
                         "TABLE_NAME",
                         "PRIMARY_KEY",

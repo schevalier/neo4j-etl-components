@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.mysql;
+package org.neo4j.integration.sql.exportcsv.io;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,11 +9,11 @@ import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.sql.Results;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.StubResults;
-import org.neo4j.integration.sql.exportcsv.ExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
@@ -42,7 +42,7 @@ public class CsvFileWriterTest
         TableName table = new TableName( "users" );
 
         // setup sql runner
-        Results results = StubResults.builder()
+        QueryResults results = StubQueryResults.builder()
                 .columns( "id", "username" )
                 .addRow( "1", "user-1" )
                 .addRow( "2", "user-2" )
@@ -79,7 +79,7 @@ public class CsvFileWriterTest
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
 
         // when
-        Path exportFile = writer.writeExportFile( mappings, mock( ExportSqlSupplier.class ), table.fullName() );
+        Path exportFile = writer.writeExportFile( mappings, mock( DatabaseExportSqlSupplier.class ), table.fullName() );
 
         // then
         List<String> contents = Files.readAllLines( exportFile );

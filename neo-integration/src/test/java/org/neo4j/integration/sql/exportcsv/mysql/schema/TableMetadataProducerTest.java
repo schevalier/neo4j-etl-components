@@ -5,9 +5,9 @@ import java.util.Collection;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.Results;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.StubResults;
+import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Table;
@@ -26,7 +26,7 @@ public class TableMetadataProducerTest
     public void shouldReturnTableMetadata() throws Exception
     {
         // given
-        Results results = StubResults.builder()
+        QueryResults results = StubQueryResults.builder()
                 .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
                 .addRow( "id", "int", "PRI" )
                 .addRow( "username", "text", "" )

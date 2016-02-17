@@ -10,7 +10,6 @@ import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import io.airlift.airline.OptionType;
 
-import org.neo4j.integration.SqlToGraphConfigMapper;
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
@@ -20,8 +19,8 @@ import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
-import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
 import org.neo4j.integration.sql.ConnectionConfig;
@@ -125,7 +124,7 @@ public class ExportFromMySqlCommand implements Runnable
             print( "Exporting from MySQL to CSV..." );
 
             ExportToCsvResults exportResults = doExport( outputDirectories, formatting, connectionConfig );
-            GraphConfig graphConfig = new SqlToGraphConfigMapper( exportResults ).createGraphConfig();
+            GraphConfig graphConfig = exportResults.createGraphConfig();
 
             print( "Creating Neo4j store from CSV..." );
 
@@ -183,7 +182,7 @@ public class ExportFromMySqlCommand implements Runnable
                     .addJoins( joins )
                     .build();
 
-            return new ExportToCsvCommand( config, new MySqlExportProvider() ).execute();
+            return new ExportToCsvCommand( config, new MySqlExportService() ).execute();
         }
     }
 

@@ -14,7 +14,7 @@ import org.neo4j.integration.sql.metadata.Table;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
-public class TableMapperTest
+public class TableToCsvFieldMapperTest
 {
     @Test
     public void shouldCreateMappingsForTable()
@@ -26,7 +26,7 @@ public class TableMapperTest
                 .addColumn( "username", ColumnType.Data )
                 .build();
 
-        TableMapper mapper = new TableMapper( Formatting.DEFAULT );
+        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( table );
@@ -51,7 +51,7 @@ public class TableMapperTest
                 .addColumn( "addressId", ColumnType.ForeignKey )
                 .build();
 
-        TableMapper mapper = new TableMapper( Formatting.DEFAULT );
+        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( table );

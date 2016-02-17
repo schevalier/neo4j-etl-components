@@ -3,7 +3,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.neo4j.integration.sql.Results;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
@@ -32,7 +32,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
         Table.Builder builder = Table.builder().name( source );
 
-        try ( Results results = databaseClient.execute( sql ).await() )
+        try ( QueryResults results = databaseClient.execute( sql ).await() )
         {
             while ( results.next() )
             {

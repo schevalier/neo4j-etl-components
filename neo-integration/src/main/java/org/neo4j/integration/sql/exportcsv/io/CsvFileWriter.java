@@ -6,10 +6,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.neo4j.integration.sql.Results;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.exportcsv.ExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 
@@ -27,11 +27,11 @@ public class CsvFileWriter
     }
 
     public Path writeExportFile( ColumnToCsvFieldMappings mappings,
-                                 ExportSqlSupplier sqlSupplier,
+                                 DatabaseExportSqlSupplier sqlSupplier,
                                  String filenamePrefix ) throws Exception
     {
         Path exportFile = createExportFile( filenamePrefix );
-        Results results = executeSql( sqlSupplier.sql( mappings ) );
+        QueryResults results = executeSql( sqlSupplier.sql( mappings ) );
 
         writeResultsToFile( results, exportFile, mappings );
 
@@ -46,12 +46,12 @@ public class CsvFileWriter
         return exportFile;
     }
 
-    private Results executeSql( String sql ) throws Exception
+    private QueryResults executeSql( String sql ) throws Exception
     {
         return databaseClient.execute( sql ).await();
     }
 
-    private void writeResultsToFile( Results results, Path file, ColumnToCsvFieldMappings mappings ) throws Exception
+    private void writeResultsToFile( QueryResults results, Path file, ColumnToCsvFieldMappings mappings ) throws Exception
     {
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
         int maxIndex = columns.length - 1;

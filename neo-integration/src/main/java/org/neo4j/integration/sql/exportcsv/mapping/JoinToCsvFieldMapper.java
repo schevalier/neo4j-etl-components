@@ -7,11 +7,11 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 
-public class JoinMapper implements Mapper<Join>
+public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
 {
     private final Formatting formatting;
 
-    public JoinMapper( Formatting formatting )
+    public JoinToCsvFieldMapper( Formatting formatting )
     {
         this.formatting = formatting;
     }

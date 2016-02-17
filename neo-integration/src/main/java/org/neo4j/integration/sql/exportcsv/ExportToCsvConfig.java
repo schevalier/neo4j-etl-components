@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.config;
+package org.neo4j.integration.sql.exportcsv;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import static java.lang.String.format;
 
 import static org.neo4j.integration.util.StringListBuilder.stringList;
 
-public class ExportToCsvConfig implements ExportProperties
+public class ExportToCsvConfig
 {
     public static Builder.SetDestination builder()
     {
@@ -43,34 +43,19 @@ public class ExportToCsvConfig implements ExportProperties
         validate();
     }
 
-
-
-    @Override
     public Path destination()
     {
         return destination;
     }
 
-    @Override
     public ConnectionConfig connectionConfig()
     {
         return connectionConfig;
     }
 
-    @Override
     public Formatting formatting()
     {
         return formatting;
-    }
-
-    public Collection<Table> tables()
-    {
-        return tables;
-    }
-
-    public Collection<Join> joins()
-    {
-        return joins;
     }
 
     public Collection<DatabaseObject> databaseObjects()

@@ -14,7 +14,7 @@ public class EndIdTest
         EndId endId1 = new EndId();
         EndId endId2 = new EndId();
         EndId endId3 = new EndId( null );
-        EndId endId4 = new EndId(new IdSpace( "id-space"));
+        EndId endId4 = new EndId( new IdSpace( "id-space" ) );
 
         // then
         assertEquals( endId1, endId2 );
@@ -28,8 +28,8 @@ public class EndIdTest
     public void shouldImplementEqualityForEndIdsWithIdSpace()
     {
         // given
-        EndId endId1 = new EndId(new IdSpace( "id-space"));
-        EndId endId2 = new EndId(new IdSpace("id-space"));
+        EndId endId1 = new EndId( new IdSpace( "id-space" ) );
+        EndId endId2 = new EndId( new IdSpace( "id-space" ) );
 
         // then
         assertEquals( endId1, endId2 );

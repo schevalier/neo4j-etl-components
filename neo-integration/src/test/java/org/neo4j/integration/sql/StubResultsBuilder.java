@@ -8,20 +8,20 @@ import java.util.Map;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-class StubResultsBuilder implements StubResults.Builder.SetColumns, StubResults.Builder
+class StubResultsBuilder implements StubQueryResults.Builder.SetColumns, StubQueryResults.Builder
 {
     private final List<Map<String, String>> rows = new ArrayList<>();
     private List<String> columns;
 
     @Override
-    public StubResults.Builder columns( String... columns )
+    public StubQueryResults.Builder columns( String... columns )
     {
         this.columns = asList( columns );
         return this;
     }
 
     @Override
-    public StubResults.Builder addRow( String... values )
+    public StubQueryResults.Builder addRow( String... values )
     {
         if ( values.length != columns.size() )
         {
@@ -42,8 +42,8 @@ class StubResultsBuilder implements StubResults.Builder.SetColumns, StubResults.
     }
 
     @Override
-    public Results build()
+    public QueryResults build()
     {
-        return new StubResults( rows );
+        return new StubQueryResults( rows );
     }
 }

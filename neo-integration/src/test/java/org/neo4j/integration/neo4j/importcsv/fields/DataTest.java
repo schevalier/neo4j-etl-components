@@ -56,7 +56,7 @@ public class DataTest
     }
 
     @Test
-    public void shouldThrowExceptionIfEmptyStringlNameForArrayType()
+    public void shouldThrowExceptionIfEmptyStringNameForArrayType()
     {
         try
         {

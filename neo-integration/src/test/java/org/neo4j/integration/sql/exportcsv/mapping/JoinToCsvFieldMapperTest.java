@@ -13,7 +13,7 @@ import org.neo4j.integration.sql.metadata.TableName;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
-public class JoinMapperTest
+public class JoinToCsvFieldMapperTest
 {
     @Test
     public void shouldCreateMappingsForJoin()
@@ -26,7 +26,7 @@ public class JoinMapperTest
                 .childTable( new TableName( "test.Address" ) )
                 .build();
 
-        JoinMapper mapper = new JoinMapper( Formatting.DEFAULT );
+        JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );

@@ -29,13 +29,13 @@ public class DatabaseClient implements AutoCloseable
         Loggers.MySql.log().fine( "Connected to database" );
     }
 
-    public AwaitHandle<Results> execute( String sql )
+    public AwaitHandle<QueryResults> execute( String sql )
     {
         return new DatabaseClientAwaitHandle(
-                FutureUtils.<Results>exceptionableFuture( () ->
+                FutureUtils.<QueryResults>exceptionableFuture( () ->
                 {
                     Loggers.MySql.log().finest( sql );
-                    return new SqlResults( connection.createStatement().executeQuery( sql ) );
+                    return new SqlQueryResults( connection.createStatement().executeQuery( sql ) );
 
                 }, r -> new Thread( r ).start() ) );
     }
@@ -46,39 +46,39 @@ public class DatabaseClient implements AutoCloseable
         connection.close();
     }
 
-    private static class DatabaseClientAwaitHandle implements AwaitHandle<Results>
+    private static class DatabaseClientAwaitHandle implements AwaitHandle<QueryResults>
     {
-        private final CompletableFuture<Results> future;
+        private final CompletableFuture<QueryResults> future;
 
-        private DatabaseClientAwaitHandle( CompletableFuture<Results> future )
+        private DatabaseClientAwaitHandle( CompletableFuture<QueryResults> future )
         {
             this.future = future;
         }
 
         @Override
-        public Results await() throws Exception
+        public QueryResults await() throws Exception
         {
             return future.get();
         }
 
         @Override
-        public Results await( long timeout, TimeUnit unit ) throws Exception
+        public QueryResults await( long timeout, TimeUnit unit ) throws Exception
         {
             return future.get( timeout, unit );
         }
 
         @Override
-        public CompletableFuture<Results> toFuture()
+        public CompletableFuture<QueryResults> toFuture()
         {
             return future;
         }
     }
 
-    private static class SqlResults implements Results
+    private static class SqlQueryResults implements QueryResults
     {
         private final ResultSet results;
 
-        public SqlResults( ResultSet results )
+        public SqlQueryResults( ResultSet results )
         {
             this.results = results;
         }

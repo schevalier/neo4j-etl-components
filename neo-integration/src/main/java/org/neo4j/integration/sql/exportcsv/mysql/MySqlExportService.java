@@ -5,20 +5,20 @@ import java.util.Collection;
 
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.exportcsv.DatabaseExportProvider;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvResult;
-import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.DatabaseExportService;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
-import org.neo4j.integration.sql.exportcsv.mapping.JoinMapper;
-import org.neo4j.integration.sql.exportcsv.mapping.TableMapper;
+import org.neo4j.integration.sql.exportcsv.mapping.JoinToCsvFieldMapper;
+import org.neo4j.integration.sql.exportcsv.mapping.TableToCsvFieldMapper;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 
 import static java.lang.String.format;
 
-public class MySqlExportProvider implements DatabaseExportProvider
+public class MySqlExportService implements DatabaseExportService
 {
     @Override
     public CsvFileWriter createExportFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
@@ -27,7 +27,7 @@ public class MySqlExportProvider implements DatabaseExportProvider
     }
 
     @Override
-    public ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
+    public ExportToCsvResults.ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
                                                    HeaderFileWriter headerFileWriter,
                                                    CsvFileWriter csvFileWriter,
                                                    ExportToCsvConfig config ) throws Exception
@@ -37,18 +37,18 @@ public class MySqlExportProvider implements DatabaseExportProvider
             Table table = (Table) databaseObject;
 
             Collection<Path> files = new CsvFilesWriter<Table>( headerFileWriter, csvFileWriter )
-                    .write( table, new TableMapper( config.formatting() ), new MySqlExportSqlSupplier() );
+                    .write( table, new TableToCsvFieldMapper( config.formatting() ), new MySqlExportSqlSupplier() );
 
-            return new ExportToCsvResult( table, files );
+            return new ExportToCsvResults.ExportToCsvResult( table, files );
         }
         else if ( databaseObject instanceof Join )
         {
             Join join = (Join) databaseObject;
 
             Collection<Path> files = new CsvFilesWriter<Join>( headerFileWriter, csvFileWriter )
-                    .write( join, new JoinMapper( config.formatting() ), new MySqlExportSqlSupplier() );
+                    .write( join, new JoinToCsvFieldMapper( config.formatting() ), new MySqlExportSqlSupplier() );
 
-            return new ExportToCsvResult( join, files );
+            return new ExportToCsvResults.ExportToCsvResult( join, files );
         }
         else
         {

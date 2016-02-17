@@ -1,6 +1,6 @@
 package org.neo4j.integration.sql;
 
-public interface Results extends AutoCloseable
+public interface QueryResults extends AutoCloseable
 {
     boolean next() throws Exception;
 

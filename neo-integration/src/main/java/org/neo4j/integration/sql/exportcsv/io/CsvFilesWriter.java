@@ -3,9 +3,9 @@ package org.neo4j.integration.sql.exportcsv.io;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import org.neo4j.integration.sql.exportcsv.ExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
-import org.neo4j.integration.sql.exportcsv.mapping.Mapper;
+import org.neo4j.integration.sql.exportcsv.mapping.DatabaseObjectToCsvFieldMapper;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 
@@ -23,8 +23,8 @@ public class CsvFilesWriter<T extends DatabaseObject>
     }
 
     public Collection<Path> write( T source,
-                                   Mapper<T> mapper,
-                                   ExportSqlSupplier sqlSupplier ) throws Exception
+                                   DatabaseObjectToCsvFieldMapper<T> mapper,
+                                   DatabaseExportSqlSupplier sqlSupplier ) throws Exception
     {
         ColumnToCsvFieldMappings mappings = mapper.createMappings( source );
 

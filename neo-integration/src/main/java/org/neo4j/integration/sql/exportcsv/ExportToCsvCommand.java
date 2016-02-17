@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.util.OperatingSystem;
@@ -15,12 +14,12 @@ import org.neo4j.integration.util.OperatingSystem;
 public class ExportToCsvCommand
 {
     private final ExportToCsvConfig config;
-    private final DatabaseExportProvider databaseExportProvider;
+    private final DatabaseExportService databaseExportService;
 
-    public ExportToCsvCommand( ExportToCsvConfig config, DatabaseExportProvider databaseExportProvider )
+    public ExportToCsvCommand( ExportToCsvConfig config, DatabaseExportService databaseExportService )
     {
         this.config = config;
-        this.databaseExportProvider = databaseExportProvider;
+        this.databaseExportService = databaseExportService;
     }
 
     public ExportToCsvResults execute() throws Exception
@@ -35,17 +34,17 @@ public class ExportToCsvCommand
             Commands.commands( "chmod", "0777", config.destination().toString() ).execute().await();
         }
 
-        Collection<ExportToCsvResult> results = new ArrayList<>();
+        Collection<ExportToCsvResults.ExportToCsvResult> results = new ArrayList<>();
 
         try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
-            CsvFileWriter csvFileWriter = databaseExportProvider.createExportFileWriter( config, databaseClient );
+            CsvFileWriter csvFileWriter = databaseExportService.createExportFileWriter( config, databaseClient );
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
                 results.add(
-                        databaseExportProvider.exportDatabaseObject(
+                        databaseExportService.exportDatabaseObject(
                                 databaseObject,
                                 headerFileWriter,
                                 csvFileWriter,

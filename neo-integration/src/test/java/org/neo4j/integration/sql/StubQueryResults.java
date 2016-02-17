@@ -3,7 +3,7 @@ package org.neo4j.integration.sql;
 import java.util.List;
 import java.util.Map;
 
-public class StubResults implements Results
+public class StubQueryResults implements QueryResults
 {
     public static Builder.SetColumns builder()
     {
@@ -13,7 +13,7 @@ public class StubResults implements Results
     private final List<Map<String, String>> rows;
     private int currentRowIndex = -1;
 
-    StubResults( List<Map<String, String>> rows )
+    StubQueryResults( List<Map<String, String>> rows )
     {
         this.rows = rows;
     }
@@ -46,6 +46,6 @@ public class StubResults implements Results
 
         Builder addRow(String... rows);
 
-        Results build();
+        QueryResults build();
     }
 }

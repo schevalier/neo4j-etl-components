@@ -3,7 +3,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.integration.sql.Results;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
@@ -28,7 +28,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
 
         Collection<Join> joins = new ArrayList<>();
 
-        try ( Results results = databaseClient.execute( sql ).await() )
+        try ( QueryResults results = databaseClient.execute( sql ).await() )
         {
             while ( results.next() )
             {
