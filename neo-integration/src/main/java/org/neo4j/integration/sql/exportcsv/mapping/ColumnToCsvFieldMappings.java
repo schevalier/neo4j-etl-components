@@ -10,6 +10,8 @@ import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.util.Preconditions;
 
+import static java.lang.String.format;
+
 public class ColumnToCsvFieldMappings
 {
     public static Builder builder()
@@ -32,6 +34,13 @@ public class ColumnToCsvFieldMappings
     public Collection<Column> columns()
     {
         return mappings.keySet();
+    }
+
+    public Collection<String> aliasedColumns(  )
+    {
+        return columns().stream()
+                .map( c -> format( "%s AS %s", c.name(), c.alias() ) )
+                .collect( Collectors.toList() );
     }
 
     public Collection<String> tableNames()

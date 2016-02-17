@@ -31,7 +31,7 @@ public class CsvFileWriter
                                  String filenamePrefix ) throws Exception
     {
         Path exportFile = createExportFile( filenamePrefix );
-        Results results = executeSql( sqlSupplier.sql( mappings, exportFile ) );
+        Results results = executeSql( sqlSupplier.sql( mappings ) );
 
         writeResultsToFile( results, exportFile, mappings );
 
