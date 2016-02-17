@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.neo4j.integration.sql.Results;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.Table;
@@ -12,11 +12,11 @@ import org.neo4j.integration.sql.metadata.TableName;
 
 public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 {
-    private final SqlRunner sqlRunner;
+    private final DatabaseClient databaseClient;
 
-    public TableMetadataProducer( SqlRunner sqlRunner )
+    public TableMetadataProducer( DatabaseClient databaseClient )
     {
-        this.sqlRunner = sqlRunner;
+        this.databaseClient = databaseClient;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
         Table.Builder builder = Table.builder().name( source );
 
-        try ( Results results = sqlRunner.execute( sql ).await() )
+        try ( Results results = databaseClient.execute( sql ).await() )
         {
             while ( results.next() )
             {

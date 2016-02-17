@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.integration.sql.metadata.ConnectionConfig;
+import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;

@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.neo4j.integration.sql.Results;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.ExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
@@ -18,12 +18,12 @@ import static java.lang.String.format;
 public class CsvFileWriter
 {
     private final ExportToCsvConfig config;
-    private final SqlRunner sqlRunner;
+    private final DatabaseClient databaseClient;
 
-    public CsvFileWriter( ExportToCsvConfig config, SqlRunner sqlRunner )
+    public CsvFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
     {
         this.config = config;
-        this.sqlRunner = sqlRunner;
+        this.databaseClient = databaseClient;
     }
 
     public Path writeExportFile( ColumnToCsvFieldMappings mappings,
@@ -48,7 +48,7 @@ public class CsvFileWriter
 
     private Results executeSql( String sql ) throws Exception
     {
-        return sqlRunner.execute( sql ).await();
+        return databaseClient.execute( sql ).await();
     }
 
     private void writeResultsToFile( Results results, Path file, ColumnToCsvFieldMappings mappings ) throws Exception

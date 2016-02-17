@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
@@ -37,10 +37,10 @@ public class ExportToCsvCommand
 
         Collection<ExportToCsvResult> results = new ArrayList<>();
 
-        try ( SqlRunner sqlRunner = new SqlRunner( config.connectionConfig() ) )
+        try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
-            CsvFileWriter csvFileWriter = databaseExportProvider.createExportFileWriter( config, sqlRunner );
+            CsvFileWriter csvFileWriter = databaseExportProvider.createExportFileWriter( config, databaseClient );
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {

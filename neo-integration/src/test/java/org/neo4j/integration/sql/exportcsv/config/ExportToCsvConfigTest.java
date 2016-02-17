@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.ConnectionConfig;
+import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;

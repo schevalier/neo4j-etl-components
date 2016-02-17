@@ -8,15 +8,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.metadata.ConnectionConfig;
 import org.neo4j.integration.util.FutureUtils;
 import org.neo4j.integration.util.Loggers;
 
-public class SqlRunner implements AutoCloseable
+public class DatabaseClient implements AutoCloseable
 {
     private final Connection connection;
 
-    public SqlRunner( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
+    public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
         Loggers.MySql.log().fine( "Connecting to database..." );
 
@@ -32,7 +31,7 @@ public class SqlRunner implements AutoCloseable
 
     public AwaitHandle<Results> execute( String sql )
     {
-        return new SqlRunnerAwaitHandle(
+        return new DatabaseClientAwaitHandle(
                 FutureUtils.<Results>exceptionableFuture( () ->
                 {
                     Loggers.MySql.log().finest( sql );
@@ -47,11 +46,11 @@ public class SqlRunner implements AutoCloseable
         connection.close();
     }
 
-    private static class SqlRunnerAwaitHandle implements AwaitHandle<Results>
+    private static class DatabaseClientAwaitHandle implements AwaitHandle<Results>
     {
         private final CompletableFuture<Results> future;
 
-        private SqlRunnerAwaitHandle( CompletableFuture<Results> future )
+        private DatabaseClientAwaitHandle( CompletableFuture<Results> future )
         {
             this.future = future;
         }

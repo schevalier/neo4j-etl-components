@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportProvider;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResult;
@@ -21,9 +21,9 @@ import static java.lang.String.format;
 public class MySqlExportProvider implements DatabaseExportProvider
 {
     @Override
-    public CsvFileWriter createExportFileWriter( ExportToCsvConfig config, SqlRunner sqlRunner )
+    public CsvFileWriter createExportFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
     {
-        return new CsvFileWriter( config, sqlRunner );
+        return new CsvFileWriter( config, databaseClient );
     }
 
     @Override

@@ -1,6 +1,4 @@
-package org.neo4j.integration.sql.metadata;
-
-import org.neo4j.integration.sql.DatabaseType;
+package org.neo4j.integration.sql;
 
 class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetHost,
         ConnectionConfig.Builder.SetPort,

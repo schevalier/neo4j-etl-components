@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.neo4j.integration.sql.Results;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -12,11 +12,11 @@ import org.neo4j.integration.sql.metadata.TableNamePair;
 
 public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Join>
 {
-    private final SqlRunner sqlRunner;
+    private final DatabaseClient databaseClient;
 
-    public JoinMetadataProducer( SqlRunner sqlRunner )
+    public JoinMetadataProducer( DatabaseClient databaseClient )
     {
-        this.sqlRunner = sqlRunner;
+        this.databaseClient = databaseClient;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
 
         Collection<Join> joins = new ArrayList<>();
 
-        try ( Results results = sqlRunner.execute( sql ).await() )
+        try ( Results results = databaseClient.execute( sql ).await() )
         {
             while ( results.next() )
             {

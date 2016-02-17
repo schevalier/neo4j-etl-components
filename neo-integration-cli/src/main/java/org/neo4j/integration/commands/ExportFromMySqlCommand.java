@@ -1,7 +1,6 @@
 package org.neo4j.integration.commands;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,14 +17,14 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportProvider;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
-import org.neo4j.integration.sql.metadata.ConnectionConfig;
+import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -165,15 +164,15 @@ public class ExportFromMySqlCommand implements Runnable
         TableName person = new TableName( database, parentTable );
         TableName address = new TableName( database, childTable );
 
-        try ( SqlRunner sqlRunner = new SqlRunner( connectionConfig ) )
+        try ( DatabaseClient databaseClient = new DatabaseClient( connectionConfig ) )
         {
-            TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( sqlRunner );
+            TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
 
             Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( person );
             Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( address );
 
             Collection<Join> joins =
-                    new JoinMetadataProducer( sqlRunner ).createMetadataFor( new TableNamePair( person, address ) );
+                    new JoinMetadataProducer( databaseClient ).createMetadataFor( new TableNamePair( person, address ) );
 
             ExportToCsvConfig config = ExportToCsvConfig.builder()
                     .destination( outputDirectories.csvDirectory() )

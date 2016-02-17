@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.Results;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.StubResults;
 import org.neo4j.integration.sql.exportcsv.ExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.config.ExportToCsvConfig;
@@ -18,7 +18,7 @@ import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.ConnectionConfig;
+import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
@@ -48,8 +48,8 @@ public class CsvFileWriterTest
                 .addRow( "2", "user-2" )
                 .build();
 
-        SqlRunner sqlRunner = mock( SqlRunner.class );
-        when( sqlRunner.execute( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.execute( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // setup config
         ExportToCsvConfig config = ExportToCsvConfig.builder()
@@ -76,7 +76,7 @@ public class CsvFileWriterTest
                                 .build() ) );
 
         // create writer under test
-        CsvFileWriter writer = new CsvFileWriter( config, sqlRunner );
+        CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
 
         // when
         Path exportFile = writer.writeExportFile( mappings, mock( ExportSqlSupplier.class ), table.fullName() );

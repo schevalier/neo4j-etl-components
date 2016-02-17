@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.Results;
-import org.neo4j.integration.sql.SqlRunner;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.StubResults;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -38,10 +38,10 @@ public class JoinMetadataProducerTest
                 .addRow( "test", "Address", "id", "ownerId", "test", "Person" )
                 .build();
 
-        SqlRunner sqlRunner = mock( SqlRunner.class );
-        when( sqlRunner.execute( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.execute( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
-        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( sqlRunner );
+        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
 
         // when
         Collection<Join> joins = getJoinMetadata

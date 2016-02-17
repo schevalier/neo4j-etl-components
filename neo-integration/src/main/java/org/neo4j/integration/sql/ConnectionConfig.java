@@ -1,8 +1,7 @@
-package org.neo4j.integration.sql.metadata;
+package org.neo4j.integration.sql;
 
 import java.net.URI;
 
-import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.util.Preconditions;
 
 public class ConnectionConfig
