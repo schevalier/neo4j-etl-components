@@ -1,23 +1,19 @@
 package org.neo4j.integration.mysql;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.neo4j.integration.process.Commands;
-import org.neo4j.integration.process.Result;
+import org.neo4j.integration.sql.ConnectionConfig;
+import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.DatabaseType;
 
 public class MySqlClient
 {
-    public MySqlClient( Path tempDirectory, String host )
+    public MySqlClient( String host )
     {
-        this.tempDirectory = tempDirectory;
         this.host = host;
     }
 
     public enum Parameters
     {
-        DBRootPassword(  "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" );
+        DBRootPassword( "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" ), Database( "javabase" );
 
         private final String value;
 
@@ -32,29 +28,23 @@ public class MySqlClient
         }
     }
 
-    private final Path tempDirectory;
     private final String host;
 
-    public Result execute( String sql ) throws Exception
+    public void execute( String sql ) throws Exception
     {
-        return Commands.builder( "mysql",
-                "--user=" + MySqlClient.Parameters.DBUser.value(),
-                "--password=" + MySqlClient.Parameters.DBPassword.value(),
-                "-h", host )
-                .inheritWorkingDirectory()
-                .failOnNonZeroExitValue()
-                .noTimeout()
-                .inheritEnvironment()
-                .redirectStdInFrom( tempFile( sql ) )
-                .build()
-                .execute()
-                .await();
-    }
+        DatabaseClient client = new DatabaseClient( ConnectionConfig.forDatabase( DatabaseType.MySQL )
+                .host( host )
+                .port( DatabaseType.MySQL.defaultPort() )
+                .username( Parameters.DBUser.value() )
+                .password( Parameters.DBPassword.value() )
+                .build() );
 
-    private Path tempFile( String contents ) throws IOException
-    {
-        Path file = Files.createTempFile( tempDirectory, "", "" );
-        Files.write( file, contents.getBytes() );
-        return file;
+        for ( String line : sql.split( ";" ) )
+        {
+            if ( !line.trim().isEmpty() )
+            {
+                client.execute( line ).await();
+            }
+        }
     }
 }

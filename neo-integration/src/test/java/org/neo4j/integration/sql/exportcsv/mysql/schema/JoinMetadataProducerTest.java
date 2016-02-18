@@ -39,7 +39,7 @@ public class JoinMetadataProducerTest
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
-        when( databaseClient.execute( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
 

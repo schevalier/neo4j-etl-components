@@ -48,7 +48,7 @@ public class CsvFileWriter
 
     private QueryResults executeSql( String sql ) throws Exception
     {
-        return databaseClient.execute( sql ).await();
+        return databaseClient.executeQuery( sql ).await();
     }
 
     private void writeResultsToFile( QueryResults results, Path file, ColumnToCsvFieldMappings mappings ) throws Exception

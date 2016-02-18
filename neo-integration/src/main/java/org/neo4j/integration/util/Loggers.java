@@ -7,7 +7,7 @@ public enum Loggers
 {
     Default,
     Cli,
-    MySql;
+    Sql;
 
     private final Logger log;
 

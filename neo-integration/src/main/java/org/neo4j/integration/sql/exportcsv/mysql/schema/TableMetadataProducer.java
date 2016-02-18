@@ -32,7 +32,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
         Table.Builder builder = Table.builder().name( source );
 
-        try ( QueryResults results = databaseClient.execute( sql ).await() )
+        try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
             while ( results.next() )
             {

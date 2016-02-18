@@ -28,7 +28,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
 
         Collection<Join> joins = new ArrayList<>();
 
-        try ( QueryResults results = databaseClient.execute( sql ).await() )
+        try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
             while ( results.next() )
             {

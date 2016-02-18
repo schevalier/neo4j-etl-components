@@ -2,7 +2,7 @@ package org.neo4j.integration.sql;
 
 class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetHost,
         ConnectionConfig.Builder.SetPort,
-        ConnectionConfig.Builder.SetDatabase,
+        ConnectionConfig.Builder.SetDatabaseOrUsername,
         ConnectionConfig.Builder.SetUsername,
         ConnectionConfig.Builder.SetPassword,
         ConnectionConfig.Builder
@@ -11,7 +11,7 @@ class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetHost,
     final DatabaseType databaseType;
     String host;
     int port;
-    String database;
+    String database = "";
     String username;
     String password;
 
@@ -28,7 +28,7 @@ class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetHost,
     }
 
     @Override
-    public SetDatabase port( int port )
+    public SetDatabaseOrUsername port( int port )
     {
         this.port = port;
         return this;

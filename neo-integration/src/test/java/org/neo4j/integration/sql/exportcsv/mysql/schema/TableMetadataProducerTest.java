@@ -34,7 +34,7 @@ public class TableMetadataProducerTest
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
-        when( databaseClient.execute( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         TableMetadataProducer getTableMetadata = new TableMetadataProducer( databaseClient );
 

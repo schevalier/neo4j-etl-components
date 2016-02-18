@@ -17,7 +17,7 @@ public class DatabaseClient implements AutoCloseable
 
     public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
-        Loggers.MySql.log().fine( "Connecting to database..." );
+        Loggers.Sql.log().fine( "Connecting to database..." );
 
         Class.forName( connectionConfig.driverClassName() );
 
@@ -26,16 +26,27 @@ public class DatabaseClient implements AutoCloseable
                 connectionConfig.username(),
                 connectionConfig.password() );
 
-        Loggers.MySql.log().fine( "Connected to database" );
+        Loggers.Sql.log().fine( "Connected to database" );
     }
 
-    public AwaitHandle<QueryResults> execute( String sql )
+    public AwaitHandle<QueryResults> executeQuery( String sql )
     {
-        return new DatabaseClientAwaitHandle(
+        return new DatabaseClientAwaitHandle<>(
                 FutureUtils.<QueryResults>exceptionableFuture( () ->
                 {
-                    Loggers.MySql.log().finest( sql );
+                    Loggers.Sql.log().finest( sql );
                     return new SqlQueryResults( connection.createStatement().executeQuery( sql ) );
+
+                }, r -> new Thread( r ).start() ) );
+    }
+
+    public AwaitHandle<Boolean> execute( String sql )
+    {
+        return new DatabaseClientAwaitHandle<>(
+                FutureUtils.exceptionableFuture( () ->
+                {
+                    Loggers.Sql.log().finest( sql );
+                    return connection.createStatement().execute( sql );
 
                 }, r -> new Thread( r ).start() ) );
     }
@@ -46,29 +57,29 @@ public class DatabaseClient implements AutoCloseable
         connection.close();
     }
 
-    private static class DatabaseClientAwaitHandle implements AwaitHandle<QueryResults>
+    private static class DatabaseClientAwaitHandle<T> implements AwaitHandle<T>
     {
-        private final CompletableFuture<QueryResults> future;
+        private final CompletableFuture<T> future;
 
-        private DatabaseClientAwaitHandle( CompletableFuture<QueryResults> future )
+        private DatabaseClientAwaitHandle( CompletableFuture<T> future )
         {
             this.future = future;
         }
 
         @Override
-        public QueryResults await() throws Exception
+        public T await() throws Exception
         {
             return future.get();
         }
 
         @Override
-        public QueryResults await( long timeout, TimeUnit unit ) throws Exception
+        public T await( long timeout, TimeUnit unit ) throws Exception
         {
             return future.get( timeout, unit );
         }
 
         @Override
-        public CompletableFuture<QueryResults> toFuture()
+        public CompletableFuture<T> toFuture()
         {
             return future;
         }

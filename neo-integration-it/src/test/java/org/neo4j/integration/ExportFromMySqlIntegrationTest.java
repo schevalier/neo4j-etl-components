@@ -51,7 +51,7 @@ public class ExportFromMySqlIntegrationTest
                         "--host", mySqlServer.get().ipAddress(),
                         "--user", MySqlClient.Parameters.DBUser.value(),
                         "--password", MySqlClient.Parameters.DBPassword.value(),
-                        "--database", "javabase",
+                        "--database", MySqlClient.Parameters.Database.value(),
                         "--import-tool", neo4j.get().binDirectory().toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
@@ -84,7 +84,7 @@ public class ExportFromMySqlIntegrationTest
 
     private void populateMySqlDatabase() throws Exception
     {
-        MySqlClient client = new MySqlClient( tempDirectory.get(), mySqlServer.get().ipAddress() );
+        MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
         client.execute( MySqlScripts.setupDatabaseScript().value() );
     }
 }

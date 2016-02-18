@@ -14,7 +14,6 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -49,7 +48,7 @@ public class CsvFileWriterTest
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
-        when( databaseClient.execute( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        when( databaseClient.executeQuery( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // setup config
         ExportToCsvConfig config = ExportToCsvConfig.builder()

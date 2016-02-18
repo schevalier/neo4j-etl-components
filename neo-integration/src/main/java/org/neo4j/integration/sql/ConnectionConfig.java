@@ -6,9 +6,9 @@ import org.neo4j.integration.util.Preconditions;
 
 public class ConnectionConfig
 {
-    public static Builder.SetHost forDatabase(DatabaseType databaseType)
+    public static Builder.SetHost forDatabase( DatabaseType databaseType )
     {
-        return new ConnectionConfigBuilder(databaseType);
+        return new ConnectionConfigBuilder( databaseType );
     }
 
     private final DatabaseType databaseType;
@@ -23,7 +23,7 @@ public class ConnectionConfig
         this.databaseType = Preconditions.requireNonNull( builder.databaseType, "DatabaseType" );
         this.host = Preconditions.requireNonNullString( builder.host, "Host" );
         this.port = builder.port;
-        this.database = Preconditions.requireNonNullString( builder.database, "Database" );
+        this.database = Preconditions.requireNonNull( builder.database, "Database" );
         this.username = Preconditions.requireNonNullString( builder.username, "Username" );
         this.password = Preconditions.requireNonNullString( builder.password, "Password" );
     }
@@ -57,22 +57,24 @@ public class ConnectionConfig
 
         interface SetPort
         {
-            SetDatabase port( int port );
+            SetDatabaseOrUsername port( int port );
         }
 
-        interface SetDatabase
+        interface SetDatabaseOrUsername
         {
             SetUsername database( String database );
+
+            SetPassword username( String username );
         }
 
         interface SetUsername
         {
-            SetPassword username(String username);
+            SetPassword username( String username );
         }
 
         interface SetPassword
         {
-            Builder password(String password);
+            Builder password( String password );
         }
 
         ConnectionConfig build();
