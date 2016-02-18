@@ -1,9 +1,6 @@
 package org.neo4j.integration;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +42,25 @@ public class ExportFromMySqlIntegrationTest
     @Test
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
+        // given
+        populateMySqlDatabase();
+
+        // when
+        NeoIntegrationCli.executeMainReturnSysOut(
+                new String[]{"mysql-export",
+                        "--host", mySqlServer.get().ipAddress(),
+                        "--user", MySqlClient.Parameters.DBUser.value(),
+                        "--password", MySqlClient.Parameters.DBPassword.value(),
+                        "--database", "javabase",
+                        "--import-tool", neo4j.get().binDirectory().toString(),
+                        "--csv-directory", tempDirectory.get().toString(),
+                        "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
+                        "--parent", "Person",
+                        "--child", "Address"} );
+
+        // then
+        neo4j.get().start();
+
         String expectedResults = Strings.lineSeparated(
                 "+-------------------------------+",
                 "| n                             |",
@@ -62,25 +78,6 @@ public class ExportFromMySqlIntegrationTest
                 "| Node[10]{postcode:\"XY98 9BA\"} |",
                 "| Node[11]{postcode:\"ZZ1 0MN\"}  |",
                 "+-------------------------------+" );
-
-        populateMySqlDatabase();
-
-        Collection<String> paths = NeoIntegrationCli.executeMainReturnSysOut(
-                new String[]{"mysql-export",
-                        "--host", mySqlServer.get().ipAddress(),
-                        "--user", MySqlClient.Parameters.DBUser.value(),
-                        "--password", MySqlClient.Parameters.DBPassword.value(),
-                        "--database", "javabase",
-                        "--import-tool", neo4j.get().binDirectory().toString(),
-                        "--destination", tempDirectory.get().toString(),
-                        "--parent", "Person",
-                        "--child", "Address"} );
-
-        Files.move(
-                Paths.get( paths.stream().findFirst().get() ),
-                neo4j.get().databasesDirectory().resolve( "graph.db" ) );
-
-        neo4j.get().start();
 
         assertThat( neo4j.get().execute( "MATCH (n) RETURN n;" ), startsWith( expectedResults ) );
     }

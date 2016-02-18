@@ -17,7 +17,7 @@ public class ImportConfig implements CommandsSupplier
         return new ImportConfigBuilder();
     }
 
-    private static final String IMPORT_TOOL = OperatingSystem.isWindows() ? "Neo4jImport.bat" : "neo4j-import";
+    public static final String IMPORT_TOOL = OperatingSystem.isWindows() ? "Neo4jImport.bat" : "neo4j-import";
 
     private final Path importToolDirectory;
     private final Path destination;

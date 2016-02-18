@@ -10,7 +10,7 @@ import java.util.logging.LogManager;
 import io.airlift.airline.Cli;
 import io.airlift.airline.help.Help;
 
-import org.neo4j.integration.commands.ExportFromMySqlCommand;
+import org.neo4j.integration.cli.ExportFromMySqlCliCommand;
 import org.neo4j.integration.util.CliRunner;
 
 import static java.util.Arrays.asList;
@@ -34,7 +34,7 @@ public class NeoIntegrationCli
     private static final Cli<Runnable> PARSER = Cli.<Runnable>builder( "neo-integration" )
             .withDescription( "Neo4j integration tools." )
             .withDefaultCommand( Help.class )
-            .withCommand( ExportFromMySqlCommand.class )
+            .withCommand( ExportFromMySqlCliCommand.class )
             .withCommand( Help.class )
             .build();
 
