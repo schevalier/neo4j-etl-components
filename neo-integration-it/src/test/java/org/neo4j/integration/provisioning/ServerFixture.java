@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.neo4j.integration.provisioning.platforms.Aws;
+import org.neo4j.integration.provisioning.platforms.Local;
 import org.neo4j.integration.provisioning.platforms.Vagrant;
 import org.neo4j.integration.util.EnvironmentVariables;
 import org.neo4j.integration.util.LazyResource;
@@ -20,11 +21,15 @@ public class ServerFixture
             @Override
             public Server create() throws Exception
             {
-                String platform = systemPropertyOrEnvironmentVariable( "PLATFORM" ).orElse( "local" ).toLowerCase();
+                String platform = systemPropertyOrEnvironmentVariable( "PLATFORM" ).orElse( "vagrant" ).toLowerCase();
                 Optional<String> ec2Key = systemPropertyOrEnvironmentVariable( "EC2_SSH_KEY" );
                 Optional<String> vagrantBoxUri = systemPropertyOrEnvironmentVariable( "VAGRANT_BOX_URI" );
 
-                if ( platform.equals( "aws" ) && ec2Key.isPresent() )
+                if ( platform.equalsIgnoreCase( "local" ) )
+                {
+                    return new Local().createServer( script );
+                }
+                else if ( platform.equalsIgnoreCase( "aws" ) && ec2Key.isPresent() )
                 {
                     return new Aws( description, ec2Key.get(), port ).createServer( script );
                 }
@@ -46,7 +51,7 @@ public class ServerFixture
         } );
     }
 
-    private static Optional<String> systemPropertyOrEnvironmentVariable(String key)
+    private static Optional<String> systemPropertyOrEnvironmentVariable( String key )
     {
         Optional<String> value = SystemProperties.asOptionalString( key );
         return value.isPresent() ? value : EnvironmentVariables.asOptionalString( key );
