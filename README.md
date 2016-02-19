@@ -4,7 +4,7 @@ Integration with MySQL.
 
 ## Integration Tests
 
-You can run the tests with a local MySQL instance, or using (Vagrant)[https://www.vagrantup.com/], or in AWS. To run the tests in AWS, you'll need an AWS IAM user.
+You can run the tests with a local MySQL instance, or using [Vagrant] (https://www.vagrantup.com/), or in AWS. To run the tests in AWS, you'll need an AWS IAM user.
 
 To run the tests using AWS:
 
