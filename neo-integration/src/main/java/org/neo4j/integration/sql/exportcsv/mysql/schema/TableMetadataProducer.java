@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.Table;
@@ -39,18 +40,27 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                 String columnName = results.getString( "COLUMN_NAME" );
                 String columnKey = results.getString( "COLUMN_KEY" );
 
+                ColumnType columnType;
+
                 switch ( columnKey )
                 {
                     case "PRI":
-                        builder.addColumn( columnName, ColumnType.PrimaryKey );
+                        columnType = ColumnType.PrimaryKey;
                         break;
                     case "MUL":
-                        builder.addColumn( columnName, ColumnType.ForeignKey );
+                        columnType = ColumnType.ForeignKey;
                         break;
                     default:
-                        builder.addColumn( columnName, ColumnType.Data );
+                        columnType = ColumnType.Data ;
                         break;
                 }
+
+                builder.addColumn( Column.builder()
+                        .table( source )
+                        .name( source.fullyQualifiedColumnName( columnName ) )
+                        .alias( columnName )
+                        .type( columnType )
+                        .build() );
             }
         }
 

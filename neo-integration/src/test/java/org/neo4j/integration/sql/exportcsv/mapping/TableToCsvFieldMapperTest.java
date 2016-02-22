@@ -8,8 +8,10 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.DataType;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Table;
+import org.neo4j.integration.sql.metadata.TableName;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
@@ -20,10 +22,12 @@ public class TableToCsvFieldMapperTest
     public void shouldCreateMappingsForTable()
     {
         // given
+        TableName personTable = new TableName( "test.Person" );
+
         Table table = Table.builder()
-                .name( "test.Person" )
-                .addColumn( "id", ColumnType.PrimaryKey )
-                .addColumn( "username", ColumnType.Data )
+                .name( personTable )
+                .addColumn( column( personTable, "id", ColumnType.PrimaryKey ) )
+                .addColumn( column( personTable, "username", ColumnType.Data ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
@@ -44,11 +48,13 @@ public class TableToCsvFieldMapperTest
     public void shouldNotCreateMappingForForeignKey()
     {
         // given
+        TableName personTable = new TableName( "test.Person" );
+
         Table table = Table.builder()
-                .name( "test.Person" )
-                .addColumn( "id", ColumnType.PrimaryKey )
-                .addColumn( "username", ColumnType.Data )
-                .addColumn( "addressId", ColumnType.ForeignKey )
+                .name( personTable )
+                .addColumn( column( personTable, "id", ColumnType.PrimaryKey ) )
+                .addColumn( column( personTable, "username", ColumnType.Data ) )
+                .addColumn( column( personTable, "addressId", ColumnType.ForeignKey ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
@@ -63,5 +69,15 @@ public class TableToCsvFieldMapperTest
                 CsvField.id( new IdSpace( "test.Person" ) ),
                 CsvField.data( "username", DataType.String ),
                 CsvField.label() ) );
+    }
+
+    private Column column( TableName table, String name, ColumnType type )
+    {
+        return Column.builder()
+                .table( table )
+                .name( table.fullyQualifiedColumnName( name ) )
+                .alias( name )
+                .type( type )
+                .build();
     }
 }

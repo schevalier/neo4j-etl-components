@@ -56,7 +56,7 @@ public class Table implements DatabaseObject
             Builder name( TableName name );
         }
 
-        Builder addColumn(String name, ColumnType type);
+        Builder addColumn( Column column );
 
         Table build();
     }

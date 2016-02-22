@@ -22,14 +22,9 @@ class TableBuilder implements Table.Builder.SetName, Table.Builder
     }
 
     @Override
-    public Table.Builder addColumn( String name, ColumnType type )
+    public Table.Builder addColumn( Column column )
     {
-        columns.add( Column.builder()
-                .table( table )
-                .name( table.fullyQualifiedColumnName( name ) )
-                .alias( name )
-                .type( type )
-                .build() );
+        columns.add( column );
         return this;
     }
 
