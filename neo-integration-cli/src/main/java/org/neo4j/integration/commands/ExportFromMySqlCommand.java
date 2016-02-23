@@ -142,19 +142,18 @@ public class ExportFromMySqlCommand
                                          Formatting formatting,
                                          ConnectionConfig connectionConfig ) throws Exception
     {
-        TableName person = new TableName( database, parentTable );
-        TableName address = new TableName( database, childTable );
+        TableName parent = new TableName( database, parentTable );
+        TableName child = new TableName( database, childTable );
 
         try ( DatabaseClient databaseClient = new DatabaseClient( connectionConfig ) )
         {
             TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
 
-            Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( person );
-            Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( address );
+            Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( parent );
+            Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( child );
 
             Collection<Join> joins =
-                    new JoinMetadataProducer( databaseClient ).createMetadataFor( new TableNamePair( person, address
-                    ) );
+                    new JoinMetadataProducer( databaseClient ).createMetadataFor( new TableNamePair( parent, child ) );
 
             ExportToCsvConfig config = ExportToCsvConfig.builder()
                     .destination( csvDirectory )

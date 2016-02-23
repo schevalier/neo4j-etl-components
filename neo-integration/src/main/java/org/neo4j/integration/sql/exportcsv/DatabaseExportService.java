@@ -9,9 +9,9 @@ public interface DatabaseExportService
 {
     CsvFileWriter createExportFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient );
 
-    ExportToCsvResults.ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
-                                                  HeaderFileWriter headerFileWriter,
-                                                  CsvFileWriter csvFileWriter,
-                                                  ExportToCsvConfig config ) throws Exception;
+    ExportToCsvResults.ExportToCsvResult exportDatabaseObjectToCsv( DatabaseObject databaseObject,
+                                                                    HeaderFileWriter headerFileWriter,
+                                                                    CsvFileWriter csvFileWriter,
+                                                                    ExportToCsvConfig config ) throws Exception;
 
 }

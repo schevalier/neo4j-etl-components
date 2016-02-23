@@ -44,7 +44,7 @@ public class ExportToCsvCommand
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
                 results.add(
-                        databaseExportService.exportDatabaseObject(
+                        databaseExportService.exportDatabaseObjectToCsv(
                                 databaseObject,
                                 headerFileWriter,
                                 csvFileWriter,

@@ -27,10 +27,10 @@ public class MySqlExportService implements DatabaseExportService
     }
 
     @Override
-    public ExportToCsvResults.ExportToCsvResult exportDatabaseObject( DatabaseObject databaseObject,
-                                                   HeaderFileWriter headerFileWriter,
-                                                   CsvFileWriter csvFileWriter,
-                                                   ExportToCsvConfig config ) throws Exception
+    public ExportToCsvResults.ExportToCsvResult exportDatabaseObjectToCsv( DatabaseObject databaseObject,
+                                                                           HeaderFileWriter headerFileWriter,
+                                                                           CsvFileWriter csvFileWriter,
+                                                                           ExportToCsvConfig config ) throws Exception
     {
         if ( databaseObject instanceof Table )
         {
