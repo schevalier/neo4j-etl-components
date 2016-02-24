@@ -1,6 +1,6 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
-public enum DataType
+public enum Neo4jDataType
 {
     Int,
     Long,

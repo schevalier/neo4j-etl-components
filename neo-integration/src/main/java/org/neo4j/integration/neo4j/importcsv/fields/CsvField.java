@@ -52,17 +52,12 @@ public interface CsvField
         return new Label();
     }
 
-    static CsvField data( String name )
-    {
-        return new Data( name, DataType.String );
-    }
-
-    static CsvField data( String name, DataType type )
+    static CsvField data( String name, Neo4jDataType type )
     {
         return new Data( name, type );
     }
 
-    static CsvField array( String name, DataType type )
+    static CsvField array( String name, Neo4jDataType type )
     {
         return new Data( name, type, true );
     }

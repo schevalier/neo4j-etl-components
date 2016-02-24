@@ -3,11 +3,13 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -39,6 +41,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
             {
                 String columnName = results.getString( "COLUMN_NAME" );
                 String columnKey = results.getString( "COLUMN_KEY" );
+                SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
 
                 ColumnType columnType;
 
@@ -51,7 +54,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                         columnType = ColumnType.ForeignKey;
                         break;
                     default:
-                        columnType = ColumnType.Data ;
+                        columnType = ColumnType.Data;
                         break;
                 }
 
@@ -59,7 +62,8 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                         .table( source )
                         .name( source.fullyQualifiedColumnName( columnName ) )
                         .alias( columnName )
-                        .type( columnType )
+                        .columnType( columnType )
+                        .dataType( dataType )
                         .build() );
             }
         }

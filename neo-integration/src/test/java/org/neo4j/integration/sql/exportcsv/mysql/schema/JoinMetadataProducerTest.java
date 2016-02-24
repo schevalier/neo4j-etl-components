@@ -6,9 +6,10 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
@@ -58,14 +59,17 @@ public class JoinMetadataProducerTest
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey )
+                .columnType( ColumnType.PrimaryKey )
+                .dataType( MySqlDataType.TEXT )
                 .build(), join1.primaryKey() );
 
         assertEquals( Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.addressId" )
                 .alias( "addressId" )
-                .type( ColumnType.ForeignKey )
+                .columnType( ColumnType.ForeignKey )
+                .dataType( MySqlDataType.TEXT )
+
                 .build(), join1.foreignKey() );
 
         assertEquals( new TableName( "test.Address" ), join1.childTable() );
@@ -76,14 +80,16 @@ public class JoinMetadataProducerTest
                 .table( new TableName( "test.Address" ) )
                 .name( "test.Address.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey )
+                .columnType( ColumnType.PrimaryKey )
+                .dataType( MySqlDataType.TEXT )
                 .build(), join2.primaryKey() );
 
         assertEquals( Column.builder()
                 .table( new TableName( "test.Address" ) )
                 .name( "test.Address.ownerId" )
                 .alias( "ownerId" )
-                .type( ColumnType.ForeignKey )
+                .columnType( ColumnType.ForeignKey )
+                .dataType( MySqlDataType.TEXT )
                 .build(), join2.foreignKey() );
 
         assertEquals( new TableName( "test.Person" ), join2.childTable() );

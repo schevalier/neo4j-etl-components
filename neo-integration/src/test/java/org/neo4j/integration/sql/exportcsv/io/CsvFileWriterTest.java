@@ -9,15 +9,16 @@ import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
@@ -65,13 +66,15 @@ public class CsvFileWriterTest
                                 .table( table )
                                 .name( "id" )
                                 .alias( "id" )
-                                .type( ColumnType.PrimaryKey )
+                                .columnType( ColumnType.PrimaryKey )
+                                .dataType( MySqlDataType.TEXT )
                                 .build(),
                         Column.builder()
                                 .table( table )
                                 .name( "username" )
                                 .alias( "username" )
-                                .type( ColumnType.PrimaryKey )
+                                .columnType( ColumnType.PrimaryKey )
+                                .dataType( MySqlDataType.TEXT )
                                 .build() ) );
 
         // create writer under test

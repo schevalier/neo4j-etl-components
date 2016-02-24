@@ -1,11 +1,12 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 
 public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
 {
@@ -28,7 +29,9 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
                         .table( join.primaryKey().table() )
                         .name( formatting.quote().enquote( join.childTable().simpleName() ) )
                         .alias( join.childTable().simpleName() )
-                        .type( ColumnType.Literal ).build(),
+                        .columnType( ColumnType.Literal )
+                        .dataType( SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE )
+                        .build(),
                 CsvField.relationshipType() );
 
         return builder.build();

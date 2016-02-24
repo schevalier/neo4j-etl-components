@@ -10,10 +10,10 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.fields.DataType;
-import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.util.ResourceRule;
 
 import static java.util.Collections.singletonList;
@@ -37,8 +37,8 @@ public class HeaderFileWriterTest
         Collection<CsvField> fields = new ArrayList<>();
         fields.add( CsvField.id( "personId", new IdSpace( "person" ) ) );
         fields.add( CsvField.label() );
-        fields.add( CsvField.data( "name", DataType.String ) );
-        fields.add( CsvField.array( "addresses", DataType.String ) );
+        fields.add( CsvField.data( "name", Neo4jDataType.String ) );
+        fields.add( CsvField.array( "addresses", Neo4jDataType.String ) );
 
         Path file = headerFileWriter.writeHeaderFile( fields, "nodes" );
 

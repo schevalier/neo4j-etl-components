@@ -12,14 +12,16 @@ public class Column
     private final TableName table;
     private final String name;
     private final String alias;
-    private final ColumnType type;
+    private final ColumnType columnType;
+    private final SqlDataType dataType;
 
     Column( ColumnBuilder builder )
     {
         this.table = Preconditions.requireNonNull( builder.table, "Table" );
         this.name = Preconditions.requireNonNullString( builder.name, "Name" );
         this.alias = Preconditions.requireNonNullString( builder.alias, "Alias" );
-        this.type = Preconditions.requireNonNull( builder.type, "Type" );
+        this.columnType = Preconditions.requireNonNull( builder.columnType, "ColumnType" );
+        this.dataType = Preconditions.requireNonNull( builder.dataType, "DataType" );
     }
 
     public TableName table()
@@ -41,7 +43,12 @@ public class Column
 
     public ColumnType type()
     {
-        return type;
+        return columnType;
+    }
+
+    public SqlDataType dataType()
+    {
+        return dataType;
     }
 
     @Override
@@ -51,7 +58,8 @@ public class Column
                 "table=" + table +
                 ", name='" + name + '\'' +
                 ", alias='" + alias + '\'' +
-                ", type=" + type +
+                ", columnType=" + columnType +
+                ", dataType='" + dataType + '\'' +
                 '}';
     }
 
@@ -69,10 +77,8 @@ public class Column
 
         Column column = (Column) o;
 
-        return table.equals( column.table ) &&
-                name.equals( column.name ) &&
-                alias.equals( column.alias ) &&
-                type == column.type;
+        return table.equals( column.table ) && name.equals( column.name ) && alias.equals( column.alias ) &&
+                columnType == column.columnType && dataType.equals( column.dataType );
 
     }
 
@@ -82,7 +88,8 @@ public class Column
         int result = table.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + alias.hashCode();
-        result = 31 * result + type.hashCode();
+        result = 31 * result + columnType.hashCode();
+        result = 31 * result + dataType.hashCode();
         return result;
     }
 
@@ -100,12 +107,17 @@ public class Column
 
         interface SetAlias
         {
-            SetType alias( String alias );
+            SetColumnType alias( String alias );
         }
 
-        interface SetType
+        interface SetColumnType
         {
-            Builder type( ColumnType type );
+            SetDataType columnType( ColumnType columnType );
+        }
+
+        interface SetDataType
+        {
+            Builder dataType( SqlDataType dataType );
         }
 
         Column build();

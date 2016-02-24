@@ -1,5 +1,6 @@
 package org.neo4j.integration.sql.metadata;
 
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.util.Preconditions;
 
 class JoinBuilder implements Join.Builder.SetParentTable,
@@ -27,7 +28,8 @@ class JoinBuilder implements Join.Builder.SetParentTable,
                 .table( parentTable )
                 .name( parentTable.fullyQualifiedColumnName( primaryKey ) )
                 .alias( primaryKey )
-                .type( ColumnType.PrimaryKey )
+                .columnType( ColumnType.PrimaryKey )
+                .dataType( MySqlDataType.TEXT )
                 .build();
         return this;
     }
@@ -39,7 +41,8 @@ class JoinBuilder implements Join.Builder.SetParentTable,
                 .table( parentTable )
                 .name( parentTable.fullyQualifiedColumnName( foreignKey ) )
                 .alias( foreignKey )
-                .type( ColumnType.ForeignKey )
+                .columnType( ColumnType.ForeignKey )
+                .dataType( MySqlDataType.TEXT )
                 .build();
         return this;
     }

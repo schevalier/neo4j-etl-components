@@ -13,7 +13,7 @@ public class DataTest
         try
         {
             // when
-            new Data( null, DataType.Int );
+            new Data( null, Neo4jDataType.Int );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -29,7 +29,7 @@ public class DataTest
         try
         {
             // when
-            new Data( null, DataType.Int, true );
+            new Data( null, Neo4jDataType.Int, true );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -45,7 +45,7 @@ public class DataTest
         try
         {
             // when
-            new Data( " \t", DataType.Int );
+            new Data( " \t", Neo4jDataType.Int );
             fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException e )
@@ -61,7 +61,7 @@ public class DataTest
         try
         {
             // when
-            new Data( " \t", DataType.Int, true );
+            new Data( " \t", Neo4jDataType.Int, true );
             fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException e )

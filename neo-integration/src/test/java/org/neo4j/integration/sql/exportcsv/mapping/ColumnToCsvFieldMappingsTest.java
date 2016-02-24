@@ -5,6 +5,8 @@ import java.util.Collection;
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -22,23 +24,23 @@ public class ColumnToCsvFieldMappingsTest
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey ).build();
+                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
 
         Column column2 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.username" )
                 .alias( "username" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
 
         Column column3 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.age" )
                 .alias( "age" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
 
         CsvField idField = CsvField.id();
-        CsvField usernameField = CsvField.data( "username" );
-        CsvField ageField = CsvField.data( "age" );
+        CsvField usernameField = CsvField.data( "username", Neo4jDataType.String );
+        CsvField ageField = CsvField.data( "age", Neo4jDataType.String );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, idField )
@@ -61,24 +63,26 @@ public class ColumnToCsvFieldMappingsTest
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey ).build();
+                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
 
         Column column2 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.username" )
                 .alias( "username" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        ;
 
         Column column3 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.age" )
                 .alias( "age" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        ;
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "username" ) )
-                .add( column3, CsvField.data( "age" ) )
+                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
+                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
                 .build();
 
         // when
@@ -96,24 +100,26 @@ public class ColumnToCsvFieldMappingsTest
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey ).build();
+                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
 
         Column column2 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.username" )
                 .alias( "username" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        ;
 
         Column column3 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.age" )
                 .alias( "age" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        ;
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "username" ) )
-                .add( column3, CsvField.data( "age" ) )
+                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
+                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
                 .build();
 
         // when
@@ -132,24 +138,25 @@ public class ColumnToCsvFieldMappingsTest
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey ).build();
+                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
 
         Column column2 = Column.builder()
                 .table( new TableName( "test.Person" ) )
                 .name( "test.Person.username" )
                 .alias( "username" )
-                .type( ColumnType.Data ).build();
+                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        ;
 
         Column column3 = Column.builder()
                 .table( new TableName( "test.Address" ) )
                 .name( "test.Address.id" )
                 .alias( "id" )
-                .type( ColumnType.PrimaryKey ).build();
+                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "username" ) )
-                .add( column3, CsvField.data( "age" ) )
+                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
+                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
                 .build();
 
         // when

@@ -7,15 +7,15 @@ import static java.lang.String.format;
 class Data implements CsvField
 {
     private final String name;
-    private final DataType type;
+    private final Neo4jDataType type;
     private final boolean isArray;
 
-    Data( String name, DataType type )
+    Data( String name, Neo4jDataType type )
     {
         this( name, type, false );
     }
 
-    Data( String name, DataType type, boolean isArray )
+    Data( String name, Neo4jDataType type, boolean isArray )
     {
         this.name = Preconditions.requireNonNullString( name, "Name" );
         this.type = Preconditions.requireNonNull( type, "Type" );

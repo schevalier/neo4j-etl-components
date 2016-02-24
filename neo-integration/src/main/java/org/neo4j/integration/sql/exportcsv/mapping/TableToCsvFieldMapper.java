@@ -5,6 +5,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 
 public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
@@ -29,7 +30,7 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                     builder.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
                     break;
                 case Data:
-                    builder.add( column, CsvField.data( column.alias() ) );
+                    builder.add( column, CsvField.data( column.alias(), column.dataType().toNeo4jDataType() ) );
                     break;
                 default:
                     // Do nothing
@@ -42,7 +43,8 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                         .table( table.name() )
                         .name( formatting.quote().enquote( table.name().simpleName() ) )
                         .alias( table.name().simpleName() )
-                        .type( ColumnType.Literal )
+                        .columnType( ColumnType.Literal )
+                        .dataType( SqlDataType.LABEL_DATA_TYPE )
                         .build(),
                 CsvField.label() );
 

@@ -5,9 +5,10 @@ import java.util.Collection;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Table;
@@ -28,8 +29,8 @@ public class TableMetadataProducerTest
         // given
         QueryResults results = StubQueryResults.builder()
                 .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "id", "int", "PRI" )
-                .addRow( "username", "text", "" )
+                .addRow( "id", "INT", "PRI" )
+                .addRow( "username", "TEXT", "" )
                 .addRow( "addressId", "int", "MUL" )
                 .build();
 
@@ -46,25 +47,28 @@ public class TableMetadataProducerTest
         Table table = metadata.stream().findFirst().get();
 
         assertEquals( expectedTableName, table.name() );
-        assertEquals( "test.Person", table.descriptor());
-        assertThat(table.columns(), contains(
+        assertEquals( "test.Person", table.descriptor() );
+        assertThat( table.columns(), contains(
                 Column.builder()
                         .table( expectedTableName )
                         .name( expectedTableName.fullyQualifiedColumnName( "id" ) )
                         .alias( "id" )
-                        .type( ColumnType.PrimaryKey )
+                        .columnType( ColumnType.PrimaryKey )
+                        .dataType( MySqlDataType.INT )
                         .build(),
                 Column.builder()
                         .table( expectedTableName )
                         .name( expectedTableName.fullyQualifiedColumnName( "username" ) )
                         .alias( "username" )
-                        .type( ColumnType.Data )
+                        .columnType( ColumnType.Data )
+                        .dataType( MySqlDataType.TEXT )
                         .build(),
                 Column.builder()
                         .table( expectedTableName )
                         .name( expectedTableName.fullyQualifiedColumnName( "addressId" ) )
                         .alias( "addressId" )
-                        .type( ColumnType.ForeignKey )
-                        .build() ));
+                        .columnType( ColumnType.ForeignKey )
+                        .dataType( MySqlDataType.INT )
+                        .build() ) );
     }
 }

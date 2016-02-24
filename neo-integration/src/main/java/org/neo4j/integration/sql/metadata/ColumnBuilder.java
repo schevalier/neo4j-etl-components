@@ -3,13 +3,15 @@ package org.neo4j.integration.sql.metadata;
 class ColumnBuilder implements Column.Builder.SetTable,
         Column.Builder.SetName,
         Column.Builder.SetAlias,
-        Column.Builder.SetType,
+        Column.Builder.SetColumnType,
+        Column.Builder.SetDataType,
         Column.Builder
 {
     TableName table;
     String name;
     String alias;
-    ColumnType type;
+    ColumnType columnType;
+    SqlDataType dataType;
 
     @Override
     public SetName table( TableName table )
@@ -26,16 +28,23 @@ class ColumnBuilder implements Column.Builder.SetTable,
     }
 
     @Override
-    public SetType alias( String alias )
+    public SetColumnType alias( String alias )
     {
         this.alias = alias;
         return this;
     }
 
     @Override
-    public Column.Builder type( ColumnType type )
+    public SetDataType columnType( ColumnType columnType )
     {
-        this.type = type;
+        this.columnType = columnType;
+        return this;
+    }
+
+    @Override
+    public Column.Builder dataType( SqlDataType dataType )
+    {
+        this.dataType = dataType;
         return this;
     }
 

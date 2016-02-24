@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
@@ -93,7 +94,8 @@ public class ExportToCsvConfigTest
                 .table( table )
                 .name( table.fullyQualifiedColumnName( name ) )
                 .alias( name )
-                .type( type )
+                .columnType( type )
+                .dataType( MySqlDataType.TEXT )
                 .build();
     }
 }
