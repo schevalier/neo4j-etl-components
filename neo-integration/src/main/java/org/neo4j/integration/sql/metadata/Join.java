@@ -2,6 +2,8 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -48,24 +50,20 @@ public class Join implements DatabaseObject
     @Override
     public String descriptor()
     {
-        return format("%s_%s", primaryKey.table().fullName(), childTable.fullName());
+        return format( "%s_%s", primaryKey.table().fullName(), childTable.fullName() );
     }
 
     @Override
     public String toString()
     {
-        return "Join{" +
-                "primaryKey=" + primaryKey +
-                ", foreignKey=" + foreignKey +
-                ", childTable=" + childTable +
-                '}';
+        return ToStringBuilder.reflectionToString( this );
     }
 
     public interface Builder
     {
         interface SetParentTable
         {
-            SetPrimaryKey parentTable(TableName parent);
+            SetPrimaryKey parentTable( TableName parent );
         }
 
         interface SetPrimaryKey
@@ -80,7 +78,7 @@ public class Join implements DatabaseObject
 
         interface SetChildTable
         {
-            Builder childTable(TableName childTable);
+            Builder childTable( TableName childTable );
         }
 
         Join build();

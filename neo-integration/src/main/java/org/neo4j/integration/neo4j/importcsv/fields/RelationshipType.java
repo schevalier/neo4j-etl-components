@@ -1,5 +1,8 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 class RelationshipType implements CsvField
 {
     private final String value = ":TYPE";
@@ -16,27 +19,16 @@ class RelationshipType implements CsvField
         return value();
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        RelationshipType that = (RelationshipType) o;
-
-        return value.equals( that.value );
-
+        return EqualsBuilder.reflectionEquals( this, o );
     }
 
     @Override
     public int hashCode()
     {
-        return value.hashCode();
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 }

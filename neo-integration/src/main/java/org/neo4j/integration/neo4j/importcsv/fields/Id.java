@@ -2,6 +2,9 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.util.Strings;
 
 import static java.lang.String.format;
@@ -53,34 +56,23 @@ class Id implements CsvField
         }
     }
 
+
     @Override
     public String toString()
     {
         return value();
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        Id id = (Id) o;
-
-        return name.equals( id.name ) && idSpace.equals( id.idSpace );
+        return EqualsBuilder.reflectionEquals( this, o );
     }
 
     @Override
     public int hashCode()
     {
-        int result = name.hashCode();
-        result = 31 * result + idSpace.hashCode();
-        return result;
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 }

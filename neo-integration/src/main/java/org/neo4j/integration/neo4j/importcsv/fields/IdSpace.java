@@ -1,5 +1,8 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 public class IdSpace
@@ -16,33 +19,23 @@ public class IdSpace
         return value;
     }
 
+
     @Override
     public String toString()
     {
         return value();
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        IdSpace idSpace = (IdSpace) o;
-
-        return value.equals( idSpace.value );
-
+        return EqualsBuilder.reflectionEquals( this, o );
     }
 
     @Override
     public int hashCode()
     {
-        return value.hashCode();
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 }

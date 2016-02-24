@@ -1,5 +1,9 @@
 package org.neo4j.integration.sql.metadata;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 public class Column
@@ -54,43 +58,20 @@ public class Column
     @Override
     public String toString()
     {
-        return "Column{" +
-                "table=" + table +
-                ", name='" + name + '\'' +
-                ", alias='" + alias + '\'' +
-                ", columnType=" + columnType +
-                ", dataType='" + dataType + '\'' +
-                '}';
+        return ToStringBuilder.reflectionToString( this );
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        Column column = (Column) o;
-
-        return table.equals( column.table ) && name.equals( column.name ) && alias.equals( column.alias ) &&
-                columnType == column.columnType && dataType.equals( column.dataType );
-
+        return EqualsBuilder.reflectionEquals( this, o );
     }
 
     @Override
     public int hashCode()
     {
-        int result = table.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + alias.hashCode();
-        result = 31 * result + columnType.hashCode();
-        result = 31 * result + dataType.hashCode();
-        return result;
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 
     public interface Builder

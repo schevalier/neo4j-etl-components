@@ -3,6 +3,8 @@ package org.neo4j.integration.neo4j;
 import java.util.Optional;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.stringtemplate.v4.ST;
 
 import org.neo4j.integration.util.RegexUtils;
@@ -232,30 +234,17 @@ public class Neo4jVersion
         return new Neo4jVersion( major, minor, patch, Optional.of( "SNAPSHOT" ) );
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        Neo4jVersion that = (Neo4jVersion) o;
-        return major == that.major && minor == that.minor && patch == that.patch && label.equals( that.label );
+        return EqualsBuilder.reflectionEquals( this, o );
     }
 
     @Override
     public int hashCode()
     {
-        int result = major;
-        result = 31 * result + minor;
-        result = 31 * result + patch;
-        result = 31 * result + label.hashCode();
-        return result;
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 
     public String format( String format )

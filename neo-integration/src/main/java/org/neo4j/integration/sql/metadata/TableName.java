@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.metadata;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -7,7 +9,6 @@ import static java.lang.String.format;
 public class TableName
 {
     private final String name;
-    private final String lowercaseName;
 
     public TableName( String schema, String name )
     {
@@ -17,7 +18,6 @@ public class TableName
     public TableName( String fullName )
     {
         this.name = Preconditions.requireNonNullString( fullName, "Name" );
-        this.lowercaseName = name.toLowerCase();
     }
 
     public String schema()
@@ -67,13 +67,13 @@ public class TableName
 
         TableName tableName = (TableName) o;
 
-        return lowercaseName.equals( tableName.lowercaseName );
+        return name.equalsIgnoreCase( tableName.name );
 
     }
 
     @Override
     public int hashCode()
     {
-        return lowercaseName.hashCode();
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 }

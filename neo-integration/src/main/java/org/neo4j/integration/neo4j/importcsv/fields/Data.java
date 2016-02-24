@@ -1,5 +1,8 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -36,29 +39,16 @@ class Data implements CsvField
         return value();
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        Data data = (Data) o;
-
-        return isArray == data.isArray && name.equals( data.name ) && type == data.type;
+        return EqualsBuilder.reflectionEquals( this, o );
     }
 
     @Override
     public int hashCode()
     {
-        int result = name.hashCode();
-        result = 31 * result + type.hashCode();
-        result = 31 * result + (isArray ? 1 : 0);
-        return result;
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 }

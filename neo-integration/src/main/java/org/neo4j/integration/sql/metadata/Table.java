@@ -3,6 +3,8 @@ package org.neo4j.integration.sql.metadata;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 public class Table implements DatabaseObject
@@ -41,10 +43,7 @@ public class Table implements DatabaseObject
     @Override
     public String toString()
     {
-        return "Table{" +
-                "name=" + name +
-                ", columns=" + columns +
-                '}';
+        return ToStringBuilder.reflectionToString( this );
     }
 
     public interface Builder
