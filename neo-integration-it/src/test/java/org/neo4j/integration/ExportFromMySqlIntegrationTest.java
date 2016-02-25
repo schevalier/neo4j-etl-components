@@ -2,7 +2,8 @@ package org.neo4j.integration;
 
 import java.nio.file.Path;
 
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -24,39 +25,32 @@ public class ExportFromMySqlIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M03;
 
-    @Rule
-    public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
+    @ClassRule
+    public static final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
-    @Rule
-    public final ResourceRule<Server> mySqlServer = new ResourceRule<>(
+    @ClassRule
+    public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
                     tempDirectory.get() ) );
 
-    @Rule
-    public final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
+    @ClassRule
+    public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
             Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
+
+    @BeforeClass
+    public static void setUp() throws Exception
+    {
+        populateMySqlDatabase();
+    }
 
     @Test
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
-        // given
-        populateMySqlDatabase();
-
         // when
-        NeoIntegrationCli.executeMainReturnSysOut(
-                new String[]{"mysql-export",
-                        "--host", mySqlServer.get().ipAddress(),
-                        "--user", MySqlClient.Parameters.DBUser.value(),
-                        "--password", MySqlClient.Parameters.DBPassword.value(),
-                        "--database", MySqlClient.Parameters.Database.value(),
-                        "--import-tool", neo4j.get().binDirectory().toString(),
-                        "--csv-directory", tempDirectory.get().toString(),
-                        "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
-                        "--parent", "Person",
-                        "--child", "Address"} );
+        exportFromMySqlToNeo4j( "Person", "Address" );
 
         // then
         neo4j.get().start();
@@ -79,10 +73,49 @@ public class ExportFromMySqlIntegrationTest
                 "| Node[11]{postcode:\"ZZ1 0MN\"}  |",
                 "+-------------------------------+" );
 
-        assertThat( neo4j.get().execute( "MATCH (n) RETURN n;" ), startsWith( expectedResults ) );
+        String execute = neo4j.get().execute( "MATCH (n) RETURN n;" );
+        assertThat( execute, startsWith( expectedResults ) );
+        neo4j.get().stop();
     }
 
-    private void populateMySqlDatabase() throws Exception
+    @Test
+    public void shouldExportFromMySqlAndImportIntoGraphForNumericTables() throws Exception
+    {
+        // when
+        exportFromMySqlToNeo4j( "String_Table", "Numeric_Table" );
+
+        // then
+        neo4j.get().start();
+
+        String expectedResults = Strings.lineSeparated(
+                "+--------------------------------------------------------------------------------------------------------------------------------------------------+",
+                "| n                                                                                                                                                |",
+                "+--------------------------------------------------------------------------------------------------------------------------------------------------+",
+                "| Node[0]{char_field:\"char-field\",varchar_field:\"varchar-field\"}                                                                                   |",
+                "| Node[1]{tinyint_field:1,smallint_field:123,mediumint_field:123,bigint_field:123,float_field:123.2,double_field:1.232343445E7,decimal_field:18.0} |",
+                "+--------------------------------------------------------------------------------------------------------------------------------------------------+" );
+
+        String execute = neo4j.get().execute( "MATCH (n) RETURN n;" );
+        assertThat( execute, startsWith( expectedResults ) );
+        neo4j.get().stop();
+    }
+
+    private void exportFromMySqlToNeo4j( String parent, String child )
+    {
+        NeoIntegrationCli.executeMainReturnSysOut(
+                new String[]{"mysql-export",
+                        "--host", mySqlServer.get().ipAddress(),
+                        "--user", MySqlClient.Parameters.DBUser.value(),
+                        "--password", MySqlClient.Parameters.DBPassword.value(),
+                        "--database", MySqlClient.Parameters.Database.value(),
+                        "--import-tool", neo4j.get().binDirectory().toString(),
+                        "--csv-directory", tempDirectory.get().toString(),
+                        "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
+                        "--parent", parent,
+                        "--child", child} );
+    }
+
+    private static void populateMySqlDatabase() throws Exception
     {
         MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
         client.execute( MySqlScripts.setupDatabaseScript().value() );

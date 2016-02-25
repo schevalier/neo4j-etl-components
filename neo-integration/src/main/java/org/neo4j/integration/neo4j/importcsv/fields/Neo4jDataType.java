@@ -2,11 +2,11 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 public enum Neo4jDataType
 {
+    Boolean,
     Int,
     Long,
     Float,
     Double,
-    Boolean,
     Byte,
     Short,
     Char,
