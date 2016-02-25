@@ -37,5 +37,13 @@ public class MySqlDataTypeTest
     {
         assertThat( MySqlDataType.CHAR.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( MySqlDataType.VARCHAR.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.BLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.TINYBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.TINYTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.MEDIUMTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.MEDIUMBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.LONGTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.LONGBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.ENUM.toNeo4jDataType(), is( Neo4jDataType.String ) );
     }
 }

@@ -20,6 +20,25 @@ CREATE TABLE javabase.Person
   FOREIGN KEY (addressId) REFERENCES javabase.Address(id));
 GRANT ALL ON javabase.Person TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
 
+CREATE TABLE javabase.Numeric_Table
+(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ tinyint_field TINYINT(4),
+ smallint_field SMALLINT,
+ mediumint_field MEDIUMINT,
+ bigint_field BIGINT,
+ float_field FLOAT,
+ double_field DOUBLE,
+ decimal_field DECIMAL);
+GRANT ALL ON javabase.Numeric_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+
+CREATE TABLE javabase.String_Table
+(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ numericId INT NOT NULL,
+ FOREIGN KEY (numericId) REFERENCES javabase.Numeric_Table(id),
+ char_field CHAR(20),
+ varchar_field VARCHAR(200));
+GRANT ALL ON javabase.String_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');
 INSERT INTO javabase.Address (postcode) VALUES ('ZZ1 0MN');
