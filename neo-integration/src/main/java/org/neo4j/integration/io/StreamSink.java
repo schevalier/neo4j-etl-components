@@ -34,7 +34,7 @@ public class StreamSink extends Thread
         {
             try
             {
-                if ( !e.getMessage().equals( "Stream closed" ) )
+                if ( !e.getMessage().equals( "Stream closed" ) && !e.getMessage().equals( "Interrupted system call" ) )
                 {
                     eventHandler.onException( e );
                 }
