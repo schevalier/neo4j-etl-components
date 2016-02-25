@@ -79,7 +79,7 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    public void shouldExportFromMySqlAndImportIntoGraphForNumericTables() throws Exception
+    public void shouldExportFromMySqlAndImportIntoGraphForNumericAndStringTables() throws Exception
     {
         // when
         exportFromMySqlToNeo4j( "String_Table", "Numeric_Table" );
@@ -87,13 +87,13 @@ public class ExportFromMySqlIntegrationTest
         // then
         neo4j.get().start();
 
-        String expectedResults = Strings.lineSeparated(
-                "+--------------------------------------------------------------------------------------------------------------------------------------------------+",
-                "| n                                                                                                                                                |",
-                "+--------------------------------------------------------------------------------------------------------------------------------------------------+",
-                "| Node[0]{char_field:\"char-field\",varchar_field:\"varchar-field\"}                                                                                   |",
-                "| Node[1]{tinyint_field:1,smallint_field:123,mediumint_field:123,bigint_field:123,float_field:123.2,double_field:1.232343445E7,decimal_field:18.0} |",
-                "+--------------------------------------------------------------------------------------------------------------------------------------------------+" );
+    String expectedResults = Strings.lineSeparated(
+                "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+",
+                "| n                                                                                                                                                                                                                                                                                                                                         |",
+                "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+",
+                "| Node[0]{char_field:\"char-field\",text_field:\"text_field\",blob_field:\"blob_field\",tinytext_field:\"tinytext_field\",tinyblob_field:\"tinyblob_field\",mediumtext_field:\"mediumtext_field\",mediumblob_field:\"mediumblob_field\",longtext_field:\"longtext_field\",longblob_field:\"longblob_field\",enum_field:\"val-1\",varchar_field:\"varchar-field\"} |",
+                "| Node[1]{tinyint_field:1,smallint_field:123,mediumint_field:123,bigint_field:123,float_field:123.2,double_field:1.232343445E7,decimal_field:18.0}                                                                                                                                                                                          |",
+                "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
 
         String execute = neo4j.get().execute( "MATCH (n) RETURN n;" );
         assertThat( execute, startsWith( expectedResults ) );

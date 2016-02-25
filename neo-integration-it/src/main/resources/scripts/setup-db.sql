@@ -36,6 +36,15 @@ CREATE TABLE javabase.String_Table
  numericId INT NOT NULL,
  FOREIGN KEY (numericId) REFERENCES javabase.Numeric_Table(id),
  char_field CHAR(20),
+ text_field TEXT,
+ blob_field BLOB,
+ tinytext_field TINYTEXT,
+ tinyblob_field TINYBLOB,
+ mediumtext_field MEDIUMTEXT,
+ mediumblob_field MEDIUMBLOB,
+ longtext_field LONGTEXT,
+ longblob_field LONGBLOB,
+ enum_field ENUM('val-1', 'val-2'),
  varchar_field VARCHAR(200));
 GRANT ALL ON javabase.String_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
 
@@ -53,5 +62,13 @@ INSERT INTO javabase.Person (username, addressId) SELECT 'user-7', id FROM javab
 INSERT INTO javabase.Person (username, addressId) SELECT 'user-8', id FROM javabase.Address WHERE javabase.Address.postcode = 'ZZ1 0MN';
 INSERT INTO javabase.Person (username, addressId) SELECT 'user-9', id FROM javabase.Address WHERE javabase.Address.postcode = 'ZZ1 0MN';
 
-INSERT INTO javabase.Numeric_Table (tinyint_field, smallint_field, mediumint_field, bigint_field, float_field, double_field, decimal_field) VALUES (1, 123, 123, 123, 123.2, 12323434.45, 18.10);
-INSERT INTO javabase.String_Table (char_field, varchar_field, numericId) SELECT 'char-field', 'varchar-field', id FROM javabase.Numeric_Table WHERE javabase.Numeric_Table.tinyint_field = 1;
+INSERT INTO javabase.Numeric_Table (tinyint_field, smallint_field, mediumint_field, bigint_field,
+                                    float_field, double_field, decimal_field)
+VALUES (1, 123, 123, 123, 123.2, 12323434.45, 18.10);
+
+INSERT INTO javabase.String_Table (char_field, varchar_field, text_field, blob_field, tinytext_field, tinyblob_field,
+                                   mediumtext_field, mediumblob_field, longtext_field, longblob_field,
+                                   enum_field, numericId)
+  SELECT 'char-field', 'varchar-field', 'text_field', 'blob_field', 'tinytext_field', 'tinyblob_field',
+    'mediumtext_field', 'mediumblob_field', 'longtext_field', 'longblob_field',
+    'val-1', id FROM javabase.Numeric_Table WHERE javabase.Numeric_Table.tinyint_field = 1;
