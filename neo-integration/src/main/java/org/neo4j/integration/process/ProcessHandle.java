@@ -94,12 +94,14 @@ public class ProcessHandle implements AwaitHandle<Result>, AutoCloseable
         }
         catch ( InterruptedException e )
         {
-            Loggers.Default.log( Level.FINE, "Cancelling command [Command: ''{0}'']", programAndArguments );
+            Loggers.Default.log( Level.FINE, "Cancelling command [Command: ''{0}'', DurationMillis: {1}]",
+                    new Object[]{programAndArguments, System.currentTimeMillis() - startTime} );
             return null;
         }
         catch ( IOException e )
         {
-            throw new CommandFailedException( format( "Command failed [Command: '%s']", programAndArguments ), e );
+            throw new CommandFailedException( format( "Command failed [Command: '%s', DurationMillis: %s]",
+                    programAndArguments, System.currentTimeMillis() - startTime ), e );
         }
         finally
         {
