@@ -105,7 +105,7 @@ public class CommandsTest
         Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 5 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
-                .timeout( 5, TimeUnit.MILLISECONDS )
+                .timeout( 10, TimeUnit.MILLISECONDS )
                 .inheritEnvironment()
                 .build();
 
@@ -178,7 +178,7 @@ public class CommandsTest
         Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
-                .timeout( 5, TimeUnit.MILLISECONDS )
+                .timeout( 10, TimeUnit.MILLISECONDS )
                 .inheritEnvironment()
                 .build();
 
