@@ -25,7 +25,9 @@ public class Neo4jFixture
                 URI uri = ReleaseDownloads.uriFor( version, Neo4jEdition.Enterprise, PackageType.Tarball );
                 Stream<Path> files = new DownloadableFile( uri ).downloadTo( directory ).extract();
 
-                return new Neo4j( files.findFirst().orElseThrow( IllegalStateException::new ) );
+                Neo4j neo4j = new Neo4j( files.findFirst().orElseThrow( IllegalStateException::new ) );
+                neo4j.disableAuth();
+                return neo4j;
             }
 
             @Override

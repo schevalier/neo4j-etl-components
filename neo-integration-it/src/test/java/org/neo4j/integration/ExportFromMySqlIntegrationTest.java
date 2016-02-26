@@ -1,7 +1,14 @@
 package org.neo4j.integration;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -18,15 +25,16 @@ import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.Strings;
 import org.neo4j.integration.util.TemporaryDirectory;
 
-import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertThat;
 
 public class ExportFromMySqlIntegrationTest
 {
-    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M03;
+    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
 
     @ClassRule
-    public static final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
+    public static final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory
+            () );
 
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
@@ -55,26 +63,14 @@ public class ExportFromMySqlIntegrationTest
         // then
         neo4j.get().start();
 
-        String expectedResults = Strings.lineSeparated(
-                "+-------------------------------+",
-                "| n                             |",
-                "+-------------------------------+",
-                "| Node[0]{username:\"user-1\"}    |",
-                "| Node[1]{username:\"user-2\"}    |",
-                "| Node[2]{username:\"user-3\"}    |",
-                "| Node[3]{username:\"user-4\"}    |",
-                "| Node[4]{username:\"user-5\"}    |",
-                "| Node[5]{username:\"user-6\"}    |",
-                "| Node[6]{username:\"user-7\"}    |",
-                "| Node[7]{username:\"user-8\"}    |",
-                "| Node[8]{username:\"user-9\"}    |",
-                "| Node[9]{postcode:\"AB12 1XY\"}  |",
-                "| Node[10]{postcode:\"XY98 9BA\"} |",
-                "| Node[11]{postcode:\"ZZ1 0MN\"}  |",
-                "+-------------------------------+" );
 
-        String execute = neo4j.get().execute( "MATCH (n) RETURN n;" );
-        assertThat( execute, startsWith( expectedResults ) );
+        String response = neo4j.get().executeHttp( "http://localhost:7474/db/data/transaction/commit",
+                requestEntityUsingJackson() );
+        List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[*].username" );
+        List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[*].postcode" );
+        assertThat( usernames, hasItems( "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7",
+                "user-8", "user-9" ) );
+        assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
         neo4j.get().stop();
     }
 
@@ -87,16 +83,33 @@ public class ExportFromMySqlIntegrationTest
         // then
         neo4j.get().start();
 
-    String expectedResults = Strings.lineSeparated(
+        String expectedResults = Strings.lineSeparated(
                 "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+",
-                "| n                                                                                                                                                                                                                                                                                                                                         |",
+                "| n                                                                                                 " +
+                        "                                                                                            " +
+                        "                                                                                            " +
+                        "                                                |",
                 "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+",
-                "| Node[0]{char_field:\"char-field\",text_field:\"text_field\",blob_field:\"blob_field\",tinytext_field:\"tinytext_field\",tinyblob_field:\"tinyblob_field\",mediumtext_field:\"mediumtext_field\",mediumblob_field:\"mediumblob_field\",longtext_field:\"longtext_field\",longblob_field:\"longblob_field\",enum_field:\"val-1\",varchar_field:\"varchar-field\"} |",
-                "| Node[1]{tinyint_field:1,smallint_field:123,mediumint_field:123,bigint_field:123,float_field:123.2,double_field:1.232343445E7,decimal_field:18.0}                                                                                                                                                                                          |",
-                "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
+                "| Node[0]{char_field:\"char-field\",text_field:\"text_field\",blob_field:\"blob_field\"," +
+                        "tinytext_field:\"tinytext_field\",tinyblob_field:\"tinyblob_field\"," +
+                        "mediumtext_field:\"mediumtext_field\",mediumblob_field:\"mediumblob_field\"," +
+                        "longtext_field:\"longtext_field\",longblob_field:\"longblob_field\",enum_field:\"val-1\"," +
+                        "varchar_field:\"varchar-field\"} |",
+                "| Node[1]{tinyint_field:1,smallint_field:123,mediumint_field:123,bigint_field:123,float_field:123.2," +
+                        "double_field:1.232343445E7,decimal_field:18.0}                                              " +
+                        "                                                                                            " +
+                        "                                                |",
+                "+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+" );
 
-        String execute = neo4j.get().execute( "MATCH (n) RETURN n;" );
-        assertThat( execute, startsWith( expectedResults ) );
+        String response = neo4j.get().executeHttp( "http://localhost:7474/db/data/transaction/commit",
+                requestEntityUsingJackson() );
+        List<Map<String, String>> stringFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
+        List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[1].row[0]" );
+        assertThat( stringFields.get( 0 ).values(), hasItems( "val-1", "mediumtext_field", "longblob_field",
+                "blob_field",
+                "tinytext_field", "mediumblob_field", "char-field", "text_field", "varchar-field",
+                "tinyblob_field", "longtext_field" ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.0, 1.232343445E7, 1 ) );
         neo4j.get().stop();
     }
 
@@ -119,5 +132,35 @@ public class ExportFromMySqlIntegrationTest
     {
         MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
         client.execute( MySqlScripts.setupDatabaseScript().value() );
+    }
+
+    public String requestEntityUsingJackson() throws JsonProcessingException
+    {
+        Statements statements = new Statements();
+        statements.add( new Statement( "MATCH (n) RETURN n;" ) );
+        return new ObjectMapper().writeValueAsString( statements );
+    }
+
+    public class Statements
+    {
+        @JsonProperty("statements")
+        private List<Statement> statements = new ArrayList<>();
+
+        private Statements add( Statement statement )
+        {
+            statements.add( statement );
+            return this;
+        }
+    }
+
+    public class Statement
+    {
+        @JsonProperty("statement")
+        public String value;
+
+        public Statement( String value )
+        {
+            this.value = value;
+        }
     }
 }

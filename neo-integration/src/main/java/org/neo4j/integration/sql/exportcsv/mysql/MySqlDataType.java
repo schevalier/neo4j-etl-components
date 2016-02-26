@@ -11,8 +11,8 @@ public enum MySqlDataType implements SqlDataType
     BIGINT( Neo4jDataType.Long ),
     FLOAT( Neo4jDataType.Float ),
     DOUBLE( Neo4jDataType.Double ),
-    DECIMAL( Neo4jDataType.Float ), //unconfirmed
-    MEDIUMINT( Neo4jDataType.Int ), //unconfirmed
+    DECIMAL( Neo4jDataType.Float ),
+    MEDIUMINT( Neo4jDataType.Int ),
 
     CHAR( Neo4jDataType.String ),
     VARCHAR( Neo4jDataType.String ),
