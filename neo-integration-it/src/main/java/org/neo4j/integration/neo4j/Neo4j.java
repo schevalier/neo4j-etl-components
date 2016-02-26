@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -94,14 +95,14 @@ public class Neo4j implements AutoCloseable
         return result.stdout();
     }
 
-    public String executeHttp( URI uri, String request ) throws JsonProcessingException, InterruptedException
+    public String executeHttp( URI uri, String query ) throws JsonProcessingException, InterruptedException
     {
         Client client = Client.create();
 
         ClientResponse post = client.resource( uri )
                 .type( MediaType.APPLICATION_JSON_TYPE )
                 .accept( MediaType.APPLICATION_JSON_TYPE )
-                .post( ClientResponse.class, request );
+                .post( ClientResponse.class, requestEntityUsingJackson( query ) );
 
         return post.getEntity( String.class );
     }
@@ -111,4 +112,12 @@ public class Neo4j implements AutoCloseable
     {
         stop();
     }
+
+    private String requestEntityUsingJackson( String query ) throws JsonProcessingException
+    {
+        Statements statements = new Statements();
+        statements.add( new Statement( query ) );
+        return new ObjectMapper().writeValueAsString( statements );
+    }
+
 }
