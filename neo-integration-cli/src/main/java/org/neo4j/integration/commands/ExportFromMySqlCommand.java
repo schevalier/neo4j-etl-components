@@ -1,7 +1,5 @@
 package org.neo4j.integration.commands;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
@@ -23,7 +21,6 @@ import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
-import org.neo4j.integration.util.FileUtils;
 
 import static java.lang.String.format;
 
@@ -34,40 +31,32 @@ public class ExportFromMySqlCommand
     private final String user;
     private final String password;
     private final String database;
-    private final Path importToolDirectory;
-    private final Path csvRootDirectory;
-    private final Path destinationDirectory;
     private final String parentTable;
     private final String childTable;
+    private final Environment environment;
 
     public ExportFromMySqlCommand( String host,
                                    int port,
                                    String user,
                                    String password,
                                    String database,
-                                   Path importToolDirectory,
-                                   Path csvRootDirectory,
-                                   Path destinationDirectory,
                                    String parentTable,
-                                   String childTable )
+                                   String childTable,
+                                   Environment environment )
     {
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password;
         this.database = database;
-        this.importToolDirectory = importToolDirectory;
-        this.csvRootDirectory = csvRootDirectory;
-        this.destinationDirectory = destinationDirectory;
         this.parentTable = parentTable;
         this.childTable = childTable;
+        this.environment = environment;
     }
 
     public void execute() throws Exception
     {
-        ensureImportToolExists();
-        deleteDestinationDirectory();
-        Path csvDirectory = createCsvDirectory();
+        Path csvDirectory = environment.prepare();
 
         print( format( "CSV directory: %s", csvDirectory ) );
 
@@ -91,45 +80,14 @@ public class ExportFromMySqlCommand
         doImport( formatting, graphConfig );
 
         print( "Done" );
-        printResult( destinationDirectory );
-    }
-
-    private void ensureImportToolExists()
-    {
-        Path importTool = importToolDirectory.resolve( ImportConfig.IMPORT_TOOL );
-        if ( Files.notExists( importTool ) )
-        {
-            throw new IllegalArgumentException( format( "Unable to find import tool: %s", importTool ) );
-        }
-    }
-
-    private Path createCsvDirectory() throws IOException
-    {
-        Files.createDirectories( csvRootDirectory );
-        int index = 1;
-
-        Path csvDirectory = csvRootDirectory.resolve( format( "csv-%03d", index++ ) );
-
-        while ( Files.exists( csvDirectory ) )
-        {
-            csvDirectory = csvRootDirectory.resolve( format( "csv-%03d", index++ ) );
-        }
-
-        Files.createDirectories( csvDirectory );
-
-        return csvDirectory;
-    }
-
-    private void deleteDestinationDirectory() throws IOException
-    {
-        FileUtils.deleteRecursively( destinationDirectory );
+        printResult( environment.destinationDirectory() );
     }
 
     private void doImport( Formatting formatting, GraphConfig graphConfig ) throws Exception
     {
         ImportConfig importConfig = ImportConfig.builder()
-                .importToolDirectory( importToolDirectory )
-                .destination( destinationDirectory )
+                .importToolDirectory( environment.importToolDirectory() )
+                .destination( environment.destinationDirectory() )
                 .formatting( formatting )
                 .idType( IdType.Integer )
                 .graphDataConfig( graphConfig )

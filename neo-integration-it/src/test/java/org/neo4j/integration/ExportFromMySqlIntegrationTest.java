@@ -116,7 +116,8 @@ public class ExportFromMySqlIntegrationTest
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
                         "--parent", parent,
-                        "--child", child} );
+                        "--child", child,
+                        "--force"} );
     }
 
     private static void populateMySqlDatabase() throws Exception
