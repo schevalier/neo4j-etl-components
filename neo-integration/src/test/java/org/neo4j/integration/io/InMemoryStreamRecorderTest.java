@@ -46,7 +46,7 @@ public class InMemoryStreamRecorderTest
         {
             // when
             //noinspection ResultOfMethodCallIgnored
-            recorder.awaitContents( 100, TimeUnit.MILLISECONDS );
+            recorder.awaitContents( 1, TimeUnit.SECONDS );
             fail( "Expected IOException" );
         }
         catch ( IOException e )
@@ -84,7 +84,7 @@ public class InMemoryStreamRecorderTest
         writer.close();
 
         // when
-        String contents = recorder.awaitContents( 30, TimeUnit.MILLISECONDS );
+        String contents = recorder.awaitContents( 1, TimeUnit.SECONDS );
 
         // then
         String expectedContents = "A" + NEWLINE + "B" + NEWLINE + "C";
@@ -107,7 +107,7 @@ public class InMemoryStreamRecorderTest
         writer.close();
 
         // when
-        String result = recorder.awaitContents( 100, TimeUnit.MILLISECONDS );
+        String result = recorder.awaitContents( 1, TimeUnit.SECONDS );
 
         // then
         assertEquals( "", result );
@@ -136,7 +136,7 @@ public class InMemoryStreamRecorderTest
         writer.close();
 
         // when
-        String contents = recorder.awaitContents( 10, TimeUnit.MILLISECONDS );
+        String contents = recorder.awaitContents( 1, TimeUnit.SECONDS );
 
         // then
         String expectedContents = "0" + NEWLINE
