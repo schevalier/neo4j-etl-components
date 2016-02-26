@@ -2,6 +2,7 @@ package org.neo4j.integration.neo4j;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -37,12 +38,15 @@ public class Neo4j implements AutoCloseable
     public void disableAuth() throws IOException
     {
         Path confFile = directory.resolve( "conf/neo4j.conf" );
+
         Properties properties = new Properties();
         properties.load( Files.newInputStream( confFile ) );
+
         properties.setProperty( "dbms.security.auth_enabled", "false" );
+
         try ( BufferedWriter writer = Files.newBufferedWriter( confFile ) )
         {
-            properties.store( writer, "" );
+            properties.store( writer, "Disabled Auth" );
         }
     }
 
@@ -60,7 +64,8 @@ public class Neo4j implements AutoCloseable
                 .build()
                 .execute()
                 .await();
-        Thread.sleep( 10000 );
+
+        Thread.sleep( 15000 );
     }
 
     public void stop() throws Exception
@@ -75,7 +80,7 @@ public class Neo4j implements AutoCloseable
                 .await();
     }
 
-    public String execute( String command ) throws Exception
+    public String executeShell( String command ) throws Exception
     {
         Result result = Commands.builder( "bin/neo4j-shell", "-c", command )
                 .workingDirectory( directory )
@@ -89,13 +94,7 @@ public class Neo4j implements AutoCloseable
         return result.stdout();
     }
 
-    @Override
-    public void close() throws Exception
-    {
-        stop();
-    }
-
-    public String executeHttp( String uri, String request ) throws JsonProcessingException, InterruptedException
+    public String executeHttp( URI uri, String request ) throws JsonProcessingException, InterruptedException
     {
         Client client = Client.create();
 
@@ -105,5 +104,11 @@ public class Neo4j implements AutoCloseable
                 .post( ClientResponse.class, request );
 
         return post.getEntity( String.class );
+    }
+
+    @Override
+    public void close() throws Exception
+    {
+        stop();
     }
 }
