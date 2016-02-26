@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+
+import org.neo4j.integration.util.Loggers;
 
 public class StreamSink extends Thread
 {
@@ -34,7 +37,11 @@ public class StreamSink extends Thread
         {
             try
             {
-                if ( !e.getMessage().equals( "Stream closed" ) && !e.getMessage().equals( "Interrupted system call" ) )
+                if ( e.getMessage().equals( "Interrupted system call" ) )
+                {
+                    Loggers.Default.log( Level.WARNING, e.getMessage() );
+                }
+                else if ( !e.getMessage().equals( "Stream closed" ) )
                 {
                     eventHandler.onException( e );
                 }
