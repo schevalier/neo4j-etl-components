@@ -25,10 +25,34 @@ public class StreamSink extends Thread
         {
             BufferedReader bufferedReader = new BufferedReader( new InputStreamReader( input ) );
 
+            boolean allowContinue = true;
             String line;
-            while ( (line = bufferedReader.readLine()) != null )
+
+            while ( allowContinue )
             {
-                eventHandler.onLine( line );
+                try
+                {
+                    line = bufferedReader.readLine();
+                    if ( line != null )
+                    {
+                        eventHandler.onLine( line );
+                    }
+                    else
+                    {
+                        allowContinue = false;
+                    }
+                }
+                catch ( IOException e )
+                {
+                    if ( e.getMessage().equals( "Interrupted system call" ) )
+                    {
+                        Loggers.Default.log( Level.WARNING, e.getMessage() );
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
             }
 
             eventHandler.onCompleted();
@@ -37,11 +61,7 @@ public class StreamSink extends Thread
         {
             try
             {
-                if ( e.getMessage().equals( "Interrupted system call" ) )
-                {
-                    Loggers.Default.log( Level.WARNING, e.getMessage() );
-                }
-                else if ( !e.getMessage().equals( "Stream closed" ) )
+                if ( !e.getMessage().equals( "Stream closed" ) )
                 {
                     eventHandler.onException( e );
                 }
