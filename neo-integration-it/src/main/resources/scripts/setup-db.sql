@@ -48,6 +48,18 @@ CREATE TABLE javabase.String_Table
  varchar_field VARCHAR(200));
 GRANT ALL ON javabase.String_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
 
+
+CREATE TABLE javabase.Date_Table
+(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ numericId INT NOT NULL,
+ FOREIGN KEY (numericId) REFERENCES javabase.Numeric_Table(id),
+ date_field DATE,
+ datetime_field DATETIME,
+ timestamp_field TIMESTAMP,
+ time_field TIME,
+ year_field YEAR(4));
+GRANT ALL ON javabase.Date_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');
 INSERT INTO javabase.Address (postcode) VALUES ('ZZ1 0MN');
@@ -72,3 +84,7 @@ INSERT INTO javabase.String_Table (char_field, varchar_field, text_field, blob_f
   SELECT 'char-field', 'varchar-field', 'text_field', 'blob_field', 'tinytext_field', 'tinyblob_field',
     'mediumtext_field', 'mediumblob_field', 'longtext_field', 'longblob_field',
     'val-1', id FROM javabase.Numeric_Table WHERE javabase.Numeric_Table.tinyint_field = 1;
+
+INSERT INTO javabase.Date_Table(date_field, datetime_field, timestamp_field, time_field, year_field, numericId)
+  SELECT '1988-01-23', '2038-01-19 03:14:07.123456', '1989-01-23', '22:34:35', 1987, id
+  FROM javabase.Numeric_Table WHERE javabase.Numeric_Table.tinyint_field = 1;

@@ -6,8 +6,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
@@ -51,7 +51,8 @@ public class CsvFileWriter
         return databaseClient.executeQuery( sql ).await();
     }
 
-    private void writeResultsToFile( QueryResults results, Path file, ColumnToCsvFieldMappings mappings ) throws Exception
+    private void writeResultsToFile( QueryResults results, Path file, ColumnToCsvFieldMappings mappings ) throws
+            Exception
     {
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
         int maxIndex = columns.length - 1;
@@ -70,15 +71,15 @@ public class CsvFileWriter
         }
     }
 
-    private void writeFieldValueAndNewLine( String string, BufferedWriter writer ) throws Exception
+    private void writeFieldValueAndNewLine( String value, BufferedWriter writer ) throws Exception
     {
-        writer.write( string );
+        writer.write( value );
         writer.newLine();
     }
 
-    private void writeFieldValueAndDelimiter( String string, BufferedWriter writer ) throws Exception
+    private void writeFieldValueAndDelimiter( String value, BufferedWriter writer ) throws Exception
     {
-        writer.write( string );
+        writer.write( value );
         writer.write( config.formatting().delimiter().value() );
     }
 }

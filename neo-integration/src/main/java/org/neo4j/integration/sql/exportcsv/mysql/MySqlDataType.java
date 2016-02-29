@@ -24,7 +24,13 @@ public enum MySqlDataType implements SqlDataType
     MEDIUMBLOB( Neo4jDataType.String ),
     LONGTEXT( Neo4jDataType.String ),
     LONGBLOB( Neo4jDataType.String ),
-    ENUM( Neo4jDataType.String );
+    ENUM( Neo4jDataType.String ),
+
+    DATE(Neo4jDataType.String ),
+    DATETIME( Neo4jDataType.String ),
+    TIMESTAMP( Neo4jDataType.String ),
+    TIME( Neo4jDataType.String ),
+    YEAR( Neo4jDataType.String );
 
     private final Neo4jDataType neo4jDataType;
 

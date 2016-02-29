@@ -46,4 +46,14 @@ public class MySqlDataTypeTest
         assertThat( MySqlDataType.LONGBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( MySqlDataType.ENUM.toNeo4jDataType(), is( Neo4jDataType.String ) );
     }
+
+    @Test
+    public void toNeo4jDataTypeMappingOfDateTypes() throws Exception
+    {
+        assertThat( MySqlDataType.DATE.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.DATETIME.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.TIMESTAMP.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.TIME.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( MySqlDataType.YEAR.toNeo4jDataType(), is( Neo4jDataType.String ) );
+    }
 }

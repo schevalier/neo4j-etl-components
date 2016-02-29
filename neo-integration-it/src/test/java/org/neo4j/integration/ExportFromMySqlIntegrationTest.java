@@ -104,6 +104,35 @@ public class ExportFromMySqlIntegrationTest
         }
     }
 
+    @Test
+    public void shouldExportFromMySqlAndImportIntoGraphForNumericAndDateTables() throws Exception
+    {
+        // when
+        exportFromMySqlToNeo4j( "Date_Table", "Numeric_Table" );
+
+        // then
+        try
+        {
+            neo4j.get().start();
+
+            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (n) RETURN n" );
+
+            List<Map<String, Object>> dateFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
+            List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[1].row[0]" );
+            assertThat( dateFields.get( 0 ).values(), hasItems(
+                    "22:34:35",
+                    "1987-01-01",
+                    "1989-01-23 00:00:00.0",
+                    "2038-01-19 03:14:07.0",
+                    "1988-01-23" ) );
+            assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.0, 1.232343445E7, 1 ) );
+        }
+        finally
+        {
+            neo4j.get().stop();
+        }
+    }
+
     private void exportFromMySqlToNeo4j( String parent, String child )
     {
         NeoIntegrationCli.executeMainReturnSysOut(
