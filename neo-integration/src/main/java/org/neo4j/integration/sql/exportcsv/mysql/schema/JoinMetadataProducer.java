@@ -3,8 +3,8 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -22,9 +22,9 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
     @Override
     public Collection<Join> createMetadataFor( TableNamePair source ) throws Exception
     {
-        String sql = select( source.table1(), source.table2() ) +
+        String sql = select( source.startTable(), source.endTable() ) +
                 " UNION " +
-                select( source.table2(), source.table1() );
+                select( source.endTable(), source.startTable() );
 
         Collection<Join> joins = new ArrayList<>();
 
@@ -43,6 +43,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
                                 new TableName(
                                         results.getString( "REFERENCED_TABLE_SCHEMA" ),
                                         results.getString( "REFERENCED_TABLE_NAME" ) ) )
+                        .startTable( source.startTable() )
                         .build();
 
                 joins.add( join );

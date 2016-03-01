@@ -19,12 +19,24 @@ public class Join implements DatabaseObject
     private final Column primaryKey;
     private final Column foreignKey;
     private final TableName childTable;
+    private final TableName startTable;
 
     Join( JoinBuilder builder )
     {
         this.primaryKey = Preconditions.requireNonNull( builder.primaryKey, "Primary key" );
         this.foreignKey = Preconditions.requireNonNull( builder.foreignKey, "Foreign key" );
         this.childTable = Preconditions.requireNonNull( builder.childTable, "Child table" );
+        this.startTable = Preconditions.requireNonNull( builder.startTable, "Start table" );
+    }
+
+    public boolean childTableRepresentsStartOfRelationship()
+    {
+        return startTable.equals( childTable);
+    }
+
+    public boolean parentTableRepresentsStartOfRelationship()
+    {
+        return startTable.equals( primaryKey.table() );
     }
 
     public Column primaryKey()
@@ -78,7 +90,12 @@ public class Join implements DatabaseObject
 
         interface SetChildTable
         {
-            Builder childTable( TableName childTable );
+            SetStartTable childTable( TableName childTable );
+        }
+
+        interface SetStartTable
+        {
+            Builder startTable( TableName startTable );
         }
 
         Join build();

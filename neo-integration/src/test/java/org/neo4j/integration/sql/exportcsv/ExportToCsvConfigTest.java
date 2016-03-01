@@ -41,6 +41,7 @@ public class ExportToCsvConfigTest
                             .primaryKey( "id" )
                             .foreignKey( "addressId" )
                             .childTable( addressTable )
+                            .startTable(  new TableName( "test.Person" )  )
                             .build() )
                     .build();
             fail( "Expected IllegalStatException" );
@@ -76,6 +77,7 @@ public class ExportToCsvConfigTest
                             .primaryKey( "id" )
                             .foreignKey( "addressId" )
                             .childTable( new TableName( "test.Address" ) )
+                            .startTable( new TableName( "test.Person" ) )
                             .build() )
                     .build();
             fail( "Expected IllegalStatException" );

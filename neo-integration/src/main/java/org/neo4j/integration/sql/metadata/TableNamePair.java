@@ -2,22 +2,22 @@ package org.neo4j.integration.sql.metadata;
 
 public class TableNamePair
 {
-    private final TableName table1;
-    private final TableName table2;
+    private final TableName startTable;
+    private final TableName endTable;
 
-    public TableNamePair( TableName table1, TableName table2 )
+    public TableNamePair( TableName startTable, TableName endTable )
     {
-        this.table1 = table1;
-        this.table2 = table2;
+        this.startTable = startTable;
+        this.endTable = endTable;
     }
 
-    public TableName table1()
+    public TableName startTable()
     {
-        return table1;
+        return startTable;
     }
 
-    public TableName table2()
+    public TableName endTable()
     {
-        return table2;
+        return endTable;
     }
 }

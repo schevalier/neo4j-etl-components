@@ -1,22 +1,26 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.TableName;
 
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertThat;
+import static java.util.Arrays.asList;
+
+import static org.junit.Assert.assertEquals;
 
 public class JoinToCsvFieldMapperTest
 {
     @Test
-    public void shouldCreateMappingsForJoin()
+    public void shouldCreateMappingsForJoinWhereStartTableIsParentTableInJoin()
     {
         // given
         Join join = Join.builder()
@@ -24,6 +28,7 @@ public class JoinToCsvFieldMapperTest
                 .primaryKey( "id" )
                 .foreignKey( "addressId" )
                 .childTable( new TableName( "test.Address" ) )
+                .startTable( new TableName( "test.Person" ) )
                 .build();
 
         JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
@@ -32,11 +37,43 @@ public class JoinToCsvFieldMapperTest
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );
 
         // then
-        Collection<CsvField> fields = mappings.fields();
+        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
+        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
 
-        assertThat( fields, contains(
+        assertEquals( fields, asList(
                 CsvField.startId( new IdSpace( "test.Person" ) ),
                 CsvField.endId( new IdSpace( "test.Address" ) ),
                 CsvField.relationshipType() ) );
+
+        assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"ADDRESS\"" ), columns );
+    }
+
+    @Test
+    public void shouldCreateMappingsForJoinWhereStartTableIsChildTableInJoin()
+    {
+        // given
+        Join join = Join.builder()
+                .parentTable( new TableName( "test.Person" ) )
+                .primaryKey( "id" )
+                .foreignKey( "addressId" )
+                .childTable( new TableName( "test.Address" ) )
+                .startTable( new TableName( "test.Address" ) )
+                .build();
+
+        JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
+
+        // when
+        ColumnToCsvFieldMappings mappings = mapper.createMappings( join );
+
+        // then
+        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
+        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
+
+        assertEquals( fields, asList(
+                CsvField.endId( new IdSpace( "test.Person" ) ),
+                CsvField.startId( new IdSpace( "test.Address" ) ),
+                CsvField.relationshipType() ) );
+
+        assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"PERSON\"" ), columns );
     }
 }

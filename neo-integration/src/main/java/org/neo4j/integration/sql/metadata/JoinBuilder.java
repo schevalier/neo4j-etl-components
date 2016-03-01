@@ -7,12 +7,14 @@ class JoinBuilder implements Join.Builder.SetParentTable,
         Join.Builder.SetPrimaryKey,
         Join.Builder.SetForeignKey,
         Join.Builder.SetChildTable,
+        Join.Builder.SetStartTable,
         Join.Builder
 {
     private TableName parentTable;
     Column primaryKey;
     Column foreignKey;
     TableName childTable;
+    TableName startTable;
 
     @Override
     public SetPrimaryKey parentTable( TableName parent )
@@ -47,16 +49,24 @@ class JoinBuilder implements Join.Builder.SetParentTable,
         return this;
     }
 
+
     @Override
-    public Join.Builder childTable( TableName childTable )
+    public Join build()
+    {
+        return new Join( this );
+    }
+
+    @Override
+    public SetStartTable childTable( TableName childTable )
     {
         this.childTable = childTable;
         return this;
     }
 
     @Override
-    public Join build()
+    public Join.Builder startTable( TableName startTable )
     {
-        return new Join( this );
+        this.startTable = startTable;
+        return this;
     }
 }

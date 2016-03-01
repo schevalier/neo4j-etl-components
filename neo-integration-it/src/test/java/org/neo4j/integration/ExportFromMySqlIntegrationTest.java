@@ -21,7 +21,11 @@ import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
+import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ExportFromMySqlIntegrationTest
@@ -29,8 +33,8 @@ public class ExportFromMySqlIntegrationTest
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
 
     @ClassRule
-    public static final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory
-            () );
+    public static final ResourceRule<Path> tempDirectory =
+            new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
@@ -38,7 +42,7 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get()) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -62,13 +66,49 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (n) RETURN n" );
+            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
 
-            List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[*].username" );
-            List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[*].postcode" );
+            List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
+            List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
+            List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[2].postcode" );
+
+            assertThat( usernames.size(), is(9) );
 
             assertThat( usernames, hasItems(
                     "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
+            assertEquals( asList( "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS",
+                    "ADDRESS", "ADDRESS", "ADDRESS" ), relationships );
+            assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
+        }
+        finally
+        {
+            neo4j.get().stop();
+        }
+    }
+
+    @Test
+    public void shouldBaseRelationshipNameAndDirectionOnStartAndEndTableSpecification() throws Exception
+    {
+        // when
+        exportFromMySqlToNeo4j( "Address", "Person" );
+
+        // then
+        try
+        {
+            neo4j.get().start();
+
+            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
+
+            List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[0].postcode" );
+            List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
+            List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[2].username" );
+
+            assertThat( usernames.size(), is(9) );
+
+            assertThat( usernames, hasItems(
+                    "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
+            assertEquals( asList( "PERSON", "PERSON", "PERSON", "PERSON", "PERSON", "PERSON",
+                    "PERSON", "PERSON", "PERSON" ), relationships );
             assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
         }
         finally
@@ -133,7 +173,7 @@ public class ExportFromMySqlIntegrationTest
         }
     }
 
-    private void exportFromMySqlToNeo4j( String parent, String child )
+    private void exportFromMySqlToNeo4j( String start, String end )
     {
         NeoIntegrationCli.executeMainReturnSysOut(
                 new String[]{"mysql-export",
@@ -144,8 +184,8 @@ public class ExportFromMySqlIntegrationTest
                         "--import-tool", neo4j.get().binDirectory().toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
-                        "--parent", parent,
-                        "--child", child,
+                        "--start", start,
+                        "--end", end,
                         "--force"} );
     }
 

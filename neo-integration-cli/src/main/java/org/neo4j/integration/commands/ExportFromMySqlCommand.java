@@ -31,8 +31,8 @@ public class ExportFromMySqlCommand
     private final String user;
     private final String password;
     private final String database;
-    private final String parentTable;
-    private final String childTable;
+    private final String startTable;
+    private final String endTable;
     private final Environment environment;
 
     public ExportFromMySqlCommand( String host,
@@ -40,8 +40,8 @@ public class ExportFromMySqlCommand
                                    String user,
                                    String password,
                                    String database,
-                                   String parentTable,
-                                   String childTable,
+                                   String startTable,
+                                   String endTable,
                                    Environment environment )
     {
         this.host = host;
@@ -49,8 +49,8 @@ public class ExportFromMySqlCommand
         this.user = user;
         this.password = password;
         this.database = database;
-        this.parentTable = parentTable;
-        this.childTable = childTable;
+        this.startTable = startTable;
+        this.endTable = endTable;
         this.environment = environment;
     }
 
@@ -100,18 +100,18 @@ public class ExportFromMySqlCommand
                                          Formatting formatting,
                                          ConnectionConfig connectionConfig ) throws Exception
     {
-        TableName parent = new TableName( database, parentTable );
-        TableName child = new TableName( database, childTable );
+        TableName start = new TableName( database, startTable );
+        TableName end = new TableName( database, endTable );
 
         try ( DatabaseClient databaseClient = new DatabaseClient( connectionConfig ) )
         {
             TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
 
-            Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( parent );
-            Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( child );
+            Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( start );
+            Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( end );
 
             Collection<Join> joins =
-                    new JoinMetadataProducer( databaseClient ).createMetadataFor( new TableNamePair( parent, child ) );
+                    new JoinMetadataProducer( databaseClient ).createMetadataFor( new TableNamePair( start, end) );
 
             ExportToCsvConfig config = ExportToCsvConfig.builder()
                     .destination( csvDirectory )

@@ -16,12 +16,31 @@ public class ServerFixture
 {
     public static Resource<Server> server( String description, int port, Script script, Path directory )
     {
+        return server( description, port, script, directory, Optional.empty() );
+    }
+
+    public static Resource<Server> server( String description,
+                                           int port,
+                                           Script script,
+                                           Path directory,
+                                           String platform )
+    {
+        return server( description, port, script, directory, Optional.of( platform ) );
+    }
+
+    private static Resource<Server> server( String description,
+                                            int port,
+                                            Script script,
+                                            Path directory,
+                                            Optional<String> _platform )
+    {
         return new LazyResource<>( new LazyResource.Lifecycle<Server>()
         {
             @Override
             public Server create() throws Exception
             {
-                String platform = systemPropertyOrEnvironmentVariable( "PLATFORM" ).orElse( "vagrant" ).toLowerCase();
+                String platform = _platform.orElse(
+                        systemPropertyOrEnvironmentVariable( "PLATFORM" ).orElse( "vagrant" ).toLowerCase() );
                 Optional<String> ec2Key = systemPropertyOrEnvironmentVariable( "EC2_SSH_KEY" );
                 Optional<String> vagrantBoxUri = systemPropertyOrEnvironmentVariable( "VAGRANT_BOX_URI" );
 

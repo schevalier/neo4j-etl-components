@@ -71,18 +71,18 @@ public class ExportFromMySqlCliCommand implements Runnable
     private String destinationDirectory;
 
     @Option(type = OptionType.COMMAND,
-            name = {"--parent"},
-            description = "Parent MySQL table.",
+            name = {"--start"},
+            description = "Table representing nodes at the start of the relationship.",
             title = "name",
             required = true)
-    private String parentTable;
+    private String startTable;
 
     @Option(type = OptionType.COMMAND,
-            name = {"--child"},
-            description = "Child MySQL table.",
+            name = {"--end"},
+            description = "Table representing nodes at the end of the relationship.",
             title = "name",
             required = true)
-    private String childTable;
+    private String endTable;
 
     @Option(type = OptionType.COMMAND,
             name = {"--force"},
@@ -101,8 +101,8 @@ public class ExportFromMySqlCliCommand implements Runnable
                     user,
                     password,
                     database,
-                    parentTable,
-                    childTable,
+                    startTable,
+                    endTable,
                     new Environment(
                             Paths.get( importToolDirectory ),
                             Paths.get( destinationDirectory ),

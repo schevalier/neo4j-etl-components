@@ -71,15 +71,15 @@ public class CsvFileWriter
         }
     }
 
-    private void writeFieldValueAndNewLine( String value, BufferedWriter writer ) throws Exception
-    {
-        writer.write( value );
-        writer.newLine();
-    }
-
     private void writeFieldValueAndDelimiter( String value, BufferedWriter writer ) throws Exception
     {
         writer.write( value );
         writer.write( config.formatting().delimiter().value() );
+    }
+
+    private void writeFieldValueAndNewLine( String value, BufferedWriter writer ) throws Exception
+    {
+        writer.write( value );
+        writer.newLine();
     }
 }
