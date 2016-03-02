@@ -9,7 +9,7 @@ import org.neo4j.integration.util.Preconditions;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-public class Join implements DatabaseObject
+public class Join extends DatabaseObject
 {
     public static Builder.SetParentTable builder()
     {

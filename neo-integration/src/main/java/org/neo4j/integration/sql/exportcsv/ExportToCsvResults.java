@@ -11,8 +11,6 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
 import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
-import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.util.Preconditions;
 
@@ -25,7 +23,7 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
     public ExportToCsvResults( Collection<ExportToCsvResult> exportResults )
     {
         this.exportResults = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( exportResults, "exportResults"));
+                Preconditions.requireNonEmptyCollection( exportResults, "exportResults" ) );
     }
 
     public GraphConfig createGraphConfig()
@@ -34,20 +32,15 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
 
         for ( ExportToCsvResult result : exportResults )
         {
-            if ( result.databaseObject() instanceof Table )
+            DatabaseObject databaseObject = result.databaseObject();
+            if ( result.databaseObject().isTable() )
             {
                 graphDataConfig.add( NodeConfig.builder()
                         .addInputFiles( result.csvFiles() )
                         .addLabel( ((Table) result.databaseObject()).name().simpleName() )
                         .build() );
             }
-            else if ( result.databaseObject() instanceof Join )
-            {
-                graphDataConfig.add( RelationshipConfig.builder()
-                        .addInputFiles( result.csvFiles() )
-                        .build() );
-            }
-            else if ( result.databaseObject() instanceof JoinTable )
+            else if ( databaseObject.isJoin() || databaseObject.isJoinTable() )
             {
                 graphDataConfig.add( RelationshipConfig.builder()
                         .addInputFiles( result.csvFiles() )

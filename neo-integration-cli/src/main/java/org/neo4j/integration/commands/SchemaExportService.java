@@ -32,21 +32,22 @@ public class SchemaExportService
             Collection<Table> startTable = tableMetadataProducer.createMetadataFor( start );
             Collection<Table> endTable = tableMetadataProducer.createMetadataFor( end );
 
+            Collection<Join> joins = emptyList();
+            Collection<JoinTable> joinTables = emptyList();
+
             if ( schemaDetails.joinTable().isPresent() )
             {
-                Collection<JoinTable> joinTables = new JoinTableMetadataProducer( databaseClient )
+                joinTables = new JoinTableMetadataProducer( databaseClient )
                         .createMetadataFor(
                                 new JoinTableInfo( new TableName( database, schemaDetails.joinTable().get() ),
                                         new TableNamePair( start, end ) ) );
-                return new SchemaExport( startTable, endTable, emptyList(), joinTables );
             }
             else
             {
-                Collection<Join> joins =
-                        new JoinMetadataProducer( databaseClient )
+                joins = new JoinMetadataProducer( databaseClient )
                                 .createMetadataFor( new TableNamePair( start, end ) );
-                return new SchemaExport( startTable, endTable, joins, emptyList() );
             }
+            return new SchemaExport( startTable, endTable, joins, joinTables );
         }
     }
 }

@@ -42,7 +42,7 @@ public class MySqlExportService implements DatabaseExportService
                                                                            CsvFileWriter csvFileWriter,
                                                                            ExportToCsvConfig config ) throws Exception
     {
-        if ( databaseObject instanceof Table )
+        if ( databaseObject.isTable())
         {
             Table table = (Table) databaseObject;
 
@@ -51,7 +51,7 @@ public class MySqlExportService implements DatabaseExportService
 
             return new ExportToCsvResults.ExportToCsvResult( table, files );
         }
-        else if ( databaseObject instanceof Join )
+        else if ( databaseObject.isJoin())
         {
             Join join = (Join) databaseObject;
 
@@ -60,7 +60,7 @@ public class MySqlExportService implements DatabaseExportService
 
             return new ExportToCsvResults.ExportToCsvResult( join, files );
         }
-        else if ( databaseObject instanceof JoinTable )
+        else if ( databaseObject.isJoinTable() )
         {
             JoinTable joinTable = (JoinTable) databaseObject;
 

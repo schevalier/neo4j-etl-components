@@ -19,6 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 public class JoinToCsvFieldMapperTest
 {
+
+    private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
+
     @Test
     public void shouldCreateMappingsForJoinWhereStartTableIsParentTableInJoin()
     {
@@ -30,8 +33,6 @@ public class JoinToCsvFieldMapperTest
                 .childTable( new TableName( "test.Address" ) )
                 .startTable( new TableName( "test.Person" ) )
                 .build();
-
-        JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );
@@ -59,8 +60,6 @@ public class JoinToCsvFieldMapperTest
                 .childTable( new TableName( "test.Address" ) )
                 .startTable( new TableName( "test.Address" ) )
                 .build();
-
-        JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );

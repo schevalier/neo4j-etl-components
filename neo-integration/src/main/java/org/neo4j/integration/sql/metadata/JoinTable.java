@@ -2,7 +2,7 @@ package org.neo4j.integration.sql.metadata;
 
 import org.neo4j.integration.util.Preconditions;
 
-public class JoinTable implements DatabaseObject
+public class JoinTable extends DatabaseObject
 {
     public static Builder.SetStartForeignKey builder()
     {

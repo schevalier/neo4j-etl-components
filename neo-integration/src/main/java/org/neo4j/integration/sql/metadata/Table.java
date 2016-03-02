@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.neo4j.integration.util.Preconditions;
 
-public class Table implements DatabaseObject
+public class Table extends DatabaseObject
 {
     public static Builder.SetName builder()
     {
