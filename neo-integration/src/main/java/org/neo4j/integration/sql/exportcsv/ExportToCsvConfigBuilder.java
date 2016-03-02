@@ -4,10 +4,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 
 class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
         ExportToCsvConfig.Builder.SetDestination,
@@ -16,6 +17,7 @@ class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
 {
     final Collection<Table> tables = new ArrayList<>();
     final Collection<Join> joins = new ArrayList<>();
+    final Collection<JoinTable> joinTables = new ArrayList<>();
     Path destination;
     ConnectionConfig connectionConfig;
     Formatting formatting;
@@ -67,6 +69,22 @@ class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
     {
         this.joins.addAll( joins );
         return this;
+    }
+
+    @Override
+    public ExportToCsvConfig.Builder addJoinTable( JoinTable joinTable )
+    {
+        joinTables.add( joinTable );
+        return this;
+
+    }
+
+    @Override
+    public ExportToCsvConfig.Builder addJoinTables( Collection<JoinTable> joinTables )
+    {
+        this.joinTables.addAll( joinTables );
+        return this;
+
     }
 
     @Override

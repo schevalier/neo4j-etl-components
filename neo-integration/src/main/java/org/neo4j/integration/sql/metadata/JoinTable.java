@@ -48,6 +48,11 @@ public class JoinTable implements DatabaseObject
         return endPrimaryKey;
     }
 
+    public TableName joinTableName()
+    {
+        return startForeignKey.table();
+    }
+
     public interface Builder
     {
         interface SetStartForeignKey

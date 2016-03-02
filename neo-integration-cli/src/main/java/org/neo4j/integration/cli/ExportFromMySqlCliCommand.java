@@ -87,6 +87,13 @@ public class ExportFromMySqlCliCommand implements Runnable
     private String endTable;
 
     @Option(type = OptionType.COMMAND,
+            name = {"--join-table"},
+            description = "Table representing join table between the start and end tables.",
+            title = "name",
+            required = false)
+    private String joinTable;
+
+    @Option(type = OptionType.COMMAND,
             name = {"--force"},
             description = "Force delete destination store directory if it already exists.",
             title = "boolean")
@@ -107,7 +114,7 @@ public class ExportFromMySqlCliCommand implements Runnable
                             Paths.get( destinationDirectory ),
                             Paths.get( csvRootDirectory ),
                             force ),
-                    new SchemaDetails( database, startTable, endTable, Optional.empty() )
+                    new SchemaDetails( database, startTable, endTable, Optional.ofNullable( joinTable ) )
             ).execute();
         }
         catch ( Exception e )

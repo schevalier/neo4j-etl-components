@@ -12,6 +12,7 @@ import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
 import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.util.Preconditions;
 
@@ -41,6 +42,12 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
                         .build() );
             }
             else if ( result.databaseObject() instanceof Join )
+            {
+                graphDataConfig.add( RelationshipConfig.builder()
+                        .addInputFiles( result.csvFiles() )
+                        .build() );
+            }
+            else if ( result.databaseObject() instanceof JoinTable )
             {
                 graphDataConfig.add( RelationshipConfig.builder()
                         .addInputFiles( result.csvFiles() )

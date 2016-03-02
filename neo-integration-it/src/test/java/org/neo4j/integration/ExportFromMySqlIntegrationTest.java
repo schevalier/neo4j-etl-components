@@ -42,7 +42,7 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get(), "local") );
+                    tempDirectory.get(), "local" ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -67,12 +67,11 @@ public class ExportFromMySqlIntegrationTest
             neo4j.get().start();
 
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
-
             List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
             List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[2].postcode" );
 
-            assertThat( usernames.size(), is(9) );
+            assertThat( usernames.size(), is( 9 ) );
 
             assertThat( usernames, hasItems(
                     "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
@@ -103,7 +102,7 @@ public class ExportFromMySqlIntegrationTest
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
             List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[2].username" );
 
-            assertThat( usernames.size(), is(9) );
+            assertThat( usernames.size(), is( 9 ) );
 
             assertThat( usernames, hasItems(
                     "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
@@ -177,24 +176,26 @@ public class ExportFromMySqlIntegrationTest
     public void shouldExportFromMySqlAndImportIntoGraphForThreeTableJoin() throws Exception
     {
         // when
-        exportFromMySqlToNeo4j( "Student", "Course" );
+        exportFromMySqlToNeo4j( "Student", "Course", "Student_Course" );
 
         // then
         try
         {
             neo4j.get().start();
 
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (n) RETURN n" );
+            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
 
-//            List<Map<String, Object>> dateFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
-//            List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[1].row[0]" );
-//            assertThat( dateFields.get( 0 ).values(), hasItems(
-//                    "22:34:35",
-//                    "1987-01-01",
-//                    "1989-01-23 00:00:00.0",
-//                    "2038-01-19 03:14:07.0",
-//                    "1988-01-23" ) );
-//            assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.0, 1.232343445E7, 1 ) );
+            List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
+            List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
+            List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[2].name" );
+
+            assertThat( students.size(), is( 4 ) );
+            assertThat( students, hasItems( "jim", "mark") );
+
+            assertEquals( asList( "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE"), relationships );
+
+            assertThat( courses.size(), is( 4 ) );
+            assertThat( courses, hasItems("Science", "Maths", "English") );
         }
         finally
         {
@@ -215,6 +216,23 @@ public class ExportFromMySqlIntegrationTest
                         "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
                         "--start", start,
                         "--end", end,
+                        "--force"} );
+    }
+
+    private void exportFromMySqlToNeo4j( String start, String end, String joinTable )
+    {
+        NeoIntegrationCli.executeMainReturnSysOut(
+                new String[]{"mysql-export",
+                        "--host", mySqlServer.get().ipAddress(),
+                        "--user", MySqlClient.Parameters.DBUser.value(),
+                        "--password", MySqlClient.Parameters.DBPassword.value(),
+                        "--database", MySqlClient.Parameters.Database.value(),
+                        "--import-tool", neo4j.get().binDirectory().toString(),
+                        "--csv-directory", tempDirectory.get().toString(),
+                        "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
+                        "--start", start,
+                        "--end", end,
+                        "--join-table", joinTable,
                         "--force"} );
     }
 

@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
@@ -25,6 +26,7 @@ public class ExportFromMySqlCommand
     private final Environment environment;
     private final SchemaExportService schemaExportService;
     private final SchemaDetails schemaDetails;
+    private MySqlExportService databaseExportService;
 
     public ExportFromMySqlCommand( String host,
                                    int port,
@@ -40,6 +42,7 @@ public class ExportFromMySqlCommand
         this.schemaDetails = schemaDetails;
         this.environment = environment;
         this.schemaExportService = new SchemaExportService();
+        this.databaseExportService = new MySqlExportService();
     }
 
     public void execute() throws Exception
@@ -53,14 +56,14 @@ public class ExportFromMySqlCommand
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
                 .port( port )
-                .database( schemaDetails.getDatabase() )
+                .database( schemaDetails.database() )
                 .username( user )
                 .password( password )
                 .build();
 
         print( "Exporting from MySQL to CSV..." );
 
-        GraphConfig graphConfig = exportAndCreateGraphConfig( csvDirectory, formatting, connectionConfig, new MySqlExportService() );
+        GraphConfig graphConfig = exportAndCreateGraphConfig( csvDirectory, formatting, connectionConfig );
 
         print( "Creating Neo4j store from CSV..." );
 
@@ -72,17 +75,18 @@ public class ExportFromMySqlCommand
 
     private GraphConfig exportAndCreateGraphConfig( Path csvDirectory,
                                                     Formatting formatting,
-                                                    ConnectionConfig connectionConfig,
-                                                    MySqlExportService databaseExportService ) throws Exception
+                                                    ConnectionConfig connectionConfig ) throws Exception
     {
-        SchemaExport schemaExport = schemaExportService.doExport( connectionConfig, schemaDetails );
+        SchemaExport schemaExport =
+                schemaExportService.doExport( schemaDetails, () -> new DatabaseClient( connectionConfig ) );
         ExportToCsvConfig config = ExportToCsvConfig.builder()
                 .destination( csvDirectory )
                 .connectionConfig( connectionConfig )
                 .formatting( formatting )
-                .addTables( schemaExport.getStartTable() )
-                .addTables( schemaExport.getEndTable() )
-                .addJoins( schemaExport.getJoins() )
+                .addTables( schemaExport.startTable() )
+                .addTables( schemaExport.endTable() )
+                .addJoins( schemaExport.joins() )
+                .addJoinTables(schemaExport.joinTables())
                 .build();
 
         ExportToCsvResults exportResults = new ExportToCsvCommand( config, databaseExportService ).execute();

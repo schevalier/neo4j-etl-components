@@ -7,12 +7,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
-import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -27,10 +28,12 @@ public class ExportToCsvConfig
     }
 
     private final Path destination;
+
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final Collection<Table> tables;
     private final Collection<Join> joins;
+    private final Collection<JoinTable> joinTables;
 
     ExportToCsvConfig( ExportToCsvConfigBuilder builder )
     {
@@ -39,6 +42,7 @@ public class ExportToCsvConfig
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
         this.tables = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.tables, "Tables" ) );
         this.joins = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.joins, "Joins" ) );
+        this.joinTables = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.joinTables, "JoinTables" ) );
 
         validate();
     }
@@ -63,6 +67,7 @@ public class ExportToCsvConfig
         Collection<DatabaseObject>  results = new ArrayList<>(  );
         results.addAll( tables );
         results.addAll( joins );
+        results.addAll( joinTables );
         return results;
     }
 
@@ -109,6 +114,10 @@ public class ExportToCsvConfig
         Builder addJoin( Join join );
 
         Builder addJoins( Collection<Join> joins );
+
+        Builder addJoinTable( JoinTable joinTable );
+
+        Builder addJoinTables( Collection<JoinTable> joinTables );
 
         ExportToCsvConfig build();
     }

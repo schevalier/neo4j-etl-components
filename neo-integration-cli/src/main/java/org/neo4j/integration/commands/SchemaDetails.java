@@ -17,22 +17,22 @@ public class SchemaDetails
         this.joinTable = joinTable;
     }
 
-    public String getDatabase()
+    public String database()
     {
         return database;
     }
 
-    public String getStartTable()
+    public String startTable()
     {
         return startTable;
     }
 
-    public String getEndTable()
+    public String endTable()
     {
         return endTable;
     }
 
-    public Optional<String> getJoinTable()
+    public Optional<String> joinTable()
     {
         return joinTable;
     }
