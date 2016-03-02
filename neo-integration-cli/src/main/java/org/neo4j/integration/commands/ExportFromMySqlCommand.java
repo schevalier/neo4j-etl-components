@@ -1,7 +1,6 @@
 package org.neo4j.integration.commands;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
@@ -9,18 +8,11 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
-import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.Table;
-import org.neo4j.integration.sql.metadata.TableName;
-import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static java.lang.String.format;
 
@@ -30,28 +22,24 @@ public class ExportFromMySqlCommand
     private final int port;
     private final String user;
     private final String password;
-    private final String database;
-    private final String startTable;
-    private final String endTable;
     private final Environment environment;
+    private final SchemaExportService schemaExportService;
+    private final SchemaDetails schemaDetails;
 
     public ExportFromMySqlCommand( String host,
                                    int port,
                                    String user,
                                    String password,
-                                   String database,
-                                   String startTable,
-                                   String endTable,
-                                   Environment environment )
+                                   Environment environment,
+                                   SchemaDetails schemaDetails )
     {
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password;
-        this.database = database;
-        this.startTable = startTable;
-        this.endTable = endTable;
+        this.schemaDetails = schemaDetails;
         this.environment = environment;
+        this.schemaExportService = new SchemaExportService();
     }
 
     public void execute() throws Exception
@@ -65,15 +53,14 @@ public class ExportFromMySqlCommand
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
                 .port( port )
-                .database( database )
+                .database( schemaDetails.getDatabase() )
                 .username( user )
                 .password( password )
                 .build();
 
         print( "Exporting from MySQL to CSV..." );
 
-        ExportToCsvResults exportResults = doExport( csvDirectory, formatting, connectionConfig );
-        GraphConfig graphConfig = exportResults.createGraphConfig();
+        GraphConfig graphConfig = exportAndCreateGraphConfig( csvDirectory, formatting, connectionConfig, new MySqlExportService() );
 
         print( "Creating Neo4j store from CSV..." );
 
@@ -81,6 +68,25 @@ public class ExportFromMySqlCommand
 
         print( "Done" );
         printResult( environment.destinationDirectory() );
+    }
+
+    private GraphConfig exportAndCreateGraphConfig( Path csvDirectory,
+                                                    Formatting formatting,
+                                                    ConnectionConfig connectionConfig,
+                                                    MySqlExportService databaseExportService ) throws Exception
+    {
+        SchemaExport schemaExport = schemaExportService.doExport( connectionConfig, schemaDetails );
+        ExportToCsvConfig config = ExportToCsvConfig.builder()
+                .destination( csvDirectory )
+                .connectionConfig( connectionConfig )
+                .formatting( formatting )
+                .addTables( schemaExport.getStartTable() )
+                .addTables( schemaExport.getEndTable() )
+                .addJoins( schemaExport.getJoins() )
+                .build();
+
+        ExportToCsvResults exportResults = new ExportToCsvCommand( config, databaseExportService ).execute();
+        return exportResults.createGraphConfig();
     }
 
     private void doImport( Formatting formatting, GraphConfig graphConfig ) throws Exception
@@ -96,36 +102,6 @@ public class ExportFromMySqlCommand
         new ImportFromCsvCommand( importConfig ).execute();
     }
 
-    private ExportToCsvResults doExport( Path csvDirectory,
-                                         Formatting formatting,
-                                         ConnectionConfig connectionConfig ) throws Exception
-    {
-        TableName start = new TableName( database, startTable );
-        TableName end = new TableName( database, endTable );
-
-        try ( DatabaseClient databaseClient = new DatabaseClient( connectionConfig ) )
-        {
-            TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
-
-            Collection<Table> tables1 = tableMetadataProducer.createMetadataFor( start );
-            Collection<Table> tables2 = tableMetadataProducer.createMetadataFor( end );
-
-            Collection<Join> joins =
-                    new JoinMetadataProducer( databaseClient ).createMetadataFor( new TableNamePair( start, end) );
-
-            ExportToCsvConfig config = ExportToCsvConfig.builder()
-                    .destination( csvDirectory )
-                    .connectionConfig( connectionConfig )
-                    .formatting( formatting )
-                    .addTables( tables1 )
-                    .addTables( tables2 )
-                    .addJoins( joins )
-                    .build();
-
-            return new ExportToCsvCommand( config, new MySqlExportService() ).execute();
-        }
-    }
-
     private void print( Object message )
     {
         System.err.println( message );
@@ -135,4 +111,5 @@ public class ExportFromMySqlCommand
     {
         System.out.println( message );
     }
+
 }

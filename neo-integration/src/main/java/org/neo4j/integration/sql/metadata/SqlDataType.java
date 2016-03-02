@@ -6,6 +6,7 @@ public interface SqlDataType
 {
     SqlDataType LABEL_DATA_TYPE = () -> Neo4jDataType.String;
     SqlDataType RELATIONSHIP_TYPE_DATA_TYPE = () -> Neo4jDataType.String;
+    SqlDataType KEY_DATA_TYPE = () -> Neo4jDataType.String;
 
     Neo4jDataType toNeo4jDataType();
 }
