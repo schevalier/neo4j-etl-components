@@ -1,9 +1,17 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
+import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
+import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
+import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
+import org.neo4j.integration.sql.exportcsv.mapping.JoinToCsvFieldMapper;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -63,6 +71,18 @@ public class Join extends DatabaseObject
     public String descriptor()
     {
         return format( "%s_%s", primaryKey.table().fullName(), childTable.fullName() );
+    }
+
+    @Override
+    ExportToCsvResults.ExportToCsvResult exportToCsv( DatabaseExportSqlSupplier sqlSupplier,
+                                                      HeaderFileWriter headerFileWriter,
+                                                      CsvFileWriter csvFileWriter,
+                                                      ExportToCsvConfig config ) throws Exception
+    {
+        Collection<Path> files = new CsvFilesWriter<Join>( headerFileWriter, csvFileWriter )
+                .write( this, new JoinToCsvFieldMapper( config.formatting() ), sqlSupplier );
+
+        return new ExportToCsvResults.ExportToCsvResult( this, files );
     }
 
     @Override

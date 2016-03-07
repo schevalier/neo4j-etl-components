@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
+import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
 import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
@@ -32,25 +33,7 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
 
         for ( ExportToCsvResult result : exportResults )
         {
-            DatabaseObject databaseObject = result.databaseObject();
-            if ( result.databaseObject().isTable() )
-            {
-                graphDataConfig.add( NodeConfig.builder()
-                        .addInputFiles( result.csvFiles() )
-                        .addLabel( ((Table) result.databaseObject()).name().simpleName() )
-                        .build() );
-            }
-            else if ( databaseObject.isJoin() || databaseObject.isJoinTable() )
-            {
-                graphDataConfig.add( RelationshipConfig.builder()
-                        .addInputFiles( result.csvFiles() )
-                        .build() );
-            }
-            else
-            {
-                throw new IllegalStateException(
-                        format( "Unknown database object: %s", result.databaseObject() ) );
-            }
+            graphDataConfig.add( result );
         }
 
         return new GraphConfig( graphDataConfig );
@@ -62,7 +45,7 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
         return exportResults.iterator();
     }
 
-    public static class ExportToCsvResult
+    public static class ExportToCsvResult implements GraphDataConfig
     {
         private final DatabaseObject databaseObject;
         private final Collection<Path> csvFiles;
@@ -74,14 +57,27 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
                     Preconditions.requireNonEmptyCollection( csvFiles, "CsvFiles" ) );
         }
 
-        public DatabaseObject databaseObject()
+        @Override
+        public void addTo( ImportConfig.Builder importConfig )
         {
-            return databaseObject;
-        }
-
-        public Collection<Path> csvFiles()
-        {
-            return csvFiles;
+            if ( databaseObject.isTable() )
+            {
+                importConfig.addNodeConfig( NodeConfig.builder()
+                        .addInputFiles( csvFiles )
+                        .addLabel( ((Table) databaseObject).name().simpleName() )
+                        .build() );
+            }
+            else if ( databaseObject.isJoin() || databaseObject.isJoinTable() )
+            {
+                importConfig.addRelationshipConfig( RelationshipConfig.builder()
+                        .addInputFiles( csvFiles )
+                        .build() );
+            }
+            else
+            {
+                throw new IllegalStateException(
+                        format( "Unknown database object: %s", databaseObject ) );
+            }
         }
     }
 }
