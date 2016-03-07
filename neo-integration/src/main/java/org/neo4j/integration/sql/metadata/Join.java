@@ -23,10 +23,10 @@ public class Join extends DatabaseObject
 
     Join( JoinBuilder builder )
     {
-        this.primaryKey = Preconditions.requireNonNull( builder.primaryKey, "Primary key" );
-        this.foreignKey = Preconditions.requireNonNull( builder.foreignKey, "Foreign key" );
-        this.childTable = Preconditions.requireNonNull( builder.childTable, "Child table" );
-        this.startTable = Preconditions.requireNonNull( builder.startTable, "Start table" );
+        this.primaryKey = Preconditions.requireNonNull( builder.primaryKey, "PrimaryKey" );
+        this.foreignKey = Preconditions.requireNonNull( builder.foreignKey, "ForeignKey" );
+        this.childTable = Preconditions.requireNonNull( builder.childTable, "ChildTable" );
+        this.startTable = Preconditions.requireNonNull( builder.startTable, "StartTable" );
     }
 
     public boolean childTableRepresentsStartOfRelationship()

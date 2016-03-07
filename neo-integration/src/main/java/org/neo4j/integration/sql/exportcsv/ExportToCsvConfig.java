@@ -38,7 +38,7 @@ public class ExportToCsvConfig
     ExportToCsvConfig( ExportToCsvConfigBuilder builder )
     {
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
-        this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "Connection" );
+        this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "ConnectionConfig" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
         this.tables = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.tables, "Tables" ) );
         this.joins = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.joins, "Joins" ) );

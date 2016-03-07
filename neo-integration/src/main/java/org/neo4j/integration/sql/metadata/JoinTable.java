@@ -16,10 +16,10 @@ public class JoinTable extends DatabaseObject
 
     public JoinTable( JoinTableBuilder builder )
     {
-        this.startForeignKey = Preconditions.requireNonNull(builder.startForeignKey, "Start foreign key");
-        this.startPrimaryKey = Preconditions.requireNonNull(builder.startPrimaryKey, "Start primary key");
-        this.endPrimaryKey = Preconditions.requireNonNull(builder.endPrimaryKey, "End primary key");
-        this.endForeignKey = Preconditions.requireNonNull(builder.endForeignKey, "End foreign key");
+        this.startForeignKey = Preconditions.requireNonNull(builder.startForeignKey, "StartForeignKey");
+        this.startPrimaryKey = Preconditions.requireNonNull(builder.startPrimaryKey, "StartPrimaryKey");
+        this.endPrimaryKey = Preconditions.requireNonNull(builder.endPrimaryKey, "EndPrimaryKey");
+        this.endForeignKey = Preconditions.requireNonNull(builder.endForeignKey, "EndForeignKey");
     }
 
     @Override

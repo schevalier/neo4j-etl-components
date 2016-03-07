@@ -23,7 +23,7 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
     public ExportToCsvResults( Collection<ExportToCsvResult> exportResults )
     {
         this.exportResults = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( exportResults, "exportResults" ) );
+                Preconditions.requireNonEmptyCollection( exportResults, "ExportResults" ) );
     }
 
     public GraphConfig createGraphConfig()
@@ -69,9 +69,9 @@ public class ExportToCsvResults implements Iterable<ExportToCsvResults.ExportToC
 
         public ExportToCsvResult( DatabaseObject databaseObject, Collection<Path> csvFiles )
         {
-            this.databaseObject = Preconditions.requireNonNull( databaseObject, "databaseObject" );
+            this.databaseObject = Preconditions.requireNonNull( databaseObject, "DatabaseObject" );
             this.csvFiles = Collections.unmodifiableCollection(
-                    Preconditions.requireNonEmptyCollection( csvFiles, "csvFiles" ) );
+                    Preconditions.requireNonEmptyCollection( csvFiles, "CsvFiles" ) );
         }
 
         public DatabaseObject databaseObject()

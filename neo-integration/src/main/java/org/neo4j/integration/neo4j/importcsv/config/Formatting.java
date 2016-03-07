@@ -18,7 +18,7 @@ public class Formatting
     Formatting( FormattingConfigBuilder builder )
     {
         this.delimiter = Preconditions.requireNonNull( builder.delimiter, "Delimiter" );
-        this.arrayDelimiter = Preconditions.requireNonNull( builder.arrayDelimiter, "Array delimiter" );
+        this.arrayDelimiter = Preconditions.requireNonNull( builder.arrayDelimiter, "ArrayDelimiter" );
         this.quote = Preconditions.requireNonNull( builder.quote, "Quote" );
     }
 

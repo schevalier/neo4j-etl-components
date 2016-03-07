@@ -28,10 +28,10 @@ public class ImportConfig implements CommandsSupplier
 
     ImportConfig( ImportConfigBuilder builder )
     {
-        this.importToolDirectory = Preconditions.requireNonNull( builder.importToolDirectory, "Import tool directory" );
+        this.importToolDirectory = Preconditions.requireNonNull( builder.importToolDirectory, "ImportToolDirectory" );
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
-        this.idType = Preconditions.requireNonNull( builder.idType, "Id type" );
+        this.idType = Preconditions.requireNonNull( builder.idType, "IdType" );
         this.nodes = Collections.unmodifiableCollection( builder.nodes );
         this.relationships = Collections.unmodifiableCollection( builder.relationships );
     }
