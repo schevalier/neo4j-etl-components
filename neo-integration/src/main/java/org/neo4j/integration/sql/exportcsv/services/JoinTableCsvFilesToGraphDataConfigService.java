@@ -12,8 +12,6 @@ class JoinTableCsvFilesToGraphDataConfigService implements CsvFilesToGraphDataCo
     @Override
     public GraphDataConfig createGraphDataConfig( Collection<Path> csvFiles )
     {
-        return importConfig -> importConfig.addRelationshipConfig( RelationshipConfig.builder()
-                .addInputFiles( csvFiles )
-                .build() );
+        return RelationshipConfig.builder() .addInputFiles( csvFiles ).build();
     }
 }

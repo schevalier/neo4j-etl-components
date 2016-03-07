@@ -32,8 +32,8 @@ public class ImportConfig implements CommandsSupplier
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
         this.idType = Preconditions.requireNonNull( builder.idType, "IdType" );
-        this.nodes = Collections.unmodifiableCollection( builder.nodes );
-        this.relationships = Collections.unmodifiableCollection( builder.relationships );
+        this.nodes = builder.nodes;
+        this.relationships = builder.relationships;
     }
 
     @Override

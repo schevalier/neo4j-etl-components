@@ -4,6 +4,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.CommandsSupplier;
 import org.neo4j.integration.util.Preconditions;
@@ -24,9 +27,8 @@ public class NodeConfig implements CommandsSupplier, GraphDataConfig
 
     NodeConfig( NodeConfigBuilder builder )
     {
-        this.files = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( builder.files, "Files" ) );
-        this.labels = Collections.unmodifiableCollection( builder.labels );
+        this.files = Preconditions.requireNonEmptyCollection( builder.files, "Files" );
+        this.labels = builder.labels;
     }
 
     @Override
@@ -40,6 +42,19 @@ public class NodeConfig implements CommandsSupplier, GraphDataConfig
     public void addTo( ImportConfig.Builder importConfig )
     {
         importConfig.addNodeConfig( this );
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals( Object o )
+    {
+        return EqualsBuilder.reflectionEquals( this, o );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 
     public interface Builder

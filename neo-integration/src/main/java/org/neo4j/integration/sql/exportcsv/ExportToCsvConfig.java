@@ -3,7 +3,6 @@ package org.neo4j.integration.sql.exportcsv;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,9 +39,9 @@ public class ExportToCsvConfig
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "ConnectionConfig" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
-        this.tables = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.tables, "Tables" ) );
-        this.joins = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.joins, "Joins" ) );
-        this.joinTables = Collections.unmodifiableCollection( Preconditions.requireNonNull( builder.joinTables, "JoinTables" ) );
+        this.tables = Preconditions.requireNonNull( builder.tables, "Tables" );
+        this.joins = Preconditions.requireNonNull( builder.joins, "Joins" );
+        this.joinTables = Preconditions.requireNonNull( builder.joinTables, "JoinTables" );
 
         validate();
     }
@@ -64,7 +63,7 @@ public class ExportToCsvConfig
 
     public Collection<DatabaseObject> databaseObjects()
     {
-        Collection<DatabaseObject>  results = new ArrayList<>(  );
+        Collection<DatabaseObject> results = new ArrayList<>();
         results.addAll( tables );
         results.addAll( joins );
         results.addAll( joinTables );

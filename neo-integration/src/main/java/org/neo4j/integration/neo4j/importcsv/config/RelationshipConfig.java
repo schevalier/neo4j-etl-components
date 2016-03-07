@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.CommandsSupplier;
 import org.neo4j.integration.util.Preconditions;
@@ -26,8 +29,7 @@ public class RelationshipConfig implements CommandsSupplier, GraphDataConfig
 
     RelationshipConfig( RelationshipConfigBuilder builder )
     {
-        this.files = Collections.unmodifiableCollection(
-                Preconditions.requireNonEmptyCollection( builder.files, "Files" ) );
+        this.files = Preconditions.requireNonEmptyCollection( builder.files, "Files" );
         this.type = Optional.ofNullable( Strings.orNull( builder.type ) );
     }
 
@@ -42,6 +44,19 @@ public class RelationshipConfig implements CommandsSupplier, GraphDataConfig
     public void addTo( ImportConfig.Builder importConfig )
     {
         importConfig.addRelationshipConfig( this );
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals( Object o )
+    {
+        return EqualsBuilder.reflectionEquals( this, o );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode( 31 );
     }
 
     public interface Builder

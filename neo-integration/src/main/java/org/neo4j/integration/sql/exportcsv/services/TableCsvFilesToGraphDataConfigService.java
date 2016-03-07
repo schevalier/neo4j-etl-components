@@ -20,9 +20,9 @@ class TableCsvFilesToGraphDataConfigService implements CsvFilesToGraphDataConfig
     @Override
     public GraphDataConfig createGraphDataConfig( Collection<Path> csvFiles )
     {
-        return importConfig -> importConfig.addNodeConfig( NodeConfig.builder()
+        return NodeConfig.builder()
                 .addInputFiles( csvFiles )
                 .addLabel( table.name().simpleName() )
-                .build() );
+                .build();
     }
 }
