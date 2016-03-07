@@ -12,7 +12,6 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
 
 import static java.lang.String.format;
@@ -86,11 +85,10 @@ public class ExportFromMySqlCommand
                 .addTables( schemaExport.startTable() )
                 .addTables( schemaExport.endTable() )
                 .addJoins( schemaExport.joins() )
-                .addJoinTables(schemaExport.joinTables())
+                .addJoinTables( schemaExport.joinTables() )
                 .build();
 
-        ExportToCsvResults exportResults = new ExportToCsvCommand( config, databaseExportService ).execute();
-        return exportResults.createGraphConfig();
+        return new ExportToCsvCommand( config, databaseExportService ).execute();
     }
 
     private void doImport( Formatting formatting, GraphConfig graphConfig ) throws Exception

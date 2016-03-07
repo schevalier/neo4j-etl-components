@@ -1,18 +1,9 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.nio.file.Path;
 import java.util.Collection;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
-import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
-import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
-import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
-import org.neo4j.integration.sql.exportcsv.mapping.JoinToCsvFieldMapper;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -75,9 +66,9 @@ public class Join implements DatabaseObject
     }
 
     @Override
-    public <T> T exportService( ExportServiceProvider<T> exportServiceProvider )
+    public <T> T createService( MetadataServiceProvider<T> metadataServiceProvider )
     {
-        return exportServiceProvider.joinExportService( this );
+        return metadataServiceProvider.joinService( this );
     }
 
     @Override

@@ -1,19 +1,10 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
-import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
-import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
-import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
-import org.neo4j.integration.sql.exportcsv.mapping.TableToCsvFieldMapper;
 import org.neo4j.integration.util.Preconditions;
 
 public class Table implements DatabaseObject
@@ -50,9 +41,9 @@ public class Table implements DatabaseObject
     }
 
     @Override
-    public <T> T exportService( ExportServiceProvider<T> exportServiceProvider )
+    public <T> T createService( MetadataServiceProvider<T> metadataServiceProvider )
     {
-        return exportServiceProvider.tableExportService( this );
+        return metadataServiceProvider.tableService( this );
     }
 
     @Override
