@@ -6,16 +6,17 @@ import java.util.Collections;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
+import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.TableToCsvFieldMapper;
 import org.neo4j.integration.util.Preconditions;
 
-public class Table extends DatabaseObject
+public class Table implements DatabaseObject
 {
     public static Builder.SetName builder()
     {
@@ -49,16 +50,9 @@ public class Table extends DatabaseObject
     }
 
     @Override
-    ExportToCsvResults.ExportToCsvResult exportToCsv( DatabaseExportSqlSupplier sqlSupplier,
-                                                      HeaderFileWriter headerFileWriter,
-                                                      CsvFileWriter csvFileWriter,
-                                                      ExportToCsvConfig config ) throws Exception
+    public <T> T exportService( ExportServiceProvider<T> exportServiceProvider )
     {
-
-        Collection<Path> files = new CsvFilesWriter<Table>( headerFileWriter, csvFileWriter )
-                .write( this, new TableToCsvFieldMapper( config.formatting() ), sqlSupplier );
-
-        return new ExportToCsvResults.ExportToCsvResult( this, files );
+        return exportServiceProvider.tableExportService( this );
     }
 
     @Override

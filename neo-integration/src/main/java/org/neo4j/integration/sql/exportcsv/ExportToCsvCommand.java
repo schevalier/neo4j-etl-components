@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.DatabaseClient;
@@ -34,22 +35,18 @@ public class ExportToCsvCommand
             Commands.commands( "chmod", "0777", config.destination().toString() ).execute().await();
         }
 
-        Collection<ExportToCsvResults.ExportToCsvResult> results = new ArrayList<>();
+        Collection<GraphDataConfig> results = new ArrayList<>();
 
         try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
             CsvFileWriter csvFileWriter = databaseExportService.createExportFileWriter( config, databaseClient );
+            ExportToCsvService exportService = new ExportToCsvService();
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
-                results.add(
-                        databaseExportService.exportDatabaseObjectToCsv(
-                                databaseObject,
-                                headerFileWriter,
-                                csvFileWriter,
-                                config
-                        ) );
+                results.add( databaseObject.exportService( exportService )
+                        .exportToCsv(  databaseExportService.sqlSupplier(), headerFileWriter, csvFileWriter, config) );
             }
         }
 

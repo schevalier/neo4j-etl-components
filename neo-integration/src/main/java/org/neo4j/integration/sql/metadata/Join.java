@@ -5,10 +5,11 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.config.GraphDataConfig;
+import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.JoinToCsvFieldMapper;
@@ -17,7 +18,7 @@ import org.neo4j.integration.util.Preconditions;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-public class Join extends DatabaseObject
+public class Join implements DatabaseObject
 {
     public static Builder.SetParentTable builder()
     {
@@ -39,7 +40,7 @@ public class Join extends DatabaseObject
 
     public boolean childTableRepresentsStartOfRelationship()
     {
-        return startTable.equals( childTable);
+        return startTable.equals( childTable );
     }
 
     public boolean parentTableRepresentsStartOfRelationship()
@@ -74,15 +75,9 @@ public class Join extends DatabaseObject
     }
 
     @Override
-    ExportToCsvResults.ExportToCsvResult exportToCsv( DatabaseExportSqlSupplier sqlSupplier,
-                                                      HeaderFileWriter headerFileWriter,
-                                                      CsvFileWriter csvFileWriter,
-                                                      ExportToCsvConfig config ) throws Exception
+    public <T> T exportService( ExportServiceProvider<T> exportServiceProvider )
     {
-        Collection<Path> files = new CsvFilesWriter<Join>( headerFileWriter, csvFileWriter )
-                .write( this, new JoinToCsvFieldMapper( config.formatting() ), sqlSupplier );
-
-        return new ExportToCsvResults.ExportToCsvResult( this, files );
+        return exportServiceProvider.joinExportService( this );
     }
 
     @Override

@@ -1,18 +1,8 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.nio.file.Path;
-import java.util.Collection;
-
-import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
-import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvResults;
-import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
-import org.neo4j.integration.sql.exportcsv.mapping.JoinTableToCsvFieldMapper;
 import org.neo4j.integration.util.Preconditions;
 
-public class JoinTable extends DatabaseObject
+public class JoinTable implements DatabaseObject
 {
     public static Builder.SetStartForeignKey builder()
     {
@@ -26,10 +16,10 @@ public class JoinTable extends DatabaseObject
 
     public JoinTable( JoinTableBuilder builder )
     {
-        this.startForeignKey = Preconditions.requireNonNull(builder.startForeignKey, "StartForeignKey");
-        this.startPrimaryKey = Preconditions.requireNonNull(builder.startPrimaryKey, "StartPrimaryKey");
-        this.endPrimaryKey = Preconditions.requireNonNull(builder.endPrimaryKey, "EndPrimaryKey");
-        this.endForeignKey = Preconditions.requireNonNull(builder.endForeignKey, "EndForeignKey");
+        this.startForeignKey = Preconditions.requireNonNull( builder.startForeignKey, "StartForeignKey" );
+        this.startPrimaryKey = Preconditions.requireNonNull( builder.startPrimaryKey, "StartPrimaryKey" );
+        this.endPrimaryKey = Preconditions.requireNonNull( builder.endPrimaryKey, "EndPrimaryKey" );
+        this.endForeignKey = Preconditions.requireNonNull( builder.endForeignKey, "EndForeignKey" );
     }
 
     @Override
@@ -39,15 +29,9 @@ public class JoinTable extends DatabaseObject
     }
 
     @Override
-    ExportToCsvResults.ExportToCsvResult exportToCsv( DatabaseExportSqlSupplier sqlSupplier,
-                                                      HeaderFileWriter headerFileWriter,
-                                                      CsvFileWriter csvFileWriter,
-                                                      ExportToCsvConfig config ) throws Exception
+    public <T> T exportService( ExportServiceProvider<T> exportServiceProvider )
     {
-        Collection<Path> files = new CsvFilesWriter<JoinTable>( headerFileWriter, csvFileWriter )
-                .write( this, new JoinTableToCsvFieldMapper( config.formatting() ), sqlSupplier );
-
-        return new ExportToCsvResults.ExportToCsvResult( this, files );
+        return exportServiceProvider.joinTableExportService( this );
     }
 
     public Column startForeignKey()
