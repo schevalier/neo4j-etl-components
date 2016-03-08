@@ -46,12 +46,12 @@ public class ExportToCsvCommand
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
             CsvFileWriter csvFileWriter = databaseExportService.createExportFileWriter( config, databaseClient );
 
-            ExportToCsvServiceProvider exportServiceProvider = new ExportToCsvServiceProvider();
+            ExportToCsvServiceProvider exportToCsvServiceProvider = new ExportToCsvServiceProvider();
             GraphDataConfigServiceProvider graphDataConfigServiceProvider = new GraphDataConfigServiceProvider();
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
-                Collection<Path> csvFiles = databaseObject.createService( exportServiceProvider )
+                Collection<Path> csvFiles = databaseObject.createService( exportToCsvServiceProvider )
                         .exportToCsv( databaseExportService.sqlSupplier(), headerFileWriter, csvFileWriter, config );
                 GraphDataConfig graphDataConfig = databaseObject.createService( graphDataConfigServiceProvider )
                         .createGraphDataConfig( csvFiles );

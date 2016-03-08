@@ -29,9 +29,9 @@ public class JoinTable implements DatabaseObject
     }
 
     @Override
-    public <T> T createService( MetadataServiceProvider<T> metadataServiceProvider )
+    public <T> T createService( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider )
     {
-        return metadataServiceProvider.joinTableService( this );
+        return databaseObjectServiceProvider.joinTableService( this );
     }
 
     public Column startForeignKey()

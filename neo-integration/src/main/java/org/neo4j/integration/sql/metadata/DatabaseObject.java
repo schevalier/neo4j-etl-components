@@ -4,5 +4,5 @@ public interface DatabaseObject
 {
     String descriptor();
 
-    <T> T createService( MetadataServiceProvider<T> metadataServiceProvider );
+    <T> T createService( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider );
 }

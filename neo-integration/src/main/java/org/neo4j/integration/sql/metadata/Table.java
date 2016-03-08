@@ -1,7 +1,6 @@
 package org.neo4j.integration.sql.metadata;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -40,9 +39,9 @@ public class Table implements DatabaseObject
     }
 
     @Override
-    public <T> T createService( MetadataServiceProvider<T> metadataServiceProvider )
+    public <T> T createService( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider )
     {
-        return metadataServiceProvider.tableService( this );
+        return databaseObjectServiceProvider.tableService( this );
     }
 
     @Override

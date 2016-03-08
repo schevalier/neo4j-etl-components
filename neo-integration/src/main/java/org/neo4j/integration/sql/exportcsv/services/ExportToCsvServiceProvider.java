@@ -1,12 +1,12 @@
 package org.neo4j.integration.sql.exportcsv.services;
 
 import org.neo4j.integration.sql.exportcsv.DatabaseObjectToCsvFilesService;
-import org.neo4j.integration.sql.metadata.MetadataServiceProvider;
+import org.neo4j.integration.sql.metadata.DatabaseObjectServiceProvider;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
 
-public class ExportToCsvServiceProvider implements MetadataServiceProvider<DatabaseObjectToCsvFilesService>
+public class ExportToCsvServiceProvider implements DatabaseObjectServiceProvider<DatabaseObjectToCsvFilesService>
 {
     @Override
     public DatabaseObjectToCsvFilesService tableService( Table table )

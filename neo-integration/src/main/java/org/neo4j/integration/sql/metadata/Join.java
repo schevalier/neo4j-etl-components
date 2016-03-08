@@ -66,9 +66,9 @@ public class Join implements DatabaseObject
     }
 
     @Override
-    public <T> T createService( MetadataServiceProvider<T> metadataServiceProvider )
+    public <T> T createService( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider )
     {
-        return metadataServiceProvider.joinService( this );
+        return databaseObjectServiceProvider.joinService( this );
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.neo4j.integration.sql.metadata;
 
-public interface MetadataServiceProvider<T>
+public interface DatabaseObjectServiceProvider<T>
 {
     T tableService( Table table );
 
