@@ -31,38 +31,14 @@ public class JoinTableToCsvFieldMapperTest
         TableName startTableName = new TableName( "test.Student" );
         TableName endTableName = new TableName( "test.Course" );
 
-        Column startForeignKey = Column.builder()
-                .table( joinTableName )
-                .name( joinTableName.fullyQualifiedColumnName( "studentId" ) )
-                .alias( "studentId" )
-                .columnType( ColumnType.ForeignKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build();
-        Column startPrimaryKey = Column.builder()
-                .table( startTableName )
-                .name( startTableName.fullyQualifiedColumnName( "id" ) )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build();
+        Column startForeignKey = getBuild( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
+        Column startPrimaryKey = getBuild( startTableName, "id", "id", ColumnType.PrimaryKey );
 
-        Column endForeignKey = Column.builder()
-                .table( joinTableName )
-                .name( joinTableName.fullyQualifiedColumnName( "courseId" ) )
-                .alias( "courseId" )
-                .columnType( ColumnType.ForeignKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build();
-        Column endPrimaryKey = Column.builder()
-                .table( endTableName )
-                .name( endTableName.fullyQualifiedColumnName( "id" ) )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build();
+        Column endForeignKey = getBuild( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
+        Column endPrimaryKey = getBuild( endTableName, "id", "id", ColumnType.PrimaryKey );
 
         JoinTable joinTable = JoinTable.builder()
-                .startForeignKey(startForeignKey  )
+                .startForeignKey( startForeignKey )
                 .connectsToStartTablePrimaryKey( startPrimaryKey )
                 .endForeignKey( endForeignKey )
                 .connectsToEndTablePrimaryKey( endPrimaryKey )
@@ -82,6 +58,17 @@ public class JoinTableToCsvFieldMapperTest
                 CsvField.endId( new IdSpace( "test.Course" ) ),
                 CsvField.relationshipType() ) );
 
-        assertEquals( asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"" ), columns );
+        assertEquals( asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"" )
+                , columns );
+    }
+
+    private Column getBuild( TableName tableName, String name, String alias, ColumnType columnType )
+    {
+        return new Column(
+                tableName,
+                tableName.fullyQualifiedColumnName( name ),
+                alias,
+                columnType,
+                SqlDataType.KEY_DATA_TYPE );
     }
 }

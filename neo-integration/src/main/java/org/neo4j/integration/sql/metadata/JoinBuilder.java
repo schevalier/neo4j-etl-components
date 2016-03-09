@@ -25,26 +25,26 @@ class JoinBuilder implements Join.Builder.SetParentTable,
     @Override
     public SetForeignKey primaryKey( String primaryKey )
     {
-        this.primaryKey = Column.builder()
-                .table( parentTable )
-                .name( parentTable.fullyQualifiedColumnName( primaryKey ) )
-                .alias( primaryKey )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build();
+
+        this.primaryKey = new Column(
+                parentTable,
+                parentTable.fullyQualifiedColumnName( primaryKey ),
+                primaryKey,
+                ColumnType.PrimaryKey,
+                SqlDataType.KEY_DATA_TYPE );
         return this;
     }
 
     @Override
     public SetChildTable foreignKey( String foreignKey )
     {
-        this.foreignKey = Column.builder()
-                .table( parentTable )
-                .name( parentTable.fullyQualifiedColumnName( foreignKey ) )
-                .alias( foreignKey )
-                .columnType( ColumnType.ForeignKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build();
+
+        this.foreignKey = new Column(
+                parentTable,
+                parentTable.fullyQualifiedColumnName( foreignKey ),
+                foreignKey,
+                ColumnType.ForeignKey,
+                SqlDataType.KEY_DATA_TYPE );
         return this;
     }
 

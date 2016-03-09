@@ -28,13 +28,11 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
         String relationshipType = deriveRelationshipType( join ).toUpperCase();
 
         builder.add(
-                Column.builder()
-                        .table( join.primaryKey().table() )
-                        .name( formatting.quote().enquote( relationshipType ) )
-                        .alias( relationshipType )
-                        .columnType( ColumnType.Literal )
-                        .dataType( SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE )
-                        .build(),
+                new Column( join.primaryKey().table(),
+                        formatting.quote().enquote( relationshipType ),
+                        relationshipType,
+                        ColumnType.Literal,
+                        SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE ),
                 CsvField.relationshipType() );
 
         return builder.build();

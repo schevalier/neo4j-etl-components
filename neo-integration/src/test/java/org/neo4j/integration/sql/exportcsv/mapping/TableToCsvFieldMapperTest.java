@@ -76,12 +76,11 @@ public class TableToCsvFieldMapperTest
 
     private Column column( TableName table, String name, ColumnType columnType, MySqlDataType text )
     {
-        return Column.builder()
-                .table( table )
-                .name( table.fullyQualifiedColumnName( name ) )
-                .alias( name )
-                .columnType( columnType )
-                .dataType( text )
-                .build();
+        return new Column(
+                table,
+                table.fullyQualifiedColumnName( name ),
+                name,
+                columnType,
+                text );
     }
 }

@@ -60,20 +60,18 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
         TableName joinTableName = joinTableInfo.joinTableName();
         TableName referencedTable = referenceTableFunction.apply( joinTableInfo );
         return new ColumnPair(
-                Column.builder()
-                        .table( joinTableName )
-                        .name( joinTableName.fullyQualifiedColumnName( results.getString( "FOREIGN_KEY" ) ) )
-                        .alias( results.getString( "FOREIGN_KEY" ) )
-                        .columnType( ColumnType.ForeignKey )
-                        .dataType( SqlDataType.KEY_DATA_TYPE )
-                        .build(),
-                Column.builder()
-                        .table( referencedTable )
-                        .name( referencedTable.fullyQualifiedColumnName(   results.getString( "REFERENCED_PRIMARY_KEY" ) ))
-                        .alias( results.getString( "REFERENCED_PRIMARY_KEY" ) )
-                        .columnType( ColumnType.PrimaryKey )
-                        .dataType( SqlDataType.KEY_DATA_TYPE )
-                        .build()
+                new Column(
+                        joinTableName,
+                        joinTableName.fullyQualifiedColumnName( results.getString( "FOREIGN_KEY" ) ),
+                        results.getString( "FOREIGN_KEY" ),
+                        ColumnType.ForeignKey,
+                        SqlDataType.KEY_DATA_TYPE ),
+                new Column(
+                        referencedTable,
+                        referencedTable.fullyQualifiedColumnName( results.getString( "REFERENCED_PRIMARY_KEY" ) ),
+                        results.getString( "REFERENCED_PRIMARY_KEY" ),
+                        ColumnType.PrimaryKey,
+                        SqlDataType.KEY_DATA_TYPE )
 
         );
     }

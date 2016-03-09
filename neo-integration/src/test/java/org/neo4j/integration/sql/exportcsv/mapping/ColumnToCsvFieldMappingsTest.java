@@ -20,23 +20,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfCsvFields()
     {
         // given
-        Column column1 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
+        Column column1 = buildColumn( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.username" )
-                .alias( "username" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
+                .Data );
 
-        Column column3 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.age" )
-                .alias( "age" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
 
         CsvField idField = CsvField.id();
         CsvField usernameField = CsvField.data( "username", Neo4jDataType.String );
@@ -59,25 +48,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfFullyQualifiedColumnNames()
     {
         // given
-        Column column1 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
+        Column column1 = buildColumn( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.username" )
-                .alias( "username" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
-        ;
+        Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
+                .Data );
 
-        Column column3 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.age" )
-                .alias( "age" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
-        ;
+        Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -96,24 +72,13 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfAliasedColumnNames()
     {
         // given
-        Column column1 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
+        Column column1 = buildColumn( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.username" )
-                .alias( "username" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
+                .Data );
         ;
 
-        Column column3 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.age" )
-                .alias( "age" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
+        Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
         ;
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
@@ -134,24 +99,22 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfFullyQualifiedTableNames()
     {
         // given
-        Column column1 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
+        Column column1 = buildColumn(
+                new TableName( "test.Person" ),
+                "test.Person.id",
+                "id",
+                ColumnType.PrimaryKey );
 
-        Column column2 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.username" )
-                .alias( "username" )
-                .columnType( ColumnType.Data ).dataType( MySqlDataType.TEXT ).build();
-        ;
-
-        Column column3 = Column.builder()
-                .table( new TableName( "test.Address" ) )
-                .name( "test.Address.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey ).dataType( MySqlDataType.TEXT ).build();
+        Column column2 = buildColumn(
+                new TableName( "test.Person" ),
+                "test.Person.username",
+                "username",
+                ColumnType.Data );
+        Column column3 = buildColumn(
+                new TableName( "test.Address" ),
+                "test.Address.id",
+                "id",
+                ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -164,5 +127,16 @@ public class ColumnToCsvFieldMappingsTest
 
         // then
         assertThat( tableNames, hasItems( "test.Person", "test.Address" ) );
+    }
+
+    private Column buildColumn( TableName table, String name, String alias, ColumnType columnType )
+    {
+        return new Column(
+                table,
+                name,
+                alias,
+                columnType,
+                MySqlDataType.TEXT );
+
     }
 }

@@ -8,24 +8,19 @@ import org.neo4j.integration.util.Preconditions;
 
 public class Column
 {
-    public static Column.Builder.SetTable builder()
-    {
-        return new ColumnBuilder();
-    }
-
     private final TableName table;
     private final String name;
     private final String alias;
     private final ColumnType columnType;
     private final SqlDataType dataType;
 
-    Column( ColumnBuilder builder )
+    public Column( TableName table, String name, String alias, ColumnType columnType, SqlDataType dataType )
     {
-        this.table = Preconditions.requireNonNull( builder.table, "Table" );
-        this.name = Preconditions.requireNonNullString( builder.name, "Name" );
-        this.alias = Preconditions.requireNonNullString( builder.alias, "Alias" );
-        this.columnType = Preconditions.requireNonNull( builder.columnType, "ColumnType" );
-        this.dataType = Preconditions.requireNonNull( builder.dataType, "DataType" );
+        this.table = Preconditions.requireNonNull( table, "Table" );
+        this.name = Preconditions.requireNonNullString( name, "Name" );
+        this.alias = Preconditions.requireNonNullString( alias, "Alias" );
+        this.columnType = Preconditions.requireNonNull( columnType, "ColumnType" );
+        this.dataType = Preconditions.requireNonNull( dataType, "DataType" );
     }
 
     public TableName table()
@@ -72,35 +67,5 @@ public class Column
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode( 31 );
-    }
-
-    public interface Builder
-    {
-        interface SetTable
-        {
-            SetName table( TableName table );
-        }
-
-        interface SetName
-        {
-            SetAlias name( String name );
-        }
-
-        interface SetAlias
-        {
-            SetColumnType alias( String alias );
-        }
-
-        interface SetColumnType
-        {
-            SetDataType columnType( ColumnType columnType );
-        }
-
-        interface SetDataType
-        {
-            Builder dataType( SqlDataType dataType );
-        }
-
-        Column build();
     }
 }

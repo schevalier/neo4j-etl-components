@@ -58,13 +58,13 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                         break;
                 }
 
-                builder.addColumn( Column.builder()
-                        .table( source )
-                        .name( source.fullyQualifiedColumnName( columnName ) )
-                        .alias( columnName )
-                        .columnType( columnType )
-                        .dataType( dataType )
-                        .build() );
+                builder.addColumn(
+                        new Column(
+                                source,
+                                source.fullyQualifiedColumnName( columnName ),
+                                columnName,
+                                columnType,
+                                dataType ) );
             }
         }
 

@@ -55,41 +55,37 @@ public class JoinMetadataProducerTest
 
         Join join1 = iterator.next();
 
-        assertEquals( Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build(), join1.primaryKey() );
+        assertEquals( new Column(
+                new TableName( "test.Person" ),
+                "test.Person.id",
+                "id",
+                ColumnType.PrimaryKey,
+                SqlDataType.KEY_DATA_TYPE ), join1.primaryKey() );
 
-        assertEquals( Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.addressId" )
-                .alias( "addressId" )
-                .columnType( ColumnType.ForeignKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build(), join1.foreignKey() );
+        assertEquals( new Column(
+                new TableName( "test.Person" ),
+                "test.Person.addressId",
+                "addressId",
+                ColumnType.ForeignKey,
+                SqlDataType.KEY_DATA_TYPE ), join1.foreignKey() );
 
         assertEquals( new TableName( "test.Address" ), join1.childTable() );
 
         Join join2 = iterator.next();
 
-        assertEquals( Column.builder()
-                .table( new TableName( "test.Address" ) )
-                .name( "test.Address.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build(), join2.primaryKey() );
+        assertEquals( new Column(
+                new TableName( "test.Address" ),
+                "test.Address.id",
+                "id",
+                ColumnType.PrimaryKey,
+                SqlDataType.KEY_DATA_TYPE ), join2.primaryKey() );
 
-        assertEquals( Column.builder()
-                .table( new TableName( "test.Address" ) )
-                .name( "test.Address.ownerId" )
-                .alias( "ownerId" )
-                .columnType( ColumnType.ForeignKey )
-                .dataType( SqlDataType.KEY_DATA_TYPE )
-                .build(), join2.foreignKey() );
+        assertEquals( new Column(
+                new TableName( "test.Address" ),
+                "test.Address.ownerId",
+                "ownerId",
+                ColumnType.ForeignKey,
+                SqlDataType.KEY_DATA_TYPE ), join2.foreignKey() );
 
         assertEquals( new TableName( "test.Person" ), join2.childTable() );
 

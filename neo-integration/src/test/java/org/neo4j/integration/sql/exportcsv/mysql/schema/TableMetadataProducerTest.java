@@ -48,27 +48,25 @@ public class TableMetadataProducerTest
 
         assertEquals( expectedTableName, table.name() );
         assertEquals( "test.Person", table.descriptor() );
+
         assertThat( table.columns(), contains(
-                Column.builder()
-                        .table( expectedTableName )
-                        .name( expectedTableName.fullyQualifiedColumnName( "id" ) )
-                        .alias( "id" )
-                        .columnType( ColumnType.PrimaryKey )
-                        .dataType( MySqlDataType.INT )
-                        .build(),
-                Column.builder()
-                        .table( expectedTableName )
-                        .name( expectedTableName.fullyQualifiedColumnName( "username" ) )
-                        .alias( "username" )
-                        .columnType( ColumnType.Data )
-                        .dataType( MySqlDataType.TEXT )
-                        .build(),
-                Column.builder()
-                        .table( expectedTableName )
-                        .name( expectedTableName.fullyQualifiedColumnName( "addressId" ) )
-                        .alias( "addressId" )
-                        .columnType( ColumnType.ForeignKey )
-                        .dataType( MySqlDataType.INT )
-                        .build() ) );
+                new Column(
+                        expectedTableName,
+                        expectedTableName.fullyQualifiedColumnName( "id" ),
+                        "id",
+                        ColumnType.PrimaryKey,
+                        MySqlDataType.INT ),
+                new Column(
+                        expectedTableName,
+                        expectedTableName.fullyQualifiedColumnName( "username" ),
+                        "username",
+                        ColumnType.Data,
+                        MySqlDataType.TEXT ),
+                new Column(
+                        expectedTableName,
+                        expectedTableName.fullyQualifiedColumnName( "addressId" ),
+                        "addressId",
+                        ColumnType.ForeignKey,
+                        MySqlDataType.INT ) ) );
     }
 }

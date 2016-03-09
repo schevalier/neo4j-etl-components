@@ -56,40 +56,35 @@ public class JoinTableMetadataProducerTest
 
         JoinTable joinTable = iterator.next();
 
-        assertEquals( Column.builder()
-                        .table( new TableName( "test.Student_Course" ) )
-                        .name( "test.Student_Course.studentId" )
-                        .alias( "studentId" )
-                        .columnType( ColumnType.ForeignKey )
-                        .dataType( SqlDataType.KEY_DATA_TYPE )
-                        .build(),
+        assertEquals( new Column(
+                    new TableName( "test.Student_Course" ),
+                    "test.Student_Course.studentId",
+                    "studentId",
+                    ColumnType.ForeignKey,
+                    SqlDataType.KEY_DATA_TYPE ),
                 joinTable.startForeignKey() );
 
-        assertEquals( Column.builder()
-                        .table( new TableName( "test.Student" ) )
-                        .name( "test.Student.id" )
-                        .alias( "id" )
-                        .columnType( ColumnType.PrimaryKey )
-                        .dataType( SqlDataType.KEY_DATA_TYPE )
-                        .build(),
+        assertEquals( new Column(
+                    new TableName( "test.Student" ),
+                    "test.Student.id",
+                    "id",
+                    ColumnType.PrimaryKey,
+                    SqlDataType.KEY_DATA_TYPE ),
                 joinTable.startPrimaryKey() );
 
-        assertEquals( Column.builder()
-                        .table( new TableName( "test.Student_Course" ) )
-                        .name( "test.Student_Course.courseId" )
-                        .alias( "courseId" )
-                        .columnType( ColumnType.ForeignKey )
-                        .dataType( SqlDataType.KEY_DATA_TYPE )
-                        .build(),
+        assertEquals( new Column(
+                        new TableName( "test.Student_Course" ),
+                        "test.Student_Course.courseId",
+                        "courseId",
+                        ColumnType.ForeignKey,
+                        SqlDataType.KEY_DATA_TYPE ),
                 joinTable.endForeignKey() );
 
-        assertEquals( Column.builder()
-                        .table( new TableName( "test.Course" ) )
-                        .name( "test.Course.id" )
-                        .alias( "id" )
-                        .columnType( ColumnType.PrimaryKey )
-                        .dataType( SqlDataType.KEY_DATA_TYPE )
-                        .build(),
+        assertEquals( new Column(
+                        new TableName( "test.Course" ),
+                        "test.Course.id", "id",
+                        ColumnType.PrimaryKey,
+                        SqlDataType.KEY_DATA_TYPE ),
                 joinTable.endPrimaryKey() );
 
         assertFalse( iterator.hasNext() );

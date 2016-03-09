@@ -62,20 +62,18 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        Column.builder()
-                                .table( table )
-                                .name( "id" )
-                                .alias( "id" )
-                                .columnType( ColumnType.PrimaryKey )
-                                .dataType( MySqlDataType.TEXT )
-                                .build(),
-                        Column.builder()
-                                .table( table )
-                                .name( "username" )
-                                .alias( "username" )
-                                .columnType( ColumnType.PrimaryKey )
-                                .dataType( MySqlDataType.TEXT )
-                                .build() ) );
+                        new Column(
+                                table,
+                                "id",
+                                "id",
+                                ColumnType.PrimaryKey,
+                                MySqlDataType.TEXT ),
+                        new Column(
+                                table,
+                                "username",
+                                "username",
+                                ColumnType.PrimaryKey,
+                                MySqlDataType.TEXT ) ) );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );

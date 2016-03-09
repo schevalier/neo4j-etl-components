@@ -41,7 +41,7 @@ public class ExportToCsvConfigTest
                             .primaryKey( "id" )
                             .foreignKey( "addressId" )
                             .childTable( addressTable )
-                            .startTable(  new TableName( "test.Person" )  )
+                            .startTable( new TableName( "test.Person" ) )
                             .build() )
                     .build();
             fail( "Expected IllegalStatException" );
@@ -92,12 +92,11 @@ public class ExportToCsvConfigTest
 
     private Column column( TableName table, String name, ColumnType type )
     {
-        return Column.builder()
-                .table( table )
-                .name( table.fullyQualifiedColumnName( name ) )
-                .alias( name )
-                .columnType( type )
-                .dataType( MySqlDataType.TEXT )
-                .build();
+        return new Column(
+                table,
+                table.fullyQualifiedColumnName( name ),
+                name,
+                type,
+                MySqlDataType.TEXT );
     }
 }

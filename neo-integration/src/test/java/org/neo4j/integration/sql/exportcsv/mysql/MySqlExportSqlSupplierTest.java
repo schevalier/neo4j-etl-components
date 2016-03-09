@@ -17,29 +17,26 @@ public class MySqlExportSqlSupplierTest
     public void shouldCreateSqlForSelectingColumnsFromTables()
     {
         // given
-        Column column1 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( MySqlDataType.TEXT )
-                .build();
+        Column column1 = new Column(
+                new TableName( "test.Person" ),
+                "test.Person.id",
+                "id",
+                ColumnType.PrimaryKey,
+                MySqlDataType.TEXT );
 
-        Column column2 = Column.builder()
-                .table( new TableName( "test.Person" ) )
-                .name( "test.Person.username" )
-                .alias( "username" )
-                .columnType( ColumnType.Data )
-                .dataType( MySqlDataType.TEXT )
-                .build();
+        Column column2 = new Column(
+                new TableName( "test.Person" ),
+                "test.Person.username",
+                "username",
+                ColumnType.Data,
+                MySqlDataType.TEXT );
 
-        Column column3 = Column.builder()
-                .table( new TableName( "test.Address" ) )
-                .name( "test.Address.id" )
-                .alias( "id" )
-                .columnType( ColumnType.PrimaryKey )
-                .dataType( MySqlDataType.TEXT )
-                .build();
+        Column column3 = new Column(
+                new TableName( "test.Address" ),
+                "test.Address.id",
+                "id",
+                ColumnType.PrimaryKey,
+                MySqlDataType.TEXT );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
