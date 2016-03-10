@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.services;
+package org.neo4j.integration.sql.exportcsv.services.csv;
 
 import org.neo4j.integration.sql.exportcsv.DatabaseObjectToCsvFilesService;
 import org.neo4j.integration.sql.metadata.DatabaseObjectServiceProvider;

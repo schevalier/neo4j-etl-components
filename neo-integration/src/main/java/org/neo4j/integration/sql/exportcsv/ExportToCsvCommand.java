@@ -11,8 +11,8 @@ import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.services.ExportToCsvServiceProvider;
-import org.neo4j.integration.sql.exportcsv.services.GraphDataConfigServiceProvider;
+import org.neo4j.integration.sql.exportcsv.services.csv.ExportToCsvServiceProvider;
+import org.neo4j.integration.sql.exportcsv.services.graphconfig.GraphDataConfigServiceProvider;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.util.OperatingSystem;
 

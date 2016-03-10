@@ -190,12 +190,13 @@ public class ExportFromMySqlIntegrationTest
             List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[2].name" );
 
             assertThat( students.size(), is( 4 ) );
-            assertThat( students, hasItems( "jim", "mark") );
+            assertThat( students, hasItems( "jim", "mark" ) );
 
-            assertEquals( asList( "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE"), relationships );
+            assertEquals( asList( "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE" ),
+                    relationships );
 
             assertThat( courses.size(), is( 4 ) );
-            assertThat( courses, hasItems("Science", "Maths", "English") );
+            assertThat( courses, hasItems( "Science", "Maths", "English" ) );
         }
         finally
         {

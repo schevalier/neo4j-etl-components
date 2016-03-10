@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.services;
+package org.neo4j.integration.sql.exportcsv.services.graphconfig;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,9 +11,9 @@ import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
 
 import static java.util.Arrays.asList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class JoinTableCsvFilesToGraphDataConfigServiceTest
+public class JoinCsvFilesToGraphDataConfigServiceTest
 {
     @Test
     public void shouldCreateRelationshipConfig()
@@ -22,7 +22,7 @@ public class JoinTableCsvFilesToGraphDataConfigServiceTest
         Collection<Path> csvFiles = asList( Paths.get( "header.csv" ), Paths.get( "body.csv" ) );
         GraphDataConfig expectedRelationshipConfig = RelationshipConfig.builder().addInputFiles( csvFiles ).build();
 
-        JoinTableCsvFilesToGraphDataConfigService service = new JoinTableCsvFilesToGraphDataConfigService();
+        JoinCsvFilesToGraphDataConfigService service = new JoinCsvFilesToGraphDataConfigService();
 
         // when
         GraphDataConfig graphDataConfig = service.createGraphDataConfig( csvFiles );

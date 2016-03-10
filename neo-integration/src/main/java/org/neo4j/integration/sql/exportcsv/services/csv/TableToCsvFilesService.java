@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.services;
+package org.neo4j.integration.sql.exportcsv.services.csv;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -9,16 +9,16 @@ import org.neo4j.integration.sql.exportcsv.DatabaseObjectToCsvFilesService;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.io.CsvFilesWriter;
-import org.neo4j.integration.sql.exportcsv.mapping.JoinToCsvFieldMapper;
-import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.exportcsv.mapping.TableToCsvFieldMapper;
+import org.neo4j.integration.sql.metadata.Table;
 
-class JoinToCsvFilesService implements DatabaseObjectToCsvFilesService
+class TableToCsvFilesService implements DatabaseObjectToCsvFilesService
 {
-    private final Join join;
+    private final Table table;
 
-    public JoinToCsvFilesService( Join join )
+    public TableToCsvFilesService( Table table )
     {
-        this.join = join;
+        this.table = table;
     }
 
     @Override
@@ -27,7 +27,7 @@ class JoinToCsvFilesService implements DatabaseObjectToCsvFilesService
                                          CsvFileWriter csvFileWriter,
                                          ExportToCsvConfig config ) throws Exception
     {
-        return new CsvFilesWriter<Join>( headerFileWriter, csvFileWriter )
-                .write( join, new JoinToCsvFieldMapper( config.formatting() ), sqlSupplier );
+        return new CsvFilesWriter<Table>( headerFileWriter, csvFileWriter )
+                .write( table, new TableToCsvFieldMapper( config.formatting() ), sqlSupplier );
     }
 }
