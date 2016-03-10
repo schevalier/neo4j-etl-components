@@ -1,5 +1,8 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 class JoinTableBuilder implements
         JoinTable.Builder.SetStartForeignKey,
         JoinTable.Builder.SetStartPrimaryKey,
@@ -11,6 +14,8 @@ class JoinTableBuilder implements
     Column startPrimaryKey;
     Column endPrimaryKey;
     Column endForeignKey;
+    final Collection<Column> columns = new ArrayList<>();
+
 
     @Override
     public JoinTable.Builder.SetStartPrimaryKey startForeignKey( Column startForeignKey )
@@ -37,6 +42,13 @@ class JoinTableBuilder implements
     public JoinTable.Builder connectsToEndTablePrimaryKey( Column endPrimaryKey )
     {
         this.endPrimaryKey = endPrimaryKey;
+        return this;
+    }
+
+    @Override
+    public JoinTable.Builder addColumn( Column column )
+    {
+        this.columns.add( column );
         return this;
     }
 

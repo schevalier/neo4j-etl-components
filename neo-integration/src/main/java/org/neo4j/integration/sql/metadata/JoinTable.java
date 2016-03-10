@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.util.Collection;
+
 import org.neo4j.integration.util.Preconditions;
 
 public class JoinTable implements DatabaseObject
@@ -10,9 +12,12 @@ public class JoinTable implements DatabaseObject
     }
 
     private final Column startForeignKey;
+
     private final Column startPrimaryKey;
     private final Column endPrimaryKey;
     private final Column endForeignKey;
+    private final Collection<Column> columns;
+
 
     public JoinTable( JoinTableBuilder builder )
     {
@@ -20,6 +25,7 @@ public class JoinTable implements DatabaseObject
         this.startPrimaryKey = Preconditions.requireNonNull( builder.startPrimaryKey, "StartPrimaryKey" );
         this.endPrimaryKey = Preconditions.requireNonNull( builder.endPrimaryKey, "EndPrimaryKey" );
         this.endForeignKey = Preconditions.requireNonNull( builder.endForeignKey, "EndForeignKey" );
+        this.columns = builder.columns;
     }
 
     @Override
@@ -54,6 +60,11 @@ public class JoinTable implements DatabaseObject
         return endPrimaryKey;
     }
 
+    public Collection<Column> columns()
+    {
+        return columns;
+    }
+
     public TableName joinTableName()
     {
         return startForeignKey.table();
@@ -80,6 +91,8 @@ public class JoinTable implements DatabaseObject
         {
             Builder connectsToEndTablePrimaryKey( Column endPrimaryKey );
         }
+
+        Builder addColumn( Column column );
 
         JoinTable build();
     }

@@ -40,6 +40,27 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
                         SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE ),
                 CsvField.relationshipType() );
 
+        addProperties( joinTable, builder );
+
         return builder.build();
+    }
+
+    private void addProperties( JoinTable joinTable, ColumnToCsvFieldMappings.Builder builder )
+    {
+        for ( Column column : joinTable.columns() )
+        {
+            switch ( column.type() )
+            {
+                case PrimaryKey:
+                    builder.add( column, CsvField.id( new IdSpace( joinTable.joinTableName().fullName() ) ) );
+                    break;
+                case Data:
+                    builder.add( column, CsvField.data( column.alias(), column.dataType().toNeo4jDataType() ) );
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
     }
 }

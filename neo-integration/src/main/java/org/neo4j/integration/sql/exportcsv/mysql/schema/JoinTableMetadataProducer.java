@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.JoinTable;
@@ -38,23 +39,68 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
             ColumnPair start = getColumnPair( results, source, jT -> jT.referencedTables().startTable() );
             ColumnPair end = getColumnPair( results, source, jT -> jT.referencedTables().endTable() );
 
-            JoinTable joinTable = JoinTable.builder()
+            JoinTable.Builder builder = JoinTable.builder()
                     .startForeignKey( start.foreignKey() )
                     .connectsToStartTablePrimaryKey( start.referencedPrimaryKey() )
                     .endForeignKey( end.foreignKey() )
-                    .connectsToEndTablePrimaryKey( end.referencedPrimaryKey() )
-                    .build();
+                    .connectsToEndTablePrimaryKey( end.referencedPrimaryKey() );
 
+            addColumn( builder, source.joinTableName() );
 
+            JoinTable joinTable = builder.build();
             joinTables.add( joinTable );
         }
-
         return joinTables;
 
     }
 
-    private ColumnPair getColumnPair( QueryResults results, JoinTableInfo joinTableInfo, Function<JoinTableInfo,
-            TableName> referenceTableFunction ) throws Exception
+    private void addColumn( JoinTable.Builder builder, TableName joinTableName ) throws Exception
+    {
+        String projectColumnsSql = "SELECT " +
+                "COLUMN_NAME, " +
+                "DATA_TYPE, " +
+                "COLUMN_KEY " +
+                "FROM INFORMATION_SCHEMA.COLUMNS " +
+                "WHERE TABLE_SCHEMA = '" + joinTableName.schema() +
+                "' AND TABLE_NAME ='" + joinTableName.simpleName() + "'" +
+                " AND COLUMN_KEY NOT IN ('MUL', 'PRI')" + ";";
+
+        try ( QueryResults results = databaseClient.executeQuery( projectColumnsSql ).await() )
+        {
+            while ( results.next() )
+            {
+                String columnName = results.getString( "COLUMN_NAME" );
+                String columnKey = results.getString( "COLUMN_KEY" );
+                SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
+
+                ColumnType columnType;
+
+                switch ( columnKey )
+                {
+                    case "PRI":
+                        columnType = ColumnType.PrimaryKey;
+                        break;
+                    case "MUL":
+                        columnType = ColumnType.ForeignKey;
+                        break;
+                    default:
+                        columnType = ColumnType.Data;
+                        break;
+                }
+
+                builder.addColumn( new Column(
+                        joinTableName,
+                        joinTableName.fullyQualifiedColumnName( columnName ),
+                        columnName,
+                        columnType,
+                        dataType ) );
+            }
+        }
+    }
+
+    private ColumnPair getColumnPair( QueryResults results,
+                                      JoinTableInfo joinTableInfo,
+                                      Function<JoinTableInfo, TableName> referenceTableFunction ) throws Exception
     {
         results.next();
         TableName joinTableName = joinTableInfo.joinTableName();

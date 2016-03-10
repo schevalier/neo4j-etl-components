@@ -2,14 +2,16 @@ DROP DATABASE IF EXISTS javabase;
 CREATE DATABASE javabase
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci;
-GRANT ALL ON javabase.* TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.* TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Address
 (
   id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
   postcode TEXT NOT NULL
 );
-GRANT ALL ON javabase.Address TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Address TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Person
 (
@@ -18,7 +20,8 @@ CREATE TABLE javabase.Person
   addressId INT  NOT NULL,
   FOREIGN KEY (addressId) REFERENCES javabase.Address (id)
 );
-GRANT ALL ON javabase.Person TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Person TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Numeric_Table
 (
@@ -31,7 +34,8 @@ CREATE TABLE javabase.Numeric_Table
   double_field    DOUBLE,
   decimal_field   DECIMAL
 );
-GRANT ALL ON javabase.Numeric_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Numeric_Table TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.String_Table
 (
@@ -50,7 +54,8 @@ CREATE TABLE javabase.String_Table
   enum_field       ENUM('val-1', 'val-2'),
   varchar_field    VARCHAR(200)
 );
-GRANT ALL ON javabase.String_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.String_Table TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 
 CREATE TABLE javabase.Date_Table
@@ -64,30 +69,35 @@ CREATE TABLE javabase.Date_Table
   time_field      TIME,
   year_field      YEAR(4)
 );
-GRANT ALL ON javabase.Date_Table TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Date_Table TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Student
 (
   id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
   username TEXT NOT NULL
 );
-GRANT ALL ON javabase.Student TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Student TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Course
 (
   id   INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name TEXT NOT NULL
 );
-GRANT ALL ON javabase.Course TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Course TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Student_Course
 (
-  studentId INT NOT NULL,
-  courseId  INT NOT NULL,
+  studentId INT  NOT NULL,
+  courseId  INT  NOT NULL,
+  credits      INT NOT NULL,
   FOREIGN KEY (studentId) REFERENCES javabase.Student (id),
   FOREIGN KEY (courseId) REFERENCES javabase.Course (id)
 );
-GRANT ALL ON javabase.Student_Course TO '<DBUser>'@'localhost' IDENTIFIED BY '<DBPassword>';
+GRANT ALL ON javabase.Student_Course TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
 
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');
@@ -180,30 +190,34 @@ INSERT INTO javabase.Course (name) VALUES ('Maths');
 INSERT INTO javabase.Course (name) VALUES ('Science');
 INSERT INTO javabase.Course (name) VALUES ('English');
 
-INSERT INTO javabase.Student_Course (studentId, courseId)
+INSERT INTO javabase.Student_Course (studentId, courseId, credits)
   SELECT
     s.id,
-    c.id
+    c.id,
+    1
   FROM javabase.Student s, javabase.Course c
   WHERE s.username = 'jim' AND c.name = 'Maths';
 
-INSERT INTO javabase.Student_Course (studentId, courseId)
+INSERT INTO javabase.Student_Course (studentId, courseId, credits)
   SELECT
     s.id,
-    c.id
+    c.id,
+    2
   FROM javabase.Student s, javabase.Course c
   WHERE s.username = 'jim' AND c.name = 'Science';
 
-INSERT INTO javabase.Student_Course (studentId, courseId)
+INSERT INTO javabase.Student_Course (studentId, courseId, credits)
   SELECT
     s.id,
-    c.id
+    c.id,
+    3
   FROM javabase.Student s, javabase.Course c
   WHERE s.username = 'mark' AND c.name = 'Maths';
 
-INSERT INTO javabase.Student_Course (studentId, courseId)
+INSERT INTO javabase.Student_Course (studentId, courseId, credits)
   SELECT
     s.id,
-    c.id
+    c.id,
+    4
   FROM javabase.Student s, javabase.Course c
   WHERE s.username = 'mark' AND c.name = 'English';
