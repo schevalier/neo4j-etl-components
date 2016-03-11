@@ -173,38 +173,6 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    public void shouldExportFromMySqlAndImportIntoGraphForThreeTableJoin() throws Exception
-    {
-        // when
-        exportFromMySqlToNeo4j( "Student", "Course", "Student_Course" );
-
-        // then
-        try
-        {
-            neo4j.get().start();
-
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
-
-            List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
-            List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
-            List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[2].name" );
-
-            assertThat( students.size(), is( 4 ) );
-            assertThat( students, hasItems( "jim", "mark" ) );
-
-            assertEquals( asList( "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE", "STUDENT_COURSE" ),
-                    relationships );
-
-            assertThat( courses.size(), is( 4 ) );
-            assertThat( courses, hasItems( "Science", "Maths", "English" ) );
-        }
-        finally
-        {
-            neo4j.get().stop();
-        }
-    }
-
-    @Test
     public void shouldExportFromMySqlAndImportIntoGraphForThreeTableJoinWithProperties() throws Exception
     {
         // when
@@ -229,6 +197,15 @@ public class ExportFromMySqlIntegrationTest
             assertThat( courses, hasItems( "Science", "Maths", "English" ) );
 
             assertThat( credits, hasItems( 1, 2, 3, 4 ) );
+
+            String coursesResponse = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:Course) RETURN c.name" );
+            String studentsResponse = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (s:Student) RETURN s.username" );
+
+            List<String> allCourses = JsonPath.read( coursesResponse, "$.results[*].data[*].row[0]" );
+            List<String> allStudents = JsonPath.read( studentsResponse, "$.results[*].data[*].row[0]" );
+
+            assertThat( allStudents, hasItems( "jim", "mark", "eve" ) );
+            assertThat( allCourses, hasItems(  "Science", "Maths", "English", "Theology" ) );
         }
         finally
         {

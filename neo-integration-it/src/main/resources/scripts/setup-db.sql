@@ -185,10 +185,12 @@ INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, ti
 
 INSERT INTO javabase.Student (username) VALUES ('jim');
 INSERT INTO javabase.Student (username) VALUES ('mark');
+INSERT INTO javabase.Student (username) VALUES ('eve');
 
 INSERT INTO javabase.Course (name) VALUES ('Maths');
 INSERT INTO javabase.Course (name) VALUES ('Science');
 INSERT INTO javabase.Course (name) VALUES ('English');
+INSERT INTO javabase.Course (name) VALUES ('Theology');
 
 INSERT INTO javabase.Student_Course (studentId, courseId, credits)
   SELECT
