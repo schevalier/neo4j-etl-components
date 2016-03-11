@@ -89,8 +89,6 @@ public class ImportConfig implements CommandsSupplier
             Builder idType( IdType idType );
         }
 
-        Builder graphDataConfig( GraphConfig graphConfig );
-
         Builder addNodeConfig( NodeConfig nodeConfig );
 
         Builder addRelationshipConfig( RelationshipConfig relationshipConfig );

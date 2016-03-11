@@ -1,10 +1,8 @@
-package org.neo4j.integration.sql.exportcsv.io;
+package org.neo4j.integration.neo4j.importcsv.config;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
-
-import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 
 public class Manifest
 {
@@ -16,12 +14,24 @@ public class Manifest
         return this;
     }
 
-    public Collection<CsvFiles> csvFilesForNodes()
+    public void addNodesAndRelationshipsToBuilder( ImportConfig.Builder builder )
+    {
+        csvFilesForNodes().stream()
+                .forEach(
+                        csvFiles -> builder.addNodeConfig(
+                                NodeConfig.builder().addInputFiles( csvFiles.asCollection() ).build() ) );
+        csvFilesForRelationships().stream()
+                .forEach(
+                        csvFiles -> builder.addRelationshipConfig(
+                                RelationshipConfig.builder().addInputFiles( csvFiles.asCollection() ).build() ) );
+    }
+
+    private Collection<CsvFiles> csvFilesForNodes()
     {
         return csvFilesForGraphObject( GraphObjectType.Node );
     }
 
-    public Collection<CsvFiles> csvFilesForRelationships()
+    private Collection<CsvFiles> csvFilesForRelationships()
     {
         return csvFilesForGraphObject( GraphObjectType.Relationship );
     }

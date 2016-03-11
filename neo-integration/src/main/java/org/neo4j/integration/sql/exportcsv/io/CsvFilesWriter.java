@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.exportcsv.io;
 
 import java.nio.file.Path;
 
+import org.neo4j.integration.neo4j.importcsv.config.CsvFiles;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;

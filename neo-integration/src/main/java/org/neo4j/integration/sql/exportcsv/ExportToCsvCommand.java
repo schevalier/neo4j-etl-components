@@ -2,12 +2,12 @@ package org.neo4j.integration.sql.exportcsv;
 
 import java.nio.file.Files;
 
+import org.neo4j.integration.neo4j.importcsv.config.Manifest;
+import org.neo4j.integration.neo4j.importcsv.config.ManifestEntry;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.io.Manifest;
-import org.neo4j.integration.sql.exportcsv.io.ManifestEntry;
 import org.neo4j.integration.sql.exportcsv.services.csv.ExportToCsvServiceProvider;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.util.OperatingSystem;

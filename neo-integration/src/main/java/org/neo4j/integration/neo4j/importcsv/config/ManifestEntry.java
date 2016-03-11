@@ -1,6 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.io;
-
-import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
+package org.neo4j.integration.neo4j.importcsv.config;
 
 public class ManifestEntry
 {

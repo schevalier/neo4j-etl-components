@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv.io;
+package org.neo4j.integration.neo4j.importcsv.config;
 
 import java.nio.file.Path;
 import java.util.Collection;

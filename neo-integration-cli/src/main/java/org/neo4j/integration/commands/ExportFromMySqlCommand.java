@@ -5,15 +5,13 @@ import java.nio.file.Path;
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
-import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
-import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
+import org.neo4j.integration.neo4j.importcsv.config.Manifest;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.io.Manifest;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
 
 import static java.lang.String.format;
@@ -101,18 +99,9 @@ public class ExportFromMySqlCommand
                 .formatting( formatting )
                 .idType( IdType.Integer );
 
-        manifest.csvFilesForNodes().stream()
-                .forEach(
-                        csvFiles -> builder.addNodeConfig(
-                                NodeConfig.builder().addInputFiles( csvFiles.asCollection() ).build() ) );
-        manifest.csvFilesForRelationships().stream()
-                .forEach(
-                        csvFiles -> builder.addRelationshipConfig(
-                                RelationshipConfig.builder().addInputFiles( csvFiles.asCollection() ).build() ) );
+        manifest.addNodesAndRelationshipsToBuilder( builder );
 
-        ImportConfig importConfig = builder.build();
-
-        new ImportFromCsvCommand( importConfig ).execute();
+        new ImportFromCsvCommand( builder.build() ).execute();
     }
 
     private void print( Object message )

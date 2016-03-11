@@ -1,8 +1,8 @@
 package org.neo4j.integration.sql.exportcsv;
 
+import org.neo4j.integration.neo4j.importcsv.config.ManifestEntry;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.io.ManifestEntry;
 
 public interface DatabaseObjectToCsvFilesService
 {

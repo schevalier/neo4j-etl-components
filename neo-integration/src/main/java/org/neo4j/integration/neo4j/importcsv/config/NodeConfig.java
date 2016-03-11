@@ -15,7 +15,7 @@ import static java.lang.String.format;
 
 import static org.neo4j.integration.util.StringListBuilder.stringList;
 
-public class NodeConfig implements CommandsSupplier, GraphDataConfig
+public class NodeConfig implements CommandsSupplier
 {
     public static Builder.SetInputFiles builder()
     {
@@ -36,12 +36,6 @@ public class NodeConfig implements CommandsSupplier, GraphDataConfig
     {
         commands.addCommand( labels.isEmpty() ? "--nodes" : format( "--nodes:%s", stringList( labels, ":" ) ) );
         commands.addCommand( format( "%s", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
-    }
-
-    @Override
-    public void addTo( ImportConfig.Builder importConfig )
-    {
-        importConfig.addNodeConfig( this );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
