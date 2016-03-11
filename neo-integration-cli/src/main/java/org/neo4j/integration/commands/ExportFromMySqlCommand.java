@@ -4,14 +4,16 @@ import java.nio.file.Path;
 
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.GraphConfig;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
+import org.neo4j.integration.neo4j.importcsv.config.NodeConfig;
+import org.neo4j.integration.neo4j.importcsv.config.RelationshipConfig;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.io.Manifest;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
 
 import static java.lang.String.format;
@@ -62,19 +64,19 @@ public class ExportFromMySqlCommand
 
         print( "Exporting from MySQL to CSV..." );
 
-        GraphConfig graphConfig = exportAndCreateGraphConfig( csvDirectory, formatting, connectionConfig );
+        Manifest manifest = exportAndCreateManifest( csvDirectory, formatting, connectionConfig );
 
         print( "Creating Neo4j store from CSV..." );
 
-        doImport( formatting, graphConfig );
+        doImport( formatting, manifest );
 
         print( "Done" );
         printResult( environment.destinationDirectory() );
     }
 
-    private GraphConfig exportAndCreateGraphConfig( Path csvDirectory,
-                                                    Formatting formatting,
-                                                    ConnectionConfig connectionConfig ) throws Exception
+    private Manifest exportAndCreateManifest( Path csvDirectory,
+                                              Formatting formatting,
+                                              ConnectionConfig connectionConfig ) throws Exception
     {
         SchemaExport schemaExport =
                 schemaExportService.doExport( schemaDetails, () -> new DatabaseClient( connectionConfig ) );
@@ -91,15 +93,24 @@ public class ExportFromMySqlCommand
         return new ExportToCsvCommand( config, databaseExportService ).execute();
     }
 
-    private void doImport( Formatting formatting, GraphConfig graphConfig ) throws Exception
+    private void doImport( Formatting formatting, Manifest manifest ) throws Exception
     {
-        ImportConfig importConfig = ImportConfig.builder()
+        ImportConfig.Builder builder = ImportConfig.builder()
                 .importToolDirectory( environment.importToolDirectory() )
                 .destination( environment.destinationDirectory() )
                 .formatting( formatting )
-                .idType( IdType.Integer )
-                .graphDataConfig( graphConfig )
-                .build();
+                .idType( IdType.Integer );
+
+        manifest.csvFilesForNodes().stream()
+                .forEach(
+                        csvFiles -> builder.addNodeConfig(
+                                NodeConfig.builder().addInputFiles( csvFiles.asCollection() ).build() ) );
+        manifest.csvFilesForRelationships().stream()
+                .forEach(
+                        csvFiles -> builder.addRelationshipConfig(
+                                RelationshipConfig.builder().addInputFiles( csvFiles.asCollection() ).build() ) );
+
+        ImportConfig importConfig = builder.build();
 
         new ImportFromCsvCommand( importConfig ).execute();
     }
