@@ -245,7 +245,7 @@ public class Neo4jVersion
     @Override
     public int hashCode()
     {
-        return HashCodeBuilder.reflectionHashCode( 31 );
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 
     public String format( String format )

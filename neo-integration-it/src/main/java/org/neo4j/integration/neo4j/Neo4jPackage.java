@@ -56,7 +56,7 @@ public class Neo4jPackage
     @Override
     public int hashCode()
     {
-        return HashCodeBuilder.reflectionHashCode( 31 );
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 
     @Override

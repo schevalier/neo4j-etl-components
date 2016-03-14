@@ -2,7 +2,6 @@ package org.neo4j.integration.neo4j.importcsv.config;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -48,7 +47,7 @@ public class NodeConfig implements CommandsSupplier
     @Override
     public int hashCode()
     {
-        return HashCodeBuilder.reflectionHashCode( 31 );
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 
     public interface Builder

@@ -1,5 +1,8 @@
 package org.neo4j.integration.sql.metadata;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class JoinTableInfo
 {
     private final TableName joinTableName;
@@ -19,5 +22,18 @@ public class JoinTableInfo
     public TableNamePair referencedTables()
     {
         return referencedTables;
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals( Object o )
+    {
+        return EqualsBuilder.reflectionEquals( this, o );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 }

@@ -1,5 +1,8 @@
 package org.neo4j.integration.sql.metadata;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class TableNamePair
 {
     private final TableName startTable;
@@ -19,5 +22,18 @@ public class TableNamePair
     public TableName endTable()
     {
         return endTable;
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals( Object o )
+    {
+        return EqualsBuilder.reflectionEquals( this, o );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 }

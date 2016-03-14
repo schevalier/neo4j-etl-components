@@ -2,6 +2,9 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.neo4j.integration.util.Preconditions;
 
 public class JoinTable implements DatabaseObject
@@ -26,6 +29,19 @@ public class JoinTable implements DatabaseObject
         this.endPrimaryKey = Preconditions.requireNonNull( builder.endPrimaryKey, "EndPrimaryKey" );
         this.endForeignKey = Preconditions.requireNonNull( builder.endForeignKey, "EndForeignKey" );
         this.columns = builder.columns;
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals( Object o )
+    {
+        return EqualsBuilder.reflectionEquals( this, o );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 
     @Override
