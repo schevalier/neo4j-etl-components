@@ -60,6 +60,12 @@ public class DatabaseExport
                 primaryKeys.add( columnName );
             }
 
+            if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isNotEmpty( referencedTableName ) )
+            {
+                primaryKeys.remove( columnName );
+                foreignKeys.add( referencedTableName );
+            }
+
             if ( columnKey.equalsIgnoreCase( "MUL" ) )
             {
                 foreignKeys.add( referencedTableName );

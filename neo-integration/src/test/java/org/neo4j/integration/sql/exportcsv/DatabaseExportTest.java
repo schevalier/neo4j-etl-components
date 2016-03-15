@@ -134,6 +134,38 @@ public class DatabaseExportTest
         verify( config ).addJoins( argThat( matchesCollection( emptyList() ) ) );
     }
 
+    @Test
+    public void shouldAddJoinTableForTableWithCandidateKey() throws Exception
+    {
+        // given
+        ExportToCsvConfig.Builder config = mock( ExportToCsvConfig.Builder.class );
+
+        TableName joinTable = new TableName( "test.Student_Course" );
+        TableName student = new TableName( "test.Student" );
+        TableName course = new TableName( "test.Course" );
+        TableNamePair referencedTables = new TableNamePair( student, course );
+        Collection<JoinTable> joinTables = singletonList( mock( JoinTable.class ) );
+
+        QueryResults results = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "REFERENCED_COLUMN_NAME", "COLUMN_KEY" )
+                .addRow( "studentId", "Student", "id", "PRI" )
+                .addRow( "courseId", "Course", "id", "PRI" )
+                .build();
+
+        when( joinTableMetadataProducer.createMetadataFor( new JoinTableInfo( joinTable, referencedTables ) ) )
+                .thenReturn( joinTables );
+        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+
+        // when
+        databaseExport.updateConfig( config, joinTable );
+
+        // then
+        verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
+
+        verify( config ).addTables( argThat( matchesCollection( emptyList() ) ) );
+        verify( config ).addJoins( argThat( matchesCollection( emptyList() ) ) );
+    }
+
     private <T> TypeSafeMatcher<Collection<T>> matchesCollection( final Collection<T> expected )
     {
         return new TypeSafeMatcher<Collection<T>>()
