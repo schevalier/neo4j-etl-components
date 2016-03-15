@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.BiPredicate;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
@@ -28,12 +31,13 @@ public class CsvFileWriter
 
     public Path writeExportFile( ColumnToCsvFieldMappings mappings,
                                  DatabaseExportSqlSupplier sqlSupplier,
-                                 String filenamePrefix ) throws Exception
+                                 String filenamePrefix,
+                                 BiPredicate writeRowWithNullsStrategy ) throws Exception
     {
         Path exportFile = createExportFile( filenamePrefix );
         QueryResults results = executeSql( sqlSupplier.sql( mappings ) );
 
-        writeResultsToFile( results, exportFile, mappings );
+        writeResultsToFile( results, exportFile, mappings, writeRowWithNullsStrategy );
 
         return exportFile;
     }
@@ -51,8 +55,9 @@ public class CsvFileWriter
         return databaseClient.executeQuery( sql ).await();
     }
 
-    private void writeResultsToFile( QueryResults results, Path file, ColumnToCsvFieldMappings mappings ) throws
-            Exception
+    private void writeResultsToFile( QueryResults results, Path file,
+                                     ColumnToCsvFieldMappings mappings,
+                                     BiPredicate writeRowWithNullsStrategy ) throws Exception
     {
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
         int maxIndex = columns.length - 1;
@@ -61,25 +66,38 @@ public class CsvFileWriter
         {
             while ( results.next() )
             {
-                for ( int i = 0; i < maxIndex; i++ )
-                {
-                    writeFieldValueAndDelimiter( results.getString( columns[i].alias() ), writer );
-                }
 
-                writeFieldValueAndNewLine( results.getString( columns[(maxIndex)].alias() ), writer );
+                if ( writeRowWithNullsStrategy.test( results, mappings.columns() ) )
+                {
+
+                    for ( int i = 0; i < maxIndex; i++ )
+                    {
+                        writeFieldValueAndDelimiter( results.getString( columns[i].alias() ), writer );
+                    }
+
+                    writeFieldValueAndNewLine( results.getString( columns[(maxIndex)].alias() ), writer );
+                }
             }
         }
     }
 
     private void writeFieldValueAndDelimiter( String value, BufferedWriter writer ) throws Exception
     {
-        writer.write( value );
+        sanitiseAndWriteData( value, writer );
         writer.write( config.formatting().delimiter().value() );
     }
 
     private void writeFieldValueAndNewLine( String value, BufferedWriter writer ) throws Exception
     {
-        writer.write( value );
+        sanitiseAndWriteData( value, writer );
         writer.newLine();
+    }
+
+    private void sanitiseAndWriteData( String value, BufferedWriter writer ) throws IOException
+    {
+        if ( StringUtils.isNotEmpty( value ) )
+        {
+            writer.write( value );
+        }
     }
 }

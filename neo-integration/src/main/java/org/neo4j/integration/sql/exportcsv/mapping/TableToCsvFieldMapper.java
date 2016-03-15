@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.function.BiPredicate;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
@@ -48,5 +50,11 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                 CsvField.label() );
 
         return builder.build();
+    }
+
+    @Override
+    public BiPredicate writeRowWithNullsStrategy()
+    {
+        return ( r, c ) -> true;
     }
 }
