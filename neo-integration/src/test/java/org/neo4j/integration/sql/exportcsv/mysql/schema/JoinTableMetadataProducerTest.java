@@ -33,8 +33,9 @@ public class JoinTableMetadataProducerTest
     public void shouldReturnJoinTableMetadata() throws Exception
     {
         // given
-        QueryResults columnProjectionResults = mock( QueryResults.class );
-        when( columnProjectionResults.next() ).thenReturn( false );
+        QueryResults columnProjectionResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
+                .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) )
@@ -45,12 +46,12 @@ public class JoinTableMetadataProducerTest
 
         // when
         Collection<JoinTable> joinTables = metadataProducer
-                                            .createMetadataFor(
-                                                    new JoinTableInfo(
-                                                            new TableName( "test.Student_Course" ),
-                                                            new TableNamePair(
-                                                                    new TableName( "test.Student" ),
-                                                                    new TableName( "test.Course" ) ) ) );
+                .createMetadataFor(
+                        new JoinTableInfo(
+                                new TableName( "test.Student_Course" ),
+                                new TableNamePair(
+                                        new TableName( "test.Student" ),
+                                        new TableName( "test.Course" ) ) ) );
 
         // then
         Iterator<JoinTable> iterator = joinTables.iterator();
@@ -98,12 +99,58 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                            new Column(
-                                    studentCourse,
-                                    studentCourse.fullyQualifiedColumnName( "credits" ),
-                                    "credits",
-                                    ColumnType.Data,
-                                    MySqlDataType.TEXT ) ) );
+                new Column(
+                        studentCourse,
+                        studentCourse.fullyQualifiedColumnName( "credits" ),
+                        "credits",
+                        ColumnType.Data,
+                        MySqlDataType.TEXT ) ) );
+
+        assertFalse( iterator.hasNext() );
+    }
+
+    @Test
+    public void shouldIgnoreKeysForJoinsWithProperties() throws Exception
+    {
+        // given
+        QueryResults columnProjectionResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
+                .addRow( "credits", "text", "" )
+                .addRow( "studentId", "int", "PRI" )
+                .addRow( "addressId", "int", "MUL" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.executeQuery( any( String.class ) ) )
+                .thenReturn( AwaitHandle.forReturnValue( stubJoinResults() ) )
+                .thenReturn( AwaitHandle.forReturnValue( columnProjectionResults ) );
+
+        JoinTableMetadataProducer metadataProducer = new JoinTableMetadataProducer( databaseClient );
+
+        // when
+        TableName studentCourse = new TableName( "test.Student_Course" );
+        Collection<JoinTable> joinTables = metadataProducer
+                .createMetadataFor(
+                        new JoinTableInfo(
+                                studentCourse,
+                                new TableNamePair(
+                                        new TableName( "test.Student" ),
+                                        new TableName( "test.Course" ) ) ) );
+
+        // then
+        Iterator<JoinTable> iterator = joinTables.iterator();
+
+        JoinTable joinTable = iterator.next();
+
+        assertJoinTableKeyMappings( joinTable );
+
+        assertThat( joinTable.columns(), contains(
+                new Column(
+                        studentCourse,
+                        studentCourse.fullyQualifiedColumnName( "credits" ),
+                        "credits",
+                        ColumnType.Data,
+                        MySqlDataType.TEXT ) ) );
 
         assertFalse( iterator.hasNext() );
     }
@@ -132,7 +179,7 @@ public class JoinTableMetadataProducerTest
                         "id",
                         ColumnType.PrimaryKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                    joinTable.startPrimaryKey() );
+                joinTable.startPrimaryKey() );
 
         assertEquals( expectedCourseId, joinTable.endForeignKey() );
 
@@ -141,7 +188,7 @@ public class JoinTableMetadataProducerTest
                         "test.Course.id", "id",
                         ColumnType.PrimaryKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                      joinTable.endPrimaryKey() );
+                joinTable.endPrimaryKey() );
     }
 
     private QueryResults stubJoinResults()

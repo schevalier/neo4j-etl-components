@@ -42,7 +42,7 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get()) );
+                    tempDirectory.get() ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -205,7 +205,7 @@ public class ExportFromMySqlIntegrationTest
             List<String> allStudents = JsonPath.read( studentsResponse, "$.results[*].data[*].row[0]" );
 
             assertThat( allStudents, hasItems( "jim", "mark", "eve" ) );
-            assertThat( allCourses, hasItems(  "Science", "Maths", "English", "Theology" ) );
+            assertThat( allCourses, hasItems( "Science", "Maths", "English", "Theology" ) );
         }
         finally
         {

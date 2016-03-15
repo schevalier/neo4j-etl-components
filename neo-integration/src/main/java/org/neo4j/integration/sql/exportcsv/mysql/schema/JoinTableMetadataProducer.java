@@ -56,14 +56,25 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
 
     private void addColumn( JoinTable.Builder builder, TableName joinTableName ) throws Exception
     {
+
         String projectColumnsSql = "SELECT " +
-                "COLUMN_NAME, " +
-                "DATA_TYPE, " +
-                "COLUMN_KEY " +
-                "FROM INFORMATION_SCHEMA.COLUMNS " +
-                "WHERE TABLE_SCHEMA = '" + joinTableName.schema() +
-                "' AND TABLE_NAME ='" + joinTableName.simpleName() + "'" +
-                " AND COLUMN_KEY NOT IN ('MUL', 'PRI')" + ";";
+                "c.COLUMN_NAME AS COLUMN_NAME," +
+                "CASE (SELECT COUNT(kcu.REFERENCED_TABLE_NAME) " +
+                "      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu " +
+                "      WHERE c.TABLE_SCHEMA = kcu.TABLE_SCHEMA " +
+                "      AND c.TABLE_NAME = kcu.TABLE_NAME " +
+                "      AND c.COLUMN_NAME = kcu.COLUMN_NAME )" +
+                "    WHEN 0 THEN" +
+                "      CASE c.COLUMN_KEY" +
+                "        WHEN 'PRI' THEN 'PRI'" +
+                "        ELSE ''" +
+                "      END" +
+                "    ELSE 'MUL'" +
+                "END AS COLUMN_KEY," +
+                "c.DATA_TYPE AS DATA_TYPE " +
+                "FROM INFORMATION_SCHEMA.COLUMNS c " +
+                "WHERE c.TABLE_SCHEMA = '" + joinTableName.schema() + "' " +
+                "AND c.TABLE_NAME ='" + joinTableName.simpleName() + "';";
 
         try ( QueryResults results = databaseClient.executeQuery( projectColumnsSql ).await() )
         {
@@ -88,12 +99,15 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
                         break;
                 }
 
-                builder.addColumn( new Column(
-                        joinTableName,
-                        joinTableName.fullyQualifiedColumnName( columnName ),
-                        columnName,
-                        columnType,
-                        dataType ) );
+                if ( columnType == ColumnType.Data )
+                {
+                    builder.addColumn( new Column(
+                            joinTableName,
+                            joinTableName.fullyQualifiedColumnName( columnName ),
+                            columnName,
+                            columnType,
+                            dataType ) );
+                }
             }
         }
     }

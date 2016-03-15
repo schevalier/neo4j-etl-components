@@ -26,12 +26,22 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
     public Collection<Table> createMetadataFor( TableName source ) throws Exception
     {
         String sql = "SELECT " +
-                "COLUMN_NAME, " +
-                "DATA_TYPE, " +
-                "COLUMN_KEY " +
-                "FROM INFORMATION_SCHEMA.COLUMNS " +
-                "WHERE TABLE_SCHEMA = '" + source.schema() +
-                "' AND TABLE_NAME ='" + source.simpleName() + "';";
+                "c.COLUMN_NAME AS COLUMN_NAME," +
+                "CASE (SELECT COUNT(kcu.REFERENCED_TABLE_NAME) " +
+                "      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu " +
+                "      WHERE c.TABLE_SCHEMA = kcu.TABLE_SCHEMA " +
+                "      AND c.TABLE_NAME = kcu.TABLE_NAME " +
+                "      AND c.COLUMN_NAME = kcu.COLUMN_NAME )" +
+                "    WHEN 0 THEN" +
+                "      CASE c.COLUMN_KEY" +
+                "        WHEN 'PRI' THEN 'PRI'" +
+                "        ELSE ''" +
+                "      END" +
+                "    ELSE 'MUL'" +
+                "END AS COLUMN_KEY," +
+                "c.DATA_TYPE AS DATA_TYPE " +
+                "FROM INFORMATION_SCHEMA.COLUMNS c " +
+                "WHERE c.TABLE_SCHEMA = '" + source.schema() + "' AND c.TABLE_NAME ='" + source.simpleName() + "';";
 
         Table.Builder builder = Table.builder().name( source );
 
