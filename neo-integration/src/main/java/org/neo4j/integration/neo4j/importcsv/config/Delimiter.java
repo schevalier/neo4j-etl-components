@@ -2,7 +2,7 @@ package org.neo4j.integration.neo4j.importcsv.config;
 
 public class Delimiter
 {
-    public static final Delimiter TAB = new Delimiter( "\\t", "TAB" );
+    public static final Delimiter TAB = new Delimiter( "\t", "TAB" );
     public static final Delimiter SEMICOLON = new Delimiter( ";" );
     public static final Delimiter COMMA = new Delimiter( "," );
 
