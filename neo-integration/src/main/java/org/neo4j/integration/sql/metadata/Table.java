@@ -19,7 +19,7 @@ public class Table implements DatabaseObject
     Table( TableBuilder builder )
     {
         this.name = Preconditions.requireNonNull( builder.table, "Name" );
-        this.columns = Preconditions.requireNonEmptyCollection( builder.columns, "Columns" );
+        this.columns = Preconditions.requireNonNull( builder.columns, "Columns" );
     }
 
     public TableName name()

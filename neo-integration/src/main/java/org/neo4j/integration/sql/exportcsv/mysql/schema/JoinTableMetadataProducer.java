@@ -2,7 +2,9 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
@@ -13,6 +15,7 @@ import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.SqlDataType;
+import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
 public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo, JoinTable>
@@ -45,71 +48,24 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
                     .endForeignKey( end.foreignKey() )
                     .connectsToEndTablePrimaryKey( end.referencedPrimaryKey() );
 
-            addColumn( builder, source.joinTableName() );
+            addColumns( builder, source.joinTableName() );
 
             JoinTable joinTable = builder.build();
             joinTables.add( joinTable );
         }
-        return joinTables;
 
+        return joinTables;
     }
 
-    private void addColumn( JoinTable.Builder builder, TableName joinTableName ) throws Exception
+    private void addColumns( JoinTable.Builder builder, TableName joinTableName ) throws Exception
     {
+        Collection<Table> tables =
+                new TableMetadataProducer( databaseClient, c -> c == ColumnType.Data )
+                        .createMetadataFor( joinTableName );
 
-        String projectColumnsSql = "SELECT " +
-                "c.COLUMN_NAME AS COLUMN_NAME," +
-                "CASE (SELECT COUNT(kcu.REFERENCED_TABLE_NAME) " +
-                "      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu " +
-                "      WHERE c.TABLE_SCHEMA = kcu.TABLE_SCHEMA " +
-                "      AND c.TABLE_NAME = kcu.TABLE_NAME " +
-                "      AND c.COLUMN_NAME = kcu.COLUMN_NAME )" +
-                "    WHEN 0 THEN" +
-                "      CASE c.COLUMN_KEY" +
-                "        WHEN 'PRI' THEN 'PRI'" +
-                "        ELSE ''" +
-                "      END" +
-                "    ELSE 'MUL'" +
-                "END AS COLUMN_KEY," +
-                "c.DATA_TYPE AS DATA_TYPE " +
-                "FROM INFORMATION_SCHEMA.COLUMNS c " +
-                "WHERE c.TABLE_SCHEMA = '" + joinTableName.schema() + "' " +
-                "AND c.TABLE_NAME ='" + joinTableName.simpleName() + "';";
-
-        try ( QueryResults results = databaseClient.executeQuery( projectColumnsSql ).await() )
-        {
-            while ( results.next() )
-            {
-                String columnName = results.getString( "COLUMN_NAME" );
-                String columnKey = results.getString( "COLUMN_KEY" );
-                SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
-
-                ColumnType columnType;
-
-                switch ( columnKey )
-                {
-                    case "PRI":
-                        columnType = ColumnType.PrimaryKey;
-                        break;
-                    case "MUL":
-                        columnType = ColumnType.ForeignKey;
-                        break;
-                    default:
-                        columnType = ColumnType.Data;
-                        break;
-                }
-
-                if ( columnType == ColumnType.Data )
-                {
-                    builder.addColumn( new Column(
-                            joinTableName,
-                            joinTableName.fullyQualifiedColumnName( columnName ),
-                            columnName,
-                            columnType,
-                            dataType ) );
-                }
-            }
-        }
+        tables.stream()
+                .flatMap( t -> t.columns().stream() )
+                .forEach( builder::addColumn );
     }
 
     private ColumnPair getColumnPair( QueryResults results,
@@ -135,7 +91,6 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
 
         );
     }
-
 
     private static class ColumnPair
     {

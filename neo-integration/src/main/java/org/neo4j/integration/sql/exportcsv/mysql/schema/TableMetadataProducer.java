@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Predicate;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
@@ -16,10 +17,17 @@ import org.neo4j.integration.sql.metadata.TableName;
 public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 {
     private final DatabaseClient databaseClient;
+    private final Predicate<ColumnType> columnFilter;
 
     public TableMetadataProducer( DatabaseClient databaseClient )
     {
+        this( databaseClient, c -> true );
+    }
+
+    public TableMetadataProducer( DatabaseClient databaseClient, Predicate<ColumnType> columnFilter )
+    {
         this.databaseClient = databaseClient;
+        this.columnFilter = columnFilter;
     }
 
     @Override
@@ -68,13 +76,16 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                         break;
                 }
 
-                builder.addColumn(
-                        new Column(
-                                source,
-                                source.fullyQualifiedColumnName( columnName ),
-                                columnName,
-                                columnType,
-                                dataType ) );
+                if ( columnFilter.test( columnType ) )
+                {
+                    builder.addColumn(
+                            new Column(
+                                    source,
+                                    source.fullyQualifiedColumnName( columnName ),
+                                    columnName,
+                                    columnType,
+                                    dataType ) );
+                }
             }
         }
 
