@@ -94,7 +94,7 @@ public class MySqlDatabaseExportIntegrationTest
                 "suppliers");
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL ).host( "localhost" )
                 .port( DatabaseType.MySQL.defaultPort() )
-                .database( "northwind" ).username( "root" ).password( "password" ).build();
+                .database( "northwind" ).username( "root" ).password( "Patt3rn5" ).build();
         DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
         JoinMetadataProducer joinMetadataProducer = new JoinMetadataProducer( databaseClient );

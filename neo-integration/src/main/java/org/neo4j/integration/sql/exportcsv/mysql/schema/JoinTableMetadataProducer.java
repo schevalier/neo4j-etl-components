@@ -134,7 +134,7 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
                 "INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c3 ON " +
                 " (kcu.TABLE_SCHEMA = c3.TABLE_SCHEMA " +
                 " AND kcu.TABLE_NAME = c3.TABLE_NAME " +
-                " AND c3.COLUMN_KEY = 'MUL') " +
+                " AND c3.COLUMN_KEY IN ('PRI', 'MUL')) " +
                 "WHERE kcu.TABLE_SCHEMA = '" + joinTable.schema() + "' " +
                 " AND kcu.TABLE_NAME = '" + joinTable.simpleName() + "' " +
                 " AND kcu.REFERENCED_TABLE_SCHEMA = '" + referenceTable.schema() + "' " +
