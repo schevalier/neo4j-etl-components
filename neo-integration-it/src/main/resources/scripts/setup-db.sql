@@ -80,10 +80,22 @@ CREATE TABLE javabase.Student
 GRANT ALL ON javabase.Student TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
+CREATE TABLE javabase.Author
+(
+  first_name VARCHAR(20) NOT NULL,
+  last_name VARCHAR(20) NOT NULL,
+  PRIMARY KEY (first_name, last_name)
+);
+GRANT ALL ON javabase.Author TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
 CREATE TABLE javabase.Course
 (
   id   INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  name TEXT NOT NULL
+  name TEXT NOT NULL,
+  author_first_name VARCHAR(20),
+  author_last_name VARCHAR(20),
+  FOREIGN KEY (author_first_name, author_last_name) REFERENCES javabase.Author(first_name, last_name)
 );
 GRANT ALL ON javabase.Course TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';

@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
@@ -32,7 +34,8 @@ public class CsvFileWriter
     public Path writeExportFile( ColumnToCsvFieldMappings mappings,
                                  DatabaseExportSqlSupplier sqlSupplier,
                                  String filenamePrefix,
-                                 BiPredicate writeRowWithNullsStrategy ) throws Exception
+                                 BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy ) throws
+            Exception
     {
         Path exportFile = createExportFile( filenamePrefix );
         QueryResults results = executeSql( sqlSupplier.sql( mappings ) );
@@ -57,7 +60,8 @@ public class CsvFileWriter
 
     private void writeResultsToFile( QueryResults results, Path file,
                                      ColumnToCsvFieldMappings mappings,
-                                     BiPredicate writeRowWithNullsStrategy ) throws Exception
+                                     BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy )
+            throws Exception
     {
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
         int maxIndex = columns.length - 1;

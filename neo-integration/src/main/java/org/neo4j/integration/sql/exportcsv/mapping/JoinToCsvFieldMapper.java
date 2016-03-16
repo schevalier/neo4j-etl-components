@@ -1,8 +1,11 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.Collection;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.io.WriteRowWithNullsStrategy;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -41,7 +44,7 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
     }
 
     @Override
-    public BiPredicate writeRowWithNullsStrategy()
+    public BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy()
     {
         return new WriteRowWithNullsStrategy();
     }
