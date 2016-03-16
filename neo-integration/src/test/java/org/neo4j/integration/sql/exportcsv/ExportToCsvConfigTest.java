@@ -26,23 +26,24 @@ public class ExportToCsvConfigTest
         try
         {
             // when
-            TableName addressTable = new TableName( "test.Address" );
+            TableName leftTable = new TableName( "test.Person" );
+            TableName rightTable = new TableName( "test.Address" );
 
             ExportToCsvConfig.builder()
                     .destination( Paths.get( "" ) )
                     .connectionConfig( mock( ConnectionConfig.class ) )
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
-                            .name( addressTable )
-                            .addColumn( column( addressTable, "id", ColumnType.PrimaryKey ) )
-                            .addColumn( column( addressTable, "postcode", ColumnType.Data ) )
+                            .name( rightTable )
+                            .addColumn( column( rightTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( column( rightTable, "postcode", ColumnType.Data ) )
                             .build() )
                     .addJoin( Join.builder()
-                            .parentTable( new TableName( "test.Person" ) )
-                            .primaryKey( "id" )
-                            .foreignKey( "addressId" )
-                            .childTable( addressTable )
-                            .startTable( new TableName( "test.Person" ) )
+                            .leftSource( leftTable, "id", ColumnType.PrimaryKey )
+                            .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
+                            .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
+                            .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
+                            .startTable( leftTable )
                             .build() )
                     .build();
             fail( "Expected IllegalStatException" );
@@ -61,27 +62,28 @@ public class ExportToCsvConfigTest
         try
         {
             // when
-            TableName personTable = new TableName( "test.Person" );
+            TableName leftTable = new TableName( "test.Person" );
+            TableName rightTable = new TableName( "test.Address" );
 
             ExportToCsvConfig.builder()
                     .destination( Paths.get( "" ) )
                     .connectionConfig( mock( ConnectionConfig.class ) )
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
-                            .name( personTable )
-                            .addColumn( column( personTable, "id", ColumnType.PrimaryKey ) )
-                            .addColumn( column( personTable, "username", ColumnType.Data ) )
-                            .addColumn( column( personTable, "addressId", ColumnType.ForeignKey ) )
+                            .name( leftTable )
+                            .addColumn( column( leftTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( column( leftTable, "username", ColumnType.Data ) )
+                            .addColumn( column( leftTable, "addressId", ColumnType.ForeignKey ) )
                             .build() )
                     .addJoin( Join.builder()
-                            .parentTable( personTable )
-                            .primaryKey( "id" )
-                            .foreignKey( "addressId" )
-                            .childTable( new TableName( "test.Address" ) )
-                            .startTable( new TableName( "test.Person" ) )
+                            .leftSource( leftTable, "id", ColumnType.PrimaryKey )
+                            .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
+                            .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
+                            .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
+                            .startTable( leftTable )
                             .build() )
                     .build();
-            fail( "Expected IllegalStatException" );
+            fail( "Expected IllegalStateException" );
         }
         catch ( IllegalStateException e )
         {

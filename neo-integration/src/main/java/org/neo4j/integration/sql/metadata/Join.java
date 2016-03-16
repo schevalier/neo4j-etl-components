@@ -13,58 +13,55 @@ import static java.util.Arrays.asList;
 
 public class Join implements DatabaseObject
 {
-    public static Builder.SetParentTable builder()
+    public static Builder.SetLeftSource builder()
     {
         return new JoinBuilder();
     }
 
-    private final Column primaryKey;
-    private final Column foreignKey;
-    private final TableName childTable;
+    private final JoinKey left;
+    private final JoinKey right;
     private final TableName startTable;
 
     Join( JoinBuilder builder )
     {
-        this.primaryKey = Preconditions.requireNonNull( builder.primaryKey, "PrimaryKey" );
-        this.foreignKey = Preconditions.requireNonNull( builder.foreignKey, "ForeignKey" );
-        this.childTable = Preconditions.requireNonNull( builder.childTable, "ChildTable" );
         this.startTable = Preconditions.requireNonNull( builder.startTable, "StartTable" );
+        this.left = new JoinKey(
+                Preconditions.requireNonNull( builder.leftSource, "LeftSource" ),
+                Preconditions.requireNonNull( builder.leftTarget, "LeftTarget" ) );
+        this.right = new JoinKey(
+                Preconditions.requireNonNull( builder.rightSource, "RightSource" ),
+                Preconditions.requireNonNull( builder.rightTarget, "RightTarget" ) );
     }
 
     public boolean childTableRepresentsStartOfRelationship()
     {
-        return startTable.equals( childTable );
+        return startTable.equals( right.target().table() );
     }
 
     public boolean parentTableRepresentsStartOfRelationship()
     {
-        return startTable.equals( primaryKey.table() );
+        return startTable.equals( left.source().table() );
     }
 
-    public Column primaryKey()
+    public JoinKey left()
     {
-        return primaryKey;
+        return left;
     }
 
-    public Column foreignKey()
+    public JoinKey right()
     {
-        return foreignKey;
-    }
-
-    public TableName childTable()
-    {
-        return childTable;
+        return right;
     }
 
     public Collection<TableName> tableNames()
     {
-        return asList( primaryKey.table(), childTable );
+        return asList( left.source().table(), right.target().table() );
     }
 
     @Override
     public String descriptor()
     {
-        return format( "%s_%s", primaryKey.table().fullName(), childTable.fullName() );
+        return format( "%s_%s", left.source().table().fullName(), right().target().table().fullName() );
     }
 
     @Override
@@ -94,24 +91,24 @@ public class Join implements DatabaseObject
 
     public interface Builder
     {
-        interface SetParentTable
+        interface SetLeftSource
         {
-            SetPrimaryKey parentTable( TableName parent );
+            SetLeftTarget leftSource( TableName table, String column, ColumnType columnType );
         }
 
-        interface SetPrimaryKey
+        interface SetLeftTarget
         {
-            SetForeignKey primaryKey( String primaryKey );
+            SetRightSource leftTarget( TableName table, String column, ColumnType columnType );
         }
 
-        interface SetForeignKey
+        interface SetRightSource
         {
-            SetChildTable foreignKey( String foreignKey );
+            SetRightTarget rightSource( TableName table, String column, ColumnType columnType );
         }
 
-        interface SetChildTable
+        interface SetRightTarget
         {
-            SetStartTable childTable( TableName childTable );
+            SetStartTable rightTarget( TableName table, String column, ColumnType columnType );
         }
 
         interface SetStartTable

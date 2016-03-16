@@ -34,9 +34,10 @@ public class JoinMetadataProducerTest
                         "PRIMARY_KEY",
                         "FOREIGN_KEY",
                         "REFERENCED_TABLE_SCHEMA",
-                        "REFERENCED_TABLE_NAME" )
-                .addRow( "test", "Person", "id", "addressId", "test", "Address" )
-                .addRow( "test", "Address", "id", "ownerId", "test", "Person" )
+                        "REFERENCED_TABLE_NAME",
+                        "REFERENCED_PRIMARY_KEY" )
+                .addRow( "test", "Person", "id", "addressId", "test", "Address", "id" )
+                .addRow( "test", "Address", "id", "ownerId", "test", "Person", "id" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
@@ -60,16 +61,16 @@ public class JoinMetadataProducerTest
                 "test.Person.id",
                 "id",
                 ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE ), join1.primaryKey() );
+                SqlDataType.KEY_DATA_TYPE ), join1.left().source() );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.addressId",
                 "addressId",
                 ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE ), join1.foreignKey() );
+                SqlDataType.KEY_DATA_TYPE ), join1.right().source() );
 
-        assertEquals( new TableName( "test.Address" ), join1.childTable() );
+        assertEquals( new TableName( "test.Address" ), join1.right().target().table() );
 
         Join join2 = iterator.next();
 
@@ -78,16 +79,16 @@ public class JoinMetadataProducerTest
                 "test.Address.id",
                 "id",
                 ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE ), join2.primaryKey() );
+                SqlDataType.KEY_DATA_TYPE ), join2.left().source() );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.ownerId",
                 "ownerId",
                 ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE ), join2.foreignKey() );
+                SqlDataType.KEY_DATA_TYPE ), join2.right().source() );
 
-        assertEquals( new TableName( "test.Person" ), join2.childTable() );
+        assertEquals( new TableName( "test.Person" ), join2.right().target().table() );
 
         assertFalse( iterator.hasNext() );
     }

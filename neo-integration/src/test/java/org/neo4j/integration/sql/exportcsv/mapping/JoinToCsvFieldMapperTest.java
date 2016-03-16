@@ -10,6 +10,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
+import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -26,12 +27,14 @@ public class JoinToCsvFieldMapperTest
     public void shouldCreateMappingsForJoinWhereStartTableIsParentTableInJoin()
     {
         // given
+        TableName leftTable = new TableName( "test.Person" );
+        TableName rightTable = new TableName( "test.Address" );
         Join join = Join.builder()
-                .parentTable( new TableName( "test.Person" ) )
-                .primaryKey( "id" )
-                .foreignKey( "addressId" )
-                .childTable( new TableName( "test.Address" ) )
-                .startTable( new TableName( "test.Person" ) )
+                .leftSource( leftTable, "id", ColumnType.PrimaryKey )
+                .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
+                .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
+                .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
+                .startTable( leftTable )
                 .build();
 
         // when
@@ -53,12 +56,14 @@ public class JoinToCsvFieldMapperTest
     public void shouldCreateMappingsForJoinWhereStartTableIsChildTableInJoin()
     {
         // given
+        TableName leftTable = new TableName( "test.Person" );
+        TableName rightTable = new TableName( "test.Address" );
         Join join = Join.builder()
-                .parentTable( new TableName( "test.Person" ) )
-                .primaryKey( "id" )
-                .foreignKey( "addressId" )
-                .childTable( new TableName( "test.Address" ) )
-                .startTable( new TableName( "test.Address" ) )
+                .leftSource( leftTable, "id", ColumnType.PrimaryKey )
+                .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
+                .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
+                .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
+                .startTable( rightTable )
                 .build();
 
         // when

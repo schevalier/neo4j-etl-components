@@ -1,53 +1,54 @@
 package org.neo4j.integration.sql.metadata;
 
-import org.neo4j.integration.util.Preconditions;
-
-class JoinBuilder implements Join.Builder.SetParentTable,
-        Join.Builder.SetPrimaryKey,
-        Join.Builder.SetForeignKey,
-        Join.Builder.SetChildTable,
+class JoinBuilder implements
+        Join.Builder.SetLeftSource,
+        Join.Builder.SetLeftTarget,
+        Join.Builder.SetRightSource,
+        Join.Builder.SetRightTarget,
         Join.Builder.SetStartTable,
         Join.Builder
 {
-    private TableName parentTable;
-    Column primaryKey;
-    Column foreignKey;
-    TableName childTable;
+    Column leftSource;
+    Column leftTarget;
+    Column rightSource;
+    Column rightTarget;
     TableName startTable;
 
     @Override
-    public SetPrimaryKey parentTable( TableName parent )
+    public Join.Builder startTable( TableName startTable )
     {
-        this.parentTable = Preconditions.requireNonNull( parent, "Parent table" );
+        this.startTable = startTable;
         return this;
     }
 
     @Override
-    public SetForeignKey primaryKey( String primaryKey )
+    public SetLeftTarget leftSource( TableName table, String column, ColumnType columnType )
     {
+        this.leftSource = createColumn( table, column, columnType );
+        return this;
+    }
 
-        this.primaryKey = new SimpleColumn(
-                parentTable,
-                parentTable.fullyQualifiedColumnName( primaryKey ),
-                primaryKey,
-                ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE );
+
+    @Override
+    public SetRightSource leftTarget( TableName table, String column, ColumnType columnType )
+    {
+        this.leftTarget = createColumn( table, column, columnType );
         return this;
     }
 
     @Override
-    public SetChildTable foreignKey( String foreignKey )
+    public SetRightTarget rightSource( TableName table, String column, ColumnType columnType )
     {
-
-        this.foreignKey = new SimpleColumn(
-                parentTable,
-                parentTable.fullyQualifiedColumnName( foreignKey ),
-                foreignKey,
-                ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE );
+        this.rightSource = createColumn( table, column, columnType );
         return this;
     }
 
+    @Override
+    public SetStartTable rightTarget( TableName table, String column, ColumnType columnType )
+    {
+        this.rightTarget = createColumn( table, column, columnType );
+        return this;
+    }
 
     @Override
     public Join build()
@@ -55,17 +56,13 @@ class JoinBuilder implements Join.Builder.SetParentTable,
         return new Join( this );
     }
 
-    @Override
-    public SetStartTable childTable( TableName childTable )
+    private SimpleColumn createColumn( TableName table, String column, ColumnType columnType )
     {
-        this.childTable = childTable;
-        return this;
-    }
-
-    @Override
-    public Join.Builder startTable( TableName startTable )
-    {
-        this.startTable = startTable;
-        return this;
+        return new SimpleColumn(
+                table,
+                table.fullyQualifiedColumnName( column ),
+                column,
+                columnType,
+                SqlDataType.KEY_DATA_TYPE );
     }
 }

@@ -49,9 +49,10 @@ public class SchemaExportServiceTest
                         "PRIMARY_KEY",
                         "FOREIGN_KEY",
                         "REFERENCED_TABLE_SCHEMA",
-                        "REFERENCED_TABLE_NAME" )
-                .addRow( "test", "Person", "id", "addressId", "test", "Address" )
-                .addRow( "test", "Address", "id", "ownerId", "test", "Person" )
+                        "REFERENCED_TABLE_NAME",
+                        "REFERENCED_PRIMARY_KEY" )
+                .addRow( "test", "Person", "id", "addressId", "test", "Address", "id" )
+                .addRow( "test", "Address", "id", "ownerId", "test", "Person", "id" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );

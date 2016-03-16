@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -32,17 +33,18 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
         {
             while ( results.next() )
             {
+                TableName leftTable = new TableName(
+                        results.getString( "TABLE_SCHEMA" ),
+                        results.getString( "TABLE_NAME" ) );
+                String primaryKey = results.getString( "PRIMARY_KEY" );
+                TableName rightTable = new TableName(
+                        results.getString( "REFERENCED_TABLE_SCHEMA" ),
+                        results.getString( "REFERENCED_TABLE_NAME" ) );
                 Join join = Join.builder()
-                        .parentTable(
-                                new TableName(
-                                        results.getString( "TABLE_SCHEMA" ),
-                                        results.getString( "TABLE_NAME" ) ) )
-                        .primaryKey( results.getString( "PRIMARY_KEY" ) )
-                        .foreignKey( results.getString( "FOREIGN_KEY" ) )
-                        .childTable(
-                                new TableName(
-                                        results.getString( "REFERENCED_TABLE_SCHEMA" ),
-                                        results.getString( "REFERENCED_TABLE_NAME" ) ) )
+                        .leftSource( leftTable, primaryKey, ColumnType.PrimaryKey )
+                        .leftTarget( leftTable, primaryKey, ColumnType.PrimaryKey )
+                        .rightSource( leftTable, results.getString( "FOREIGN_KEY" ), ColumnType.ForeignKey )
+                        .rightTarget( rightTable, results.getString( "REFERENCED_PRIMARY_KEY" ), ColumnType.PrimaryKey )
                         .startTable( source.startTable() )
                         .build();
 
