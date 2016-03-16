@@ -1,8 +1,6 @@
 package org.neo4j.integration.sql;
 
-public interface QueryResults extends AutoCloseable
+public interface QueryResults extends RowAccessor, AutoCloseable
 {
     boolean next() throws Exception;
-
-    String getString( String columnLabel ) throws Exception;
 }

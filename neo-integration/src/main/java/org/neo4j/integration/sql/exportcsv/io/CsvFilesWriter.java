@@ -27,8 +27,11 @@ public class CsvFilesWriter<T extends DatabaseObject>
         ColumnToCsvFieldMappings mappings = mapper.createMappings( source );
 
         Path headerFile = headerFileWriter.writeHeaderFile( mappings.fields(), source.descriptor() );
-        Path exportFile = csvFileWriter.writeExportFile( mappings, sqlSupplier, source.descriptor(), mapper
-                .writeRowWithNullsStrategy() );
+        Path exportFile = csvFileWriter.writeExportFile(
+                mappings,
+                sqlSupplier,
+                source.descriptor(),
+                mapper.writeRowWithNullsStrategy() );
 
         return new CsvFiles( headerFile, exportFile );
     }

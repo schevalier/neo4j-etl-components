@@ -1,7 +1,5 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import java.util.function.BiPredicate;
-
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
@@ -10,6 +8,7 @@ import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.SqlDataType;
+import org.neo4j.integration.util.BiPredicate;
 
 public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
 {
