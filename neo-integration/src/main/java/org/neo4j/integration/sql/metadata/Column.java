@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.metadata;
 
+import org.neo4j.integration.sql.RowAccessor;
+
 public interface Column
 {
     TableName table();
@@ -13,4 +15,6 @@ public interface Column
     ColumnType type();
 
     SqlDataType dataType();
+
+    String selectFrom( RowAccessor row);
 }

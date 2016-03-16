@@ -101,9 +101,16 @@ public class DatabaseClient implements AutoCloseable
         }
 
         @Override
-        public String getString( String columnLabel ) throws Exception
+        public String getString( String columnLabel )
         {
-            return results.getString( columnLabel );
+            try
+            {
+                return results.getString( columnLabel );
+            }
+            catch ( SQLException e )
+            {
+                throw new RuntimeException( e );
+            }
         }
 
         @Override

@@ -4,6 +4,7 @@ public enum ColumnType
 {
     PrimaryKey,
     ForeignKey,
+    CompositeKey,
     Data,
     Literal
 }

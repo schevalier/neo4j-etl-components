@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.function.BiPredicate;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,7 +17,6 @@ import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.util.BiPredicate;
 
 import static java.lang.String.format;
 
@@ -75,10 +75,10 @@ public class CsvFileWriter
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {
-                        writeFieldValueAndDelimiter( results.getString( columns[i].alias() ), writer );
+                        writeFieldValueAndDelimiter( columns[i].selectFrom( results ), writer );
                     }
 
-                    writeFieldValueAndNewLine( results.getString( columns[(maxIndex)].alias() ), writer );
+                    writeFieldValueAndNewLine( columns[maxIndex].selectFrom( results ), writer );
                 }
             }
         }

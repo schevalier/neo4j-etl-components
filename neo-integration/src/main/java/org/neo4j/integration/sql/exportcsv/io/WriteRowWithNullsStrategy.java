@@ -1,18 +1,18 @@
 package org.neo4j.integration.sql.exportcsv.io;
 
 import java.util.Collection;
+import java.util.function.BiPredicate;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.util.BiPredicate;
 
 public class WriteRowWithNullsStrategy implements BiPredicate<RowAccessor, Collection<Column>>
 {
     @Override
-    public boolean test( RowAccessor row, Collection<Column> columns ) throws Exception
+    public boolean test( RowAccessor row, Collection<Column> columns )
     {
         boolean allowWriteLine = true;
         for ( Column column : columns )

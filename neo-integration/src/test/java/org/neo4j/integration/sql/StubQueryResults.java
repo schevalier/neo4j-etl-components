@@ -26,7 +26,7 @@ public class StubQueryResults implements QueryResults
     }
 
     @Override
-    public String getString( String columnLabel ) throws Exception
+    public String getString( String columnLabel )
     {
         return rows.get( currentRowIndex ).get( columnLabel );
     }

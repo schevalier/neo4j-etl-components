@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.util.Preconditions;
 
 public class SimpleColumn implements Column
@@ -53,6 +54,12 @@ public class SimpleColumn implements Column
     public SqlDataType dataType()
     {
         return dataType;
+    }
+
+    @Override
+    public String selectFrom( RowAccessor row )
+    {
+        return row.getString( alias );
     }
 
     @Override
