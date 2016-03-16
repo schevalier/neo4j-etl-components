@@ -31,16 +31,16 @@ public class SchemaExportServiceTest
     {
         // given
         QueryResults personResults = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "id", "INT", "PRI" )
-                .addRow( "username", "TEXT", "" )
-                .addRow( "addressId", "int", "MUL" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "username", "TEXT", "Data" )
+                .addRow( "addressId", "int", "ForeignKey" )
                 .build();
 
         QueryResults addressResults = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "id", "INT", "PRI" )
-                .addRow( "postcode", "TEXT", "" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "postcode", "TEXT", "Data" )
                 .build();
 
         QueryResults joinResults = StubQueryResults.builder()
@@ -83,15 +83,15 @@ public class SchemaExportServiceTest
     {
         // given
         QueryResults studentResults = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "id", "INT", "PRI" )
-                .addRow( "username", "TEXT", "" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "username", "TEXT", "Data" )
                 .build();
 
         QueryResults courseResults = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "id", "INT", "PRI" )
-                .addRow( "name", "TEXT", "" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "name", "TEXT", "Data" )
                 .build();
 
         QueryResults joinTableResults = StubQueryResults.builder()
