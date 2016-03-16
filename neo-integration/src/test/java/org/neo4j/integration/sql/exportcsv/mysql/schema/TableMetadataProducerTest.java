@@ -28,10 +28,10 @@ public class TableMetadataProducerTest
     {
         // given
         QueryResults results = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "id", "INT", "PRI" )
-                .addRow( "username", "TEXT", "" )
-                .addRow( "addressId", "int", "MUL" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "username", "TEXT", "Data" )
+                .addRow( "addressId", "int", "ForeignKey" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );

@@ -70,8 +70,8 @@ public class JoinTableMetadataProducerTest
     {
         // given
         QueryResults columnProjectionResults = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "credits", "text", "" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "credits", "text", "Data" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
@@ -114,10 +114,10 @@ public class JoinTableMetadataProducerTest
     {
         // given
         QueryResults columnProjectionResults = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
-                .addRow( "credits", "text", "" )
-                .addRow( "studentId", "int", "PRI" )
-                .addRow( "addressId", "int", "MUL" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "credits", "text", "Data" )
+                .addRow( "studentId", "int", "PrimaryKey" )
+                .addRow( "addressId", "int", "ForeignKey" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );

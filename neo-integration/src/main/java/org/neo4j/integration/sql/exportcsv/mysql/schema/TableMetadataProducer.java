@@ -42,11 +42,11 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                 "      AND c.COLUMN_NAME = kcu.COLUMN_NAME )" +
                 "    WHEN 0 THEN" +
                 "      CASE c.COLUMN_KEY" +
-                "        WHEN 'PRI' THEN 'PRI'" +
-                "        ELSE ''" +
+                "        WHEN 'PRI' THEN 'PrimaryKey'" +
+                "        ELSE 'Data'" +
                 "      END" +
-                "    ELSE 'MUL'" +
-                "END AS COLUMN_KEY," +
+                "    ELSE 'ForeignKey'" +
+                "END AS COLUMN_TYPE," +
                 "c.DATA_TYPE AS DATA_TYPE " +
                 "FROM INFORMATION_SCHEMA.COLUMNS c " +
                 "WHERE c.TABLE_SCHEMA = '" + source.schema() + "' AND c.TABLE_NAME ='" + source.simpleName() + "';";
@@ -57,20 +57,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         {
             while ( results.next() )
             {
-                ColumnType columnType;
-
-                switch ( results.getString( "COLUMN_KEY" ) )
-                {
-                    case "PRI":
-                        columnType = ColumnType.PrimaryKey;
-                        break;
-                    case "MUL":
-                        columnType = ColumnType.ForeignKey;
-                        break;
-                    default:
-                        columnType = ColumnType.Data;
-                        break;
-                }
+                ColumnType columnType = ColumnType.valueOf( results.getString( "COLUMN_TYPE" ));
 
                 if ( columnFilter.test( columnType ) )
                 {
