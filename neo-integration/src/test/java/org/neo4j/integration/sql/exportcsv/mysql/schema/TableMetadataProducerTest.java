@@ -9,8 +9,8 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
-import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -50,19 +50,19 @@ public class TableMetadataProducerTest
         assertEquals( "test.Person", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                new Column(
+                new SimpleColumn(
                         expectedTableName,
                         expectedTableName.fullyQualifiedColumnName( "id" ),
                         "id",
                         ColumnType.PrimaryKey,
                         MySqlDataType.INT ),
-                new Column(
+                new SimpleColumn(
                         expectedTableName,
                         expectedTableName.fullyQualifiedColumnName( "username" ),
                         "username",
                         ColumnType.Data,
                         MySqlDataType.TEXT ),
-                new Column(
+                new SimpleColumn(
                         expectedTableName,
                         expectedTableName.fullyQualifiedColumnName( "addressId" ),
                         "addressId",

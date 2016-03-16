@@ -14,6 +14,7 @@ import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
@@ -99,7 +100,7 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                new Column(
+                new SimpleColumn(
                         studentCourse,
                         studentCourse.fullyQualifiedColumnName( "credits" ),
                         "credits",
@@ -145,7 +146,7 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                new Column(
+                new SimpleColumn(
                         studentCourse,
                         studentCourse.fullyQualifiedColumnName( "credits" ),
                         "credits",
@@ -158,13 +159,13 @@ public class JoinTableMetadataProducerTest
     private void assertJoinTableKeyMappings( JoinTable joinTable )
     {
         TableName studentCourse = joinTable.joinTableName();
-        Column expectedStudentId = new Column(
+        Column expectedStudentId = new SimpleColumn(
                 studentCourse,
                 studentCourse.fullyQualifiedColumnName( "studentId" ),
                 "studentId",
                 ColumnType.ForeignKey,
                 SqlDataType.KEY_DATA_TYPE );
-        Column expectedCourseId = new Column(
+        Column expectedCourseId = new SimpleColumn(
                 studentCourse,
                 studentCourse.fullyQualifiedColumnName( "courseId" ),
                 "courseId",
@@ -173,7 +174,7 @@ public class JoinTableMetadataProducerTest
 
         assertEquals( expectedStudentId, joinTable.startForeignKey() );
 
-        assertEquals( new Column(
+        assertEquals( new SimpleColumn(
                         new TableName( "test.Student" ),
                         "test.Student.id",
                         "id",
@@ -183,7 +184,7 @@ public class JoinTableMetadataProducerTest
 
         assertEquals( expectedCourseId, joinTable.endForeignKey() );
 
-        assertEquals( new Column(
+        assertEquals( new SimpleColumn(
                         new TableName( "test.Course" ),
                         "test.Course.id", "id",
                         ColumnType.PrimaryKey,

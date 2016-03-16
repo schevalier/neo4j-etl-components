@@ -11,6 +11,7 @@ import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -34,9 +35,9 @@ public class WriteRowWithNullsStrategyTest
 
         TableName table = new TableName( "users" );
         List<Column> columns = asList(
-                new Column( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
-                new Column( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
-                new Column( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
+                new SimpleColumn( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
+                new SimpleColumn( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
+                new SimpleColumn( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
 
         // when
 //        results.next();
@@ -60,9 +61,9 @@ public class WriteRowWithNullsStrategyTest
 
         TableName table = new TableName( "users" );
         List<Column> columns = asList(
-                new Column( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
-                new Column( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
-                new Column( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
+                new SimpleColumn( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
+                new SimpleColumn( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
+                new SimpleColumn( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
@@ -80,9 +81,9 @@ public class WriteRowWithNullsStrategyTest
 
         TableName table = new TableName( "users" );
         List<Column> columns = asList(
-                new Column( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
-                new Column( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
-                new Column( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
+                new SimpleColumn( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
+                new SimpleColumn( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
+                new SimpleColumn( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
 
         // when
 //        results.next();

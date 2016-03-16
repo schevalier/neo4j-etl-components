@@ -73,7 +73,6 @@ public class CsvFileWriter
 
                 if ( writeRowWithNullsStrategy.test( results, mappings.columns() ) )
                 {
-
                     for ( int i = 0; i < maxIndex; i++ )
                     {
                         writeFieldValueAndDelimiter( results.getString( columns[i].alias() ), writer );

@@ -26,7 +26,7 @@ class JoinBuilder implements Join.Builder.SetParentTable,
     public SetForeignKey primaryKey( String primaryKey )
     {
 
-        this.primaryKey = new Column(
+        this.primaryKey = new SimpleColumn(
                 parentTable,
                 parentTable.fullyQualifiedColumnName( primaryKey ),
                 primaryKey,
@@ -39,7 +39,7 @@ class JoinBuilder implements Join.Builder.SetParentTable,
     public SetChildTable foreignKey( String foreignKey )
     {
 
-        this.foreignKey = new Column(
+        this.foreignKey = new SimpleColumn(
                 parentTable,
                 parentTable.fullyQualifiedColumnName( foreignKey ),
                 foreignKey,

@@ -11,6 +11,7 @@ import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -73,13 +74,13 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
         TableName joinTableName = joinTableInfo.joinTableName();
         TableName referencedTable = referenceTableFunction.apply( joinTableInfo );
         return new ColumnPair(
-                new Column(
+                new SimpleColumn(
                         joinTableName,
                         joinTableName.fullyQualifiedColumnName( results.getString( "FOREIGN_KEY" ) ),
                         results.getString( "FOREIGN_KEY" ),
                         ColumnType.ForeignKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                new Column(
+                new SimpleColumn(
                         referencedTable,
                         referencedTable.fullyQualifiedColumnName( results.getString( "REFERENCED_PRIMARY_KEY" ) ),
                         results.getString( "REFERENCED_PRIMARY_KEY" ),

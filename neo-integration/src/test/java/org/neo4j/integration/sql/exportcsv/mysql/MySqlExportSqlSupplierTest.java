@@ -7,6 +7,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static org.junit.Assert.assertEquals;
@@ -17,21 +18,21 @@ public class MySqlExportSqlSupplierTest
     public void shouldCreateSqlForSelectingColumnsFromTables()
     {
         // given
-        Column column1 = new Column(
+        Column column1 = new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.id",
                 "id",
                 ColumnType.PrimaryKey,
                 MySqlDataType.TEXT );
 
-        Column column2 = new Column(
+        Column column2 = new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.username",
                 "username",
                 ColumnType.Data,
                 MySqlDataType.TEXT );
 
-        Column column3 = new Column(
+        Column column3 = new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.id",
                 "id",

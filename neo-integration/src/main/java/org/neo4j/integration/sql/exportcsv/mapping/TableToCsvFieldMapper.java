@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.util.BiPredicate;
@@ -43,7 +44,7 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
         }
 
         builder.add(
-                new Column(
+                new SimpleColumn(
                         table.name(),
                         formatting.quote().enquote( table.name().simpleName() ),
                         table.name().simpleName(),

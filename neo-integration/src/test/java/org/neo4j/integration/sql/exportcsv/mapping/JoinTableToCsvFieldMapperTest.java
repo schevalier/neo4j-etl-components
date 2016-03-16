@@ -14,6 +14,7 @@ import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.JoinTable;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -84,7 +85,8 @@ public class JoinTableToCsvFieldMapperTest
                 .connectsToStartTablePrimaryKey( startPrimaryKey )
                 .endForeignKey( endForeignKey )
                 .connectsToEndTablePrimaryKey( endPrimaryKey )
-                .addColumn( new Column( joinTableName, "credits", "credits", ColumnType.Data, MySqlDataType.TEXT ) )
+                .addColumn( new SimpleColumn( joinTableName, "credits", "credits", ColumnType.Data, MySqlDataType
+                        .TEXT ) )
                 .build();
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );
@@ -100,16 +102,17 @@ public class JoinTableToCsvFieldMapperTest
                 CsvField.startId( new IdSpace( "test.Student" ) ),
                 CsvField.endId( new IdSpace( "test.Course" ) ),
                 CsvField.relationshipType(),
-                CsvField.data( "credits", Neo4jDataType.String )) );
+                CsvField.data( "credits", Neo4jDataType.String ) ) );
 
         assertEquals(
-                asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"", "credits" )
+                asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"",
+                        "credits" )
                 , columns );
     }
 
     private Column getBuild( TableName tableName, String name, String alias, ColumnType columnType )
     {
-        return new Column(
+        return new SimpleColumn(
                 tableName,
                 tableName.fullyQualifiedColumnName( name ),
                 alias,

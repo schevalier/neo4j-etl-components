@@ -11,6 +11,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -76,7 +77,7 @@ public class TableToCsvFieldMapperTest
 
     private Column column( TableName table, String name, ColumnType columnType, MySqlDataType text )
     {
-        return new Column(
+        return new SimpleColumn(
                 table,
                 table.fullyQualifiedColumnName( name ),
                 name,

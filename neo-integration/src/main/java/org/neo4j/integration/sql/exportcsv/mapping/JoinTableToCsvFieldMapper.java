@@ -10,6 +10,7 @@ import org.neo4j.integration.sql.exportcsv.io.WriteRowWithNullsStrategy;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.JoinTable;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.BiPredicate;
@@ -44,7 +45,7 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
         String relationshipType = table.simpleName().toUpperCase();
 
         builder.add(
-                new Column( table,
+                new SimpleColumn( table,
                         formatting.quote().enquote( relationshipType ),
                         relationshipType,
                         ColumnType.Literal,

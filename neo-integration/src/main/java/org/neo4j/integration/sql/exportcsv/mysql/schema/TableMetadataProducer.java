@@ -7,9 +7,9 @@ import java.util.function.Predicate;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
-import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -57,7 +57,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         {
             while ( results.next() )
             {
-                ColumnType columnType = ColumnType.valueOf( results.getString( "COLUMN_TYPE" ));
+                ColumnType columnType = ColumnType.valueOf( results.getString( "COLUMN_TYPE" ) );
 
                 if ( columnFilter.test( columnType ) )
                 {
@@ -65,7 +65,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                     SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
 
                     builder.addColumn(
-                            new Column(
+                            new SimpleColumn(
                                     source,
                                     source.fullyQualifiedColumnName( columnName ),
                                     columnName,

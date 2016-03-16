@@ -9,9 +9,9 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
-import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
@@ -55,14 +55,14 @@ public class JoinMetadataProducerTest
 
         Join join1 = iterator.next();
 
-        assertEquals( new Column(
+        assertEquals( new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.id",
                 "id",
                 ColumnType.PrimaryKey,
                 SqlDataType.KEY_DATA_TYPE ), join1.primaryKey() );
 
-        assertEquals( new Column(
+        assertEquals( new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.addressId",
                 "addressId",
@@ -73,14 +73,14 @@ public class JoinMetadataProducerTest
 
         Join join2 = iterator.next();
 
-        assertEquals( new Column(
+        assertEquals( new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.id",
                 "id",
                 ColumnType.PrimaryKey,
                 SqlDataType.KEY_DATA_TYPE ), join2.primaryKey() );
 
-        assertEquals( new Column(
+        assertEquals( new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.ownerId",
                 "ownerId",

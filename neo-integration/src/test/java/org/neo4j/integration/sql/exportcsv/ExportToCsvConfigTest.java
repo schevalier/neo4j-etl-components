@@ -10,6 +10,7 @@ import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -92,7 +93,7 @@ public class ExportToCsvConfigTest
 
     private Column column( TableName table, String name, ColumnType type )
     {
-        return new Column(
+        return new SimpleColumn(
                 table,
                 table.fullyQualifiedColumnName( name ),
                 name,

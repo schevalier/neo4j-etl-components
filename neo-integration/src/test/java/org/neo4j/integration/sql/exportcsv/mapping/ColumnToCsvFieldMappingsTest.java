@@ -9,6 +9,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -76,10 +77,8 @@ public class ColumnToCsvFieldMappingsTest
 
         Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
                 .Data );
-        ;
 
         Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
-        ;
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -131,7 +130,7 @@ public class ColumnToCsvFieldMappingsTest
 
     private Column buildColumn( TableName table, String name, String alias, ColumnType columnType )
     {
-        return new Column(
+        return new SimpleColumn(
                 table,
                 name,
                 alias,
