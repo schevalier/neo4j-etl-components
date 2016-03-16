@@ -57,13 +57,9 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         {
             while ( results.next() )
             {
-                String columnName = results.getString( "COLUMN_NAME" );
-                String columnKey = results.getString( "COLUMN_KEY" );
-                SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
-
                 ColumnType columnType;
 
-                switch ( columnKey )
+                switch ( results.getString( "COLUMN_KEY" ) )
                 {
                     case "PRI":
                         columnType = ColumnType.PrimaryKey;
@@ -78,6 +74,9 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
                 if ( columnFilter.test( columnType ) )
                 {
+                    String columnName = results.getString( "COLUMN_NAME" );
+                    SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
+
                     builder.addColumn(
                             new Column(
                                     source,
