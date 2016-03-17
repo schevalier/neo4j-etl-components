@@ -1,7 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,19 +25,22 @@ import static org.mockito.Mockito.when;
 public class JoinMetadataProducerTest
 {
     @Test
-    public void shouldReturnJoinMetadata() throws Exception
+    public void shouldReturnJoinMetadataForTwoWayRelationships() throws Exception
     {
         // given
         QueryResults results = StubQueryResults.builder()
-                .columns( "TABLE_SCHEMA",
-                        "TABLE_NAME",
-                        "PRIMARY_KEY",
-                        "FOREIGN_KEY",
-                        "REFERENCED_TABLE_SCHEMA",
-                        "REFERENCED_TABLE_NAME",
-                        "REFERENCED_PRIMARY_KEY" )
-                .addRow( "test", "Person", "id", "addressId", "test", "Address", "id" )
-                .addRow( "test", "Address", "id", "ownerId", "test", "Person", "id" )
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Person", "id", "PrimaryKey", "test", "Person", "id", "PrimaryKey" )
+                .addRow( "test", "Person", "addressId", "ForeignKey", "test", "Address", "id", "PrimaryKey" )
+                .addRow( "test", "Address", "id", "PrimaryKey", "test", "Address", "id", "PrimaryKey" )
+                .addRow( "test", "Address", "ownerId", "ForeignKey", "test", "Person", "id", "PrimaryKey" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
@@ -46,50 +49,49 @@ public class JoinMetadataProducerTest
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
 
         // when
-        Collection<Join> joins = getJoinMetadata
+        Collection<Join> joinCollection = getJoinMetadata
                 .createMetadataFor( new TableNamePair(
                         new TableName( "test.Person" ),
                         new TableName( "test.Address" ) ) );
 
         // then
-        Iterator<Join> iterator = joins.iterator();
-
-        Join join1 = iterator.next();
+        ArrayList<Join> joins = new ArrayList<>( joinCollection );
+        Join livesIn = joins.get( 1 );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.id",
                 "id",
                 ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE ), join1.left().source() );
+                SqlDataType.KEY_DATA_TYPE ), livesIn.left().source() );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.addressId",
                 "addressId",
                 ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE ), join1.right().source() );
+                SqlDataType.KEY_DATA_TYPE ), livesIn.right().source() );
 
-        assertEquals( new TableName( "test.Address" ), join1.right().target().table() );
+        assertEquals( new TableName( "test.Address" ), livesIn.right().target().table() );
 
-        Join join2 = iterator.next();
+        Join ownedBy = joins.get( 0 );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.id",
                 "id",
                 ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE ), join2.left().source() );
+                SqlDataType.KEY_DATA_TYPE ), ownedBy.left().source() );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.ownerId",
                 "ownerId",
                 ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE ), join2.right().source() );
+                SqlDataType.KEY_DATA_TYPE ), ownedBy.right().source() );
 
-        assertEquals( new TableName( "test.Person" ), join2.right().target().table() );
+        assertEquals( new TableName( "test.Person" ), ownedBy.right().target().table() );
 
-        assertFalse( iterator.hasNext() );
+        assertTrue( joins.size() == 2 );
     }
 }

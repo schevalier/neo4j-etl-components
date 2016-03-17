@@ -4,8 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.util.FutureUtils;
@@ -98,6 +103,30 @@ public class DatabaseClient implements AutoCloseable
         public boolean next() throws Exception
         {
             return results.next();
+        }
+
+        @Override
+        public Stream<Map<String, String>> streamOfResults( List<String> columnLabels )
+        {
+            List<Map<String, String>> listOfResults = new ArrayList<>();
+            try
+            {
+                while ( results.next() )
+                {
+                    Map<String, String> map = new HashMap<>();
+                    for ( String columnLabel : columnLabels )
+                    {
+                        map.put( columnLabel, results.getString( columnLabel ) );
+
+                    }
+                    listOfResults.add( map );
+                }
+            }
+            catch ( SQLException e )
+            {
+                e.printStackTrace();
+            }
+            return listOfResults.stream();
         }
 
         @Override

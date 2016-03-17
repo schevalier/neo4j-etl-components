@@ -22,15 +22,22 @@ public class Join implements DatabaseObject
     private final JoinKey right;
     private final TableName startTable;
 
+    public Join( JoinKey left, JoinKey right, TableName startTable )
+    {
+        this.left = Preconditions.requireNonNull( left, "Left" );
+        this.right = Preconditions.requireNonNull( right, "Right" );
+        this.startTable = Preconditions.requireNonNull( startTable, "StartTable" );
+    }
+
     Join( JoinBuilder builder )
     {
-        this.startTable = Preconditions.requireNonNull( builder.startTable, "StartTable" );
-        this.left = new JoinKey(
-                Preconditions.requireNonNull( builder.leftSource, "LeftSource" ),
-                Preconditions.requireNonNull( builder.leftTarget, "LeftTarget" ) );
-        this.right = new JoinKey(
-                Preconditions.requireNonNull( builder.rightSource, "RightSource" ),
-                Preconditions.requireNonNull( builder.rightTarget, "RightTarget" ) );
+        this( new JoinKey(
+                        Preconditions.requireNonNull( builder.leftSource, "LeftSource" ),
+                        Preconditions.requireNonNull( builder.leftTarget, "LeftTarget" ) ),
+                new JoinKey(
+                        Preconditions.requireNonNull( builder.rightSource, "RightSource" ),
+                        Preconditions.requireNonNull( builder.rightTarget, "RightTarget" ) ),
+                builder.startTable );
     }
 
     public boolean childTableRepresentsStartOfRelationship()

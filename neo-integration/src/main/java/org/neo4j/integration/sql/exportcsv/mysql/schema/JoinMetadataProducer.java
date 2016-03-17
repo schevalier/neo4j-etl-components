@@ -2,14 +2,22 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
+
+import static java.util.Arrays.asList;
 
 public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Join>
 {
@@ -23,66 +31,113 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
     @Override
     public Collection<Join> createMetadataFor( TableNamePair source ) throws Exception
     {
-        String sql = select( source.startTable(), source.endTable() ) +
-                " UNION " +
-                select( source.endTable(), source.startTable() );
+        String sql = select( source.startTable(), source.endTable() );
 
         Collection<Join> joins = new ArrayList<>();
 
         try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
-            while ( results.next() )
-            {
-                TableName leftTable = new TableName(
-                        results.getString( "TABLE_SCHEMA" ),
-                        results.getString( "TABLE_NAME" ) );
-                String primaryKey = results.getString( "PRIMARY_KEY" );
-                TableName rightTable = new TableName(
-                        results.getString( "REFERENCED_TABLE_SCHEMA" ),
-                        results.getString( "REFERENCED_TABLE_NAME" ) );
-                Join join = Join.builder()
-                        .leftSource( leftTable, primaryKey, ColumnType.PrimaryKey )
-                        .leftTarget( leftTable, primaryKey, ColumnType.PrimaryKey )
-                        .rightSource( leftTable, results.getString( "FOREIGN_KEY" ), ColumnType.ForeignKey )
-                        .rightTarget( rightTable, results.getString( "REFERENCED_PRIMARY_KEY" ), ColumnType.PrimaryKey )
-                        .startTable( source.startTable() )
-                        .build();
+            List<String> columnLabels = asList( "SOURCE_TABLE_SCHEMA", "SOURCE_TABLE_NAME",
+                    "TARGET_TABLE_SCHEMA", "TARGET_TABLE_NAME",
+                    "SOURCE_COLUMN_NAME", "TARGET_COLUMN_NAME",
+                    "SOURCE_COLUMN_TYPE", "TARGET_COLUMN_TYPE" );
 
-                joins.add( join );
+            Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.streamOfResults( columnLabels )
+                    .collect( Collectors.groupingBy( row -> row.get( "SOURCE_TABLE_NAME" ) ) );
+            for ( Map.Entry<String, List<Map<String, String>>> entry : joinsGroupedByStartTable.entrySet() )
+            {
+                Map<String, String> primaryKeyMetadata = entry.getValue().stream()
+                        .filter( row ->
+                                row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.PrimaryKey.name() ) )
+                        .findFirst().get();
+                Map<String, String> foreignKeyMetadata = entry.getValue().stream()
+                        .filter( row ->
+                                row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.ForeignKey.name() ) )
+                        .findFirst().get();
+
+                JoinKey left = createJoin( primaryKeyMetadata );
+                JoinKey right = createJoin( foreignKeyMetadata );
+                joins.add( new Join( left, right, left.source().table() ) );
             }
         }
-
         return joins;
+    }
+
+    private JoinKey createJoin( Map<String, String> results )
+    {
+        TableName sourceTable = new TableName(
+                results.get( "SOURCE_TABLE_SCHEMA" ),
+                results.get( "SOURCE_TABLE_NAME" ) );
+        TableName targetTable = new TableName(
+                results.get( "TARGET_TABLE_SCHEMA" ),
+                results.get( "TARGET_TABLE_NAME" ) );
+        String sourceColumn = results.get( "SOURCE_COLUMN_NAME" );
+        String targetColumn = results.get( "TARGET_COLUMN_NAME" );
+        ColumnType sourceColumnType = ColumnType.valueOf( results.get( "SOURCE_COLUMN_TYPE" ) );
+        ColumnType targetColumnType = ColumnType.valueOf( results.get( "TARGET_COLUMN_TYPE" ) );
+
+        return new JoinKey(
+                new SimpleColumn(
+                        sourceTable,
+                        sourceTable.fullyQualifiedColumnName( sourceColumn ),
+                        sourceColumn,
+                        sourceColumnType,
+                        SqlDataType.KEY_DATA_TYPE ),
+                new SimpleColumn(
+                        targetTable,
+                        targetTable.fullyQualifiedColumnName( targetColumn ),
+                        targetColumn,
+                        targetColumnType,
+                        SqlDataType.KEY_DATA_TYPE ) );
     }
 
     private String select( TableName t1, TableName t2 )
     {
-        return "SELECT " +
-                " kcu.TABLE_SCHEMA," +
-                " kcu.TABLE_NAME," +
-                " c3.COLUMN_NAME AS PRIMARY_KEY," +
-                " kcu.COLUMN_NAME AS FOREIGN_KEY," +
-                " c1.DATA_TYPE AS COLUMN_DATA_TYPE," +
-                " kcu.REFERENCED_COLUMN_NAME AS REFERENCED_PRIMARY_KEY," +
-                " c2.DATA_TYPE AS REFERENCED_COLUMN_DATA_TYPE," +
-                " kcu.REFERENCED_TABLE_SCHEMA," +
-                " kcu.REFERENCED_TABLE_NAME " +
-                "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS kcu " +
-                "INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c1 ON " +
-                " (kcu.TABLE_SCHEMA = c1.TABLE_SCHEMA AND " +
-                " kcu.TABLE_NAME = c1.TABLE_NAME " +
-                " AND kcu.COLUMN_NAME = c1.COLUMN_NAME) " +
-                "INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c2 ON " +
-                " (kcu.TABLE_SCHEMA = c2.TABLE_SCHEMA " +
-                " AND kcu.TABLE_NAME = c2.TABLE_NAME " +
-                " AND kcu.COLUMN_NAME = c2.COLUMN_NAME) " +
-                "INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c3 ON " +
-                " (kcu.TABLE_SCHEMA = c3.TABLE_SCHEMA " +
-                " AND kcu.TABLE_NAME = c3.TABLE_NAME " +
-                " AND c3.COLUMN_KEY = 'PRI') " +
-                "WHERE kcu.TABLE_SCHEMA = '" + t1.schema() + "' " +
-                " AND kcu.TABLE_NAME = '" + t1.simpleName() + "' " +
-                " AND kcu.REFERENCED_TABLE_SCHEMA = '" + t2.schema() + "' " +
-                " AND kcu.REFERENCED_TABLE_NAME = '" + t2.simpleName() + "'";
+        return "SELECT join_table.TABLE_SCHEMA AS SOURCE_TABLE_SCHEMA," +
+                "        CASE ( SELECT COUNT(referenced_table.REFERENCED_TABLE_NAME) " +
+                "               FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE referenced_table " +
+                "               WHERE source_column.TABLE_SCHEMA = referenced_table.TABLE_SCHEMA " +
+                "               AND source_column.TABLE_NAME = referenced_table.TABLE_NAME " +
+                "               AND source_column.COLUMN_NAME = referenced_table.COLUMN_NAME )" +
+                "    WHEN 0 THEN " +
+                "      CASE source_column.COLUMN_KEY" +
+                "        WHEN 'PRI' THEN 'PrimaryKey'" +
+                "        ELSE 'Data'" +
+                "      END" +
+                "      ELSE 'ForeignKey'" +
+                "    END AS SOURCE_COLUMN_TYPE," +
+                "    join_table.TABLE_NAME AS SOURCE_TABLE_NAME," +
+                "    join_table.COLUMN_NAME AS SOURCE_COLUMN_NAME," +
+                "        CASE ( SELECT COUNT(referenced_table.REFERENCED_TABLE_NAME) " +
+                "               FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE referenced_table " +
+                "               WHERE target_column.TABLE_SCHEMA = referenced_table.TABLE_SCHEMA " +
+                "               AND target_column.TABLE_NAME = referenced_table.TABLE_NAME " +
+                "               AND target_column.COLUMN_NAME = referenced_table.COLUMN_NAME )" +
+                "    WHEN 0 THEN" +
+                "      CASE target_column.COLUMN_KEY" +
+                "        WHEN 'PRI' THEN 'PrimaryKey'" +
+                "        ELSE 'Data'" +
+                "      END" +
+                "      ELSE 'ForeignKey'" +
+                "    END AS TARGET_COLUMN_TYPE," +
+                "    IFNULL(join_table.REFERENCED_TABLE_SCHEMA,join_table.TABLE_SCHEMA) AS TARGET_TABLE_SCHEMA," +
+                "    IFNULL(join_table.REFERENCED_TABLE_NAME,join_table.TABLE_NAME) AS TARGET_TABLE_NAME," +
+                "    IFNULL(join_table.REFERENCED_COLUMN_NAME,join_table.COLUMN_NAME) AS TARGET_COLUMN_NAME" +
+                " FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE join_table " +
+                " LEFT OUTER JOIN INFORMATION_SCHEMA.COLUMNS AS source_column ON " +
+                "  (join_table.TABLE_SCHEMA = source_column.TABLE_SCHEMA " +
+                "   AND join_table.TABLE_NAME = source_column.TABLE_NAME " +
+                "   AND join_table.COLUMN_NAME = source_column.COLUMN_NAME) " +
+                " LEFT OUTER JOIN INFORMATION_SCHEMA.COLUMNS AS target_column ON" +
+                "  (IFNULL(join_table.REFERENCED_TABLE_SCHEMA,join_table.TABLE_SCHEMA) = target_column.TABLE_SCHEMA " +
+                "   AND IFNULL(join_table.REFERENCED_TABLE_NAME,join_table.TABLE_NAME) = target_column.TABLE_NAME " +
+                "   AND IFNULL(join_table.REFERENCED_COLUMN_NAME,join_table.COLUMN_NAME) = target_column.COLUMN_NAME)" +
+                " WHERE join_table.TABLE_SCHEMA = '" + t1.schema() + "'" +
+                " AND join_table.TABLE_NAME = '" + t1.simpleName() + "'" +
+                " AND " +
+                " (" +
+                "  (source_column.COLUMN_KEY = 'PRI' AND join_table.REFERENCED_TABLE_NAME IS NULL) OR " +
+                "    (join_table.REFERENCED_TABLE_NAME IN ('" + t2.simpleName() + "'))" +
+                " );";
     }
 }
