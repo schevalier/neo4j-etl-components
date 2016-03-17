@@ -88,38 +88,6 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    @Ignore
-    public void shouldBaseRelationshipNameAndDirectionOnStartAndEndTableSpecification() throws Exception
-    {
-        // when
-        exportFromMySqlToNeo4j( "Address", "Person" );
-
-        // then
-        try
-        {
-            neo4j.get().start();
-
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
-
-            List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[0].postcode" );
-            List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
-            List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[2].username" );
-
-            assertThat( usernames.size(), is( 9 ) );
-
-            assertThat( usernames, hasItems(
-                    "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
-            assertEquals( asList( "PERSON", "PERSON", "PERSON", "PERSON", "PERSON", "PERSON",
-                    "PERSON", "PERSON", "PERSON" ), relationships );
-            assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
-        }
-        finally
-        {
-            neo4j.get().stop();
-        }
-    }
-
-    @Test
     public void shouldExportFromMySqlAndImportIntoGraphForNumericAndStringTables() throws Exception
     {
         // when
