@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
@@ -16,6 +17,8 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
+
+import static java.lang.String.format;
 
 public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Join>
 {
@@ -39,11 +42,18 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
                     .collect( Collectors.groupingBy( row -> row.get( "SOURCE_TABLE_NAME" ) ) );
             for ( Map.Entry<String, List<Map<String, String>>> entry : joinsGroupedByStartTable.entrySet() )
             {
-                Map<String, String> primaryKeyMetadata = entry.getValue().stream()
+                List<Map<String, String>> rows = entry.getValue();
+                if ( rows.size() < 2)
+                {
+                    throw new IllegalStateException(
+                            format("No join exists between '%s' and '%s'", source.startTable(), source.endTable()) );
+                }
+
+                Map<String, String> primaryKeyMetadata = rows.stream()
                         .filter( row ->
                                 row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.PrimaryKey.name() ) )
                         .findFirst().get();
-                Map<String, String> foreignKeyMetadata = entry.getValue().stream()
+                Map<String, String> foreignKeyMetadata = rows.stream()
                         .filter( row ->
                                 row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.ForeignKey.name() ) )
                         .findFirst().get();

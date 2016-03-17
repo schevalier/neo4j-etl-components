@@ -3,7 +3,9 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
@@ -24,6 +26,9 @@ import static org.mockito.Mockito.when;
 
 public class JoinMetadataProducerTest
 {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void shouldReturnJoinMetadataForTwoWayRelationships() throws Exception
     {
@@ -93,5 +98,36 @@ public class JoinMetadataProducerTest
         assertEquals( new TableName( "test.Person" ), ownedBy.right().target().table() );
 
         assertTrue( joins.size() == 2 );
+    }
+
+    @Test
+    public void shouldThrowExceptionIfJoinDoesNotExistBetweenSuppliedTables() throws Exception
+    {
+        thrown.expect( IllegalStateException.class );
+        thrown.expectMessage( "No join exists between 'test.Person' and 'test.Course'" );
+
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Person", "id", "PrimaryKey", "test", "Person", "id", "PrimaryKey" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+
+        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
+
+
+        // when
+        getJoinMetadata.createMetadataFor(
+                new TableNamePair( new TableName( "test.Person" ), new TableName( "test.Course" ) ) );
+
     }
 }
