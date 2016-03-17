@@ -2,7 +2,9 @@ package org.neo4j.integration.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -11,6 +13,7 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.JoinTable;
+import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -69,12 +72,10 @@ public class SchemaExportServiceTest
                 () -> databaseClient );
 
         // then
-        assertEquals( 1, schemaExport.startTable().stream()
-                .filter( t -> t.name().fullName().equals( "test.Person" ) )
-                .count() );
-        assertEquals( 1, schemaExport.endTable().stream()
-                .filter( t -> t.name().fullName().equals( "test.Address" ) )
-                .count() );
+        List<String> tableNames = schemaExport.tables().stream().map( t -> t.name().fullName() ).collect( Collectors
+                .toList() );
+
+        assertEquals( asList( "test.Person", "test.Address" ), tableNames );
         assertEquals( asList( new TableName( "test.Person" ), new TableName( "test.Address" ) ),
                 schemaExport.joins().stream().findFirst().get().tableNames() );
 
@@ -129,28 +130,28 @@ public class SchemaExportServiceTest
                 () -> databaseClient );
 
         // then
-        assertEquals( 1, schemaExport.startTable().stream()
-                .filter( t -> t.name().fullName().equals( "test.Student" ) )
-                .count() );
-        assertEquals( 1, schemaExport.endTable().stream()
-                .filter( t -> t.name().fullName().equals( "test.Course" ) )
-                .count() );
-        assertTrue( schemaExport.joins().isEmpty() );
+        List<String> tableNames = schemaExport.tables().stream().map( t -> t.name().fullName() ).collect( Collectors
+                .toList() );
+
+        assertEquals( tableNames, asList( "test.Student", "test.Course" ) );
+        assertTrue(  schemaExport.joins().isEmpty() );
+
+        JoinTable joinTable = new ArrayList<>( schemaExport.joinTables() ).get( 0 );
         assertEquals(
                 asList( "test.Student_Course.studentId",
                         "test.Student.id",
                         "test.Student_Course.courseId",
                         "test.Course.id" ),
-                keyNames( schemaExport.joinTables().stream().findFirst().get() ) );
+                keyNames( joinTable ) );
     }
 
     private Collection<String> keyNames( JoinTable table )
     {
         Collection<String> results = new ArrayList<>();
-        results.add( table.join().left().source().name() );
-        results.add( table.join().left().target().name() );
-        results.add( table.join().right().source().name() );
-        results.add( table.join().right().target().name() );
+        results.add( table.join().leftSource().name() );
+        results.add( table.join().leftTarget().name() );
+        results.add( table.join().rightSource().name() );
+        results.add( table.join().rightTarget().name() );
         return results;
     }
 

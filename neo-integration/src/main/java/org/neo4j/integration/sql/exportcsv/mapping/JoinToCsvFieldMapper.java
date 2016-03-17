@@ -28,13 +28,13 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        builder.add( join.left().source(), determineStartOrEndMappingForPrimaryKey( join ) );
-        builder.add( join.right().source(), determineStartOrEndMappingForForeignKey( join ) );
+        builder.add( join.leftSource(), determineStartOrEndMappingForPrimaryKey( join ) );
+        builder.add( join.rightSource(), determineStartOrEndMappingForForeignKey( join ) );
 
         String relationshipType = deriveRelationshipType( join ).toUpperCase();
 
         builder.add(
-                new SimpleColumn( join.left().source().table(),
+                new SimpleColumn( join.leftSource().table(),
                         formatting.quote().enquote( relationshipType ),
                         relationshipType,
                         ColumnType.Literal,
@@ -53,13 +53,13 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
     private String deriveRelationshipType( Join join )
     {
         return join.parentTableRepresentsStartOfRelationship() ?
-                join.right().target().table().simpleName() :
-                join.left().source().table().simpleName();
+                join.rightTarget().table().simpleName() :
+                join.leftSource().table().simpleName();
     }
 
     private CsvField determineStartOrEndMappingForPrimaryKey( Join join )
     {
-        IdSpace idSpace = new IdSpace( join.left().source().table().fullName() );
+        IdSpace idSpace = new IdSpace( join.leftSource().table().fullName() );
         return join.parentTableRepresentsStartOfRelationship() ?
                 CsvField.startId( idSpace ) :
                 CsvField.endId( idSpace );
@@ -67,7 +67,7 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
 
     private CsvField determineStartOrEndMappingForForeignKey( Join join )
     {
-        IdSpace idSpace = new IdSpace( join.right().target().table().fullName() );
+        IdSpace idSpace = new IdSpace( join.rightTarget().table().fullName() );
         return join.childTableRepresentsStartOfRelationship() ?
                 CsvField.startId( idSpace ) :
                 CsvField.endId( idSpace );

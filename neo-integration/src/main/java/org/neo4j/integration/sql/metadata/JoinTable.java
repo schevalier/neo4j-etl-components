@@ -37,7 +37,7 @@ public class JoinTable implements DatabaseObject
     @Override
     public String descriptor()
     {
-        return join.left().source().table().simpleName();
+        return join.leftSource().table().simpleName();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class JoinTable implements DatabaseObject
 
     public TableName joinTableName()
     {
-        return join().left().source().table();
+        return join().leftSource().table();
     }
 
     public interface Builder

@@ -50,14 +50,24 @@ public class Join implements DatabaseObject
         return startTable.equals( left.source().table() );
     }
 
-    public JoinKey left()
+    public Column leftSource()
     {
-        return left;
+        return left.source();
     }
 
-    public JoinKey right()
+    public Column rightSource()
     {
-        return right;
+        return right.source();
+    }
+
+    public Column leftTarget()
+    {
+        return left.target();
+    }
+
+    public Column rightTarget()
+    {
+        return right.target();
     }
 
     public Collection<TableName> tableNames()
@@ -68,7 +78,7 @@ public class Join implements DatabaseObject
     @Override
     public String descriptor()
     {
-        return format( "%s_%s", left.source().table().fullName(), right().target().table().fullName() );
+        return format( "%s_%s", left.source().table().fullName(), rightTarget().table().fullName() );
     }
 
     @Override

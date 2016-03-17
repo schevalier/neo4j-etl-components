@@ -1,5 +1,6 @@
 package org.neo4j.integration.commands;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.neo4j.integration.sql.DatabaseClient;
@@ -29,8 +30,9 @@ public class SchemaExportService
         {
             TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
 
-            Collection<Table> startTable = tableMetadataProducer.createMetadataFor( start );
-            Collection<Table> endTable = tableMetadataProducer.createMetadataFor( end );
+            Collection<Table> tables = new ArrayList<>();
+            tables.addAll( tableMetadataProducer.createMetadataFor( start ) );
+            tables.addAll( tableMetadataProducer.createMetadataFor( end ) );
 
             Collection<Join> joins = emptyList();
             Collection<JoinTable> joinTables = emptyList();
@@ -47,7 +49,7 @@ public class SchemaExportService
                 joins = new JoinMetadataProducer( databaseClient )
                                 .createMetadataFor( new TableNamePair( start, end ) );
             }
-            return new SchemaExport( startTable, endTable, joins, joinTables );
+            return new SchemaExport( tables, joins, joinTables );
         }
     }
 }

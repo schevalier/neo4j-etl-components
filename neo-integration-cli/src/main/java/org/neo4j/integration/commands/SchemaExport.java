@@ -8,32 +8,22 @@ import org.neo4j.integration.sql.metadata.Table;
 
 public class SchemaExport
 {
-    private final Collection<Table> startTable;
-    private final Collection<Table> endTable;
     private final Collection<Join> joins;
     private final Collection<JoinTable> joinTables;
+    private final Collection<Table> tables;
 
-    public SchemaExport( Collection<Table> startTable,
-                         Collection<Table> endTable,
-                         Collection<Join> joins,
-                         Collection<JoinTable> joinTables )
+    public SchemaExport( Collection<Table> tables, Collection<Join> joins, Collection<JoinTable> joinTables )
     {
-        this.startTable = startTable;
-        this.endTable = endTable;
+
         this.joins = joins;
         this.joinTables = joinTables;
+        this.tables = tables;
     }
 
-    public Collection<Table> startTable()
+    public Collection<Table> tables()
     {
-        return startTable;
+        return tables;
     }
-
-    public Collection<Table> endTable()
-    {
-        return endTable;
-    }
-
     public Collection<Join> joins()
     {
         return joins;

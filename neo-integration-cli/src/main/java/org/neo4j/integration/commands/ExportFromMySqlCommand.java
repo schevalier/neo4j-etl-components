@@ -76,14 +76,14 @@ public class ExportFromMySqlCommand
                                               Formatting formatting,
                                               ConnectionConfig connectionConfig ) throws Exception
     {
-        SchemaExport schemaExport =
-                schemaExportService.doExport( schemaDetails, () -> new DatabaseClient( connectionConfig ) );
+        SchemaExport schemaExport =  schemaExportService
+                .doExport( schemaDetails, () -> new DatabaseClient( connectionConfig ) );
         ExportToCsvConfig config = ExportToCsvConfig.builder()
                 .destination( csvDirectory )
                 .connectionConfig( connectionConfig )
                 .formatting( formatting )
-                .addTables( schemaExport.startTable() )
-                .addTables( schemaExport.endTable() )
+                .addTables( schemaExport.tables() )
+//                .addTables( schemaExport.endTable() )
                 .addJoins( schemaExport.joins() )
                 .addJoinTables( schemaExport.joinTables() )
                 .build();
