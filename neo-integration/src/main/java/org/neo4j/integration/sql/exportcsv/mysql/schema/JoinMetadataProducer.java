@@ -17,8 +17,6 @@ import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
 
-import static java.util.Arrays.asList;
-
 public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Join>
 {
     private final DatabaseClient databaseClient;
@@ -37,12 +35,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
 
         try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
-            List<String> columnLabels = asList( "SOURCE_TABLE_SCHEMA", "SOURCE_TABLE_NAME",
-                    "TARGET_TABLE_SCHEMA", "TARGET_TABLE_NAME",
-                    "SOURCE_COLUMN_NAME", "TARGET_COLUMN_NAME",
-                    "SOURCE_COLUMN_TYPE", "TARGET_COLUMN_TYPE" );
-
-            Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.streamOfResults( columnLabels )
+            Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.streamOfResults()
                     .collect( Collectors.groupingBy( row -> row.get( "SOURCE_TABLE_NAME" ) ) );
             for ( Map.Entry<String, List<Map<String, String>>> entry : joinsGroupedByStartTable.entrySet() )
             {

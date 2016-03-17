@@ -1,7 +1,5 @@
 package org.neo4j.integration.sql;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -29,27 +27,9 @@ public class StubQueryResults implements QueryResults
     }
 
     @Override
-    public Stream<Map<String, String>> streamOfResults( List<String> columnLabels )
+    public Stream<Map<String, String>> streamOfResults()
     {
-        List<Map<String, String>> listOfResults = new ArrayList<>();
-        try
-        {
-            while ( next() )
-            {
-                Map<String, String> map = new HashMap<>();
-                for ( String columnLabel : columnLabels )
-                {
-                    map.put( columnLabel, getString( columnLabel ) );
-
-                }
-                listOfResults.add( map );
-            }
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
-        return listOfResults.stream();
+        return rows.stream();
     }
 
     @Override

@@ -3,8 +3,10 @@ package org.neo4j.integration.sql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,11 +108,19 @@ public class DatabaseClient implements AutoCloseable
         }
 
         @Override
-        public Stream<Map<String, String>> streamOfResults( List<String> columnLabels )
+        public Stream<Map<String, String>> streamOfResults()
         {
-            List<Map<String, String>> listOfResults = new ArrayList<>();
             try
             {
+                Collection<String> columnLabels = new ArrayList<>();
+                ResultSetMetaData metaData = results.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                for ( int i = 1; i <= columnCount; i++ )
+                {
+                    columnLabels.add( metaData.getColumnLabel( i ) );
+                }
+
+                List<Map<String, String>> listOfResults = new ArrayList<>();
                 while ( results.next() )
                 {
                     Map<String, String> map = new HashMap<>();
@@ -121,12 +131,12 @@ public class DatabaseClient implements AutoCloseable
                     }
                     listOfResults.add( map );
                 }
+                return listOfResults.stream();
             }
             catch ( SQLException e )
             {
-                e.printStackTrace();
+                throw new IllegalStateException( e );
             }
-            return listOfResults.stream();
         }
 
         @Override
