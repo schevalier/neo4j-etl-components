@@ -27,7 +27,7 @@ public class StubQueryResults implements QueryResults
     }
 
     @Override
-    public Stream<Map<String, String>> streamOfResults()
+    public Stream<Map<String, String>> stream()
     {
         return rows.stream();
     }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
@@ -38,35 +38,52 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
 
         try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
-            Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.streamOfResults()
+            Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.stream()
                     .collect( Collectors.groupingBy( row -> row.get( "SOURCE_TABLE_NAME" ) ) );
+
             for ( Map.Entry<String, List<Map<String, String>>> entry : joinsGroupedByStartTable.entrySet() )
             {
                 List<Map<String, String>> rows = entry.getValue();
-                if ( rows.size() < 2)
-                {
-                    throw new IllegalStateException(
-                            format("No join exists between '%s' and '%s'", source.startTable(), source.endTable()) );
-                }
-
-                Map<String, String> primaryKeyMetadata = rows.stream()
-                        .filter( row ->
-                                row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.PrimaryKey.name() ) )
-                        .findFirst().get();
-                Map<String, String> foreignKeyMetadata = rows.stream()
-                        .filter( row ->
-                                row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.ForeignKey.name() ) )
-                        .findFirst().get();
-
-                JoinKey left = createJoin( primaryKeyMetadata );
-                JoinKey right = createJoin( foreignKeyMetadata );
-                joins.add( new Join( left, right, left.source().table() ) );
+                joins.add( buildJoin( source, rows ) );
             }
         }
         return joins;
     }
 
-    private JoinKey createJoin( Map<String, String> results )
+    private Join buildJoin( TableNamePair source, List<Map<String, String>> rows )
+    {
+        if ( rows.size() < 2 )
+        {
+            throw new IllegalStateException(
+                    format( "No join exists between '%s' and '%s'", source.startTable(), source.endTable() ) );
+        }
+
+        Predicate<Map<String, String>> primaryKeyPredicate =
+                row -> row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.PrimaryKey.name() );
+        Predicate<Map<String, String>> foreignKeyPredicate =
+                row -> row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.ForeignKey.name() );
+
+        Map<String, String> primaryKeyMetadata;
+        Map<String, String> foreignKeyMetadata;
+
+        if ( rows.stream().anyMatch( primaryKeyPredicate ) )
+        {
+            primaryKeyMetadata = rows.stream().filter( primaryKeyPredicate ).findFirst().get();
+            foreignKeyMetadata = rows.stream().filter( foreignKeyPredicate ).findFirst().get();
+        }
+        else
+        {
+            primaryKeyMetadata = rows.get( 0 );
+            foreignKeyMetadata = rows.get( 1 );
+        }
+
+        JoinKey left = createJoinKey( primaryKeyMetadata );
+        JoinKey right = createJoinKey( foreignKeyMetadata );
+
+        return new Join( left, right, left.source().table() ) ;
+    }
+
+    private JoinKey createJoinKey( Map<String, String> results )
     {
         TableName sourceTable = new TableName(
                 results.get( "SOURCE_TABLE_SCHEMA" ),

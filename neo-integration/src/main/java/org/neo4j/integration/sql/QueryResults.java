@@ -7,5 +7,5 @@ public interface QueryResults extends RowAccessor, AutoCloseable
 {
     boolean next() throws Exception;
 
-    Stream<Map<String, String>> streamOfResults();
+    Stream<Map<String, String>> stream();
 }

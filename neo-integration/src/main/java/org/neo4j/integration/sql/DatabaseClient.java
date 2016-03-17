@@ -108,7 +108,7 @@ public class DatabaseClient implements AutoCloseable
         }
 
         @Override
-        public Stream<Map<String, String>> streamOfResults()
+        public Stream<Map<String, String>> stream()
         {
             try
             {
