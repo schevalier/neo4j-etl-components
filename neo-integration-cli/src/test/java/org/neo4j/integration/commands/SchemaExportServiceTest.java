@@ -44,16 +44,18 @@ public class SchemaExportServiceTest
                 .build();
 
         QueryResults joinResults = StubQueryResults.builder()
-                .columns( "TABLE_SCHEMA",
-                        "TABLE_NAME",
-                        "PRIMARY_KEY",
-                        "FOREIGN_KEY",
-                        "REFERENCED_TABLE_SCHEMA",
-                        "REFERENCED_TABLE_NAME",
-                        "REFERENCED_PRIMARY_KEY" )
-                .addRow( "test", "Person", "id", "addressId", "test", "Address", "id" )
-                .addRow( "test", "Address", "id", "ownerId", "test", "Person", "id" )
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Person", "id", "PrimaryKey", "test", "Person", "id", "PrimaryKey" )
+                .addRow( "test", "Person", "addressId", "ForeignKey", "test", "Address", "id", "PrimaryKey" )
                 .build();
+
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) )
@@ -96,20 +98,29 @@ public class SchemaExportServiceTest
                 .build();
 
         QueryResults joinTableResults = StubQueryResults.builder()
-                .columns( "TABLE_SCHEMA",
-                        "TABLE_NAME",
-                        "FOREIGN_KEY",
-                        "REFERENCED_PRIMARY_KEY",
-                        "REFERENCED_TABLE_SCHEMA",
-                        "REFERENCED_TABLE_NAME" )
-                .addRow( "test", "Student_Course", "studentId", "id", "test", "Student" )
-                .addRow( "test", "Student_Course", "courseId", "id", "test", "Course" )
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "studentId", "INT", "ForeignKey" )
+                .addRow( "courseId", "INT", "ForeignKey" )
+                .build();
+
+        QueryResults joinResults = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Student_Course", "studentId", "ForeignKey", "test", "Student", "id", "PrimaryKey" )
+                .addRow( "test", "Student_Course", "courseId", "ForeignKey", "test", "Course", "id", "PrimaryKey" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) )
                 .thenReturn( AwaitHandle.forReturnValue( studentResults ) )
                 .thenReturn( AwaitHandle.forReturnValue( courseResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinResults ) )
                 .thenReturn( AwaitHandle.forReturnValue( joinTableResults ) );
 
         // when
@@ -136,10 +147,10 @@ public class SchemaExportServiceTest
     private Collection<String> keyNames( JoinTable table )
     {
         Collection<String> results = new ArrayList<>();
-        results.add( table.startForeignKey().name() );
-        results.add( table.startPrimaryKey().name() );
-        results.add( table.endForeignKey().name() );
-        results.add( table.endPrimaryKey().name() );
+        results.add( table.join().left().source().name() );
+        results.add( table.join().left().target().name() );
+        results.add( table.join().right().source().name() );
+        results.add( table.join().right().target().name() );
         return results;
     }
 

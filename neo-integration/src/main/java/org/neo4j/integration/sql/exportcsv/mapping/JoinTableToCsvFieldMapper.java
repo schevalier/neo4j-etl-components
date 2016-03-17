@@ -35,10 +35,10 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        builder.add( joinTable.startForeignKey(),
-                CsvField.startId( new IdSpace( joinTable.startPrimaryKey().table().fullName() ) ) );
-        builder.add( joinTable.endForeignKey(),
-                CsvField.endId( new IdSpace( joinTable.endPrimaryKey().table().fullName() ) ) );
+        builder.add( joinTable.join().left().source(),
+                CsvField.startId( new IdSpace( joinTable.join().left().target().table().fullName() ) ) );
+        builder.add( joinTable.join().right().source(),
+                CsvField.endId( new IdSpace( joinTable.join().right().target().table().fullName() ) ) );
 
         TableName table = joinTable.joinTableName();
 

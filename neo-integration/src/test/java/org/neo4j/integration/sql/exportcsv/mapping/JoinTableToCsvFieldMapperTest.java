@@ -13,9 +13,12 @@ import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
+import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -40,12 +43,12 @@ public class JoinTableToCsvFieldMapperTest
         Column endForeignKey = getBuild( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
         Column endPrimaryKey = getBuild( endTableName, "id", "id", ColumnType.PrimaryKey );
 
-        JoinTable joinTable = JoinTable.builder()
-                .startForeignKey( startForeignKey )
-                .connectsToStartTablePrimaryKey( startPrimaryKey )
-                .endForeignKey( endForeignKey )
-                .connectsToEndTablePrimaryKey( endPrimaryKey )
-                .build();
+        JoinTable joinTable = new JoinTable(
+                new Join(
+                        new JoinKey( startForeignKey, startPrimaryKey ),
+                        new JoinKey( endForeignKey, endPrimaryKey ),
+                        joinTableName ),
+                Table.builder().name( joinTableName ).build() );
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );
 
@@ -80,14 +83,16 @@ public class JoinTableToCsvFieldMapperTest
         Column endForeignKey = getBuild( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
         Column endPrimaryKey = getBuild( endTableName, "id", "id", ColumnType.PrimaryKey );
 
-        JoinTable joinTable = JoinTable.builder()
-                .startForeignKey( startForeignKey )
-                .connectsToStartTablePrimaryKey( startPrimaryKey )
-                .endForeignKey( endForeignKey )
-                .connectsToEndTablePrimaryKey( endPrimaryKey )
-                .addColumn( new SimpleColumn( joinTableName, "credits", "credits", ColumnType.Data, MySqlDataType
-                        .TEXT ) )
-                .build();
+        JoinTable joinTable = new JoinTable(
+                new Join(
+                        new JoinKey( startForeignKey, startPrimaryKey ),
+                        new JoinKey( endForeignKey, endPrimaryKey ),
+                        joinTableName ),
+                Table.builder()
+                        .name( joinTableName )
+                        .addColumn( new SimpleColumn(
+                                joinTableName, "credits", "credits", ColumnType.Data, MySqlDataType.TEXT ) )
+                        .build() );
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );
 

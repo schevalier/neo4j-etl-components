@@ -3,7 +3,9 @@ package org.neo4j.integration.sql.metadata;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class TableNamePair
+import static java.lang.String.format;
+
+public class TableNamePair implements JoinQueryInfo
 {
     private final TableName startTable;
     private final TableName endTable;
@@ -14,14 +16,29 @@ public class TableNamePair
         this.endTable = endTable;
     }
 
+    @Override
     public TableName startTable()
     {
         return startTable;
     }
 
+    @Override
     public TableName endTable()
     {
         return endTable;
+    }
+
+    @Override
+    public TableName table()
+    {
+        return startTable;
+    }
+
+    @Override
+    public String specialisedSql()
+    {
+        return format( "((source_column.COLUMN_KEY = 'PRI' AND join_table.REFERENCED_TABLE_NAME IS NULL) OR " +
+                "  (join_table.REFERENCED_TABLE_NAME IN ('%s')))", endTable.simpleName() );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

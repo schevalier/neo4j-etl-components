@@ -5,8 +5,6 @@ import java.util.Collection;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import org.neo4j.integration.util.Preconditions;
-
 public class JoinTable implements DatabaseObject
 {
     public static Builder.SetStartForeignKey builder()
@@ -14,21 +12,13 @@ public class JoinTable implements DatabaseObject
         return new JoinTableBuilder();
     }
 
-    private final Column startForeignKey;
+    private final Join join;
+    private final Table table;
 
-    private final Column startPrimaryKey;
-    private final Column endPrimaryKey;
-    private final Column endForeignKey;
-    private final Collection<Column> columns;
-
-
-    public JoinTable( JoinTableBuilder builder )
+    public JoinTable( Join join, Table table )
     {
-        this.startForeignKey = Preconditions.requireNonNull( builder.startForeignKey, "StartForeignKey" );
-        this.startPrimaryKey = Preconditions.requireNonNull( builder.startPrimaryKey, "StartPrimaryKey" );
-        this.endPrimaryKey = Preconditions.requireNonNull( builder.endPrimaryKey, "EndPrimaryKey" );
-        this.endForeignKey = Preconditions.requireNonNull( builder.endForeignKey, "EndForeignKey" );
-        this.columns = builder.columns;
+        this.join = join;
+        this.table = table;
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
@@ -47,7 +37,7 @@ public class JoinTable implements DatabaseObject
     @Override
     public String descriptor()
     {
-        return startForeignKey.table().simpleName();
+        return join.left().source().table().simpleName();
     }
 
     @Override
@@ -56,34 +46,19 @@ public class JoinTable implements DatabaseObject
         return databaseObjectServiceProvider.joinTableService( this );
     }
 
-    public Column startForeignKey()
+    public Join join()
     {
-        return startForeignKey;
-    }
-
-    public Column startPrimaryKey()
-    {
-        return startPrimaryKey;
-    }
-
-    public Column endForeignKey()
-    {
-        return endForeignKey;
-    }
-
-    public Column endPrimaryKey()
-    {
-        return endPrimaryKey;
+        return join;
     }
 
     public Collection<Column> columns()
     {
-        return columns;
+        return table.columns();
     }
 
     public TableName joinTableName()
     {
-        return startForeignKey.table();
+        return join().left().source().table();
     }
 
     public interface Builder

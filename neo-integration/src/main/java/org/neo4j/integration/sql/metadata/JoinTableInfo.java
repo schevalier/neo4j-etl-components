@@ -3,7 +3,9 @@ package org.neo4j.integration.sql.metadata;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class JoinTableInfo
+import static java.lang.String.format;
+
+public class JoinTableInfo implements JoinQueryInfo
 {
     private final TableName joinTableName;
     private final TableNamePair referencedTables;
@@ -19,11 +21,6 @@ public class JoinTableInfo
         return joinTableName;
     }
 
-    public TableNamePair referencedTables()
-    {
-        return referencedTables;
-    }
-
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
@@ -35,5 +32,30 @@ public class JoinTableInfo
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode( this );
+    }
+
+    @Override
+    public TableName startTable()
+    {
+        return referencedTables.startTable();
+    }
+
+    @Override
+    public TableName endTable()
+    {
+        return referencedTables.endTable();
+    }
+
+    @Override
+    public TableName table()
+    {
+        return joinTableName;
+    }
+
+    @Override
+    public String specialisedSql()
+    {
+        return format( "join_table.REFERENCED_TABLE_NAME IN ('%s', '%s')",
+                referencedTables.startTable().simpleName(), referencedTables.endTable().simpleName() );
     }
 }

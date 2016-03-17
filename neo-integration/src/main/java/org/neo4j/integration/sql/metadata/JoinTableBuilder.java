@@ -55,6 +55,6 @@ class JoinTableBuilder implements
     @Override
     public JoinTable build()
     {
-        return new JoinTable( this );
+        return new JoinTable( null, null );
     }
 }

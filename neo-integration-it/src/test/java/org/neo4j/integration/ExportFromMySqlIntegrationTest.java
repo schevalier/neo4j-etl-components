@@ -8,7 +8,6 @@ import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -154,8 +153,9 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, c, r.credits" );
-
+            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p:Student)<-[r]-(c:Course) RETURN p, c, r" +
+                    ".credits" );
+            System.out.println( response );
             List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
             List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
             List<Integer> credits = JsonPath.read( response, "$.results[*].data[*].row[2]" );

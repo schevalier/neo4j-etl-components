@@ -172,7 +172,7 @@ public class JoinTableMetadataProducerTest
                 ColumnType.ForeignKey,
                 SqlDataType.KEY_DATA_TYPE );
 
-        assertEquals( expectedStudentId, joinTable.startForeignKey() );
+        assertEquals( expectedStudentId, joinTable.join().left().source() );
 
         assertEquals( new SimpleColumn(
                         new TableName( "test.Student" ),
@@ -180,29 +180,31 @@ public class JoinTableMetadataProducerTest
                         "id",
                         ColumnType.PrimaryKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                joinTable.startPrimaryKey() );
+                joinTable.join().left().target() );
 
-        assertEquals( expectedCourseId, joinTable.endForeignKey() );
+        assertEquals( expectedCourseId, joinTable.join().right().source() );
 
         assertEquals( new SimpleColumn(
                         new TableName( "test.Course" ),
                         "test.Course.id", "id",
                         ColumnType.PrimaryKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                joinTable.endPrimaryKey() );
+                joinTable.join().right().target() );
     }
 
     private QueryResults stubJoinResults()
     {
         return StubQueryResults.builder()
-                .columns( "TABLE_SCHEMA",
-                        "TABLE_NAME",
-                        "FOREIGN_KEY",
-                        "REFERENCED_PRIMARY_KEY",
-                        "REFERENCED_TABLE_SCHEMA",
-                        "REFERENCED_TABLE_NAME" )
-                .addRow( "test", "Student_Course", "studentId", "id", "test", "Student" )
-                .addRow( "test", "Student_Course", "courseId", "id", "test", "Course" )
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Student_Course", "studentId", "ForeignKey", "test", "Student", "id", "PrimaryKey" )
+                .addRow( "test", "Student_Course", "courseId", "ForeignKey", "test", "Course", "id", "PrimaryKey" )
                 .build();
     }
 }

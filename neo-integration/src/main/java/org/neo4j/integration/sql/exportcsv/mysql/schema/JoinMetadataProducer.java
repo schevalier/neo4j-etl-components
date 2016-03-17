@@ -12,15 +12,15 @@ import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
+import org.neo4j.integration.sql.metadata.JoinQueryInfo;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
-import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static java.lang.String.format;
 
-public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Join>
+public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Join>
 {
     private final DatabaseClient databaseClient;
 
@@ -30,9 +30,9 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
     }
 
     @Override
-    public Collection<Join> createMetadataFor( TableNamePair source ) throws Exception
+    public Collection<Join> createMetadataFor( JoinQueryInfo source ) throws Exception
     {
-        String sql = select( source.startTable(), source.endTable() );
+        String sql = select( source );
 
         Collection<Join> joins = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
         return joins;
     }
 
-    private Join buildJoin( TableNamePair source, List<Map<String, String>> rows )
+    private Join buildJoin( JoinQueryInfo source, List<Map<String, String>> rows )
     {
         if ( rows.size() < 2 )
         {
@@ -80,7 +80,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
         JoinKey left = createJoinKey( primaryKeyMetadata );
         JoinKey right = createJoinKey( foreignKeyMetadata );
 
-        return new Join( left, right, left.source().table() ) ;
+        return new Join( left, right, left.source().table() );
     }
 
     private JoinKey createJoinKey( Map<String, String> results )
@@ -111,7 +111,7 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
                         SqlDataType.KEY_DATA_TYPE ) );
     }
 
-    private String select( TableName t1, TableName t2 )
+    private String select( JoinQueryInfo source )
     {
         return "SELECT join_table.TABLE_SCHEMA AS SOURCE_TABLE_SCHEMA," +
                 "        CASE ( SELECT COUNT(referenced_table.REFERENCED_TABLE_NAME) " +
@@ -152,12 +152,8 @@ public class JoinMetadataProducer implements MetadataProducer<TableNamePair, Joi
                 "  (IFNULL(join_table.REFERENCED_TABLE_SCHEMA,join_table.TABLE_SCHEMA) = target_column.TABLE_SCHEMA " +
                 "   AND IFNULL(join_table.REFERENCED_TABLE_NAME,join_table.TABLE_NAME) = target_column.TABLE_NAME " +
                 "   AND IFNULL(join_table.REFERENCED_COLUMN_NAME,join_table.COLUMN_NAME) = target_column.COLUMN_NAME)" +
-                " WHERE join_table.TABLE_SCHEMA = '" + t1.schema() + "'" +
-                " AND join_table.TABLE_NAME = '" + t1.simpleName() + "'" +
-                " AND " +
-                " (" +
-                "  (source_column.COLUMN_KEY = 'PRI' AND join_table.REFERENCED_TABLE_NAME IS NULL) OR " +
-                "    (join_table.REFERENCED_TABLE_NAME IN ('" + t2.simpleName() + "'))" +
-                " );";
+                " WHERE join_table.TABLE_SCHEMA = '" + source.table().schema() + "'" +
+                " AND join_table.TABLE_NAME = '" + source.table().simpleName() + "'" +
+                " AND " + source.specialisedSql() + ";";
     }
 }

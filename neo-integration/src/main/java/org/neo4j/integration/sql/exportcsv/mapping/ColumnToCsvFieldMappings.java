@@ -6,8 +6,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
+import org.neo4j.integration.sql.metadata.Column;
+import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -36,7 +37,7 @@ public class ColumnToCsvFieldMappings
         return mappings.keySet();
     }
 
-    public Collection<String> aliasedColumns(  )
+    public Collection<String> aliasedColumns()
     {
         return columns().stream()
                 .map( c -> format( "%s AS %s", c.name(), c.alias() ) )
@@ -46,7 +47,9 @@ public class ColumnToCsvFieldMappings
     public Collection<String> tableNames()
     {
         return mappings.keySet().stream()
-                .map( c -> c.table().fullName() )
+                .map( Column::table )
+                .distinct()
+                .map( TableName::fullName )
                 .collect( Collectors.toCollection( LinkedHashSet::new ) );
     }
 
