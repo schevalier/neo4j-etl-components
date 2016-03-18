@@ -18,14 +18,14 @@ public class Join implements DatabaseObject
         return new JoinBuilder();
     }
 
-    private final JoinKey left;
-    private final JoinKey right;
+    private final JoinKey keyOne;
+    private final JoinKey keyTwo;
     private final TableName startTable;
 
-    public Join( JoinKey left, JoinKey right, TableName startTable )
+    public Join( JoinKey keyOne, JoinKey keyTwo, TableName startTable )
     {
-        this.left = Preconditions.requireNonNull( left, "Left" );
-        this.right = Preconditions.requireNonNull( right, "Right" );
+        this.keyOne = Preconditions.requireNonNull( keyOne, "KeyOne" );
+        this.keyTwo = Preconditions.requireNonNull( keyTwo, "KeyTwo" );
         this.startTable = Preconditions.requireNonNull( startTable, "StartTable" );
     }
 
@@ -42,43 +42,43 @@ public class Join implements DatabaseObject
 
     public boolean childTableRepresentsStartOfRelationship()
     {
-        return startTable.equals( right.target().table() );
+        return startTable.equals( keyTwo.targetColumn().table() );
     }
 
     public boolean parentTableRepresentsStartOfRelationship()
     {
-        return startTable.equals( left.source().table() );
+        return startTable.equals( keyOne.sourceColumn().table() );
     }
 
-    public Column leftSource()
+    public Column keyOneSourceColumn()
     {
-        return left.source();
+        return keyOne.sourceColumn();
     }
 
-    public Column rightSource()
+    public Column keyTwoSourceColumn()
     {
-        return right.source();
+        return keyTwo.sourceColumn();
     }
 
-    public Column leftTarget()
+    public Column keyOneTargetColumn()
     {
-        return left.target();
+        return keyOne.targetColumn();
     }
 
-    public Column rightTarget()
+    public Column keyTwoTargetColumn()
     {
-        return right.target();
+        return keyTwo.targetColumn();
     }
 
     public Collection<TableName> tableNames()
     {
-        return asList( left.source().table(), right.target().table() );
+        return asList( keyOne.sourceColumn().table(), keyTwo.targetColumn().table() );
     }
 
     @Override
     public String descriptor()
     {
-        return format( "%s_%s", left.source().table().fullName(), rightTarget().table().fullName() );
+        return format( "%s_%s", keyOne.sourceColumn().table().fullName(), keyTwoTargetColumn().table().fullName() );
     }
 
     @Override

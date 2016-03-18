@@ -77,10 +77,10 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
             foreignKeyMetadata = rows.get( 1 );
         }
 
-        JoinKey left = createJoinKey( primaryKeyMetadata );
-        JoinKey right = createJoinKey( foreignKeyMetadata );
+        JoinKey keyOne = createJoinKey( primaryKeyMetadata );
+        JoinKey keyTwo = createJoinKey( foreignKeyMetadata );
 
-        return new Join( left, right, left.source().table() );
+        return new Join( keyOne, keyTwo, keyOne.sourceColumn().table() );
     }
 
     private JoinKey createJoinKey( Map<String, String> results )

@@ -13,7 +13,6 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.JoinTable;
-import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -134,7 +133,7 @@ public class SchemaExportServiceTest
                 .toList() );
 
         assertEquals( tableNames, asList( "test.Student", "test.Course" ) );
-        assertTrue(  schemaExport.joins().isEmpty() );
+        assertTrue( schemaExport.joins().isEmpty() );
 
         JoinTable joinTable = new ArrayList<>( schemaExport.joinTables() ).get( 0 );
         assertEquals(
@@ -148,10 +147,10 @@ public class SchemaExportServiceTest
     private Collection<String> keyNames( JoinTable table )
     {
         Collection<String> results = new ArrayList<>();
-        results.add( table.join().leftSource().name() );
-        results.add( table.join().leftTarget().name() );
-        results.add( table.join().rightSource().name() );
-        results.add( table.join().rightTarget().name() );
+        results.add( table.join().keyOneSourceColumn().name() );
+        results.add( table.join().keyOneTargetColumn().name() );
+        results.add( table.join().keyTwoSourceColumn().name() );
+        results.add( table.join().keyTwoTargetColumn().name() );
         return results;
     }
 

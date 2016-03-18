@@ -2,22 +2,22 @@ package org.neo4j.integration.sql.metadata;
 
 public class JoinKey
 {
-    private final Column source;
-    private final Column target;
+    private final Column sourceColumn;
+    private final Column targetColumn;
 
-    public JoinKey( Column source, Column target )
+    public JoinKey( Column sourceColumn, Column targetColumn )
     {
-        this.source = source;
-        this.target = target;
+        this.sourceColumn = sourceColumn;
+        this.targetColumn = targetColumn;
     }
 
-    public Column source()
+    public Column sourceColumn()
     {
-        return source;
+        return sourceColumn;
     }
 
-    public Column target()
+    public Column targetColumn()
     {
-        return target;
+        return targetColumn;
     }
 }

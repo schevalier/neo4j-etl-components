@@ -68,16 +68,16 @@ public class JoinMetadataProducerTest
                 "test.Person.id",
                 "id",
                 ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE ), livesIn.leftSource() );
+                SqlDataType.KEY_DATA_TYPE ), livesIn.keyOneSourceColumn() );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Person" ),
                 "test.Person.addressId",
                 "addressId",
                 ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE ), livesIn.rightSource() );
+                SqlDataType.KEY_DATA_TYPE ), livesIn.keyTwoSourceColumn() );
 
-        assertEquals( new TableName( "test.Address" ), livesIn.rightTarget().table() );
+        assertEquals( new TableName( "test.Address" ), livesIn.keyTwoTargetColumn().table() );
 
         Join ownedBy = joins.get( 0 );
 
@@ -86,16 +86,16 @@ public class JoinMetadataProducerTest
                 "test.Address.id",
                 "id",
                 ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE ), ownedBy.leftSource() );
+                SqlDataType.KEY_DATA_TYPE ), ownedBy.keyOneSourceColumn() );
 
         assertEquals( new SimpleColumn(
                 new TableName( "test.Address" ),
                 "test.Address.ownerId",
                 "ownerId",
                 ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE ), ownedBy.rightSource() );
+                SqlDataType.KEY_DATA_TYPE ), ownedBy.keyTwoSourceColumn() );
 
-        assertEquals( new TableName( "test.Person" ), ownedBy.rightTarget().table() );
+        assertEquals( new TableName( "test.Person" ), ownedBy.keyTwoTargetColumn().table() );
 
         assertTrue( joins.size() == 2 );
     }

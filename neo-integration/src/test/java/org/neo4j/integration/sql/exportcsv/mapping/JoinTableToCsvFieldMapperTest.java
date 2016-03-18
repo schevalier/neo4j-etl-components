@@ -37,16 +37,16 @@ public class JoinTableToCsvFieldMapperTest
         TableName startTableName = new TableName( "test.Student" );
         TableName endTableName = new TableName( "test.Course" );
 
-        Column startForeignKey = getBuild( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
-        Column startPrimaryKey = getBuild( startTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyOneSourceColumn = buildKeyColumn( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
+        Column keyOneTargetColumn = buildKeyColumn( startTableName, "id", "id", ColumnType.PrimaryKey );
 
-        Column endForeignKey = getBuild( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
-        Column endPrimaryKey = getBuild( endTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyTwoSourceColumn = buildKeyColumn( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
+        Column keyTwoTargetColumn = buildKeyColumn( endTableName, "id", "id", ColumnType.PrimaryKey );
 
         JoinTable joinTable = new JoinTable(
                 new Join(
-                        new JoinKey( startForeignKey, startPrimaryKey ),
-                        new JoinKey( endForeignKey, endPrimaryKey ),
+                        new JoinKey( keyOneSourceColumn, keyOneTargetColumn ),
+                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn ),
                         joinTableName ),
                 Table.builder().name( joinTableName ).build() );
 
@@ -77,16 +77,16 @@ public class JoinTableToCsvFieldMapperTest
         TableName startTableName = new TableName( "test.Student" );
         TableName endTableName = new TableName( "test.Course" );
 
-        Column startForeignKey = getBuild( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
-        Column startPrimaryKey = getBuild( startTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyOneSourceColumn = buildKeyColumn( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
+        Column keyOneTargetColumn = buildKeyColumn( startTableName, "id", "id", ColumnType.PrimaryKey );
 
-        Column endForeignKey = getBuild( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
-        Column endPrimaryKey = getBuild( endTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyTwoSourceColumn = buildKeyColumn( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
+        Column keyTwoTargetColumn = buildKeyColumn( endTableName, "id", "id", ColumnType.PrimaryKey );
 
         JoinTable joinTable = new JoinTable(
                 new Join(
-                        new JoinKey( startForeignKey, startPrimaryKey ),
-                        new JoinKey( endForeignKey, endPrimaryKey ),
+                        new JoinKey( keyOneSourceColumn, keyOneTargetColumn ),
+                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn ),
                         joinTableName ),
                 Table.builder()
                         .name( joinTableName )
@@ -115,7 +115,7 @@ public class JoinTableToCsvFieldMapperTest
                 , columns );
     }
 
-    private Column getBuild( TableName tableName, String name, String alias, ColumnType columnType )
+    private Column buildKeyColumn( TableName tableName, String name, String alias, ColumnType columnType )
     {
         return new SimpleColumn(
                 tableName,
