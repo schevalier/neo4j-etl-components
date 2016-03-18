@@ -83,7 +83,6 @@ public class ExportFromMySqlCommand
                 .connectionConfig( connectionConfig )
                 .formatting( formatting )
                 .addTables( schemaExport.tables() )
-//                .addTables( schemaExport.endTable() )
                 .addJoins( schemaExport.joins() )
                 .addJoinTables( schemaExport.joinTables() )
                 .build();

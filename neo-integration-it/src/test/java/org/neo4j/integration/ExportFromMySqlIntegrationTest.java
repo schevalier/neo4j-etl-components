@@ -42,7 +42,7 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get()) );
+                    tempDirectory.get() ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -152,9 +152,9 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p:Student)<-[r]-(c:Course) RETURN p, c, r" +
-                    ".credits" );
-            System.out.println( response );
+            String response = neo4j.get()
+                    .executeHttp( NEO_TX_URI, "MATCH (p:Student)<-[r]-(c:Course) RETURN p, c, r.credits" );
+
             List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
             List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
             List<Integer> credits = JsonPath.read( response, "$.results[*].data[*].row[2]" );
