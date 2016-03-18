@@ -9,9 +9,11 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -22,6 +24,7 @@ public class JoinToCsvFieldMapperTest
 {
 
     private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
+    private TestUtil testUtil = new TestUtil();
 
     @Test
     public void shouldCreateMappingsForJoinWhereStartTableIsParentTableInJoin()
@@ -29,14 +32,21 @@ public class JoinToCsvFieldMapperTest
         // given
         TableName leftTable = new TableName( "test.Person" );
         TableName rightTable = new TableName( "test.Address" );
-        Join join = Join.builder()
-                .leftSource( leftTable, "id", ColumnType.PrimaryKey )
-                .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
-                .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
-                .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
-                .startTable( leftTable )
-                .build();
-
+//        Join join = Join.builder()
+//                .leftSource( leftTable, "id", ColumnType.PrimaryKey )
+//                .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
+//                .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
+//                .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
+//                .startTable( leftTable )
+//                .build();
+        Join join = new Join(
+                new JoinKey(
+                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                new JoinKey(
+                        testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                        testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
+                leftTable );
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );
 
@@ -58,13 +68,14 @@ public class JoinToCsvFieldMapperTest
         // given
         TableName leftTable = new TableName( "test.Person" );
         TableName rightTable = new TableName( "test.Address" );
-        Join join = Join.builder()
-                .leftSource( leftTable, "id", ColumnType.PrimaryKey )
-                .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
-                .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
-                .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
-                .startTable( rightTable )
-                .build();
+        Join join = new Join(
+                new JoinKey(
+                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                new JoinKey(
+                        testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                        testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
+                rightTable );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );

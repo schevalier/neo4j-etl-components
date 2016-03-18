@@ -6,11 +6,9 @@ import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
-import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
+import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -20,6 +18,8 @@ import static org.mockito.Mockito.mock;
 
 public class ExportToCsvConfigTest
 {
+    private final TestUtil testUtil = new TestUtil();
+
     @Test
     public void shouldThrowExceptionIfParentOfJoinIsNotPresentInTables()
     {
@@ -35,16 +35,17 @@ public class ExportToCsvConfigTest
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( rightTable )
-                            .addColumn( column( rightTable, "id", ColumnType.PrimaryKey ) )
-                            .addColumn( column( rightTable, "postcode", ColumnType.Data ) )
+                            .addColumn( testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( testUtil.column( rightTable, "postcode", ColumnType.Data ) )
                             .build() )
-                    .addJoin( Join.builder()
-                            .leftSource( leftTable, "id", ColumnType.PrimaryKey )
-                            .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
-                            .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
-                            .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
-                            .startTable( leftTable )
-                            .build() )
+                    .addJoin( new Join(
+                            new JoinKey(
+                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                            new JoinKey(
+                                    testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
+                            leftTable ) )
                     .build();
             fail( "Expected IllegalStatException" );
         }
@@ -71,17 +72,18 @@ public class ExportToCsvConfigTest
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( leftTable )
-                            .addColumn( column( leftTable, "id", ColumnType.PrimaryKey ) )
-                            .addColumn( column( leftTable, "username", ColumnType.Data ) )
-                            .addColumn( column( leftTable, "addressId", ColumnType.ForeignKey ) )
+                            .addColumn( testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( testUtil.column( leftTable, "username", ColumnType.Data ) )
+                            .addColumn( testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ) )
                             .build() )
-                    .addJoin( Join.builder()
-                            .leftSource( leftTable, "id", ColumnType.PrimaryKey )
-                            .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
-                            .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
-                            .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
-                            .startTable( leftTable )
-                            .build() )
+                    .addJoin( new Join(
+                            new JoinKey(
+                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                            new JoinKey(
+                                    testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
+                            leftTable ) )
                     .build();
             fail( "Expected IllegalStateException" );
         }
@@ -91,15 +93,5 @@ public class ExportToCsvConfigTest
             assertEquals( "Config is missing table definition 'test.Address' for join [test.Person -> test.Address]",
                     e.getMessage() );
         }
-    }
-
-    private Column column( TableName table, String name, ColumnType type )
-    {
-        return new SimpleColumn(
-                table,
-                table.fullyQualifiedColumnName( name ),
-                name,
-                type,
-                MySqlDataType.TEXT );
     }
 }

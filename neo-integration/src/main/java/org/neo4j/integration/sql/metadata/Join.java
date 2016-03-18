@@ -13,11 +13,6 @@ import static java.util.Arrays.asList;
 
 public class Join implements DatabaseObject
 {
-    public static Builder.SetLeftSource builder()
-    {
-        return new JoinBuilder();
-    }
-
     private final JoinKey keyOne;
     private final JoinKey keyTwo;
     private final TableName startTable;
@@ -27,17 +22,6 @@ public class Join implements DatabaseObject
         this.keyOne = Preconditions.requireNonNull( keyOne, "KeyOne" );
         this.keyTwo = Preconditions.requireNonNull( keyTwo, "KeyTwo" );
         this.startTable = Preconditions.requireNonNull( startTable, "StartTable" );
-    }
-
-    Join( JoinBuilder builder )
-    {
-        this( new JoinKey(
-                        Preconditions.requireNonNull( builder.leftSource, "LeftSource" ),
-                        Preconditions.requireNonNull( builder.leftTarget, "LeftTarget" ) ),
-                new JoinKey(
-                        Preconditions.requireNonNull( builder.rightSource, "RightSource" ),
-                        Preconditions.requireNonNull( builder.rightTarget, "RightTarget" ) ),
-                builder.startTable );
     }
 
     public boolean childTableRepresentsStartOfRelationship()
@@ -104,35 +88,5 @@ public class Join implements DatabaseObject
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode( this );
-    }
-
-    public interface Builder
-    {
-        interface SetLeftSource
-        {
-            SetLeftTarget leftSource( TableName table, String column, ColumnType columnType );
-        }
-
-        interface SetLeftTarget
-        {
-            SetRightSource leftTarget( TableName table, String column, ColumnType columnType );
-        }
-
-        interface SetRightSource
-        {
-            SetRightTarget rightSource( TableName table, String column, ColumnType columnType );
-        }
-
-        interface SetRightTarget
-        {
-            SetStartTable rightTarget( TableName table, String column, ColumnType columnType );
-        }
-
-        interface SetStartTable
-        {
-            Builder startTable( TableName startTable );
-        }
-
-        Join build();
     }
 }
