@@ -17,8 +17,6 @@ import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
 
-import static org.neo4j.integration.util.StringListBuilder.stringList;
-
 public class ExportToCsvConfig
 {
     public static Builder.SetDestination builder()
@@ -83,7 +81,9 @@ public class ExportToCsvConfig
                                 throw new IllegalStateException(
                                         format( "Config is missing table definition '%s' for join [%s]",
                                                 tableName.fullName(),
-                                                stringList( join.tableNames(), " -> ", TableName::fullName ) ) );
+                                                join.tableNames().stream()
+                                                                    .map( TableName::fullName )
+                                                                    .collect( Collectors.joining(" -> ") ) ) );
                             }
                         } ) );
 

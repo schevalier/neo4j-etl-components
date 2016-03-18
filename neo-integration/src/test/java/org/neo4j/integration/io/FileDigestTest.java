@@ -5,12 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.neo4j.integration.util.ResourceRule;
-import org.neo4j.integration.util.StringListBuilder;
 
 import static org.junit.Assert.assertEquals;
 
@@ -73,6 +73,6 @@ public class FileDigestTest
         {
             lines.add( "line " + i );
         }
-        return StringListBuilder.stringList( lines, NEWLINE ).toString().getBytes();
+        return lines.stream().collect( Collectors.joining( NEWLINE ) ).getBytes();
     }
 }

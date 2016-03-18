@@ -7,7 +7,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import org.neo4j.integration.sql.RowAccessor;
-import org.neo4j.integration.util.StringListBuilder;
 
 import static java.lang.String.format;
 
@@ -40,13 +39,13 @@ public class CompositeKeyColumn implements Column
     @Override
     public String name()
     {
-        return StringListBuilder.stringList( columns, "_", Column::name ).toString();
+        return columns.stream().map( Column::name ).collect( Collectors.joining( "_" ) );
     }
 
     @Override
     public String alias()
     {
-        return StringListBuilder.stringList( columns, "_", Column::alias ).toString();
+        return columns.stream().map( Column::alias ).collect( Collectors.joining( "_" ) );
     }
 
     @Override

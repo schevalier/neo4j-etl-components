@@ -7,10 +7,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
-
-import org.neo4j.integration.util.StringListBuilder;
 
 public class FileDigest
 {
@@ -102,7 +101,7 @@ public class FileDigest
         Collections.reverse( endLines );
         lines.addAll( endLines );
 
-        return StringListBuilder.stringList( lines, NEWLINE ).toString();
+        return lines.stream().collect( Collectors.joining( NEWLINE ) );
     }
 }
 

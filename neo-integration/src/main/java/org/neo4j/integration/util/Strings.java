@@ -1,5 +1,7 @@
 package org.neo4j.integration.util;
 
+import java.util.stream.Collectors;
+
 import static java.util.Arrays.asList;
 
 public class Strings
@@ -8,7 +10,7 @@ public class Strings
 
     public static String lineSeparated( String... lines )
     {
-        return StringListBuilder.stringList( asList(lines), NEWLINE ).toString();
+        return asList( lines ).stream().collect( Collectors.joining( NEWLINE ) ).toString();
     }
 
     public static String orNull( String value )

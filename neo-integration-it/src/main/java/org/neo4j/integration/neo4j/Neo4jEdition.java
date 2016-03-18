@@ -1,7 +1,10 @@
 package org.neo4j.integration.neo4j;
 
+import java.util.stream.Collectors;
+
 import org.neo4j.integration.util.Partial;
-import org.neo4j.integration.util.StringListBuilder;
+
+import static java.util.Arrays.asList;
 
 public enum Neo4jEdition
 {
@@ -36,7 +39,9 @@ public enum Neo4jEdition
         }
         throw new IllegalArgumentException(
                 String.format( "'%s' is not a valid package. Expected an edition in [%s] followed by a [%s].",
-                        input, StringListBuilder.stringList( values(), ", " ), separator ) );
+                        input,
+                        asList( values() ).stream().map( Neo4jEdition::toString ).collect( Collectors.joining( ", " ) ),
+                        separator ) );
     }
 
     public String debPackageName()

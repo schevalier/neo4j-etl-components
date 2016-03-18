@@ -3,6 +3,7 @@ package org.neo4j.integration.neo4j.importcsv.config;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -13,8 +14,6 @@ import org.neo4j.integration.util.Preconditions;
 import org.neo4j.integration.util.Strings;
 
 import static java.lang.String.format;
-
-import static org.neo4j.integration.util.StringListBuilder.stringList;
 
 public class RelationshipConfig implements CommandsSupplier
 {
@@ -36,7 +35,10 @@ public class RelationshipConfig implements CommandsSupplier
     public void addCommandsTo( Commands.Builder.SetCommands commands )
     {
         commands.addCommand( type.isPresent() ? format( "--relationships:%s", type.get() ) : "--relationships" );
-        commands.addCommand( format( "%s", stringList( files, ",", item -> item.toAbsolutePath().toString() ) ) );
+        commands.addCommand( format( "%s",
+                files.stream()
+                        .map( item -> item.toAbsolutePath().toString() )
+                        .collect( Collectors.joining( "," ) ) ) );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
