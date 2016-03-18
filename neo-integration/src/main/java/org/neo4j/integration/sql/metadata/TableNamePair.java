@@ -7,38 +7,38 @@ import static java.lang.String.format;
 
 public class TableNamePair implements JoinQueryInfo
 {
-    private final TableName startTable;
-    private final TableName endTable;
+    private final TableName tableOne;
+    private final TableName tableTwo;
 
-    public TableNamePair( TableName startTable, TableName endTable )
+    public TableNamePair( TableName tableOne, TableName tableTwo )
     {
-        this.startTable = startTable;
-        this.endTable = endTable;
+        this.tableOne = tableOne;
+        this.tableTwo = tableTwo;
     }
 
     @Override
-    public TableName startTable()
+    public TableName tableOne()
     {
-        return startTable;
+        return tableOne;
     }
 
     @Override
-    public TableName endTable()
+    public TableName tableTwo()
     {
-        return endTable;
+        return tableTwo;
     }
 
     @Override
     public TableName table()
     {
-        return startTable;
+        return tableOne;
     }
 
     @Override
     public String specialisedSql()
     {
         return format( "((source_column.COLUMN_KEY = 'PRI' AND join_table.REFERENCED_TABLE_NAME IS NULL) OR " +
-                "  (join_table.REFERENCED_TABLE_NAME IN ('%s')))", endTable.simpleName() );
+                "  (join_table.REFERENCED_TABLE_NAME IN ('%s')))", tableTwo.simpleName() );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

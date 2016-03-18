@@ -27,26 +27,19 @@ public class JoinToCsvFieldMapperTest
     private TestUtil testUtil = new TestUtil();
 
     @Test
-    public void shouldCreateMappingsForJoinWhereStartTableIsParentTableInJoin()
+    public void shouldCreateMappingsForJoinTable()
     {
         // given
         TableName leftTable = new TableName( "test.Person" );
         TableName rightTable = new TableName( "test.Address" );
-//        Join join = Join.builder()
-//                .leftSource( leftTable, "id", ColumnType.PrimaryKey )
-//                .leftTarget( leftTable, "id", ColumnType.PrimaryKey )
-//                .rightSource( leftTable, "addressId", ColumnType.ForeignKey )
-//                .rightTarget( rightTable, "id", ColumnType.PrimaryKey )
-//                .startTable( leftTable )
-//                .build();
         Join join = new Join(
                 new JoinKey(
                         testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
                         testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
                 new JoinKey(
                         testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                        testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
-                leftTable );
+                        testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+        );
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );
 
@@ -60,35 +53,5 @@ public class JoinToCsvFieldMapperTest
                 CsvField.relationshipType() ) );
 
         assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"ADDRESS\"" ), columns );
-    }
-
-    @Test
-    public void shouldCreateMappingsForJoinWhereStartTableIsChildTableInJoin()
-    {
-        // given
-        TableName leftTable = new TableName( "test.Person" );
-        TableName rightTable = new TableName( "test.Address" );
-        Join join = new Join(
-                new JoinKey(
-                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
-                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
-                new JoinKey(
-                        testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                        testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
-                rightTable );
-
-        // when
-        ColumnToCsvFieldMappings mappings = mapper.createMappings( join );
-
-        // then
-        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
-        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
-
-        assertEquals( fields, asList(
-                CsvField.endId( new IdSpace( "test.Person" ) ),
-                CsvField.startId( new IdSpace( "test.Address" ) ),
-                CsvField.relationshipType() ) );
-
-        assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"PERSON\"" ), columns );
     }
 }

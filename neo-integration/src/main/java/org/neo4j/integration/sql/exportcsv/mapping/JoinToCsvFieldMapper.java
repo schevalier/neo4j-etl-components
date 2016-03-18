@@ -28,10 +28,12 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        builder.add( join.keyOneSourceColumn(), determineStartOrEndMappingForPrimaryKey( join ) );
-        builder.add( join.keyTwoSourceColumn(), determineStartOrEndMappingForForeignKey( join ) );
+        builder.add( join.keyOneSourceColumn(),
+                CsvField.startId( new IdSpace( join.keyOneSourceColumn().table().fullName() ) ) );
+        builder.add( join.keyTwoSourceColumn(),
+                CsvField.endId( new IdSpace( join.keyTwoTargetColumn().table().fullName() ) ) );
 
-        String relationshipType = deriveRelationshipType( join ).toUpperCase();
+        String relationshipType = join.keyTwoTargetColumn().table().simpleName().toUpperCase();
 
         builder.add(
                 new SimpleColumn( join.keyOneSourceColumn().table(),
@@ -48,28 +50,5 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
     public BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy()
     {
         return new WriteRowWithNullsStrategy();
-    }
-
-    private String deriveRelationshipType( Join join )
-    {
-        return join.parentTableRepresentsStartOfRelationship() ?
-                join.keyTwoTargetColumn().table().simpleName() :
-                join.keyOneSourceColumn().table().simpleName();
-    }
-
-    private CsvField determineStartOrEndMappingForPrimaryKey( Join join )
-    {
-        IdSpace idSpace = new IdSpace( join.keyOneSourceColumn().table().fullName() );
-        return join.parentTableRepresentsStartOfRelationship() ?
-                CsvField.startId( idSpace ) :
-                CsvField.endId( idSpace );
-    }
-
-    private CsvField determineStartOrEndMappingForForeignKey( Join join )
-    {
-        IdSpace idSpace = new IdSpace( join.keyTwoTargetColumn().table().fullName() );
-        return join.childTableRepresentsStartOfRelationship() ?
-                CsvField.startId( idSpace ) :
-                CsvField.endId( idSpace );
     }
 }

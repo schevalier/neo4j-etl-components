@@ -35,15 +35,15 @@ public class JoinTableInfo implements JoinQueryInfo
     }
 
     @Override
-    public TableName startTable()
+    public TableName tableOne()
     {
-        return referencedTables.startTable();
+        return referencedTables.tableOne();
     }
 
     @Override
-    public TableName endTable()
+    public TableName tableTwo()
     {
-        return referencedTables.endTable();
+        return referencedTables.tableTwo();
     }
 
     @Override
@@ -56,6 +56,6 @@ public class JoinTableInfo implements JoinQueryInfo
     public String specialisedSql()
     {
         return format( "join_table.REFERENCED_TABLE_NAME IN ('%s', '%s')",
-                referencedTables.startTable().simpleName(), referencedTables.endTable().simpleName() );
+                referencedTables.tableOne().simpleName(), referencedTables.tableTwo().simpleName() );
     }
 }

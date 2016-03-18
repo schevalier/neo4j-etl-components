@@ -23,16 +23,16 @@ public class SchemaExportService
     {
         String database = schemaDetails.database();
 
-        TableName start = new TableName( database, schemaDetails.startTable() );
-        TableName end = new TableName( database, schemaDetails.endTable() );
+        TableName tableOne = new TableName( database, schemaDetails.tableOne() );
+        TableName tableTwo = new TableName( database, schemaDetails.tableTwo() );
 
         try ( DatabaseClient databaseClient = supplier.supply() )
         {
             TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
 
             Collection<Table> tables = new ArrayList<>();
-            tables.addAll( tableMetadataProducer.createMetadataFor( start ) );
-            tables.addAll( tableMetadataProducer.createMetadataFor( end ) );
+            tables.addAll( tableMetadataProducer.createMetadataFor( tableOne ) );
+            tables.addAll( tableMetadataProducer.createMetadataFor( tableTwo ) );
 
             Collection<Join> joins = emptyList();
             Collection<JoinTable> joinTables = emptyList();
@@ -42,12 +42,12 @@ public class SchemaExportService
                 joinTables = new JoinTableMetadataProducer( databaseClient )
                         .createMetadataFor(
                                 new JoinTableInfo( new TableName( database, schemaDetails.joinTable().get() ),
-                                        new TableNamePair( start, end ) ) );
+                                        new TableNamePair( tableOne, tableTwo ) ) );
             }
             else
             {
                 joins = new JoinMetadataProducer( databaseClient )
-                                .createMetadataFor( new TableNamePair( start, end ) );
+                                .createMetadataFor( new TableNamePair( tableOne, tableTwo ) );
             }
             return new SchemaExport( tables, joins, joinTables );
         }

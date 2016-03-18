@@ -15,23 +15,11 @@ public class Join implements DatabaseObject
 {
     private final JoinKey keyOne;
     private final JoinKey keyTwo;
-    private final TableName startTable;
 
-    public Join( JoinKey keyOne, JoinKey keyTwo, TableName startTable )
+    public Join( JoinKey keyOne, JoinKey keyTwo )
     {
         this.keyOne = Preconditions.requireNonNull( keyOne, "KeyOne" );
         this.keyTwo = Preconditions.requireNonNull( keyTwo, "KeyTwo" );
-        this.startTable = Preconditions.requireNonNull( startTable, "StartTable" );
-    }
-
-    public boolean childTableRepresentsStartOfRelationship()
-    {
-        return startTable.equals( keyTwo.targetColumn().table() );
-    }
-
-    public boolean parentTableRepresentsStartOfRelationship()
-    {
-        return startTable.equals( keyOne.sourceColumn().table() );
     }
 
     public Column keyOneSourceColumn()

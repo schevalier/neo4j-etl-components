@@ -34,20 +34,20 @@ public class JoinTableToCsvFieldMapperTest
         // given
 
         TableName joinTableName = new TableName( "test.Student_Course" );
-        TableName startTableName = new TableName( "test.Student" );
-        TableName endTableName = new TableName( "test.Course" );
+        TableName leftTable = new TableName( "test.Student" );
+        TableName rightTable = new TableName( "test.Course" );
 
         Column keyOneSourceColumn = buildKeyColumn( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
-        Column keyOneTargetColumn = buildKeyColumn( startTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyOneTargetColumn = buildKeyColumn( leftTable, "id", "id", ColumnType.PrimaryKey );
 
         Column keyTwoSourceColumn = buildKeyColumn( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
-        Column keyTwoTargetColumn = buildKeyColumn( endTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyTwoTargetColumn = buildKeyColumn( rightTable, "id", "id", ColumnType.PrimaryKey );
 
         JoinTable joinTable = new JoinTable(
                 new Join(
                         new JoinKey( keyOneSourceColumn, keyOneTargetColumn ),
-                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn ),
-                        joinTableName ),
+                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn )
+                ),
                 Table.builder().name( joinTableName ).build() );
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );
@@ -74,20 +74,20 @@ public class JoinTableToCsvFieldMapperTest
         // given
 
         TableName joinTableName = new TableName( "test.Student_Course" );
-        TableName startTableName = new TableName( "test.Student" );
-        TableName endTableName = new TableName( "test.Course" );
+        TableName leftTable = new TableName( "test.Student" );
+        TableName rightTable = new TableName( "test.Course" );
 
         Column keyOneSourceColumn = buildKeyColumn( joinTableName, "studentId", "studentId", ColumnType.ForeignKey );
-        Column keyOneTargetColumn = buildKeyColumn( startTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyOneTargetColumn = buildKeyColumn( leftTable, "id", "id", ColumnType.PrimaryKey );
 
         Column keyTwoSourceColumn = buildKeyColumn( joinTableName, "courseId", "courseId", ColumnType.ForeignKey );
-        Column keyTwoTargetColumn = buildKeyColumn( endTableName, "id", "id", ColumnType.PrimaryKey );
+        Column keyTwoTargetColumn = buildKeyColumn( rightTable, "id", "id", ColumnType.PrimaryKey );
 
         JoinTable joinTable = new JoinTable(
                 new Join(
                         new JoinKey( keyOneSourceColumn, keyOneTargetColumn ),
-                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn ),
-                        joinTableName ),
+                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn )
+                ),
                 Table.builder()
                         .name( joinTableName )
                         .addColumn( new SimpleColumn(

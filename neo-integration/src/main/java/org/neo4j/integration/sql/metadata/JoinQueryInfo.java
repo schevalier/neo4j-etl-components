@@ -2,9 +2,9 @@ package org.neo4j.integration.sql.metadata;
 
 public interface JoinQueryInfo
 {
-    TableName startTable();
+    TableName tableOne();
 
-    TableName endTable();
+    TableName tableTwo();
 
     TableName table();
 

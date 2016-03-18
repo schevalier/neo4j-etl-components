@@ -55,7 +55,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
         if ( rows.size() < 2 )
         {
             throw new IllegalStateException(
-                    format( "No join exists between '%s' and '%s'", source.startTable(), source.endTable() ) );
+                    format( "No join exists between '%s' and '%s'", source.tableOne(), source.tableTwo() ) );
         }
 
         Predicate<Map<String, String>> primaryKeyPredicate =
@@ -80,7 +80,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
         JoinKey keyOne = createJoinKey( primaryKeyMetadata );
         JoinKey keyTwo = createJoinKey( foreignKeyMetadata );
 
-        return new Join( keyOne, keyTwo, keyOne.sourceColumn().table() );
+        return new Join( keyOne, keyTwo );
     }
 
     private JoinKey createJoinKey( Map<String, String> results )

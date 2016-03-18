@@ -5,15 +5,15 @@ import java.util.Optional;
 public class SchemaDetails
 {
     private final String database;
-    private final String startTable;
-    private final String endTable;
+    private final String tableOne;
+    private final String tableTwo;
     private final Optional<String> joinTable;
 
-    public SchemaDetails( String database, String startTable, String endTable, Optional<String> joinTable )
+    public SchemaDetails( String database, String tableOne, String tableTwo, Optional<String> joinTable )
     {
         this.database = database;
-        this.startTable = startTable;
-        this.endTable = endTable;
+        this.tableOne = tableOne;
+        this.tableTwo = tableTwo;
         this.joinTable = joinTable;
     }
 
@@ -22,14 +22,14 @@ public class SchemaDetails
         return database;
     }
 
-    public String startTable()
+    public String tableOne()
     {
-        return startTable;
+        return tableOne;
     }
 
-    public String endTable()
+    public String tableTwo()
     {
-        return endTable;
+        return tableTwo;
     }
 
     public Optional<String> joinTable()

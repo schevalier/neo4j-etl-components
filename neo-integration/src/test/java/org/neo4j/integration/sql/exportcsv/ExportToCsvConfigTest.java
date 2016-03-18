@@ -44,8 +44,8 @@ public class ExportToCsvConfigTest
                                     testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
                             new JoinKey(
                                     testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
-                            leftTable ) )
+                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                    ) )
                     .build();
             fail( "Expected IllegalStatException" );
         }
@@ -82,8 +82,8 @@ public class ExportToCsvConfigTest
                                     testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
                             new JoinKey(
                                     testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) ),
-                            leftTable ) )
+                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                    ) )
                     .build();
             fail( "Expected IllegalStateException" );
         }

@@ -7,11 +7,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class JoinTable implements DatabaseObject
 {
-    public static Builder.SetStartForeignKey builder()
-    {
-        return new JoinTableBuilder();
-    }
-
     private final Join join;
     private final Table table;
 
@@ -59,32 +54,5 @@ public class JoinTable implements DatabaseObject
     public TableName joinTableName()
     {
         return join().keyOneSourceColumn().table();
-    }
-
-    public interface Builder
-    {
-        interface SetStartForeignKey
-        {
-            SetStartPrimaryKey startForeignKey( Column startForeignKey );
-        }
-
-        interface SetStartPrimaryKey
-        {
-            SetEndForeignKey connectsToStartTablePrimaryKey( Column startPrimaryKey );
-        }
-
-        interface SetEndForeignKey
-        {
-            SetEndPrimaryKey endForeignKey( Column endForeignKey );
-        }
-
-        interface SetEndPrimaryKey
-        {
-            Builder connectsToEndTablePrimaryKey( Column endPrimaryKey );
-        }
-
-        Builder addColumn( Column column );
-
-        JoinTable build();
     }
 }
