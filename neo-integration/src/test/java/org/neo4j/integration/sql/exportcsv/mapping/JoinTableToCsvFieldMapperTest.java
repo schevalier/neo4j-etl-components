@@ -10,6 +10,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -27,6 +28,8 @@ import static org.junit.Assert.assertEquals;
 
 public class JoinTableToCsvFieldMapperTest
 {
+
+    private TestUtil testUtil = new TestUtil();
 
     @Test
     public void shouldCreateMappingsForJoinTable()
@@ -90,8 +93,7 @@ public class JoinTableToCsvFieldMapperTest
                 ),
                 Table.builder()
                         .name( joinTableName )
-                        .addColumn( new SimpleColumn(
-                                joinTableName, "credits", "credits", ColumnType.Data, MySqlDataType.TEXT ) )
+                        .addColumn( testUtil.column(joinTableName, "credits", "credits", ColumnType.Data ) )
                         .build() );
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );

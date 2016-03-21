@@ -4,40 +4,28 @@ import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static org.junit.Assert.assertEquals;
 
 public class MySqlExportSqlSupplierTest
 {
+
+    private TestUtil testUtil = new TestUtil();
+
     @Test
     public void shouldCreateSqlForSelectingColumnsFromTables()
     {
         // given
-        Column column1 = new SimpleColumn(
-                new TableName( "test.Person" ),
-                "test.Person.id",
-                "id",
-                ColumnType.PrimaryKey,
-                MySqlDataType.TEXT );
+        Column column1 = testUtil.column( new TableName( "test.Person" ), "id", ColumnType.PrimaryKey );
 
-        Column column2 = new SimpleColumn(
-                new TableName( "test.Person" ),
-                "test.Person.username",
-                "username",
-                ColumnType.Data,
-                MySqlDataType.TEXT );
+        Column column2 = testUtil.column( new TableName( "test.Person" ),"username", ColumnType.Data );
 
-        Column column3 = new SimpleColumn(
-                new TableName( "test.Address" ),
-                "test.Address.id",
-                "id",
-                ColumnType.PrimaryKey,
-                MySqlDataType.TEXT );
+        Column column3 = testUtil.column( new TableName( "test.Address" ),"id", ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )

@@ -8,13 +8,13 @@ import org.neo4j.integration.sql.metadata.TableName;
 
 public class TestUtil
 {
-    public Column column( TableName table, String name, ColumnType type )
+    public Column column( TableName table, String nameAndAlias, ColumnType type )
     {
-        return new SimpleColumn(
-                table,
-                table.fullyQualifiedColumnName( name ),
-                name,
-                type,
-                MySqlDataType.TEXT );
+        return column( table, table.fullyQualifiedColumnName( nameAndAlias ), nameAndAlias, type );
+    }
+
+    public Column column( TableName table, String name, String alias, ColumnType type )
+    {
+        return new SimpleColumn(table, name, alias, type, MySqlDataType.TEXT );
     }
 }

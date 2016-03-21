@@ -9,7 +9,7 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.JoinTable;
@@ -30,6 +30,9 @@ import static org.mockito.Mockito.when;
 
 public class JoinTableMetadataProducerTest
 {
+
+    private TestUtil testUtil = new TestUtil();
+
     @Test
     public void shouldReturnJoinTableMetadata() throws Exception
     {
@@ -100,12 +103,7 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                new SimpleColumn(
-                        studentCourse,
-                        studentCourse.fullyQualifiedColumnName( "credits" ),
-                        "credits",
-                        ColumnType.Data,
-                        MySqlDataType.TEXT ) ) );
+                testUtil.column( studentCourse, "credits", ColumnType.Data ) ) );
 
         assertFalse( iterator.hasNext() );
     }
@@ -146,12 +144,7 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                new SimpleColumn(
-                        studentCourse,
-                        studentCourse.fullyQualifiedColumnName( "credits" ),
-                        "credits",
-                        ColumnType.Data,
-                        MySqlDataType.TEXT ) ) );
+                testUtil.column( studentCourse, "credits", ColumnType.Data ) ) );
 
         assertFalse( iterator.hasNext() );
     }

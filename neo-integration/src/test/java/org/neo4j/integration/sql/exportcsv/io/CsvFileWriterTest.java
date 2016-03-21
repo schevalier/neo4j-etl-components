@@ -16,6 +16,7 @@ import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -35,6 +36,7 @@ public class CsvFileWriterTest
 {
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
+    private TestUtil testUtil = new TestUtil();
 
     @Test
     public void shouldCreateCsvFile() throws Exception
@@ -63,8 +65,8 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        new SimpleColumn( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
-                        new SimpleColumn( table, "username", "username", ColumnType.Data, MySqlDataType.TEXT ) ) );
+                        testUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        testUtil.column( table, "username", ColumnType.Data ) ) );
 
 
         // create writer under test
@@ -108,9 +110,9 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        new SimpleColumn( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
-                        new SimpleColumn( table, "username", "username", ColumnType.Data, MySqlDataType.TEXT ),
-                        new SimpleColumn( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) ) );
+                        testUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        testUtil.column( table, "username", ColumnType.Data ),
+                        testUtil.column( table, "age", ColumnType.Data )) );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
@@ -153,8 +155,8 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        new SimpleColumn( table, "id", "id", ColumnType.PrimaryKey, MySqlDataType.TEXT ),
-                        new SimpleColumn( table, "username", "username", ColumnType.Data, MySqlDataType.TEXT ) ) );
+                        testUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        testUtil.column( table, "username", ColumnType.Data ) ) );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );

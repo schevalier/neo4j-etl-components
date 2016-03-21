@@ -6,10 +6,9 @@ import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -17,16 +16,19 @@ import static org.junit.Assert.assertThat;
 
 public class ColumnToCsvFieldMappingsTest
 {
+
+    private TestUtil testUtil = new TestUtil();
+
     @Test
     public void shouldReturnCollectionOfCsvFields()
     {
         // given
-        Column column1 = buildColumn( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
+        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
                 .Data );
 
-        Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
+        Column column3 = testUtil.column( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
 
         CsvField idField = CsvField.id();
         CsvField usernameField = CsvField.data( "username", Neo4jDataType.String );
@@ -49,12 +51,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfFullyQualifiedColumnNames()
     {
         // given
-        Column column1 = buildColumn( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
+        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
                 .Data );
 
-        Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
+        Column column3 = testUtil.column( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -73,12 +75,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfAliasedColumnNames()
     {
         // given
-        Column column1 = buildColumn( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = buildColumn( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
+        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
                 .Data );
 
-        Column column3 = buildColumn( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
+        Column column3 = testUtil.column( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -98,22 +100,10 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfFullyQualifiedTableNames()
     {
         // given
-        Column column1 = buildColumn(
-                new TableName( "test.Person" ),
-                "test.Person.id",
-                "id",
-                ColumnType.PrimaryKey );
+        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = buildColumn(
-                new TableName( "test.Person" ),
-                "test.Person.username",
-                "username",
-                ColumnType.Data );
-        Column column3 = buildColumn(
-                new TableName( "test.Address" ),
-                "test.Address.id",
-                "id",
-                ColumnType.PrimaryKey );
+        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType.Data );
+        Column column3 = testUtil.column( new TableName( "test.Address" ), "test.Address.id", "id", ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -126,16 +116,5 @@ public class ColumnToCsvFieldMappingsTest
 
         // then
         assertThat( tableNames, hasItems( "test.Person", "test.Address" ) );
-    }
-
-    private Column buildColumn( TableName table, String name, String alias, ColumnType columnType )
-    {
-        return new SimpleColumn(
-                table,
-                name,
-                alias,
-                columnType,
-                MySqlDataType.TEXT );
-
     }
 }
