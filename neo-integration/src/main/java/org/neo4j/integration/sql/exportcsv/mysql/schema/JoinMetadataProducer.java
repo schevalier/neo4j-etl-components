@@ -154,6 +154,6 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
                 "   AND IFNULL(join_table.REFERENCED_COLUMN_NAME,join_table.COLUMN_NAME) = target_column.COLUMN_NAME)" +
                 " WHERE join_table.TABLE_SCHEMA = '" + source.table().schema() + "'" +
                 " AND join_table.TABLE_NAME = '" + source.table().simpleName() + "'" +
-                " AND " + source.specialisedSql() + " ORDER BY SOURCE_COLUMN_TYPE;";
+                " AND " + source.specialisedSql() + " ORDER BY SOURCE_COLUMN_TYPE, SOURCE_COLUMN_NAME;";
     }
 }
