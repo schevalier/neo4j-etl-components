@@ -80,31 +80,6 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfAliasedColumnNames()
     {
         // given
-        TableName personTable = new TableName( "test.Person" );
-        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
-
-        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
-
-        Column column3 = testUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
-
-        ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
-                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
-                .build();
-
-        // when
-        Collection<String> aliasedColumns = mappings.aliasedColumns();
-
-        // then
-        assertThat( aliasedColumns,
-                hasItems( "test.Person.id AS id", "test.Person.username AS username", "test.Person.age AS age" ) );
-    }
-
-    @Test
-    public void shouldReturnCollectionOfAliasedColumnNamesForTablesWithCompositeKey()
-    {
-        // given
         TableName authorTable = new TableName( "test.Author" );
         Column column1 = new CompositeKeyColumn( authorTable,
                 asList( new SimpleColumn(
