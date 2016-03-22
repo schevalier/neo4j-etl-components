@@ -76,6 +76,7 @@ CREATE TABLE javabase.Author
 (
   first_name VARCHAR(20) NOT NULL,
   last_name  VARCHAR(20) NOT NULL,
+  age        INT,
   PRIMARY KEY (first_name, last_name)
 );
 GRANT ALL ON javabase.Author TO '<DBUser>'@'localhost'
@@ -205,8 +206,8 @@ INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, ti
   FROM javabase.Numeric_Table
   WHERE javabase.Numeric_Table.tinyint_field = 1;
 
-INSERT INTO javabase.Author (first_name, last_name) VALUES ('Abraham', 'Silberschatz');
-INSERT INTO javabase.Author (first_name, last_name) VALUES ('Andrew', 'Tanenbaum');
+INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Abraham', 'Silberschatz', 45);
+INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Andrew', 'Tanenbaum', 56);
 
 INSERT INTO javabase.Book (name, author_first_name, author_last_name)
 VALUES ('Database System Concepts', 'Abraham', 'Silberschatz');

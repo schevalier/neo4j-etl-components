@@ -12,11 +12,14 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
+
+import static java.util.Arrays.asList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -98,6 +101,80 @@ public class JoinMetadataProducerTest
         assertEquals( new TableName( "test.Person" ), ownedBy.keyTwoTargetColumn().table() );
 
         assertTrue( joins.size() == 2 );
+    }
+
+    @Test
+    public void shouldReturnJoinMetadataRelationshipCompositeKey() throws Exception
+    {
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Book", "author_first_name", "ForeignKey", "test", "Author", "first_name",
+                        "PrimaryKey" )
+                .addRow( "test", "Book", "author_last_name", "ForeignKey", "test", "Author", "last_name", "PrimaryKey" )
+                .addRow( "test", "Book", "id", "PrimaryKey", "test", "Book", "id", "PrimaryKey" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+
+        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
+
+        // when
+        Collection<Join> joinCollection = getJoinMetadata.createMetadataFor(
+                new TableNamePair( new TableName( "test.Book" ), new TableName( "test.Author" ) ) );
+
+        // then
+        ArrayList<Join> joins = new ArrayList<>( joinCollection );
+        Join writtenBy = joins.get( 0 );
+
+        assertEquals( new SimpleColumn(
+                new TableName( "test.Book" ),
+                "test.Book.id",
+                "id",
+                ColumnType.PrimaryKey,
+                SqlDataType.KEY_DATA_TYPE ), writtenBy.keyOneSourceColumn() );
+
+        assertEquals( new CompositeKeyColumn( new TableName( "test.Book" ),
+                asList( new SimpleColumn(
+                                new TableName( "test.Book" ),
+                                "test.Book.author_first_name",
+                                "author_first_name",
+                                ColumnType.ForeignKey,
+                                SqlDataType.KEY_DATA_TYPE ),
+                        new SimpleColumn(
+                                new TableName( "test.Book" ),
+                                "test.Book.author_last_name",
+                                "author_last_name",
+                                ColumnType.ForeignKey,
+                                SqlDataType.KEY_DATA_TYPE ) )
+        ), writtenBy.keyTwoSourceColumn() );
+
+        assertEquals( new CompositeKeyColumn( new TableName( "test.Author" ),
+                asList( new SimpleColumn(
+                                new TableName( "test.Author" ),
+                                "test.Author.first_name",
+                                "first_name",
+                                ColumnType.PrimaryKey,
+                                SqlDataType.KEY_DATA_TYPE ),
+                        new SimpleColumn(
+                                new TableName( "test.Author" ),
+                                "test.Author.last_name",
+                                "last_name",
+                                ColumnType.PrimaryKey,
+                                SqlDataType.KEY_DATA_TYPE ) )
+        ), writtenBy.keyTwoTargetColumn() );
+
+        assertEquals( new TableName( "test.Author" ), writtenBy.keyTwoTargetColumn().table() );
+
+        assertTrue( joins.size() == 1 );
     }
 
     @Test

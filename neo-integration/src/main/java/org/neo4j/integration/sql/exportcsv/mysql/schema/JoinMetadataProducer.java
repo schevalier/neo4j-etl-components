@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.JoinQueryInfo;
@@ -41,11 +43,9 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
             Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.stream()
                     .collect( Collectors.groupingBy( row -> row.get( "SOURCE_TABLE_NAME" ) ) );
 
-            for ( Map.Entry<String, List<Map<String, String>>> entry : joinsGroupedByStartTable.entrySet() )
-            {
-                List<Map<String, String>> rows = entry.getValue();
-                joins.add( buildJoin( source, rows ) );
-            }
+            joinsGroupedByStartTable.entrySet().stream()
+                    .forEach( entry -> joins.add( buildJoin( source, entry.getValue() ) ) );
+
         }
         return joins;
     }
@@ -63,52 +63,83 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
         Predicate<Map<String, String>> foreignKeyPredicate =
                 row -> row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.ForeignKey.name() );
 
-        Map<String, String> primaryKeyMetadata;
-        Map<String, String> foreignKeyMetadata;
+        JoinKey keyOne = null;
+        JoinKey keyTwo = null;
 
         if ( rows.stream().anyMatch( primaryKeyPredicate ) )
         {
-            primaryKeyMetadata = rows.stream().filter( primaryKeyPredicate ).findFirst().get();
-            foreignKeyMetadata = rows.stream().filter( foreignKeyPredicate ).findFirst().get();
+            keyOne = createJoinKey( rows.stream().filter( primaryKeyPredicate ).findFirst().get() );
+            List<Map<String, String>> foreignKeys = rows.stream()
+                    .filter( foreignKeyPredicate ).collect( Collectors.toList() );
+            if ( foreignKeys.size() > 1 )
+            {
+                //Simple Join using composite Keys
+                List<Column> columns1 = foreignKeys.stream()
+                        .map( this::sourceSimpleColumn ).collect( Collectors.toList() );
+                List<Column> columns2 = foreignKeys.stream()
+                        .map( this::targetSimpleColumn ).collect( Collectors.toList() );
+
+                Map<String, String> results = foreignKeys.get( 0 );
+                TableName sourceTable = new TableName(
+                        results.get( "SOURCE_TABLE_SCHEMA" ),
+                        results.get( "SOURCE_TABLE_NAME" ) );
+                TableName targetTable = new TableName(
+                        results.get( "TARGET_TABLE_SCHEMA" ),
+                        results.get( "TARGET_TABLE_NAME" ) );
+
+                CompositeKeyColumn sourceCompositeKeyColumn = new CompositeKeyColumn( sourceTable, columns1 );
+                CompositeKeyColumn targetCompositeKeyColumn = new CompositeKeyColumn( targetTable, columns2 );
+
+                keyTwo = new JoinKey( sourceCompositeKeyColumn, targetCompositeKeyColumn );
+            }
+            else
+            {
+                //Simple Join
+                keyTwo = createJoinKey( foreignKeys.get( 0 ) );
+            }
         }
         else
         {
-            primaryKeyMetadata = rows.get( 0 );
-            foreignKeyMetadata = rows.get( 1 );
+            //Through a join table
+            keyOne = createJoinKey( rows.get( 0 ) );
+            keyTwo = createJoinKey( rows.get( 1 ) );
         }
-
-        JoinKey keyOne = createJoinKey( primaryKeyMetadata );
-        JoinKey keyTwo = createJoinKey( foreignKeyMetadata );
 
         return new Join( keyOne, keyTwo );
     }
 
-    private JoinKey createJoinKey( Map<String, String> results )
+    private Column sourceSimpleColumn( Map<String, String> results )
     {
         TableName sourceTable = new TableName(
-                results.get( "SOURCE_TABLE_SCHEMA" ),
-                results.get( "SOURCE_TABLE_NAME" ) );
-        TableName targetTable = new TableName(
-                results.get( "TARGET_TABLE_SCHEMA" ),
-                results.get( "TARGET_TABLE_NAME" ) );
+                results.get( "SOURCE_TABLE_SCHEMA" ), results.get( "SOURCE_TABLE_NAME" ) );
         String sourceColumn = results.get( "SOURCE_COLUMN_NAME" );
-        String targetColumn = results.get( "TARGET_COLUMN_NAME" );
         ColumnType sourceColumnType = ColumnType.valueOf( results.get( "SOURCE_COLUMN_TYPE" ) );
-        ColumnType targetColumnType = ColumnType.valueOf( results.get( "TARGET_COLUMN_TYPE" ) );
+        return new SimpleColumn(
+                sourceTable,
+                sourceTable.fullyQualifiedColumnName( sourceColumn ),
+                sourceColumn,
+                sourceColumnType,
+                SqlDataType.KEY_DATA_TYPE );
+    }
 
-        return new JoinKey(
-                new SimpleColumn(
-                        sourceTable,
-                        sourceTable.fullyQualifiedColumnName( sourceColumn ),
-                        sourceColumn,
-                        sourceColumnType,
-                        SqlDataType.KEY_DATA_TYPE ),
-                new SimpleColumn(
-                        targetTable,
-                        targetTable.fullyQualifiedColumnName( targetColumn ),
-                        targetColumn,
-                        targetColumnType,
-                        SqlDataType.KEY_DATA_TYPE ) );
+    private JoinKey createJoinKey( Map<String, String> results )
+    {
+        return new JoinKey( sourceSimpleColumn( results ), targetSimpleColumn( results ) );
+    }
+
+    private SimpleColumn targetSimpleColumn( Map<String, String> results )
+    {
+        TableName targetTable = new TableName(
+                results.get( "TARGET_TABLE_SCHEMA" ), results.get( "TARGET_TABLE_NAME" ) );
+        ColumnType targetColumnType = ColumnType.valueOf( results.get( "TARGET_COLUMN_TYPE" ) );
+        String targetColumn = results.get( "TARGET_COLUMN_NAME" );
+
+        return new SimpleColumn(
+                targetTable,
+                targetTable.fullyQualifiedColumnName( targetColumn ),
+                targetColumn,
+                targetColumnType,
+                SqlDataType.KEY_DATA_TYPE );
     }
 
     private String select( JoinQueryInfo source )
