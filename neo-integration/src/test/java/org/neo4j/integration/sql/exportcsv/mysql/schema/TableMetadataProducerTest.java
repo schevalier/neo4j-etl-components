@@ -1,21 +1,22 @@
 package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
-import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
+
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
@@ -26,6 +27,9 @@ import static org.mockito.Mockito.when;
 
 public class TableMetadataProducerTest
 {
+
+    private final TestUtil testUtil = new TestUtil();
+
     @Test
     public void shouldReturnTableMetadata() throws Exception
     {
@@ -44,7 +48,7 @@ public class TableMetadataProducerTest
 
         // when
         TableName forTable = new TableName( "test.Person" );
-        Collection<Table> metadata = tableMetadataProducer.createMetadataFor( new TableName( "test.Person" ) );
+        Collection<Table> metadata = tableMetadataProducer.createMetadataFor( forTable );
 
         // then
         Table table = metadata.stream().findFirst().get();
@@ -59,12 +63,7 @@ public class TableMetadataProducerTest
                         "id",
                         ColumnType.PrimaryKey,
                         MySqlDataType.INT ),
-                new SimpleColumn(
-                        forTable,
-                        forTable.fullyQualifiedColumnName( "username" ),
-                        "username",
-                        ColumnType.Data,
-                        MySqlDataType.TEXT ),
+                testUtil.column( forTable, "username", ColumnType.Data ),
                 new SimpleColumn(
                         forTable,
                         forTable.fullyQualifiedColumnName( "addressId" ),
@@ -74,52 +73,33 @@ public class TableMetadataProducerTest
     }
 
     @Test
-    @Ignore
     public void shouldReturnTableMetadataForJoinTable() throws Exception
     {
         // given
-        QueryResults results = StubQueryResults.builder()
+        QueryResults columnProjectionResults = StubQueryResults.builder()
                 .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
-                .addRow( "id", "INT", "PrimaryKey" )
-                .addRow( "username", "TEXT", "Data" )
-                .addRow( "addressId", "int", "ForeignKey" )
+                .addRow( "credits", "text", "Data" )
                 .build();
 
         DatabaseClient databaseClient = mock( DatabaseClient.class );
-        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue(
+                columnProjectionResults ) );
 
-        TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient,
-                c -> c == ColumnType.Data );
+        TableMetadataProducer tableMetadataProducer =
+                new TableMetadataProducer( databaseClient, c -> c == ColumnType.Data );
 
         // when
-        TableName forTable = new TableName( "test.Person" );
-        Collection<Table> metadata = tableMetadataProducer.createMetadataFor( new TableName( "test.Person" ) );
+        TableName forTable = new TableName( "test.Student_Course" );
+        Collection<Table> metadata = tableMetadataProducer.createMetadataFor( forTable );
 
         // then
         Table table = metadata.stream().findFirst().get();
 
         assertEquals( forTable, table.name() );
-        assertEquals( "test.Person", table.descriptor() );
+        assertEquals( "test.Student_Course", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                new SimpleColumn(
-                        forTable,
-                        forTable.fullyQualifiedColumnName( "id" ),
-                        "id",
-                        ColumnType.PrimaryKey,
-                        MySqlDataType.INT ),
-                new SimpleColumn(
-                        forTable,
-                        forTable.fullyQualifiedColumnName( "username" ),
-                        "username",
-                        ColumnType.Data,
-                        MySqlDataType.TEXT ),
-                new SimpleColumn(
-                        forTable,
-                        forTable.fullyQualifiedColumnName( "addressId" ),
-                        "addressId",
-                        ColumnType.ForeignKey,
-                        MySqlDataType.INT ) ) );
+                testUtil.column( forTable, "credits", ColumnType.Data ) ) );
     }
 
     @Test
@@ -150,7 +130,7 @@ public class TableMetadataProducerTest
         assertThat( table.columns(), contains(
                 new CompositeKeyColumn(
                         forTable,
-                        Arrays.asList(
+                        asList(
                                 new SimpleColumn(
                                         forTable,
                                         forTable.fullyQualifiedColumnName( "first_name" ),

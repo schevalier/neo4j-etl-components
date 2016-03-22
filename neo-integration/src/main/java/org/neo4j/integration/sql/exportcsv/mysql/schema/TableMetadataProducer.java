@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.neo4j.integration.sql.DatabaseClient;
@@ -64,9 +66,8 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         {
             Map<String, List<Map<String, String>>> groupedByColumnType = results.stream()
                     .collect( groupingBy( row -> row.get( "COLUMN_TYPE" ) ) );
-            groupedByColumnType.entrySet().stream().forEach( columnTypeRowAndValues -> {
-                addColumnsForColumnType( source, builder, columnTypeRowAndValues );
-            } );
+            groupedByColumnType.entrySet().stream()
+                    .forEach( columnTypeRowAndValues -> addColumnsForColumnType( source, builder, columnTypeRowAndValues ) );
         }
 
         return Collections.singletonList( builder.build() );
@@ -78,33 +79,50 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
     {
         if ( "PrimaryKey".equalsIgnoreCase( columnTypeRowAndValues.getKey() ) )
         {
-            handlePrimaryKey( source, builder, columnTypeRowAndValues );
+            addColumnsForPrimaryKeys( source, builder, columnTypeRowAndValues );
         }
         else
         {
-            columnTypeRowAndValues.getValue().stream().forEach(
-                    row -> builder.addColumn( buildSimpleColumn( source, row ) ) );
+            columnTypeRowAndValues.getValue().stream().
+                    forEach( row -> addSimpleColumn( source, builder, row ) );
+
         }
     }
 
-    private void handlePrimaryKey( TableName source, Table.Builder builder,
-                                   Map.Entry<String, List<Map<String, String>>> columnTypeRow )
+    private void addColumnsForPrimaryKeys( TableName source, Table.Builder builder,
+                                           Map.Entry<String, List<Map<String, String>>> columnTypeRow )
     {
         List<Map<String, String>> primaryKeyRows = columnTypeRow.getValue();
         if ( primaryKeyRows.size() > 1 )
         {
-            List<Column> primaryKeyColumns = primaryKeyRows.stream()
-                    .map( row -> buildSimpleColumn( source, row ) )
-                    .collect( toList() );
-            builder.addColumn( new CompositeKeyColumn( source, primaryKeyColumns ) );
+            addCompositeKey( source, builder, primaryKeyRows );
         }
         else
         {
-            builder.addColumn( buildSimpleColumn( source, primaryKeyRows.get( 0 ) ) );
+            addSimpleColumn( source, builder,  primaryKeyRows.get( 0 ) );
         }
     }
 
-    private Column buildSimpleColumn( TableName source, Map<String, String> row )
+    private void addSimpleColumn( TableName source, Table.Builder builder, Map<String, String> row )
+    {
+        Optional<SimpleColumn> columnOptional = buildSimpleColumn( source, row );
+        if ( columnOptional.isPresent() )
+        {
+            builder.addColumn( columnOptional.get() );
+        }
+    }
+
+    private void addCompositeKey( TableName source, Table.Builder builder, List<Map<String, String>> primaryKeyRows )
+    {
+        List<Column> primaryKeyColumns = primaryKeyRows.stream()
+                .map( row -> buildSimpleColumn( source, row ) )
+                .filter( Optional::isPresent )
+                .map( Optional::get )
+                .collect( toList() );
+        builder.addColumn( new CompositeKeyColumn( source, primaryKeyColumns ) );
+    }
+
+    private Optional<SimpleColumn> buildSimpleColumn( TableName source, Map<String, String> row )
     {
         ColumnType columnType = ColumnType.valueOf( row.get( "COLUMN_TYPE" ) );
         if ( columnFilter.test( columnType ) )
@@ -112,16 +130,16 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
             String columnName = row.get( "COLUMN_NAME" );
             SqlDataType dataType = MySqlDataType.parse( row.get( "DATA_TYPE" ) );
 
-            return new SimpleColumn(
+            return Optional.of( new SimpleColumn(
                     source,
                     source.fullyQualifiedColumnName( columnName ),
                     columnName,
                     columnType,
-                    dataType );
+                    dataType ) );
         }
         else
         {
-            throw new RuntimeException( "Fix This" );
+            return Optional.empty();
         }
     }
 }
