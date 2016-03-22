@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.exportcsv.mysql;
 
 import java.util.Arrays;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
@@ -21,6 +22,7 @@ public class MySqlExportSqlSupplierTest
     private TestUtil testUtil = new TestUtil();
 
     @Test
+    @Ignore
     public void shouldCreateSqlForSelectingColumnsFromTables()
     {
         // given

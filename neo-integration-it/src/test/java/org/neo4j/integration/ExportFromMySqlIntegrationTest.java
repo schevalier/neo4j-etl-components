@@ -176,7 +176,6 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    @Ignore
     public void shouldExportFromMySqlAndImportIntoGraphForThreeTableJoinWithProperties() throws Exception
     {
         // when
