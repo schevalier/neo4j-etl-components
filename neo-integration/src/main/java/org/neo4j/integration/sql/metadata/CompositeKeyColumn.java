@@ -76,6 +76,12 @@ public class CompositeKeyColumn implements Column
                 .collect( Collectors.joining( "_" ) );
     }
 
+    @Override
+    public String aliasedColumn()
+    {
+        return columns.stream().map( Column::aliasedColumn ).collect( Collectors.joining( ", " ) );
+    }
+
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )

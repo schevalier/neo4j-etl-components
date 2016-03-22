@@ -7,6 +7,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.util.Preconditions;
 
+import static java.lang.String.format;
+
 public class SimpleColumn implements Column
 {
     private final TableName table;
@@ -79,5 +81,11 @@ public class SimpleColumn implements Column
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode( this );
+    }
+
+    @Override
+    public String aliasedColumn()
+    {
+        return format( "%s AS %s", name, alias );
     }
 }

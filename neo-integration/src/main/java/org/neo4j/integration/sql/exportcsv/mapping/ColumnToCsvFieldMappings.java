@@ -11,8 +11,6 @@ import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.Preconditions;
 
-import static java.lang.String.format;
-
 public class ColumnToCsvFieldMappings
 {
     public static Builder builder()
@@ -40,7 +38,7 @@ public class ColumnToCsvFieldMappings
     public Collection<String> aliasedColumns()
     {
         return columns().stream()
-                .map( c -> format( "%s AS %s", c.name(), c.alias() ) )
+                .map( Column::aliasedColumn )
                 .collect( Collectors.toList() );
     }
 

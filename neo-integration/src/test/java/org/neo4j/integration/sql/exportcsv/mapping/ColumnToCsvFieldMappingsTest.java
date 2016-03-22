@@ -9,7 +9,12 @@ import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
+import org.neo4j.integration.sql.metadata.SimpleColumn;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
+
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertThat;
@@ -23,12 +28,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfCsvFields()
     {
         // given
-        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        TableName personTable = new TableName( "test.Person" );
+        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
-                .Data );
+        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
-        Column column3 = testUtil.column( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
+        Column column3 = testUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
 
         CsvField idField = CsvField.id();
         CsvField usernameField = CsvField.data( "username", Neo4jDataType.String );
@@ -51,12 +56,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfFullyQualifiedColumnNames()
     {
         // given
-        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        TableName personTable = new TableName( "test.Person" );
+        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
-                .Data );
+        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
-        Column column3 = testUtil.column( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
+        Column column3 = testUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -75,12 +80,12 @@ public class ColumnToCsvFieldMappingsTest
     public void shouldReturnCollectionOfAliasedColumnNames()
     {
         // given
-        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        TableName personTable = new TableName( "test.Person" );
+        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType
-                .Data );
+        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
-        Column column3 = testUtil.column( new TableName( "test.Person" ), "test.Person.age", "age", ColumnType.Data );
+        Column column3 = testUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -97,18 +102,57 @@ public class ColumnToCsvFieldMappingsTest
     }
 
     @Test
+    public void shouldReturnCollectionOfAliasedColumnNamesForTablesWithCompositeKey()
+    {
+        // given
+        TableName authorTable = new TableName( "test.Author" );
+        Column column1 = new CompositeKeyColumn( authorTable,
+                asList( new SimpleColumn(
+                                new TableName( "test.Author" ),
+                                "test.Author.first_name",
+                                "first_name",
+                                ColumnType.PrimaryKey,
+                                SqlDataType.KEY_DATA_TYPE ),
+                        new SimpleColumn(
+                                new TableName( "test.Author" ),
+                                "test.Author.last_name",
+                                "last_name",
+                                ColumnType.PrimaryKey,
+                                SqlDataType.KEY_DATA_TYPE ) ) );
+
+
+        Column column2 = testUtil.column( authorTable, "test.Author.age", "age", ColumnType.Data );
+
+        ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
+                .add( column1, CsvField.id() )
+                .add( column2, CsvField.data( "age", Neo4jDataType.String ) )
+                .build();
+
+        // when
+        Collection<String> aliasedColumns = mappings.aliasedColumns();
+
+        // then
+        assertThat( aliasedColumns,
+                hasItems(
+                        "test.Author.first_name AS first_name, test.Author.last_name AS last_name",
+                        "test.Author.age AS age" ) );
+    }
+
+    @Test
     public void shouldReturnCollectionOfFullyQualifiedTableNames()
     {
         // given
-        Column column1 = testUtil.column( new TableName( "test.Person" ), "test.Person.id", "id", ColumnType.PrimaryKey );
+        TableName personTable = new TableName( "test.Person" );
+        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( new TableName( "test.Person" ), "test.Person.username", "username", ColumnType.Data );
-        Column column3 = testUtil.column( new TableName( "test.Address" ), "test.Address.id", "id", ColumnType.PrimaryKey );
+        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
+        Column column3 = testUtil.column( new TableName( "test.Address" ), "test.Address.postcode", "postcode",
+                ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
                 .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
-                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
+                .add( column3, CsvField.data( "id", Neo4jDataType.String ) )
                 .build();
 
         // when

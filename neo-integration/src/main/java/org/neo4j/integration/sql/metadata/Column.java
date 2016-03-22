@@ -16,5 +16,7 @@ public interface Column
 
     SqlDataType dataType();
 
-    String selectFrom( RowAccessor row);
+    String selectFrom( RowAccessor row );
+
+    String aliasedColumn();
 }
