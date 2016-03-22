@@ -34,6 +34,9 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                 case PrimaryKey:
                     builder.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
                     break;
+                case CompositeKey:
+                    builder.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
+                    break;
                 case Data:
                     builder.add( column, CsvField.data( column.alias(), column.dataType().toNeo4jDataType() ) );
                     break;

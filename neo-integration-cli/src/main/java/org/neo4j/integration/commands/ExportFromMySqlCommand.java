@@ -76,7 +76,7 @@ public class ExportFromMySqlCommand
                                               Formatting formatting,
                                               ConnectionConfig connectionConfig ) throws Exception
     {
-        SchemaExport schemaExport =  schemaExportService
+        SchemaExport schemaExport = schemaExportService
                 .doExport( schemaDetails, () -> new DatabaseClient( connectionConfig ) );
         ExportToCsvConfig config = ExportToCsvConfig.builder()
                 .destination( csvDirectory )
@@ -96,7 +96,7 @@ public class ExportFromMySqlCommand
                 .importToolDirectory( environment.importToolDirectory() )
                 .destination( environment.destinationDirectory() )
                 .formatting( formatting )
-                .idType( IdType.Integer );
+                .idType( IdType.String );
 
         manifest.addNodesAndRelationshipsToBuilder( builder );
 

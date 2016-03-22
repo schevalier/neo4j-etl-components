@@ -2,17 +2,24 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 {
@@ -55,26 +62,66 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
         try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
-            while ( results.next() )
-            {
-                ColumnType columnType = ColumnType.valueOf( results.getString( "COLUMN_TYPE" ) );
-
-                if ( columnFilter.test( columnType ) )
-                {
-                    String columnName = results.getString( "COLUMN_NAME" );
-                    SqlDataType dataType = MySqlDataType.parse( results.getString( "DATA_TYPE" ) );
-
-                    builder.addColumn(
-                            new SimpleColumn(
-                                    source,
-                                    source.fullyQualifiedColumnName( columnName ),
-                                    columnName,
-                                    columnType,
-                                    dataType ) );
-                }
-            }
+            Map<String, List<Map<String, String>>> groupedByColumnType = results.stream()
+                    .collect( groupingBy( row -> row.get( "COLUMN_TYPE" ) ) );
+            groupedByColumnType.entrySet().stream().forEach( columnTypeRowAndValues -> {
+                addColumnsForColumnType( source, builder, columnTypeRowAndValues );
+            } );
         }
 
         return Collections.singletonList( builder.build() );
+    }
+
+    private void addColumnsForColumnType( TableName source,
+                                          Table.Builder builder,
+                                          Map.Entry<String, List<Map<String, String>>> columnTypeRowAndValues )
+    {
+        if ( "PrimaryKey".equalsIgnoreCase( columnTypeRowAndValues.getKey() ) )
+        {
+            handlePrimaryKey( source, builder, columnTypeRowAndValues );
+        }
+        else
+        {
+            columnTypeRowAndValues.getValue().stream().forEach(
+                    row -> builder.addColumn( buildSimpleColumn( source, row ) ) );
+        }
+    }
+
+    private void handlePrimaryKey( TableName source, Table.Builder builder,
+                                   Map.Entry<String, List<Map<String, String>>> columnTypeRow )
+    {
+        List<Map<String, String>> primaryKeyRows = columnTypeRow.getValue();
+        if ( primaryKeyRows.size() > 1 )
+        {
+            List<Column> primaryKeyColumns = primaryKeyRows.stream()
+                    .map( row -> buildSimpleColumn( source, row ) )
+                    .collect( toList() );
+            builder.addColumn( new CompositeKeyColumn( source, primaryKeyColumns ) );
+        }
+        else
+        {
+            builder.addColumn( buildSimpleColumn( source, primaryKeyRows.get( 0 ) ) );
+        }
+    }
+
+    private Column buildSimpleColumn( TableName source, Map<String, String> row )
+    {
+        ColumnType columnType = ColumnType.valueOf( row.get( "COLUMN_TYPE" ) );
+        if ( columnFilter.test( columnType ) )
+        {
+            String columnName = row.get( "COLUMN_NAME" );
+            SqlDataType dataType = MySqlDataType.parse( row.get( "DATA_TYPE" ) );
+
+            return new SimpleColumn(
+                    source,
+                    source.fullyQualifiedColumnName( columnName ),
+                    columnName,
+                    columnType,
+                    dataType );
+        }
+        else
+        {
+            throw new RuntimeException( "Fix This" );
+        }
     }
 }

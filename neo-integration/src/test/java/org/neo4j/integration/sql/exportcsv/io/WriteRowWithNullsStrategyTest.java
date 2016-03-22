@@ -41,7 +41,7 @@ public class WriteRowWithNullsStrategyTest
         List<Column> columns = asList(
                 testUtil.column( table, "id", ColumnType.PrimaryKey ),
                 testUtil.column( table, "username", ColumnType.ForeignKey ),
-                testUtil.column( table, "age", ColumnType.Data ));
+                testUtil.column( table, "age", ColumnType.Data ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
@@ -56,17 +56,17 @@ public class WriteRowWithNullsStrategyTest
     {
         // given
         List<Map<String, String>> rows = new ArrayList<>();
-        HashMap<String, String> e = new HashMap<>();
-        e.put( "id", "1" );
-        e.put( "username", null );
-        e.put( "age", "42" );
-        rows.add( e );
+        HashMap<String, String> rowOne = new HashMap<>();
+        rowOne.put( "id", "1" );
+        rowOne.put( "username", null );
+        rowOne.put( "age", "42" );
+        rows.add( rowOne );
 
         TableName table = new TableName( "users" );
         List<Column> columns = asList(
                 testUtil.column( table, "id", ColumnType.PrimaryKey ),
                 testUtil.column( table, "username", ColumnType.ForeignKey ),
-                testUtil.column( table, "age", ColumnType.Data ));
+                testUtil.column( table, "age", ColumnType.Data ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();

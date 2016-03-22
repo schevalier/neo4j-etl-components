@@ -72,6 +72,26 @@ CREATE TABLE javabase.Date_Table
 GRANT ALL ON javabase.Date_Table TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
+CREATE TABLE javabase.Author
+(
+  first_name VARCHAR(20) NOT NULL,
+  last_name  VARCHAR(20) NOT NULL,
+  PRIMARY KEY (first_name, last_name)
+);
+GRANT ALL ON javabase.Author TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
+CREATE TABLE javabase.Book
+(
+  id                INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name              TEXT NOT NULL,
+  author_first_name VARCHAR(20),
+  author_last_name  VARCHAR(20),
+  FOREIGN KEY (author_first_name, author_last_name) REFERENCES javabase.Author (first_name, last_name)
+);
+GRANT ALL ON javabase.Book TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
 CREATE TABLE javabase.Student
 (
   id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -80,31 +100,21 @@ CREATE TABLE javabase.Student
 GRANT ALL ON javabase.Student TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
-CREATE TABLE javabase.Author
-(
-  first_name VARCHAR(20) NOT NULL,
-  last_name VARCHAR(20) NOT NULL,
-  PRIMARY KEY (first_name, last_name)
-);
-GRANT ALL ON javabase.Author TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
 CREATE TABLE javabase.Course
 (
-  id   INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  name TEXT NOT NULL,
+  id                INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name              TEXT NOT NULL,
   author_first_name VARCHAR(20),
-  author_last_name VARCHAR(20),
-  FOREIGN KEY (author_first_name, author_last_name) REFERENCES javabase.Author(first_name, last_name)
+  author_last_name  VARCHAR(20)
 );
 GRANT ALL ON javabase.Course TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Student_Course
 (
-  studentId INT  NOT NULL,
-  courseId  INT  NOT NULL,
-  credits      INT NOT NULL,
+  studentId INT NOT NULL,
+  courseId  INT NOT NULL,
+  credits   INT NOT NULL,
   FOREIGN KEY (studentId) REFERENCES javabase.Student (id),
   FOREIGN KEY (courseId) REFERENCES javabase.Course (id)
 );
@@ -194,6 +204,14 @@ INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, ti
     id
   FROM javabase.Numeric_Table
   WHERE javabase.Numeric_Table.tinyint_field = 1;
+
+INSERT INTO javabase.Author (first_name, last_name) VALUES ('Abraham', 'Silberschatz');
+INSERT INTO javabase.Author (first_name, last_name) VALUES ('Andrew', 'Tanenbaum');
+
+INSERT INTO javabase.Book (name, author_first_name, author_last_name)
+VALUES ('Database System Concepts', 'Abraham', 'Silberschatz');
+INSERT INTO javabase.Book (name, author_first_name, author_last_name)
+VALUES ('Computer Networks', 'Andrew', 'Tanenbaum');
 
 INSERT INTO javabase.Student (username) VALUES ('jim');
 INSERT INTO javabase.Student (username) VALUES ('mark');

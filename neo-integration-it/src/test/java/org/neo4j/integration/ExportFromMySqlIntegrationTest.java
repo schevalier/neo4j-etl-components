@@ -8,6 +8,7 @@ import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -42,7 +43,8 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(),
+                    "local" ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -67,6 +69,38 @@ public class ExportFromMySqlIntegrationTest
             neo4j.get().start();
 
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
+            List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
+            List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
+            List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[2].postcode" );
+
+            assertThat( usernames.size(), is( 9 ) );
+
+            assertThat( usernames, hasItems(
+                    "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
+            assertEquals( asList( "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS",
+                    "ADDRESS", "ADDRESS", "ADDRESS" ), relationships );
+            assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
+        }
+        finally
+        {
+            neo4j.get().stop();
+        }
+    }
+
+    @Test
+    @Ignore
+    public void shouldExportTableWithCompositeJoinColumns() throws Exception
+    {
+        // when
+        exportFromMySqlToNeo4j( "Book", "Author" );
+
+        // then
+        try
+        {
+            neo4j.get().start();
+
+            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
+            System.out.println( response );
             List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
             List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[2].postcode" );
@@ -142,6 +176,7 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
+    @Ignore
     public void shouldExportFromMySqlAndImportIntoGraphForThreeTableJoinWithProperties() throws Exception
     {
         // when

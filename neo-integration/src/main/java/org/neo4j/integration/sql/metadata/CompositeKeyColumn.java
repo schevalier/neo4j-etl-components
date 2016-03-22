@@ -30,6 +30,11 @@ public class CompositeKeyColumn implements Column
         }
     }
 
+    public Collection<Column> columns()
+    {
+        return columns;
+    }
+
     @Override
     public TableName table()
     {
@@ -63,6 +68,8 @@ public class CompositeKeyColumn implements Column
     @Override
     public String selectFrom( RowAccessor row )
     {
+//        return row.getString( alias() );
+
         return columns.stream()
                 .map( c -> row.getString( c.alias() ) )
                 .collect( Collectors.joining( "_" ) );

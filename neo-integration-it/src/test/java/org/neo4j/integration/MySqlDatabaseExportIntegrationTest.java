@@ -91,7 +91,7 @@ public class MySqlDatabaseExportIntegrationTest
 //                "sales_reports",
                 "shippers",
 //                "strings",
-                "suppliers");
+                "suppliers" );
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL ).host( "localhost" )
                 .port( DatabaseType.MySQL.defaultPort() )
                 .database( "northwind" ).username( "root" ).password( "password" ).build();
@@ -137,7 +137,7 @@ public class MySqlDatabaseExportIntegrationTest
                 .importToolDirectory( neo4j.get().binDirectory() )
                 .destination( neo4j.get().databasesDirectory().resolve( "graph.db" ) )
                 .formatting( formatting )
-                .idType( IdType.Integer );
+                .idType( IdType.String );
 
         manifest.addNodesAndRelationshipsToBuilder( builder );
 
