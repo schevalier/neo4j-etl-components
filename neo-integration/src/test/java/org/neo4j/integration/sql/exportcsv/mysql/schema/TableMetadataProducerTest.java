@@ -103,7 +103,7 @@ public class TableMetadataProducerTest
     }
 
     @Test
-    public void tableMetadataShouldMergePrimaryKeysForTablesWithCompositeKeys() throws Exception
+    public void tableMetadataShouldAddCompositeKeyColumnForTablesWithMultiplePrimaryKeys() throws Exception
     {
         // given
         QueryResults results = StubQueryResults.builder()

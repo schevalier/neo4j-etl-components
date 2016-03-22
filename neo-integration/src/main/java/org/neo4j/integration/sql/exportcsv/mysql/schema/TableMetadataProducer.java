@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.neo4j.integration.sql.DatabaseClient;
@@ -67,7 +66,8 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
             Map<String, List<Map<String, String>>> groupedByColumnType = results.stream()
                     .collect( groupingBy( row -> row.get( "COLUMN_TYPE" ) ) );
             groupedByColumnType.entrySet().stream()
-                    .forEach( columnTypeRowAndValues -> addColumnsForColumnType( source, builder, columnTypeRowAndValues ) );
+                    .forEach( columnTypeRowAndValues -> addColumnsForColumnType( source, builder,
+                            columnTypeRowAndValues ) );
         }
 
         return Collections.singletonList( builder.build() );
@@ -77,39 +77,22 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                                           Table.Builder builder,
                                           Map.Entry<String, List<Map<String, String>>> columnTypeRowAndValues )
     {
-        if ( "PrimaryKey".equalsIgnoreCase( columnTypeRowAndValues.getKey() ) )
+        List<Map<String, String>> columnsAsMap = columnTypeRowAndValues.getValue();
+        if ( hasCompositeKeys( columnTypeRowAndValues, columnsAsMap ) )
         {
-            addColumnsForPrimaryKeys( source, builder, columnTypeRowAndValues );
+            addCompositeKey( source, builder, columnsAsMap );
         }
         else
         {
-            columnTypeRowAndValues.getValue().stream().
-                    forEach( row -> addSimpleColumn( source, builder, row ) );
+            columnsAsMap.stream().forEach( row -> addSimpleColumn( source, builder, row ) );
 
         }
     }
 
-    private void addColumnsForPrimaryKeys( TableName source, Table.Builder builder,
-                                           Map.Entry<String, List<Map<String, String>>> columnTypeRow )
+    private boolean hasCompositeKeys( Map.Entry<String, List<Map<String, String>>> columnTypeRowAndValues,
+                                      List<Map<String, String>> columnsAsMap )
     {
-        List<Map<String, String>> primaryKeyRows = columnTypeRow.getValue();
-        if ( primaryKeyRows.size() > 1 )
-        {
-            addCompositeKey( source, builder, primaryKeyRows );
-        }
-        else
-        {
-            addSimpleColumn( source, builder,  primaryKeyRows.get( 0 ) );
-        }
-    }
-
-    private void addSimpleColumn( TableName source, Table.Builder builder, Map<String, String> row )
-    {
-        Optional<SimpleColumn> columnOptional = buildSimpleColumn( source, row );
-        if ( columnOptional.isPresent() )
-        {
-            builder.addColumn( columnOptional.get() );
-        }
+        return "PrimaryKey".equalsIgnoreCase( columnTypeRowAndValues.getKey() ) && columnsAsMap.size() > 1;
     }
 
     private void addCompositeKey( TableName source, Table.Builder builder, List<Map<String, String>> primaryKeyRows )
@@ -120,6 +103,15 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                 .map( Optional::get )
                 .collect( toList() );
         builder.addColumn( new CompositeKeyColumn( source, primaryKeyColumns ) );
+    }
+
+    private void addSimpleColumn( TableName source, Table.Builder builder, Map<String, String> row )
+    {
+        Optional<SimpleColumn> columnOptional = buildSimpleColumn( source, row );
+        if ( columnOptional.isPresent() )
+        {
+            builder.addColumn( columnOptional.get() );
+        }
     }
 
     private Optional<SimpleColumn> buildSimpleColumn( TableName source, Map<String, String> row )
