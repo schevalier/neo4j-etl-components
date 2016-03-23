@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql.metadata;
 
 import org.neo4j.integration.sql.RowAccessor;
+import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
 public interface Column
 {
@@ -19,4 +20,6 @@ public interface Column
     String selectFrom( RowAccessor row );
 
     String aliasedColumn();
+
+    void addTo( ColumnToCsvFieldMappings.Builder builder );
 }

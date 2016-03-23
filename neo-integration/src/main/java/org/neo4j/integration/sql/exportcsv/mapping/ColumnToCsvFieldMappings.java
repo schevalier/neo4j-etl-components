@@ -3,7 +3,6 @@ package org.neo4j.integration.sql.exportcsv.mapping;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
@@ -18,21 +17,22 @@ public class ColumnToCsvFieldMappings
         return new ColumnToCsvFieldMappingsBuilder();
     }
 
-    private final Map<Column, CsvField> mappings;
+    private final Collection<ColumnToCsvFieldMapping> mappings;
 
-    ColumnToCsvFieldMappings( Map<Column, CsvField> mappings )
+    ColumnToCsvFieldMappings( Collection<ColumnToCsvFieldMapping> mappings )
     {
-        this.mappings = Collections.unmodifiableMap( Preconditions.requireNonEmptyMap( mappings, "Mappings" ) );
+        this.mappings = Collections.unmodifiableCollection(
+                Preconditions.requireNonEmptyCollection( mappings, "Mappings" ) );
     }
 
     public Collection<CsvField> fields()
     {
-        return mappings.values();
+        return mappings.stream().map( ColumnToCsvFieldMapping::field ).collect( Collectors.toList() );
     }
 
     public Collection<Column> columns()
     {
-        return mappings.keySet();
+        return mappings.stream().map( ColumnToCsvFieldMapping::column ).collect( Collectors.toList() );
     }
 
     public Collection<String> aliasedColumns()
@@ -44,7 +44,7 @@ public class ColumnToCsvFieldMappings
 
     public Collection<String> tableNames()
     {
-        return mappings.keySet().stream()
+        return columns().stream()
                 .map( Column::table )
                 .distinct()
                 .map( TableName::fullName )
@@ -53,7 +53,7 @@ public class ColumnToCsvFieldMappings
 
     public interface Builder
     {
-        Builder add( Column from, CsvField to );
+        Builder add( ColumnToCsvFieldMapping columnToCsvFieldMapping );
 
         ColumnToCsvFieldMappings build();
     }

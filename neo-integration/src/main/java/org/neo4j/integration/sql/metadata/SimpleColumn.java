@@ -4,7 +4,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.sql.RowAccessor;
+import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
+import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -87,5 +90,11 @@ public class SimpleColumn implements Column
     public String aliasedColumn()
     {
         return format( "%s AS %s", name, alias );
+    }
+
+    @Override
+    public void addTo( ColumnToCsvFieldMappings.Builder builder )
+    {
+        builder.add( new ColumnToCsvFieldMapping( this, CsvField.data( alias, dataType.toNeo4jDataType() ) ) );
     }
 }

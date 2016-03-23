@@ -37,9 +37,9 @@ public class ColumnToCsvFieldMappingsTest
         CsvField ageField = CsvField.data( "age", Neo4jDataType.String );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( column1, idField )
-                .add( column2, usernameField )
-                .add( column3, ageField )
+                .add( new ColumnToCsvFieldMapping( column1, idField ) )
+                .add( new ColumnToCsvFieldMapping( column2, usernameField ) )
+                .add( new ColumnToCsvFieldMapping( column3, ageField ) )
                 .build();
 
         // when
@@ -61,9 +61,9 @@ public class ColumnToCsvFieldMappingsTest
         Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
-                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
+                .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )
+                .add( new ColumnToCsvFieldMapping( column2, CsvField.data( "username", Neo4jDataType.String ) ) )
+                .add( new ColumnToCsvFieldMapping( column3, CsvField.data( "age", Neo4jDataType.String ) ) )
                 .build();
 
         // when
@@ -84,8 +84,8 @@ public class ColumnToCsvFieldMappingsTest
         Column column2 = columnUtil.column( authorTable, "test.Author.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "age", Neo4jDataType.String ) )
+                .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )
+                .add( new ColumnToCsvFieldMapping( column2, CsvField.data( "age", Neo4jDataType.String ) ) )
                 .build();
 
         // when
@@ -110,9 +110,9 @@ public class ColumnToCsvFieldMappingsTest
                 ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( column1, CsvField.id() )
-                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
-                .add( column3, CsvField.data( "id", Neo4jDataType.String ) )
+                .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )
+                .add( new ColumnToCsvFieldMapping( column2, CsvField.data( "username", Neo4jDataType.String ) ) )
+                .add( new ColumnToCsvFieldMapping( column3, CsvField.data( "id", Neo4jDataType.String ) ) )
                 .build();
 
         // when

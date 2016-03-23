@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
+import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -32,10 +33,11 @@ public class MySqlExportSqlSupplierTest
 
         Column column3 = columnUtil.column( table, "age", ColumnType.Data );
 
+        final CsvField id = CsvField.id( new IdSpace( table.fullName() ) );
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( column1, CsvField.id( new IdSpace( table.fullName() ) ) )
-                .add( column2, CsvField.data( "username", Neo4jDataType.String ) )
-                .add( column3, CsvField.data( "age", Neo4jDataType.String ) )
+                .add( new ColumnToCsvFieldMapping( column1, id ) )
+                .add( new ColumnToCsvFieldMapping( column2, CsvField.data( "username", Neo4jDataType.String ) ) )
+                .add( new ColumnToCsvFieldMapping( column3, CsvField.data( "age", Neo4jDataType.String ) ) )
                 .build();
 
         MySqlExportSqlSupplier sqlSupplier = new MySqlExportSqlSupplier();
@@ -63,10 +65,11 @@ public class MySqlExportSqlSupplierTest
 
         Column lastName = columnUtil.column( forTable, "last_name", ColumnType.PrimaryKey );
 
+        final CompositeKeyColumn from = new CompositeKeyColumn(
+                forTable, Arrays.asList( firstName, lastName ) );
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
-                .add( new CompositeKeyColumn(
-                                forTable, Arrays.asList( firstName, lastName ) ),
-                        CsvField.id() )
+                .add(
+                        new ColumnToCsvFieldMapping( from, CsvField.id() ) )
                 .build();
 
         MySqlExportSqlSupplier sqlSupplier = new MySqlExportSqlSupplier();

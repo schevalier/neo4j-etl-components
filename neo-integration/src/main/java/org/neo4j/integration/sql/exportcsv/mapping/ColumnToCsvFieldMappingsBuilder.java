@@ -1,19 +1,16 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
-import org.neo4j.integration.sql.metadata.Column;
+import java.util.ArrayList;
+import java.util.Collection;
 
 class ColumnToCsvFieldMappingsBuilder implements ColumnToCsvFieldMappings.Builder
 {
-    private final Map<Column, CsvField> mappings = new LinkedHashMap<>();
+    private final Collection<ColumnToCsvFieldMapping> mappings = new ArrayList<>();
 
     @Override
-    public ColumnToCsvFieldMappings.Builder add( Column from, CsvField transformsTo )
+    public ColumnToCsvFieldMappings.Builder add( ColumnToCsvFieldMapping columnToCsvFieldMapping )
     {
-        mappings.put( from, transformsTo );
+        mappings.add( columnToCsvFieldMapping );
         return this;
     }
 

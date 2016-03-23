@@ -3,7 +3,6 @@ package org.neo4j.integration.sql.metadata;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -11,6 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.neo4j.integration.sql.RowAccessor;
+import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
 import static java.lang.String.format;
 
@@ -113,5 +113,11 @@ public class CompositeKeyColumn implements Column
     public String toString()
     {
         return ToStringBuilder.reflectionToString( this );
+    }
+
+    @Override
+    public void addTo( ColumnToCsvFieldMappings.Builder builder )
+    {
+        columns.forEach( column -> column.addTo( builder ) );
     }
 }

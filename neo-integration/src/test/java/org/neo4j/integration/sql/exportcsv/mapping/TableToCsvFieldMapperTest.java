@@ -52,6 +52,7 @@ public class TableToCsvFieldMapperTest
 
         assertThat( fields, contains(
                 CsvField.id( new IdSpace( "test.Person" ) ),
+                CsvField.data( "id", Neo4jDataType.String ),
                 CsvField.data( "username", Neo4jDataType.String ),
                 CsvField.data( "age", Neo4jDataType.Int ),
                 CsvField.label() ) );
@@ -78,6 +79,8 @@ public class TableToCsvFieldMapperTest
 
         assertThat( fields, contains(
                 CsvField.id( new IdSpace( "test.Author" ) ),
+                CsvField.data( "first_name", Neo4jDataType.String ),
+                CsvField.data( "last_name", Neo4jDataType.String ),
                 CsvField.label() ) );
     }
 
@@ -104,6 +107,7 @@ public class TableToCsvFieldMapperTest
 
         assertThat( fields, contains(
                 CsvField.id( new IdSpace( "test.Person" ) ),
+                CsvField.data( "id", Neo4jDataType.String ),
                 CsvField.data( "username", Neo4jDataType.String ),
                 CsvField.label() ) );
     }

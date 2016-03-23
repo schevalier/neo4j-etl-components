@@ -32,13 +32,17 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
             switch ( column.type() )
             {
                 case PrimaryKey:
-                    builder.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
+                    CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
+                    builder.add( new ColumnToCsvFieldMapping( column, id ) );
+                    column.addTo( builder );
                     break;
                 case CompositeKey:
-                    builder.add( column, CsvField.id( new IdSpace( table.name().fullName() ) ) );
+                    CsvField id1 = CsvField.id( new IdSpace( table.name().fullName() ) );
+                    builder.add( new ColumnToCsvFieldMapping( column, id1 ) );
+                    column.addTo( builder );
                     break;
                 case Data:
-                    builder.add( column, CsvField.data( column.alias(), column.dataType().toNeo4jDataType() ) );
+                    column.addTo( builder );
                     break;
                 default:
                     // Do nothing
@@ -46,14 +50,14 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
             }
         }
 
+        final SimpleColumn from = new SimpleColumn(
+                table.name(),
+                formatting.quote().enquote( table.name().simpleName() ),
+                table.name().simpleName(),
+                ColumnType.Literal,
+                SqlDataType.LABEL_DATA_TYPE );
         builder.add(
-                new SimpleColumn(
-                        table.name(),
-                        formatting.quote().enquote( table.name().simpleName() ),
-                        table.name().simpleName(),
-                        ColumnType.Literal,
-                        SqlDataType.LABEL_DATA_TYPE ),
-                CsvField.label() );
+                new ColumnToCsvFieldMapping( from, CsvField.label() ) );
 
         return builder.build();
     }

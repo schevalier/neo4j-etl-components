@@ -99,13 +99,13 @@ public class ExportFromMySqlIntegrationTest
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
             List<String> books = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
-            List<Integer> age = JsonPath.read( response, "$.results[*].data[*].row[2].age" );
+            List<Integer> lastNames = JsonPath.read( response, "$.results[*].data[*].row[2].last_name" );
 
             assertThat( books.size(), is( 2 ) );
 
             assertThat( books, hasItems( "Database System Concepts" ) );
             assertEquals( asList( "AUTHOR", "AUTHOR" ), relationships );
-            assertEquals( asList( 45, 56 ), age );
+            assertEquals( asList( "Silberschatz", "Tanenbaum" ), lastNames );
         }
         finally
         {

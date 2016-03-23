@@ -28,20 +28,22 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        builder.add( join.keyOneSourceColumn(),
-                CsvField.startId( new IdSpace( join.keyOneSourceColumn().table().fullName() ) ) );
-        builder.add( join.keyTwoSourceColumn(),
-                CsvField.endId( new IdSpace( join.keyTwoTargetColumn().table().fullName() ) ) );
+        final CsvField to = CsvField.startId( new IdSpace( join.keyOneSourceColumn().table().fullName() ) );
+        builder.add(
+                new ColumnToCsvFieldMapping( join.keyOneSourceColumn(), to ) );
+        final CsvField to1 = CsvField.endId( new IdSpace( join.keyTwoTargetColumn().table().fullName() ) );
+        builder.add(
+                new ColumnToCsvFieldMapping( join.keyTwoSourceColumn(), to1 ) );
 
         String relationshipType = join.keyTwoTargetColumn().table().simpleName().toUpperCase();
 
+        final SimpleColumn from = new SimpleColumn( join.keyOneSourceColumn().table(),
+                formatting.quote().enquote( relationshipType ),
+                relationshipType,
+                ColumnType.Literal,
+                SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
         builder.add(
-                new SimpleColumn( join.keyOneSourceColumn().table(),
-                        formatting.quote().enquote( relationshipType ),
-                        relationshipType,
-                        ColumnType.Literal,
-                        SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE ),
-                CsvField.relationshipType() );
+                new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
 
         return builder.build();
     }

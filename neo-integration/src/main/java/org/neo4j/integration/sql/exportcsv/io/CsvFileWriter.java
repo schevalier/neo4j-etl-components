@@ -34,8 +34,8 @@ public class CsvFileWriter
     public Path writeExportFile( ColumnToCsvFieldMappings mappings,
                                  DatabaseExportSqlSupplier sqlSupplier,
                                  String filenamePrefix,
-                                 BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy ) throws
-            Exception
+                                 BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy )
+            throws Exception
     {
         Path exportFile = createExportFile( filenamePrefix );
         QueryResults results = executeSql( sqlSupplier.sql( mappings ) );

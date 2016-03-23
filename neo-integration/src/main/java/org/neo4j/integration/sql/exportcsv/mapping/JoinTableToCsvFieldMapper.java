@@ -35,22 +35,24 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        builder.add( joinTable.join().keyOneSourceColumn(),
-                CsvField.startId( new IdSpace( joinTable.join().keyOneTargetColumn().table().fullName() ) ) );
-        builder.add( joinTable.join().keyTwoSourceColumn(),
-                CsvField.endId( new IdSpace( joinTable.join().keyTwoTargetColumn().table().fullName() ) ) );
+        final CsvField to = CsvField.startId( new IdSpace( joinTable.join().keyOneTargetColumn().table().fullName() ) );
+        builder.add(
+                new ColumnToCsvFieldMapping( joinTable.join().keyOneSourceColumn(), to ) );
+        final CsvField to1 = CsvField.endId( new IdSpace( joinTable.join().keyTwoTargetColumn().table().fullName() ) );
+        builder.add(
+                new ColumnToCsvFieldMapping( joinTable.join().keyTwoSourceColumn(), to1 ) );
 
         TableName table = joinTable.joinTableName();
 
         String relationshipType = table.simpleName().toUpperCase();
 
+        final SimpleColumn from = new SimpleColumn( table,
+                formatting.quote().enquote( relationshipType ),
+                relationshipType,
+                ColumnType.Literal,
+                SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
         builder.add(
-                new SimpleColumn( table,
-                        formatting.quote().enquote( relationshipType ),
-                        relationshipType,
-                        ColumnType.Literal,
-                        SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE ),
-                CsvField.relationshipType() );
+                new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
 
         addProperties( joinTable, builder );
 
@@ -64,10 +66,12 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
             switch ( column.type() )
             {
                 case PrimaryKey:
-                    builder.add( column, CsvField.id( new IdSpace( joinTable.joinTableName().fullName() ) ) );
+                    CsvField id = CsvField.id( new IdSpace( joinTable.joinTableName().fullName() ) );
+                    builder.add( new ColumnToCsvFieldMapping( column, id ) );
                     break;
                 case Data:
-                    builder.add( column, CsvField.data( column.alias(), column.dataType().toNeo4jDataType() ) );
+                    builder.add( new ColumnToCsvFieldMapping( column, CsvField.data( column.alias(), column.dataType
+                            ().toNeo4jDataType() ) ) );
                     break;
                 default:
                     // Do nothing
