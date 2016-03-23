@@ -19,7 +19,7 @@ public class WriteRowWithNullsStrategy implements BiPredicate<RowAccessor, Colle
         {
             if ( isKeyColumn( column.type() ) )
             {
-                if ( StringUtils.isEmpty( row.getString( column.alias() ) ) )
+                if (  StringUtils.isEmpty( column.selectFrom( row ) ) )
                 {
                     allowWriteLine = false;
                     break;

@@ -1,9 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.io;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -17,6 +15,7 @@ import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,24 +30,37 @@ public class WriteRowWithNullsStrategyTest
     public void shouldReturnTrueIfAnyOfTheNonKeyColumnsAreNull() throws Exception
     {
         // given
-        List<Map<String, String>> rows = new ArrayList<>();
-        HashMap<String, String> e = new HashMap<>();
-        e.put( "id", "1" );
-        e.put( "username", "user-1" );
-        e.put( "age", null );
-        rows.add( e );
+        HashMap<String, String> rowOne = new HashMap<>();
+        rowOne.put( "id", "1" );
+        rowOne.put( "username", "user-1" );
+        rowOne.put( "first_name", "Boaty" );
+        rowOne.put( "last_name", "Mc.Boatface" );
+        rowOne.put( "age", null );
 
-        TableName table = new TableName( "users" );
+        TableName table = new TableName( "test.users" );
         List<Column> columns = asList(
                 testUtil.column( table, "id", ColumnType.PrimaryKey ),
                 testUtil.column( table, "username", ColumnType.ForeignKey ),
-                testUtil.column( table, "age", ColumnType.Data ) );
+                testUtil.column( table, "age", ColumnType.Data ),
+                new CompositeKeyColumn( table,
+                        asList( new SimpleColumn(
+                                        new TableName( "test.Users" ),
+                                        "test.Users.first_name",
+                                        "first_name",
+                                        ColumnType.PrimaryKey,
+                                        SqlDataType.KEY_DATA_TYPE ),
+                                new SimpleColumn(
+                                        new TableName( "test.Users" ),
+                                        "test.Users.last_name",
+                                        "last_name",
+                                        ColumnType.PrimaryKey,
+                                        SqlDataType.KEY_DATA_TYPE ) ) ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
 
         // then
-        RowAccessor stubRowAccessor = columnLabel -> rows.get( 0 ).get( columnLabel );
+        RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
         assertTrue( strategy.test( stubRowAccessor, columns ) );
     }
 
@@ -56,12 +68,10 @@ public class WriteRowWithNullsStrategyTest
     public void shouldReturnFalseIfAnyOfTheKeyColumnsAreNull() throws Exception
     {
         // given
-        List<Map<String, String>> rows = new ArrayList<>();
         HashMap<String, String> rowOne = new HashMap<>();
         rowOne.put( "id", "1" );
         rowOne.put( "username", null );
         rowOne.put( "age", "42" );
-        rows.add( rowOne );
         TableName table = new TableName( "test.Users" );
 
         List<Column> columns = asList(
@@ -73,7 +83,7 @@ public class WriteRowWithNullsStrategyTest
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
 
         // then
-        RowAccessor stubRowAccessor = columnLabel -> rows.get( 0 ).get( columnLabel );
+        RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
         assertFalse( strategy.test( stubRowAccessor, columns ) );
     }
 
@@ -81,10 +91,9 @@ public class WriteRowWithNullsStrategyTest
     public void shouldReturnFalseIfAnyOfTheCompositeKeyColumnsAreNull() throws Exception
     {
         // given
-        List<Map<String, String>> rows = new ArrayList<>();
         HashMap<String, String> rowOne = new HashMap<>();
         rowOne.put( "age", "42" );
-        rows.add( rowOne );
+
         TableName table = new TableName( "test.Users" );
         Column compositeColumn = new CompositeKeyColumn( table,
                 asList( new SimpleColumn(
@@ -108,10 +117,9 @@ public class WriteRowWithNullsStrategyTest
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
 
         // then
-        RowAccessor stubRowAccessor = columnLabel -> rows.get( 0 ).get( columnLabel );
+        RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
         assertFalse( strategy.test( stubRowAccessor, columns ) );
     }
-
 
     @Test(expected = IllegalStateException.class)
     public void shouldBubbleAccessorException() throws Exception
@@ -127,7 +135,9 @@ public class WriteRowWithNullsStrategyTest
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
 
         // then
-        RowAccessor stubRowAccessor = columnLabel -> {throw new IllegalStateException();};
+        RowAccessor stubRowAccessor = columnLabel -> {
+            throw new IllegalStateException();
+        };
         strategy.test( stubRowAccessor, columns );
         fail( "Should have bubbled up the exception" );
     }

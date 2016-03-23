@@ -1,8 +1,11 @@
 package org.neo4j.integration.sql.metadata;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -69,7 +72,20 @@ public class CompositeKeyColumn implements Column
     @Override
     public String selectFrom( RowAccessor row )
     {
-        return row.getString( alias() );
+        List<String> values = columns.stream()
+                .map( c -> row.getString( c.alias() ) )
+                .collect( Collectors.toList() );
+
+        if ( values.stream().anyMatch( StringUtils::isEmpty ) )
+        {
+            return StringUtils.EMPTY;
+        }
+        else
+        {
+            return values.stream()
+                    .filter( StringUtils::isNotEmpty )
+                    .collect( Collectors.joining( "_" ) );
+        }
     }
 
     @Override
