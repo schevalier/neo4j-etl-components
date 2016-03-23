@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
-import org.neo4j.integration.sql.exportcsv.TestUtil;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.Join;
@@ -24,7 +24,7 @@ public class JoinToCsvFieldMapperTest
 {
 
     private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
-    private TestUtil testUtil = new TestUtil();
+    private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldCreateMappingsForJoinTable()
@@ -34,11 +34,11 @@ public class JoinToCsvFieldMapperTest
         TableName rightTable = new TableName( "test.Address" );
         Join join = new Join(
                 new JoinKey(
-                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
-                        testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                        columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                        columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
                 new JoinKey(
-                        testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                        testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                        columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                        columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
         );
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( join );

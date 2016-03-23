@@ -14,13 +14,11 @@ import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.TestUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
@@ -36,7 +34,7 @@ public class CsvFileWriterTest
 {
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
-    private TestUtil testUtil = new TestUtil();
+    private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldCreateCsvFile() throws Exception
@@ -65,8 +63,8 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                        testUtil.column( table, "username", ColumnType.Data ) ) );
+                        columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        columnUtil.column( table, "username", ColumnType.Data ) ) );
 
 
         // create writer under test
@@ -110,9 +108,9 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                        testUtil.column( table, "username", ColumnType.Data ),
-                        testUtil.column( table, "age", ColumnType.Data )) );
+                        columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        columnUtil.column( table, "username", ColumnType.Data ),
+                        columnUtil.column( table, "age", ColumnType.Data ) ) );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
@@ -155,8 +153,8 @@ public class CsvFileWriterTest
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
         when( mappings.columns() ).thenReturn(
                 asList(
-                        testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                        testUtil.column( table, "username", ColumnType.Data ) ) );
+                        columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        columnUtil.column( table, "username", ColumnType.Data ) ) );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );

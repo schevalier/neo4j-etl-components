@@ -6,12 +6,9 @@ import java.util.List;
 import org.junit.Test;
 
 import org.neo4j.integration.sql.RowAccessor;
-import org.neo4j.integration.sql.exportcsv.TestUtil;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
-import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -24,7 +21,7 @@ import static org.junit.Assert.fail;
 public class WriteRowWithNullsStrategyTest
 {
 
-    private TestUtil testUtil = new TestUtil();
+    private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldReturnTrueIfAnyOfTheNonKeyColumnsAreNull() throws Exception
@@ -39,22 +36,10 @@ public class WriteRowWithNullsStrategyTest
 
         TableName table = new TableName( "test.users" );
         List<Column> columns = asList(
-                testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                testUtil.column( table, "username", ColumnType.ForeignKey ),
-                testUtil.column( table, "age", ColumnType.Data ),
-                new CompositeKeyColumn( table,
-                        asList( new SimpleColumn(
-                                        new TableName( "test.Users" ),
-                                        "test.Users.first_name",
-                                        "first_name",
-                                        ColumnType.PrimaryKey,
-                                        SqlDataType.KEY_DATA_TYPE ),
-                                new SimpleColumn(
-                                        new TableName( "test.Users" ),
-                                        "test.Users.last_name",
-                                        "last_name",
-                                        ColumnType.PrimaryKey,
-                                        SqlDataType.KEY_DATA_TYPE ) ) ) );
+                columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                columnUtil.column( table, "username", ColumnType.ForeignKey ),
+                columnUtil.column( table, "age", ColumnType.Data ),
+                columnUtil.compositeColumn( table, asList( "first_name", "last_name" ) ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
@@ -75,9 +60,9 @@ public class WriteRowWithNullsStrategyTest
         TableName table = new TableName( "test.Users" );
 
         List<Column> columns = asList(
-                testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                testUtil.column( table, "username", ColumnType.ForeignKey ),
-                testUtil.column( table, "age", ColumnType.Data ) );
+                columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                columnUtil.column( table, "username", ColumnType.ForeignKey ),
+                columnUtil.column( table, "age", ColumnType.Data ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
@@ -95,23 +80,11 @@ public class WriteRowWithNullsStrategyTest
         rowOne.put( "age", "42" );
 
         TableName table = new TableName( "test.Users" );
-        Column compositeColumn = new CompositeKeyColumn( table,
-                asList( new SimpleColumn(
-                                new TableName( "test.Users" ),
-                                "test.Users.first_name",
-                                "first_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ),
-                        new SimpleColumn(
-                                new TableName( "test.Users" ),
-                                "test.Users.last_name",
-                                "last_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ) ) );
+        Column compositeColumn = columnUtil.compositeColumn( table, asList( "first_name", "last_name" ) );
 
         List<Column> columns = asList(
                 compositeColumn,
-                testUtil.column( table, "age", ColumnType.Data ) );
+                columnUtil.column( table, "age", ColumnType.Data ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
@@ -127,9 +100,9 @@ public class WriteRowWithNullsStrategyTest
         // given
         TableName table = new TableName( "users" );
         List<Column> columns = asList(
-                testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                testUtil.column( table, "username", ColumnType.ForeignKey ),
-                testUtil.column( table, "age", ColumnType.Data ) );
+                columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                columnUtil.column( table, "username", ColumnType.ForeignKey ),
+                columnUtil.column( table, "age", ColumnType.Data ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();

@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
-import org.neo4j.integration.sql.exportcsv.TestUtil;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -19,18 +19,18 @@ import static org.junit.Assert.assertEquals;
 public class MySqlExportSqlSupplierTest
 {
 
-    private TestUtil testUtil = new TestUtil();
+    private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldCreateSqlForSelectingColumnsFromTables()
     {
         // given
         TableName table = new TableName( "test.Person" );
-        Column column1 = testUtil.column( table, "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.column( table, "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( table, "username", ColumnType.Data );
+        Column column2 = columnUtil.column( table, "username", ColumnType.Data );
 
-        Column column3 = testUtil.column( table, "age", ColumnType.Data );
+        Column column3 = columnUtil.column( table, "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id( new IdSpace( table.fullName() ) ) )
@@ -58,10 +58,10 @@ public class MySqlExportSqlSupplierTest
     {
         // given
         TableName forTable = new TableName( "test.Author" );
-        Column firstName = testUtil.column(
+        Column firstName = columnUtil.column(
                 forTable, "first_name", ColumnType.PrimaryKey );
 
-        Column lastName = testUtil.column( forTable, "last_name", ColumnType.PrimaryKey );
+        Column lastName = columnUtil.column( forTable, "last_name", ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( new CompositeKeyColumn(

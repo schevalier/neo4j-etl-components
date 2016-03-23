@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 
 public class ExportToCsvConfigTest
 {
-    private final TestUtil testUtil = new TestUtil();
+    private final ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldThrowExceptionIfParentOfJoinIsNotPresentInTables()
@@ -35,16 +35,16 @@ public class ExportToCsvConfigTest
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( rightTable )
-                            .addColumn( testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
-                            .addColumn( testUtil.column( rightTable, "postcode", ColumnType.Data ) )
+                            .addColumn( columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( columnUtil.column( rightTable, "postcode", ColumnType.Data ) )
                             .build() )
                     .addJoin( new Join(
                             new JoinKey(
-                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
-                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
                             new JoinKey(
-                                    testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                                    columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                                    columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
                     ) )
                     .build();
             fail( "Expected IllegalStatException" );
@@ -72,17 +72,17 @@ public class ExportToCsvConfigTest
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( leftTable )
-                            .addColumn( testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) )
-                            .addColumn( testUtil.column( leftTable, "username", ColumnType.Data ) )
-                            .addColumn( testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ) )
+                            .addColumn( columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( columnUtil.column( leftTable, "username", ColumnType.Data ) )
+                            .addColumn( columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ) )
                             .build() )
                     .addJoin( new Join(
                             new JoinKey(
-                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
-                                    testUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
+                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
                             new JoinKey(
-                                    testUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                                    testUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                                    columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
+                                    columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
                     ) )
                     .build();
             fail( "Expected IllegalStateException" );

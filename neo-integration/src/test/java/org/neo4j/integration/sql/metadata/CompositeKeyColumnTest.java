@@ -2,11 +2,11 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.stream.Stream;
 
 import org.junit.Test;
 
 import org.neo4j.integration.sql.RowAccessor;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -17,24 +17,14 @@ import static org.junit.Assert.assertTrue;
 
 public class CompositeKeyColumnTest
 {
+    private ColumnUtil columnUtil = new ColumnUtil();
+
     @Test
     public void shouldReturnCollectionOfAliasedColumnNames()
     {
         // given
         TableName authorTable = new TableName( "test.Author" );
-        Column column = new CompositeKeyColumn( authorTable,
-                asList( new SimpleColumn(
-                                new TableName( "test.Author" ),
-                                "test.Author.first_name",
-                                "first_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ),
-                        new SimpleColumn(
-                                new TableName( "test.Author" ),
-                                "test.Author.last_name",
-                                "last_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ) ) );
+        Column column = columnUtil.compositeColumn( authorTable, asList( "first_name", "last_name" ) );
 
 
         //then
@@ -46,7 +36,8 @@ public class CompositeKeyColumnTest
     public void selectFromRowReturnsEmptyStringIfAllOfTheCompositeKeyColumnsAreNull() throws Exception
     {
         // given
-        Column compositeColumn = createCompositeKeyColumn();
+        Column compositeColumn = columnUtil.compositeColumn( new TableName( "test.Users" ), asList( "first_name",
+                "last_name" ) );
 
 
         RowAccessor stubRowAccessor = columnLabel ->
@@ -67,11 +58,12 @@ public class CompositeKeyColumnTest
         rowOne.put( "first_name", "Boaty" );
         rowOne.put( "last_name", null );
 
-        Column compositeColumn = createCompositeKeyColumn();
+        Column compositeColumn = columnUtil.compositeColumn( new TableName( "test.Users" ), asList( "first_name",
+                "last_name" ) );
 
 
         RowAccessor stubRowAccessor = columnLabel ->
-                singletonList(  rowOne ).get( 0 ).get( columnLabel );
+                singletonList( rowOne ).get( 0 ).get( columnLabel );
 
         // when
         String value = compositeColumn.selectFrom( stubRowAccessor );
@@ -88,7 +80,8 @@ public class CompositeKeyColumnTest
         rowOne.put( "first_name", "Boaty" );
         rowOne.put( "last_name", "Mc.Boatface" );
 
-        Column compositeColumn = createCompositeKeyColumn();
+        Column compositeColumn = columnUtil.compositeColumn( new TableName( "test.Users" ), asList( "first_name",
+                "last_name" ) );
 
 
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
@@ -96,24 +89,6 @@ public class CompositeKeyColumnTest
         String value = compositeColumn.selectFrom( stubRowAccessor );
 
         // then
-        assertThat( value, is("Boaty\0Mc.Boatface"));
-    }
-
-    private Column createCompositeKeyColumn()
-    {
-        TableName table = new TableName( "test.Users" );
-        return new CompositeKeyColumn( table,
-                asList( new SimpleColumn(
-                                new TableName( "test.Users" ),
-                                "test.Users.first_name",
-                                "first_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ),
-                        new SimpleColumn(
-                                new TableName( "test.Users" ),
-                                "test.Users.last_name",
-                                "last_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ) ) );
+        assertThat( value, is( "Boaty\0Mc.Boatface" ) );
     }
 }

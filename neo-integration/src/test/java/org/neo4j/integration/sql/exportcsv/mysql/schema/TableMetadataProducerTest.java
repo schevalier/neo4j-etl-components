@@ -8,7 +8,7 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
-import org.neo4j.integration.sql.exportcsv.TestUtil;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class TableMetadataProducerTest
 {
 
-    private final TestUtil testUtil = new TestUtil();
+    private final ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldReturnTableMetadata() throws Exception
@@ -63,7 +63,7 @@ public class TableMetadataProducerTest
                         "id",
                         ColumnType.PrimaryKey,
                         MySqlDataType.INT ),
-                testUtil.column( forTable, "username", ColumnType.Data ),
+                columnUtil.column( forTable, "username", ColumnType.Data ),
                 new SimpleColumn(
                         forTable,
                         forTable.fullyQualifiedColumnName( "addressId" ),
@@ -99,7 +99,7 @@ public class TableMetadataProducerTest
         assertEquals( "test.Student_Course", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                testUtil.column( forTable, "credits", ColumnType.Data ) ) );
+                columnUtil.column( forTable, "credits", ColumnType.Data ) ) );
     }
 
     @Test

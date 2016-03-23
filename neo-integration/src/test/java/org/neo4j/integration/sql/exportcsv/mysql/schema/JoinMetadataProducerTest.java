@@ -11,6 +11,7 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.Join;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 public class JoinMetadataProducerTest
 {
+    private final ColumnUtil columnUtil = new ColumnUtil();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -128,15 +130,17 @@ public class JoinMetadataProducerTest
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
 
         // when
+        TableName book = new TableName( "test.Book" );
+        TableName author = new TableName( "test.Author" );
         Collection<Join> joinCollection = getJoinMetadata.createMetadataFor(
-                new TableNamePair( new TableName( "test.Book" ), new TableName( "test.Author" ) ) );
+                new TableNamePair( book, author ) );
 
         // then
         ArrayList<Join> joins = new ArrayList<>( joinCollection );
         Join writtenBy = joins.get( 0 );
 
         assertEquals( new SimpleColumn(
-                new TableName( "test.Book" ),
+                book,
                 "test.Book.id",
                 "id",
                 ColumnType.PrimaryKey,
@@ -157,22 +161,10 @@ public class JoinMetadataProducerTest
                                 SqlDataType.KEY_DATA_TYPE ) )
         ), writtenBy.keyTwoSourceColumn() );
 
-        assertEquals( new CompositeKeyColumn( new TableName( "test.Author" ),
-                asList( new SimpleColumn(
-                                new TableName( "test.Author" ),
-                                "test.Author.first_name",
-                                "first_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ),
-                        new SimpleColumn(
-                                new TableName( "test.Author" ),
-                                "test.Author.last_name",
-                                "last_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ) )
-        ), writtenBy.keyTwoTargetColumn() );
+        assertEquals( columnUtil.compositeColumn( author, asList( "first_name", "last_name" ) ),
+                writtenBy.keyTwoTargetColumn() );
 
-        assertEquals( new TableName( "test.Author" ), writtenBy.keyTwoTargetColumn().table() );
+        assertEquals( author, writtenBy.keyTwoTargetColumn().table() );
 
         assertTrue( joins.size() == 1 );
     }

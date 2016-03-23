@@ -6,12 +6,9 @@ import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
-import org.neo4j.integration.sql.exportcsv.TestUtil;
+import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
-import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -22,18 +19,18 @@ import static org.junit.Assert.assertThat;
 public class ColumnToCsvFieldMappingsTest
 {
 
-    private TestUtil testUtil = new TestUtil();
+    private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
     public void shouldReturnCollectionOfCsvFields()
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
+        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
-        Column column3 = testUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
+        Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
 
         CsvField idField = CsvField.id();
         CsvField usernameField = CsvField.data( "username", Neo4jDataType.String );
@@ -57,11 +54,11 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
+        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
-        Column column3 = testUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
+        Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -81,22 +78,10 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName authorTable = new TableName( "test.Author" );
-        Column column1 = new CompositeKeyColumn( authorTable,
-                asList( new SimpleColumn(
-                                new TableName( "test.Author" ),
-                                "test.Author.first_name",
-                                "first_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ),
-                        new SimpleColumn(
-                                new TableName( "test.Author" ),
-                                "test.Author.last_name",
-                                "last_name",
-                                ColumnType.PrimaryKey,
-                                SqlDataType.KEY_DATA_TYPE ) ) );
+        Column column1 = columnUtil.compositeColumn( authorTable, asList( "first_name", "last_name" ) );
 
 
-        Column column2 = testUtil.column( authorTable, "test.Author.age", "age", ColumnType.Data );
+        Column column2 = columnUtil.column( authorTable, "test.Author.age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( column1, CsvField.id() )
@@ -118,10 +103,10 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = testUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
 
-        Column column2 = testUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
-        Column column3 = testUtil.column( new TableName( "test.Address" ), "test.Address.postcode", "postcode",
+        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
+        Column column3 = columnUtil.column( new TableName( "test.Address" ), "test.Address.postcode", "postcode",
                 ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
