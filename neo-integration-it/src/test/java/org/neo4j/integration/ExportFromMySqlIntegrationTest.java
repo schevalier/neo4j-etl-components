@@ -8,6 +8,7 @@ import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -182,6 +183,51 @@ public class ExportFromMySqlIntegrationTest
 
             String response = neo4j.get()
                     .executeHttp( NEO_TX_URI, "MATCH (p:Student)<-[r]-(c:Course) RETURN p, c, r.credits" );
+
+            List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
+            List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
+            List<Integer> credits = JsonPath.read( response, "$.results[*].data[*].row[2]" );
+
+            assertThat( students.size(), is( 4 ) );
+            assertThat( students, hasItems( "jim", "mark" ) );
+
+
+            assertThat( courses.size(), is( 4 ) );
+            assertThat( courses, hasItems( "Science", "Maths", "English" ) );
+
+            assertThat( credits, hasItems( 1, 2, 3, 4 ) );
+
+            String coursesResponse = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:Course) RETURN c.name" );
+            String studentsResponse = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (s:Student) RETURN s.username" );
+
+            List<String> allCourses = JsonPath.read( coursesResponse, "$.results[*].data[*].row[0]" );
+            List<String> allStudents = JsonPath.read( studentsResponse, "$.results[*].data[*].row[0]" );
+
+            assertThat( allStudents, hasItems( "jim", "mark", "eve" ) );
+            assertThat( allCourses, hasItems( "Science", "Maths", "English", "Theology" ) );
+        }
+        finally
+        {
+            neo4j.get().stop();
+        }
+    }
+
+    @Test
+    @Ignore
+    public void shouldExportFromMySqlAndImportIntoGraphForCompositeThreeTableJoinWithProperties() throws Exception
+    {
+        // when
+        exportFromMySqlToNeo4j( "Author", "Publisher", "Author_Publisher" );
+
+        // then
+        try
+        {
+            neo4j.get().start();
+
+            String response = neo4j.get()
+                    .executeHttp( NEO_TX_URI, "MATCH (a)-[r]->(p) RETURN a, p, r" );
+
+            System.out.println( response );
 
             List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
             List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[1].name" );

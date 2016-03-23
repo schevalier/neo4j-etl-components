@@ -67,12 +67,6 @@ public class SimpleColumn implements Column
         return row.getString( alias );
     }
 
-    @Override
-    public String toString()
-    {
-        return ToStringBuilder.reflectionToString( this );
-    }
-
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals( Object o )
@@ -84,6 +78,12 @@ public class SimpleColumn implements Column
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode( this );
+    }
+
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString( this );
     }
 
     @Override

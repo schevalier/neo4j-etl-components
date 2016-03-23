@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
@@ -18,6 +19,8 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
+
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
@@ -63,6 +66,87 @@ public class JoinTableMetadataProducerTest
         JoinTable joinTable = iterator.next();
 
         assertJoinTableKeyMappings( joinTable );
+
+        assertTrue( joinTable.columns().isEmpty() );
+
+        assertFalse( iterator.hasNext() );
+    }
+
+    @Test
+    @Ignore
+    public void shouldReturnJoinTableMetadataForJoinThroughCompositeKeys() throws Exception
+    {
+        // given
+        QueryResults columnProjectionResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        QueryResults joinResults = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Author_Publisher", "author_first_name", "ForeignKey", "test", "Author",
+                        "first_name", "PrimaryKey" )
+                .addRow( "test", "Author_Publisher", "publisherId", "ForeignKey", "test", "Publisher", "id",
+                        "PrimaryKey" )
+                .addRow( "test", "Author_Publisher", "author_last_name", "ForeignKey", "test", "Author", "last_name",
+                        "PrimaryKey" )
+                .build();
+        when( databaseClient.executeQuery( any( String.class ) ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( columnProjectionResults ) );
+
+        JoinTableMetadataProducer metadataProducer = new JoinTableMetadataProducer( databaseClient );
+
+        // when
+        Collection<JoinTable> joinTables = metadataProducer
+                .createMetadataFor(
+                        new JoinTableInfo(
+                                new TableName( "test.Author_Publisher" ),
+                                new TableNamePair(
+                                        new TableName( "test.Author" ),
+                                        new TableName( "test.Publisher" ) ) ) );
+
+        // then
+        Iterator<JoinTable> iterator = joinTables.iterator();
+
+        JoinTable joinTable = iterator.next();
+
+        TableName authorPublisher = joinTable.joinTableName();
+        Column expectedAuthorId = columnUtil.
+                compositeForeignKeyColumn( authorPublisher, asList( "author_first_name", "author_last_name" ) );
+
+        Column expectedPublisherId = new SimpleColumn(
+                authorPublisher,
+                authorPublisher.fullyQualifiedColumnName( "publisherId" ),
+                "publisherId",
+                ColumnType.ForeignKey,
+                SqlDataType.KEY_DATA_TYPE );
+
+        assertEquals( expectedAuthorId, joinTable.join().keyTwoSourceColumn() );
+
+        assertEquals( new SimpleColumn(
+                        new TableName( "test.Student" ),
+                        "test.Student.id",
+                        "id",
+                        ColumnType.PrimaryKey,
+                        SqlDataType.KEY_DATA_TYPE ),
+                joinTable.join().keyTwoTargetColumn() );
+
+        assertEquals( expectedPublisherId, joinTable.join().keyOneSourceColumn() );
+
+        assertEquals( new SimpleColumn(
+                        new TableName( "test.Course" ),
+                        "test.Course.id", "id",
+                        ColumnType.PrimaryKey,
+                        SqlDataType.KEY_DATA_TYPE ),
+                joinTable.join().keyOneTargetColumn() );
 
         assertTrue( joinTable.columns().isEmpty() );
 

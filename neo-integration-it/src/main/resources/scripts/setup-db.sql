@@ -72,6 +72,14 @@ CREATE TABLE javabase.Date_Table
 GRANT ALL ON javabase.Date_Table TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
+CREATE TABLE javabase.Publisher
+(
+  id   INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  name VARCHAR(20)                    NOT NULL
+);
+GRANT ALL ON javabase.Publisher TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
 CREATE TABLE javabase.Author
 (
   first_name VARCHAR(20) NOT NULL,
@@ -80,6 +88,19 @@ CREATE TABLE javabase.Author
   PRIMARY KEY (first_name, last_name)
 );
 GRANT ALL ON javabase.Author TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
+CREATE TABLE javabase.Author_Publisher
+(
+  author_first_name VARCHAR(20) NOT NULL,
+  author_last_name  VARCHAR(20) NOT NULL,
+  publisherId       INT         NOT NULL,
+  start_year        INT,
+  end_year          INT,
+  FOREIGN KEY (author_first_name, author_last_name) REFERENCES javabase.Author (first_name, last_name),
+  FOREIGN KEY (publisherId) REFERENCES javabase.Publisher (id)
+);
+GRANT ALL ON javabase.Author_Publisher TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Book
@@ -103,10 +124,8 @@ IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Course
 (
-  id                INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  name              TEXT NOT NULL,
-  author_first_name VARCHAR(20),
-  author_last_name  VARCHAR(20)
+  id   INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name TEXT NOT NULL
 );
 GRANT ALL ON javabase.Course TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
@@ -208,6 +227,25 @@ INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, ti
 
 INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Abraham', 'Silberschatz', 45);
 INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Andrew', 'Tanenbaum', 56);
+
+INSERT INTO javabase.Publisher (name) VALUES ('O\'Reilly');
+INSERT INTO javabase.Publisher (name) VALUES ('Pearson');
+
+INSERT INTO javabase.Author_Publisher (publisherId, author_first_name, author_last_name)
+  SELECT
+    id,
+    'Abraham',
+    'Silberschatz'
+  FROM javabase.Publisher
+  WHERE name = 'O\'Reilly';
+
+INSERT INTO javabase.Author_Publisher (publisherId, author_first_name, author_last_name)
+  SELECT
+    id,
+    'Andrew',
+    'Tanenbaum'
+  FROM javabase.Publisher
+  WHERE name = 'Pearson';
 
 INSERT INTO javabase.Book (name, author_first_name, author_last_name)
 VALUES ('Database System Concepts', 'Abraham', 'Silberschatz');

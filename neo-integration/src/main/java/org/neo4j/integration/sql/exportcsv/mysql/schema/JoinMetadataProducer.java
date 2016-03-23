@@ -99,23 +99,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
             if ( foreignKeys.size() > 1 )
             {
                 //Simple Join using composite Keys
-                List<Column> columns1 = foreignKeys.stream()
-                        .map( this::sourceSimpleColumn ).collect( Collectors.toList() );
-                List<Column> columns2 = foreignKeys.stream()
-                        .map( this::targetSimpleColumn ).collect( Collectors.toList() );
-
-                Map<String, String> results = foreignKeys.get( 0 );
-                TableName sourceTable = new TableName(
-                        results.get( "SOURCE_TABLE_SCHEMA" ),
-                        results.get( "SOURCE_TABLE_NAME" ) );
-                TableName targetTable = new TableName(
-                        results.get( "TARGET_TABLE_SCHEMA" ),
-                        results.get( "TARGET_TABLE_NAME" ) );
-
-                CompositeKeyColumn sourceCompositeKeyColumn = new CompositeKeyColumn( sourceTable, columns1 );
-                CompositeKeyColumn targetCompositeKeyColumn = new CompositeKeyColumn( targetTable, columns2 );
-
-                keyTwo = new JoinKey( sourceCompositeKeyColumn, targetCompositeKeyColumn );
+                keyTwo = buildCompositeJoinKey( foreignKeys );
             }
             else
             {
@@ -128,9 +112,41 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
             //Through a join table
             keyOne = createJoinKey( rows.get( 0 ) );
             keyTwo = createJoinKey( rows.get( 1 ) );
+            /* Map<String, List<Map<String, String>>> groupByTargetTableName = rows.stream()
+                    .collect( Collectors.groupingBy( r -> r.get( "TARGET_TABLE_NAME" ) ) );
+
+            if (groupByTargetTableName.size() != 2)
+            {
+                throw new IllegalStateException( "Expected 2 target tables, found " + groupByTargetTableName.size() );
+            }
+
+            List<List<Map<String, String>>> values = new ArrayList<>( groupByTargetTableName.values() );
+            keyOne = buildKey( values.get( 0 ) );
+            keyTwo = buildKey( values.get( 1 ) );*/
         }
 
         return new Join( keyOne, keyTwo );
+    }
+
+    private JoinKey buildCompositeJoinKey( List<Map<String, String>> foreignKeys )
+    {
+        List<Column> columns1 = foreignKeys.stream()
+                .map( this::sourceSimpleColumn ).collect( Collectors.toList() );
+        List<Column> columns2 = foreignKeys.stream()
+                .map( this::targetSimpleColumn ).collect( Collectors.toList() );
+
+        Map<String, String> results = foreignKeys.get( 0 );
+        TableName sourceTable = new TableName(
+                results.get( "SOURCE_TABLE_SCHEMA" ),
+                results.get( "SOURCE_TABLE_NAME" ) );
+        TableName targetTable = new TableName(
+                results.get( "TARGET_TABLE_SCHEMA" ),
+                results.get( "TARGET_TABLE_NAME" ) );
+
+        CompositeKeyColumn sourceCompositeKeyColumn = new CompositeKeyColumn( sourceTable, columns1 );
+        CompositeKeyColumn targetCompositeKeyColumn = new CompositeKeyColumn( targetTable, columns2 );
+
+        return new JoinKey( sourceCompositeKeyColumn, targetCompositeKeyColumn );
     }
 
     private Column sourceSimpleColumn( Map<String, String> results )

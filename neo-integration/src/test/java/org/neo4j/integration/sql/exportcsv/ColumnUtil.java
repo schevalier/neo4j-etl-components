@@ -41,4 +41,17 @@ public class ColumnUtil
                         .map( name -> primaryKeyColumn( tableName, name ) )
                         .collect( Collectors.toList() ) );
     }
+
+    public Column compositeForeignKeyColumn( TableName tableName, List<String> columnNames )
+    {
+        return new CompositeKeyColumn( tableName,
+                columnNames.stream()
+                        .map( name -> new SimpleColumn(
+                                tableName,
+                                tableName.fullyQualifiedColumnName( name ),
+                                name,
+                                ColumnType.ForeignKey,
+                                SqlDataType.KEY_DATA_TYPE ) )
+                        .collect( Collectors.toList() ) );
+    }
 }
