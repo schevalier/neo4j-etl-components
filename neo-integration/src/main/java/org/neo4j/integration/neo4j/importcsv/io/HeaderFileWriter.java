@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
+import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
@@ -24,6 +26,7 @@ public class HeaderFileWriter
 
     public Path writeHeaderFile( Collection<CsvField> fields, String filenamePrefix ) throws IOException
     {
+        Loggers.Default.log( Level.INFO, format( "Writing Headers for %s", filenamePrefix ) );
         String headers = fields.stream()
                 .map( CsvField::value )
                 .collect( Collectors.joining( formatting.delimiter().value() ) );

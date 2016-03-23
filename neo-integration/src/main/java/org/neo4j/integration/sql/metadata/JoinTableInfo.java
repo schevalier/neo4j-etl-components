@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.metadata;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import static java.lang.String.format;
 
@@ -57,5 +58,11 @@ public class JoinTableInfo implements JoinQueryInfo
     {
         return format( "join_table.REFERENCED_TABLE_NAME IN ('%s', '%s')",
                 referencedTables.tableOne().simpleName(), referencedTables.tableTwo().simpleName() );
+    }
+
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString( this );
     }
 }

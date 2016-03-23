@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
@@ -18,7 +19,9 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
+import org.neo4j.integration.util.Loggers;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -41,7 +44,26 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
     @Override
     public Collection<Table> createMetadataFor( TableName source ) throws Exception
     {
-        String sql = "SELECT " +
+        Loggers.Default.log( Level.INFO, format( "Generating Table Metadata for %s", source ) );
+        String sql = select( source );
+
+        Table.Builder builder = Table.builder().name( source );
+
+        try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
+        {
+            Map<String, List<Map<String, String>>> groupedByColumnType = results.stream()
+                    .collect( groupingBy( row -> row.get( "COLUMN_TYPE" ) ) );
+            groupedByColumnType.entrySet().stream()
+                    .forEach( columnTypeRowAndValues -> addColumnsForColumnType( source, builder,
+                            columnTypeRowAndValues ) );
+        }
+
+        return Collections.singletonList( builder.build() );
+    }
+
+    private String select( TableName source )
+    {
+        return "SELECT " +
                 "c.COLUMN_NAME AS COLUMN_NAME," +
                 "CASE (SELECT COUNT(kcu.REFERENCED_TABLE_NAME) " +
                 "      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu " +
@@ -58,19 +80,6 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                 "c.DATA_TYPE AS DATA_TYPE " +
                 "FROM INFORMATION_SCHEMA.COLUMNS c " +
                 "WHERE c.TABLE_SCHEMA = '" + source.schema() + "' AND c.TABLE_NAME ='" + source.simpleName() + "';";
-
-        Table.Builder builder = Table.builder().name( source );
-
-        try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
-        {
-            Map<String, List<Map<String, String>>> groupedByColumnType = results.stream()
-                    .collect( groupingBy( row -> row.get( "COLUMN_TYPE" ) ) );
-            groupedByColumnType.entrySet().stream()
-                    .forEach( columnTypeRowAndValues -> addColumnsForColumnType( source, builder,
-                            columnTypeRowAndValues ) );
-        }
-
-        return Collections.singletonList( builder.build() );
     }
 
     private void addColumnsForColumnType( TableName source,

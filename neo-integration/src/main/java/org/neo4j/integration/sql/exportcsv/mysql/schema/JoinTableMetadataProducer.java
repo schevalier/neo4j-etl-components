@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.ColumnType;
@@ -10,6 +11,9 @@ import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.Table;
+import org.neo4j.integration.util.Loggers;
+
+import static java.lang.String.format;
 
 public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo, JoinTable>
 {
@@ -25,6 +29,7 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
     @Override
     public Collection<JoinTable> createMetadataFor( JoinTableInfo source ) throws Exception
     {
+        Loggers.Default.log( Level.INFO, format( "Generating Join Table Metadata for %s", source ) );
         Collection<Join> joins = joinMetadataProducer.createMetadataFor( source );
         Collection<Table> tables = tableMetadataProducer.createMetadataFor( source.joinTableName() );
 

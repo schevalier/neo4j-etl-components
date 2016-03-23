@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.DatabaseClient;
@@ -20,6 +21,7 @@ import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
+import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
@@ -35,6 +37,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
     @Override
     public Collection<Join> createMetadataFor( JoinQueryInfo source ) throws Exception
     {
+        Loggers.Default.log( Level.INFO, format( "Generating Join Metadata for %s", source ) );
         String sql = select( source );
 
         Collection<Join> joins = new ArrayList<>();
