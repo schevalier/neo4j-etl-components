@@ -18,27 +18,26 @@ public class ColumnUtil
         return column( table, table.fullyQualifiedColumnName( nameAndAlias ), nameAndAlias, type );
     }
 
-    public Column primaryKeyColumn( TableName table, String nameAndAlias )
-    {
-        return new SimpleColumn(
-                table,
-                table.fullyQualifiedColumnName( nameAndAlias ),
-                nameAndAlias,
-                ColumnType.PrimaryKey,
-                SqlDataType.KEY_DATA_TYPE );
-
-    }
-
     public Column column( TableName table, String name, String alias, ColumnType type )
     {
         return new SimpleColumn( table, name, alias, type, MySqlDataType.TEXT );
+    }
+
+    public SimpleColumn keyColumn( TableName tableName, String nameAndAlias, ColumnType type )
+    {
+        return new SimpleColumn(
+                tableName,
+                tableName.fullyQualifiedColumnName( nameAndAlias ),
+                nameAndAlias,
+                type,
+                SqlDataType.KEY_DATA_TYPE );
     }
 
     public Column compositeColumn( TableName tableName, List<String> columnNames )
     {
         return new CompositeKeyColumn( tableName,
                 columnNames.stream()
-                        .map( name -> primaryKeyColumn( tableName, name ) )
+                        .map( name -> keyColumn( tableName, name, ColumnType.PrimaryKey ) )
                         .collect( Collectors.toList() ) );
     }
 
@@ -46,12 +45,7 @@ public class ColumnUtil
     {
         return new CompositeKeyColumn( tableName,
                 columnNames.stream()
-                        .map( name -> new SimpleColumn(
-                                tableName,
-                                tableName.fullyQualifiedColumnName( name ),
-                                name,
-                                ColumnType.ForeignKey,
-                                SqlDataType.KEY_DATA_TYPE ) )
+                        .map( name -> keyColumn( tableName, name, ColumnType.ForeignKey ) )
                         .collect( Collectors.toList() ) );
     }
 }

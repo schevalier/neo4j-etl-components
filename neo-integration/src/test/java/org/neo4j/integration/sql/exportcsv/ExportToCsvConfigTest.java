@@ -35,16 +35,16 @@ public class ExportToCsvConfigTest
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( rightTable )
-                            .addColumn( columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey ) )
                             .addColumn( columnUtil.column( rightTable, "postcode", ColumnType.Data ) )
                             .build() )
                     .addJoin( new Join(
                             new JoinKey(
-                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
-                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                                    columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ),
+                                    columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ) ),
                             new JoinKey(
                                     columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                                    columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                                    columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey ) )
                     ) )
                     .build();
             fail( "Expected IllegalStatException" );
@@ -72,17 +72,17 @@ public class ExportToCsvConfigTest
                     .formatting( Formatting.DEFAULT )
                     .addTable( Table.builder()
                             .name( leftTable )
-                            .addColumn( columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) )
+                            .addColumn( columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ) )
                             .addColumn( columnUtil.column( leftTable, "username", ColumnType.Data ) )
                             .addColumn( columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ) )
                             .build() )
                     .addJoin( new Join(
                             new JoinKey(
-                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ),
-                                    columnUtil.column( leftTable, "id", ColumnType.PrimaryKey ) ),
+                                    columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ),
+                                    columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ) ),
                             new JoinKey(
                                     columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                                    columnUtil.column( rightTable, "id", ColumnType.PrimaryKey ) )
+                                    columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey ) )
                     ) )
                     .build();
             fail( "Expected IllegalStateException" );

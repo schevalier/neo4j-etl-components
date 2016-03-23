@@ -131,21 +131,13 @@ public class JoinTableMetadataProducerTest
 
         assertEquals( expectedAuthorId, joinTable.join().keyTwoSourceColumn() );
 
-        assertEquals( new SimpleColumn(
-                        new TableName( "test.Student" ),
-                        "test.Student.id",
-                        "id",
-                        ColumnType.PrimaryKey,
-                        SqlDataType.KEY_DATA_TYPE ),
+        assertEquals(
+                columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnType.PrimaryKey ),
                 joinTable.join().keyTwoTargetColumn() );
 
         assertEquals( expectedPublisherId, joinTable.join().keyOneSourceColumn() );
 
-        assertEquals( new SimpleColumn(
-                        new TableName( "test.Course" ),
-                        "test.Course.id", "id",
-                        ColumnType.PrimaryKey,
-                        SqlDataType.KEY_DATA_TYPE ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnType.PrimaryKey ),
                 joinTable.join().keyOneTargetColumn() );
 
         assertTrue( joinTable.columns().isEmpty() );
@@ -251,21 +243,12 @@ public class JoinTableMetadataProducerTest
 
         assertEquals( expectedStudentId, joinTable.join().keyTwoSourceColumn() );
 
-        assertEquals( new SimpleColumn(
-                        new TableName( "test.Student" ),
-                        "test.Student.id",
-                        "id",
-                        ColumnType.PrimaryKey,
-                        SqlDataType.KEY_DATA_TYPE ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnType.PrimaryKey ),
                 joinTable.join().keyTwoTargetColumn() );
 
         assertEquals( expectedCourseId, joinTable.join().keyOneSourceColumn() );
 
-        assertEquals( new SimpleColumn(
-                        new TableName( "test.Course" ),
-                        "test.Course.id", "id",
-                        ColumnType.PrimaryKey,
-                        SqlDataType.KEY_DATA_TYPE ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnType.PrimaryKey ),
                 joinTable.join().keyOneTargetColumn() );
     }
 

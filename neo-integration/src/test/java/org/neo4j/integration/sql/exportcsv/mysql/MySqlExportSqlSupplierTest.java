@@ -60,8 +60,7 @@ public class MySqlExportSqlSupplierTest
     {
         // given
         TableName forTable = new TableName( "test.Author" );
-        Column firstName = columnUtil.column(
-                forTable, "first_name", ColumnType.PrimaryKey );
+        Column firstName = columnUtil.column( forTable, "first_name", ColumnType.PrimaryKey );
 
         Column lastName = columnUtil.column( forTable, "last_name", ColumnType.PrimaryKey );
 

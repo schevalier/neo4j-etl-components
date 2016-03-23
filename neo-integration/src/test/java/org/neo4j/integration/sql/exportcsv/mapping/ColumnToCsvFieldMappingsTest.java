@@ -26,7 +26,8 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = columnUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
+
+        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
 
         Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
@@ -54,7 +55,8 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = columnUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
+
+        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
 
         Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
@@ -103,7 +105,8 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = columnUtil.column( personTable, "test.Person.id", "id", ColumnType.PrimaryKey );
+
+        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
 
         Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
         Column column3 = columnUtil.column( new TableName( "test.Address" ), "test.Address.postcode", "postcode",

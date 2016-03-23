@@ -61,9 +61,10 @@ public class CsvFileWriterTest
 
         // return columns from mappings
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
+
         when( mappings.columns() ).thenReturn(
                 asList(
-                        columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ) ) );
 
 
@@ -106,9 +107,10 @@ public class CsvFileWriterTest
 
         // return columns from mappings
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
+
         when( mappings.columns() ).thenReturn(
                 asList(
-                        columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ),
                         columnUtil.column( table, "age", ColumnType.Data ) ) );
 
@@ -151,9 +153,10 @@ public class CsvFileWriterTest
 
         // return columns from mappings
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
+
         when( mappings.columns() ).thenReturn(
                 asList(
-                        columnUtil.column( table, "id", ColumnType.PrimaryKey ),
+                        columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ) ) );
 
         // create writer under test
