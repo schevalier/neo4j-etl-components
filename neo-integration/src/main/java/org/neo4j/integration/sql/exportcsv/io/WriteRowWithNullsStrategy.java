@@ -31,6 +31,6 @@ public class WriteRowWithNullsStrategy implements BiPredicate<RowAccessor, Colle
 
     private boolean isKeyColumn( ColumnType type )
     {
-        return ColumnType.ForeignKey == type || ColumnType.PrimaryKey == type;
+        return ColumnType.ForeignKey == type || ColumnType.PrimaryKey == type || ColumnType.CompositeKey == type;
     }
 }

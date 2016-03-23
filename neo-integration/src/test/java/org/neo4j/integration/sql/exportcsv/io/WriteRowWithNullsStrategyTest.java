@@ -9,10 +9,11 @@ import org.junit.Test;
 
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.TestUtil;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -61,8 +62,8 @@ public class WriteRowWithNullsStrategyTest
         rowOne.put( "username", null );
         rowOne.put( "age", "42" );
         rows.add( rowOne );
+        TableName table = new TableName( "test.Users" );
 
-        TableName table = new TableName( "users" );
         List<Column> columns = asList(
                 testUtil.column( table, "id", ColumnType.PrimaryKey ),
                 testUtil.column( table, "username", ColumnType.ForeignKey ),
@@ -76,24 +77,57 @@ public class WriteRowWithNullsStrategyTest
         assertFalse( strategy.test( stubRowAccessor, columns ) );
     }
 
-    @Test(expected = Exception.class)
-    public void shouldBubbleException() throws Exception
+    @Test
+    public void shouldReturnFalseIfAnyOfTheCompositeKeyColumnsAreNull() throws Exception
     {
         // given
         List<Map<String, String>> rows = new ArrayList<>();
+        HashMap<String, String> rowOne = new HashMap<>();
+        rowOne.put( "age", "42" );
+        rows.add( rowOne );
+        TableName table = new TableName( "test.Users" );
+        Column compositeColumn = new CompositeKeyColumn( table,
+                asList( new SimpleColumn(
+                                new TableName( "test.Users" ),
+                                "test.Users.first_name",
+                                "first_name",
+                                ColumnType.PrimaryKey,
+                                SqlDataType.KEY_DATA_TYPE ),
+                        new SimpleColumn(
+                                new TableName( "test.Users" ),
+                                "test.Users.last_name",
+                                "last_name",
+                                ColumnType.PrimaryKey,
+                                SqlDataType.KEY_DATA_TYPE ) ) );
 
-        TableName table = new TableName( "users" );
         List<Column> columns = asList(
-                testUtil.column( table, "id", ColumnType.PrimaryKey ),
-                new SimpleColumn( table, "username", "username", ColumnType.ForeignKey, MySqlDataType.TEXT ),
-                new SimpleColumn( table, "age", "age", ColumnType.Data, MySqlDataType.TEXT ) );
+                compositeColumn,
+                testUtil.column( table, "age", ColumnType.Data ) );
 
         // when
-//        results.next();
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> rows.get( 0 ).get( columnLabel );
+        assertFalse( strategy.test( stubRowAccessor, columns ) );
+    }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldBubbleAccessorException() throws Exception
+    {
+        // given
+        TableName table = new TableName( "users" );
+        List<Column> columns = asList(
+                testUtil.column( table, "id", ColumnType.PrimaryKey ),
+                testUtil.column( table, "username", ColumnType.ForeignKey ),
+                testUtil.column( table, "age", ColumnType.Data ) );
+
+        // when
+        WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
+
+        // then
+        RowAccessor stubRowAccessor = columnLabel -> {throw new IllegalStateException();};
         strategy.test( stubRowAccessor, columns );
         fail( "Should have bubbled up the exception" );
     }

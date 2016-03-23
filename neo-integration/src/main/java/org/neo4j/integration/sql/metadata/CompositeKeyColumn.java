@@ -69,11 +69,7 @@ public class CompositeKeyColumn implements Column
     @Override
     public String selectFrom( RowAccessor row )
     {
-//        return row.getString( alias() );
-
-        return columns.stream()
-                .map( c -> row.getString( c.alias() ) )
-                .collect( Collectors.joining( "_" ) );
+        return row.getString( alias() );
     }
 
     @Override

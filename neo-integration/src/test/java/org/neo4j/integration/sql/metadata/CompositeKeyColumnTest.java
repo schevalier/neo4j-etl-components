@@ -14,7 +14,7 @@ public class CompositeKeyColumnTest
     {
         // given
         TableName authorTable = new TableName( "test.Author" );
-        Column column1 = new CompositeKeyColumn( authorTable,
+        Column column = new CompositeKeyColumn( authorTable,
                 asList( new SimpleColumn(
                                 new TableName( "test.Author" ),
                                 "test.Author.first_name",
@@ -30,8 +30,8 @@ public class CompositeKeyColumnTest
 
 
         //then
-        assertThat( column1.aliasedColumn(), is( "test.Author.first_name AS first_name, test.Author.last_name AS " +
-                "last_name" ) );
+        assertThat( column.aliasedColumn(),
+                is( "test.Author.first_name AS first_name, test.Author.last_name AS last_name" ) );
     }
 
 }
