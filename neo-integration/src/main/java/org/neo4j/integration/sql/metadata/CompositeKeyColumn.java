@@ -16,6 +16,8 @@ import static java.lang.String.format;
 
 public class CompositeKeyColumn implements Column
 {
+    private static final String SEPARATOR = "\0";
+
     private final TableName table;
     private final Collection<Column> columns;
 
@@ -48,13 +50,13 @@ public class CompositeKeyColumn implements Column
     @Override
     public String name()
     {
-        return columns.stream().map( Column::name ).collect( Collectors.joining( "_" ) );
+        return columns.stream().map( Column::name ).collect( Collectors.joining( SEPARATOR ) );
     }
 
     @Override
     public String alias()
     {
-        return columns.stream().map( Column::alias ).collect( Collectors.joining( "_" ) );
+        return columns.stream().map( Column::alias ).collect( Collectors.joining( SEPARATOR ) );
     }
 
     @Override
@@ -84,7 +86,7 @@ public class CompositeKeyColumn implements Column
         {
             return values.stream()
                     .filter( StringUtils::isNotEmpty )
-                    .collect( Collectors.joining( "_" ) );
+                    .collect( Collectors.joining( SEPARATOR ) );
         }
     }
 

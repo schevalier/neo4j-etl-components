@@ -96,7 +96,7 @@ public class CompositeKeyColumnTest
         String value = compositeColumn.selectFrom( stubRowAccessor );
 
         // then
-        assertThat( value, is("Boaty_Mc.Boatface"));
+        assertThat( value, is("Boaty\0Mc.Boatface"));
     }
 
     private Column createCompositeKeyColumn()
