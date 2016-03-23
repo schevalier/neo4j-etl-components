@@ -12,9 +12,11 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -103,6 +105,40 @@ public class JoinMetadataProducerTest
         assertEquals( new TableName( "test.Person" ), ownedBy.keyTwoTargetColumn().table() );
 
         assertTrue( joins.size() == 2 );
+    }
+
+    @Test
+    public void shouldReturnJoinMetadataForRelationshipThroughAJoinTable() throws Exception
+    {
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Student_Course", "studentId", "ForeignKey", "test", "Student", "id", "PrimaryKey" )
+                .addRow( "test", "Student_Course", "courseId", "ForeignKey", "test", "Course", "id", "PrimaryKey" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+
+        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
+
+        // when
+        TableName joinTableName = new TableName( "test.Student_Course" );
+        Collection<Join> joinCollection = getJoinMetadata.createMetadataFor(
+                new JoinTableInfo( joinTableName, new TableNamePair(
+                        new TableName( "test.Course" ),
+                        new TableName( "test.Student" ) ) ) );
+
+        // then
+        ArrayList<Join> joins = new ArrayList<>( joinCollection );
+        assertJoinTableKeyMappings( joinTableName, joins.get( 0 ) );
     }
 
     @Test
@@ -197,6 +233,42 @@ public class JoinMetadataProducerTest
         // when
         getJoinMetadata.createMetadataFor(
                 new TableNamePair( new TableName( "test.Person" ), new TableName( "test.Course" ) ) );
+
+    }
+
+    private void assertJoinTableKeyMappings( TableName studentCourse, Join join )
+    {
+        Column expectedStudentId = new SimpleColumn(
+                studentCourse,
+                studentCourse.fullyQualifiedColumnName( "studentId" ),
+                "studentId",
+                ColumnType.ForeignKey,
+                SqlDataType.KEY_DATA_TYPE );
+        Column expectedCourseId = new SimpleColumn(
+                studentCourse,
+                studentCourse.fullyQualifiedColumnName( "courseId" ),
+                "courseId",
+                ColumnType.ForeignKey,
+                SqlDataType.KEY_DATA_TYPE );
+
+        assertEquals( expectedCourseId, join.keyOneSourceColumn() );
+
+        assertEquals( new SimpleColumn(
+                        new TableName( "test.Course" ),
+                        "test.Course.id", "id",
+                        ColumnType.PrimaryKey,
+                        SqlDataType.KEY_DATA_TYPE ),
+                join.keyOneTargetColumn() );
+
+        assertEquals( expectedStudentId, join.keyTwoSourceColumn() );
+
+        assertEquals( new SimpleColumn(
+                        new TableName( "test.Student" ),
+                        "test.Student.id",
+                        "id",
+                        ColumnType.PrimaryKey,
+                        SqlDataType.KEY_DATA_TYPE ),
+                join.keyTwoTargetColumn() );
 
     }
 }

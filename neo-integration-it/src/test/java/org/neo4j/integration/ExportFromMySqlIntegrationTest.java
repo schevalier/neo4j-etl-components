@@ -42,8 +42,7 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get(),
-                    "local" ) );
+                    tempDirectory.get() ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -98,7 +97,6 @@ public class ExportFromMySqlIntegrationTest
             neo4j.get().start();
 
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
-            System.out.println( response );
             List<String> books = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
             List<Integer> age = JsonPath.read( response, "$.results[*].data[*].row[2].age" );

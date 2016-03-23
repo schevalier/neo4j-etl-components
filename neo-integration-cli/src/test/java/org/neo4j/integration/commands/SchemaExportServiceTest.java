@@ -147,11 +147,10 @@ public class SchemaExportServiceTest
     private Collection<String> keyNames( JoinTable table )
     {
         Collection<String> results = new ArrayList<>();
-        results.add( table.join().keyOneSourceColumn().name() );
-        results.add( table.join().keyOneTargetColumn().name() );
         results.add( table.join().keyTwoSourceColumn().name() );
         results.add( table.join().keyTwoTargetColumn().name() );
+        results.add( table.join().keyOneSourceColumn().name() );
+        results.add( table.join().keyOneTargetColumn().name() );
         return results;
     }
-
 }

@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -41,6 +42,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
         try ( QueryResults results = databaseClient.executeQuery( sql ).await() )
         {
             Map<String, List<Map<String, String>>> joinsGroupedByStartTable = results.stream()
+                    .sorted( sortOrderBasedOnSourceColTypeAndName() )
                     .collect( Collectors.groupingBy( row -> row.get( "SOURCE_TABLE_NAME" ) ) );
 
             joinsGroupedByStartTable.entrySet().stream()
@@ -48,6 +50,29 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
 
         }
         return joins;
+    }
+
+    private Comparator<Map<String, String>> sortOrderBasedOnSourceColTypeAndName()
+    {
+        return ( o1, o2 ) ->
+        {
+            String columnType1 = o1.get( "SOURCE_COLUMN_TYPE" );
+            String columnType2 = o2.get( "SOURCE_COLUMN_TYPE" );
+
+            int i = columnType1.compareTo( columnType2 );
+
+            if ( i == 0 )
+            {
+                String columnName1 = o1.get( "SOURCE_COLUMN_NAME" );
+                String columnName2 = o2.get( "SOURCE_COLUMN_NAME" );
+
+                return columnName1.compareTo( columnName2 );
+            }
+            else
+            {
+                return i;
+            }
+        };
     }
 
     private Join buildJoin( JoinQueryInfo source, List<Map<String, String>> rows )
@@ -185,6 +210,6 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
                 "   AND IFNULL(join_table.REFERENCED_COLUMN_NAME,join_table.COLUMN_NAME) = target_column.COLUMN_NAME)" +
                 " WHERE join_table.TABLE_SCHEMA = '" + source.table().schema() + "'" +
                 " AND join_table.TABLE_NAME = '" + source.table().simpleName() + "'" +
-                " AND " + source.specialisedSql() + " ORDER BY SOURCE_COLUMN_TYPE, SOURCE_COLUMN_NAME;";
+                " AND " + source.specialisedSql() + " ;";
     }
 }

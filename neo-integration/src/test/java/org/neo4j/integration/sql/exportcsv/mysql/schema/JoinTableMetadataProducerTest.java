@@ -165,7 +165,7 @@ public class JoinTableMetadataProducerTest
                 ColumnType.ForeignKey,
                 SqlDataType.KEY_DATA_TYPE );
 
-        assertEquals( expectedStudentId, joinTable.join().keyOneSourceColumn() );
+        assertEquals( expectedStudentId, joinTable.join().keyTwoSourceColumn() );
 
         assertEquals( new SimpleColumn(
                         new TableName( "test.Student" ),
@@ -173,16 +173,16 @@ public class JoinTableMetadataProducerTest
                         "id",
                         ColumnType.PrimaryKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                joinTable.join().keyOneTargetColumn() );
+                joinTable.join().keyTwoTargetColumn() );
 
-        assertEquals( expectedCourseId, joinTable.join().keyTwoSourceColumn() );
+        assertEquals( expectedCourseId, joinTable.join().keyOneSourceColumn() );
 
         assertEquals( new SimpleColumn(
                         new TableName( "test.Course" ),
                         "test.Course.id", "id",
                         ColumnType.PrimaryKey,
                         SqlDataType.KEY_DATA_TYPE ),
-                joinTable.join().keyTwoTargetColumn() );
+                joinTable.join().keyOneTargetColumn() );
     }
 
     private QueryResults stubJoinResults()
