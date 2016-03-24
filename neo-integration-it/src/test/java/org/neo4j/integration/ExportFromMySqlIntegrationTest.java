@@ -225,31 +225,16 @@ public class ExportFromMySqlIntegrationTest
             neo4j.get().start();
 
             String response = neo4j.get()
-                    .executeHttp( NEO_TX_URI, "MATCH (a)-[r]->(p) RETURN a, p, r" );
+                    .executeHttp( NEO_TX_URI, "MATCH (a:Author)-[r]->(p:Publisher) RETURN a, p" );
 
-            System.out.println( response );
+            List<String> authors = JsonPath.read( response, "$.results[*].data[*].row[0].last_name" );
+            List<String> publishers = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
 
-            List<String> students = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
-            List<String> courses = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
-            List<Integer> credits = JsonPath.read( response, "$.results[*].data[*].row[2]" );
+            assertThat( authors.size(), is( 2 ) );
+            assertThat( authors, hasItems( "Tanenbaum", "Silberschatz" ) );
 
-            assertThat( students.size(), is( 4 ) );
-            assertThat( students, hasItems( "jim", "mark" ) );
-
-
-            assertThat( courses.size(), is( 4 ) );
-            assertThat( courses, hasItems( "Science", "Maths", "English" ) );
-
-            assertThat( credits, hasItems( 1, 2, 3, 4 ) );
-
-            String coursesResponse = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:Course) RETURN c.name" );
-            String studentsResponse = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (s:Student) RETURN s.username" );
-
-            List<String> allCourses = JsonPath.read( coursesResponse, "$.results[*].data[*].row[0]" );
-            List<String> allStudents = JsonPath.read( studentsResponse, "$.results[*].data[*].row[0]" );
-
-            assertThat( allStudents, hasItems( "jim", "mark", "eve" ) );
-            assertThat( allCourses, hasItems( "Science", "Maths", "English", "Theology" ) );
+            assertThat( publishers.size(), is( 2 ) );
+            assertThat( publishers, hasItems( "Pearson", "O'Reilly" ) );
         }
         finally
         {
