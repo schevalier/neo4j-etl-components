@@ -43,12 +43,15 @@ class JoinKeysQueryResults
     {
         if ( primaryKeyQueryResults.isEmpty() )
         {
+            // Creates a join between foreign keys – as might be found in a join table
             return new Join(
                     foreignKeyQueryResults.get( 0 ).createJoinKey(),
                     foreignKeyQueryResults.get( 1 ).createJoinKey() );
         }
         else
         {
+            // Creates a Join whose first column represents the primary key in the join, and whose second
+            // column represents the foreign key.
             return new Join(
                     primaryKeyQueryResults.get( 0 ).createJoinKey(),
                     foreignKeyQueryResults.get( 0 ).createJoinKey() );
@@ -63,7 +66,7 @@ class JoinKeysQueryResults
                 .filter( keyTypePredicate )
                 .collect( Collectors.groupingBy( row -> row.get( "TARGET_TABLE_NAME" ) ) )
                 .values().stream()
-                .sorted( new SortBySourceColumnTypeAndName() )
+                .sorted( new JoinKeyQueryResultsComparator() )
                 .map( JoinKeyQueryResults::new )
                 .collect( Collectors.toList() );
     }
