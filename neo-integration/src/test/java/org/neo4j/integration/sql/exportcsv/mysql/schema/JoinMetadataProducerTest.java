@@ -179,7 +179,7 @@ public class JoinMetadataProducerTest
     public void shouldThrowExceptionIfJoinDoesNotExistBetweenSuppliedTables() throws Exception
     {
         thrown.expect( IllegalStateException.class );
-        thrown.expectMessage( "No join exists between 'test.Person' and 'test.Course'" );
+        thrown.expectMessage( "Unable to find 2 keys (found 1 primary key(s) and 0 foreign key(s))" );
 
         // given
         QueryResults results = StubQueryResults.builder()
@@ -203,7 +203,6 @@ public class JoinMetadataProducerTest
         // when
         getJoinMetadata.createMetadataFor(
                 new TableNamePair( new TableName( "test.Person" ), new TableName( "test.Course" ) ) );
-
     }
 
     private void assertJoinTableKeyMappings( TableName studentCourse, Join join )

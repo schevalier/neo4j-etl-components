@@ -52,8 +52,7 @@ public class MySqlDatabaseExportIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get(),
-                    "local" ) );
+                    tempDirectory.get() ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
