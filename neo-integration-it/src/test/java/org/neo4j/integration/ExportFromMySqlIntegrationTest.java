@@ -100,7 +100,7 @@ public class ExportFromMySqlIntegrationTest
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
             List<String> books = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
-            List<Integer> lastNames = JsonPath.read( response, "$.results[*].data[*].row[2].last_name" );
+            List<String> lastNames = JsonPath.read( response, "$.results[*].data[*].row[2].last_name" );
 
             assertThat( books.size(), is( 2 ) );
 
