@@ -1,9 +1,9 @@
 package org.neo4j.integration.sql.exportcsv.mysql.schema;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
@@ -13,10 +13,9 @@ import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
-import org.neo4j.integration.sql.metadata.SimpleColumn;
-import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
 
@@ -73,7 +72,6 @@ public class JoinTableMetadataProducerTest
     }
 
     @Test
-    @Ignore
     public void shouldReturnJoinTableMetadataForJoinThroughCompositeKeys() throws Exception
     {
         // given
@@ -91,9 +89,9 @@ public class JoinTableMetadataProducerTest
                         "TARGET_TABLE_NAME",
                         "TARGET_COLUMN_NAME",
                         "TARGET_COLUMN_TYPE" )
-                .addRow( "test", "Author_Publisher", "author_first_name", "ForeignKey", "test", "Author",
-                        "first_name", "PrimaryKey" )
                 .addRow( "test", "Author_Publisher", "publisherId", "ForeignKey", "test", "Publisher", "id",
+                        "PrimaryKey" )
+                .addRow( "test", "Author_Publisher", "author_first_name", "ForeignKey", "test", "Author", "first_name",
                         "PrimaryKey" )
                 .addRow( "test", "Author_Publisher", "author_last_name", "ForeignKey", "test", "Author", "last_name",
                         "PrimaryKey" )
@@ -105,44 +103,34 @@ public class JoinTableMetadataProducerTest
         JoinTableMetadataProducer metadataProducer = new JoinTableMetadataProducer( databaseClient );
 
         // when
-        Collection<JoinTable> joinTables = metadataProducer
-                .createMetadataFor(
-                        new JoinTableInfo(
-                                new TableName( "test.Author_Publisher" ),
-                                new TableNamePair(
-                                        new TableName( "test.Author" ),
-                                        new TableName( "test.Publisher" ) ) ) );
+        TableName author = new TableName( "test.Author" );
+        TableName publisher = new TableName( "test.Publisher" );
 
         // then
-        Iterator<JoinTable> iterator = joinTables.iterator();
+        TableName authorPublisher = new TableName( "test.Author_Publisher" );
+        ArrayList<JoinTable> joinTables = new ArrayList<>( metadataProducer.createMetadataFor(
+                new JoinTableInfo( authorPublisher, new TableNamePair( author, publisher ) ) ) );
 
-        JoinTable joinTable = iterator.next();
+        JoinTable joinTable = joinTables.get( 0 );
 
-        TableName authorPublisher = joinTable.joinTableName();
-        Column expectedAuthorId = columnUtil.
-                compositeForeignKeyColumn( authorPublisher, asList( "author_first_name", "author_last_name" ) );
+        Join join = joinTable.join();
 
-        Column expectedPublisherId = new SimpleColumn(
-                authorPublisher,
-                authorPublisher.fullyQualifiedColumnName( "publisherId" ),
-                "publisherId",
-                ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE );
-
-        assertEquals( expectedAuthorId, joinTable.join().keyTwoSourceColumn() );
+        assertEquals( columnUtil.compositeKeyColumn( authorPublisher,
+                asList( "author_first_name", "author_last_name" ), ColumnType.ForeignKey ), join.keyOneSourceColumn() );
 
         assertEquals(
-                columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnType.PrimaryKey ),
-                joinTable.join().keyTwoTargetColumn() );
+                columnUtil.keyColumn( authorPublisher, "publisherId", ColumnType.ForeignKey ),
+                join.keyTwoSourceColumn() );
 
-        assertEquals( expectedPublisherId, joinTable.join().keyOneSourceColumn() );
+        assertEquals(
+                columnUtil.keyColumn( publisher, "id", ColumnType.PrimaryKey ),
+                join.keyTwoTargetColumn() );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnType.PrimaryKey ),
-                joinTable.join().keyOneTargetColumn() );
+        assertEquals(
+                columnUtil.compositeKeyColumn( author, asList( "first_name", "last_name" ), ColumnType.PrimaryKey ),
+                join.keyOneTargetColumn() );
 
-        assertTrue( joinTable.columns().isEmpty() );
-
-        assertFalse( iterator.hasNext() );
+        assertTrue( joinTables.size() == 1 );
     }
 
     @Test
@@ -228,18 +216,8 @@ public class JoinTableMetadataProducerTest
     private void assertJoinTableKeyMappings( JoinTable joinTable )
     {
         TableName studentCourse = joinTable.joinTableName();
-        Column expectedStudentId = new SimpleColumn(
-                studentCourse,
-                studentCourse.fullyQualifiedColumnName( "studentId" ),
-                "studentId",
-                ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE );
-        Column expectedCourseId = new SimpleColumn(
-                studentCourse,
-                studentCourse.fullyQualifiedColumnName( "courseId" ),
-                "courseId",
-                ColumnType.ForeignKey,
-                SqlDataType.KEY_DATA_TYPE );
+        Column expectedStudentId = columnUtil.keyColumn( studentCourse, "studentId", ColumnType.ForeignKey );
+        Column expectedCourseId = columnUtil.keyColumn( studentCourse, "courseId", ColumnType.ForeignKey );
 
         assertEquals( expectedStudentId, joinTable.join().keyTwoSourceColumn() );
 

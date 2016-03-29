@@ -27,11 +27,6 @@ class JoinKeyQueryResults
         this.rows = Preconditions.requireNonEmptyList( rows, "Rows" );
     }
 
-    private boolean isCompositeKey()
-    {
-        return rows.size() > 1;
-    }
-
     JoinKey createJoinKey()
     {
         if ( isCompositeKey() )
@@ -44,6 +39,11 @@ class JoinKeyQueryResults
 
             return new JoinKey( simpleColumn( row, SOURCE ), simpleColumn( row, TARGET ) );
         }
+    }
+
+    private boolean isCompositeKey()
+    {
+        return rows.size() > 1;
     }
 
     private Column simpleColumn( Map<String, String> row, Function<String, String> prefix )

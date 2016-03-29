@@ -80,7 +80,8 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName authorTable = new TableName( "test.Author" );
-        Column column1 = columnUtil.compositeColumn( authorTable, asList( "first_name", "last_name" ) );
+        Column column1 = columnUtil.compositeKeyColumn( authorTable, asList( "first_name", "last_name" ), ColumnType
+                .PrimaryKey );
 
 
         Column column2 = columnUtil.column( authorTable, "test.Author.age", "age", ColumnType.Data );

@@ -33,19 +33,11 @@ public class ColumnUtil
                 SqlDataType.KEY_DATA_TYPE );
     }
 
-    public Column compositeColumn( TableName tableName, List<String> columnNames )
+    public Column compositeKeyColumn( TableName tableName, List<String> columnNames, ColumnType keyType )
     {
         return new CompositeKeyColumn( tableName,
                 columnNames.stream()
-                        .map( name -> keyColumn( tableName, name, ColumnType.PrimaryKey ) )
-                        .collect( Collectors.toList() ) );
-    }
-
-    public Column compositeForeignKeyColumn( TableName tableName, List<String> columnNames )
-    {
-        return new CompositeKeyColumn( tableName,
-                columnNames.stream()
-                        .map( name -> keyColumn( tableName, name, ColumnType.ForeignKey ) )
+                        .map( name -> keyColumn( tableName, name, keyType ) )
                         .collect( Collectors.toList() ) );
     }
 }

@@ -13,9 +13,9 @@ import static java.lang.String.format;
 class JoinKeysQueryResults
 {
     private static final Predicate<Map<String, String>> IS_PRIMARY_KEY =
-            row -> row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.PrimaryKey.name() );
+            row -> ColumnType.PrimaryKey.name().equalsIgnoreCase( row.get( "SOURCE_COLUMN_TYPE" ) );
     private static final Predicate<Map<String, String>> IS_FOREIGN_KEY =
-            row -> row.get( "SOURCE_COLUMN_TYPE" ).equalsIgnoreCase( ColumnType.ForeignKey.name() );
+            row -> ColumnType.ForeignKey.name().equalsIgnoreCase( row.get( "SOURCE_COLUMN_TYPE" ) );
 
     private final List<JoinKeyQueryResults> primaryKeyQueryResults;
     private final List<JoinKeyQueryResults> foreignKeyQueryResults;

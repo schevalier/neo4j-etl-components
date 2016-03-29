@@ -66,7 +66,8 @@ public class TableToCsvFieldMapperTest
 
         Table table = Table.builder()
                 .name( authorTable )
-                .addColumn( new ColumnUtil().compositeColumn( authorTable, asList( "first_name", "last_name" ) ) )
+                .addColumn( new ColumnUtil().compositeKeyColumn( authorTable, asList( "first_name", "last_name" ),
+                        ColumnType.PrimaryKey ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

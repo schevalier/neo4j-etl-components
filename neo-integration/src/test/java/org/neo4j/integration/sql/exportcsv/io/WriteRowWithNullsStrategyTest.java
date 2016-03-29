@@ -39,7 +39,7 @@ public class WriteRowWithNullsStrategyTest
                 columnUtil.column( table, "id", ColumnType.PrimaryKey ),
                 columnUtil.column( table, "username", ColumnType.ForeignKey ),
                 columnUtil.column( table, "age", ColumnType.Data ),
-                columnUtil.compositeColumn( table, asList( "first_name", "last_name" ) ) );
+                columnUtil.compositeKeyColumn( table, asList( "first_name", "last_name" ), ColumnType.PrimaryKey ) );
 
         // when
         WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
@@ -80,7 +80,8 @@ public class WriteRowWithNullsStrategyTest
         rowOne.put( "age", "42" );
 
         TableName table = new TableName( "test.Users" );
-        Column compositeColumn = columnUtil.compositeColumn( table, asList( "first_name", "last_name" ) );
+        Column compositeColumn = columnUtil.compositeKeyColumn( table, asList( "first_name", "last_name" ),
+                ColumnType.PrimaryKey );
 
         List<Column> columns = asList(
                 compositeColumn,
