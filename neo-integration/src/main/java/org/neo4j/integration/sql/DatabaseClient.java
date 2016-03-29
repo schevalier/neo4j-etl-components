@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.neo4j.integration.io.AwaitHandle;
+import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.FutureUtils;
 import org.neo4j.integration.util.Loggers;
 
@@ -60,6 +62,21 @@ public class DatabaseClient implements AutoCloseable
                     return connection.createStatement().execute( sql );
 
                 }, r -> new Thread( r ).start() ) );
+    }
+
+    public Collection<TableName> tableNames() throws SQLException
+    {
+        Collection<TableName> tableNames = new ArrayList<>();
+
+        ResultSet results =
+                connection.getMetaData().getTables( null, null, null, new String[]{"TABLE"} );
+
+        while ( results.next() )
+        {
+            tableNames.add( new TableName( connection.getCatalog(), results.getString( "TABLE_NAME" ) ) );
+        }
+
+        return tableNames;
     }
 
     @Override

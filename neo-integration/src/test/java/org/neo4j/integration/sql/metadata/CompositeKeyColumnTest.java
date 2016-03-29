@@ -26,7 +26,6 @@ public class CompositeKeyColumnTest
         TableName authorTable = new TableName( "test.Author" );
         Column column = columnUtil.compositeColumn( authorTable, asList( "first_name", "last_name" ) );
 
-
         //then
         assertThat( column.aliasedColumn(),
                 is( "test.Author.first_name AS first_name, test.Author.last_name AS last_name" ) );
@@ -36,9 +35,9 @@ public class CompositeKeyColumnTest
     public void selectFromRowReturnsEmptyStringIfAllOfTheCompositeKeyColumnsAreNull() throws Exception
     {
         // given
-        Column compositeColumn = columnUtil.compositeColumn( new TableName( "test.Users" ), asList( "first_name",
-                "last_name" ) );
-
+        Column compositeColumn = columnUtil.compositeColumn(
+                new TableName( "test.Users" ),
+                asList( "first_name", "last_name" ) );
 
         RowAccessor stubRowAccessor = columnLabel ->
                 singletonList( Collections.<String, String>emptyMap() ).get( 0 ).get( columnLabel );
@@ -58,9 +57,9 @@ public class CompositeKeyColumnTest
         rowOne.put( "first_name", "Boaty" );
         rowOne.put( "last_name", null );
 
-        Column compositeColumn = columnUtil.compositeColumn( new TableName( "test.Users" ), asList( "first_name",
-                "last_name" ) );
-
+        Column compositeColumn = columnUtil.compositeColumn(
+                new TableName( "test.Users" ),
+                asList( "first_name", "last_name" ) );
 
         RowAccessor stubRowAccessor = columnLabel ->
                 singletonList( rowOne ).get( 0 ).get( columnLabel );
@@ -80,9 +79,9 @@ public class CompositeKeyColumnTest
         rowOne.put( "first_name", "Boaty" );
         rowOne.put( "last_name", "Mc.Boatface" );
 
-        Column compositeColumn = columnUtil.compositeColumn( new TableName( "test.Users" ), asList( "first_name",
-                "last_name" ) );
-
+        Column compositeColumn = columnUtil.compositeColumn(
+                new TableName( "test.Users" ),
+                asList( "first_name", "last_name" ) );
 
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
         // when
