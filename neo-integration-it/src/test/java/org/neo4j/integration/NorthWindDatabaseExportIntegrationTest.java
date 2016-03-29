@@ -1,9 +1,12 @@
 package org.neo4j.integration;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.LogManager;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -38,7 +41,10 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 import static java.util.Arrays.asList;
 
-public class MySqlDatabaseExportIntegrationTest
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class NorthWindDatabaseExportIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
 
@@ -63,6 +69,16 @@ public class MySqlDatabaseExportIntegrationTest
     public static void setUp() throws Exception
     {
         populateMySqlDatabase();
+        try
+        {
+            LogManager.getLogManager().readConfiguration(
+                    NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error in loading configuration" );
+            e.printStackTrace( System.err );
+        }
     }
 
     @Test
@@ -94,6 +110,7 @@ public class MySqlDatabaseExportIntegrationTest
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL ).host( "localhost" )
                 .port( DatabaseType.MySQL.defaultPort() )
                 .database( "northwind" ).username( "root" ).password( "password" ).build();
+
         DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
         JoinMetadataProducer joinMetadataProducer = new JoinMetadataProducer( databaseClient );
@@ -120,9 +137,37 @@ public class MySqlDatabaseExportIntegrationTest
         {
             neo4j.get().start();
 
-            String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (n) RETURN n" );
-            System.out.println( response );
+            String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c) WHERE (c:customers) RETURN c" );
+            String customersWithOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
+                    "MATCH (c)--(o) " +
+                            "WHERE (c:customers)<-[:CUSTOMERS]-(o:orders) RETURN DISTINCT c" );
+            List<String> customers = JsonPath.read( customersJson, "$.results[*].data[*].row[0]" );
+            List<String> customersWithOrders = JsonPath.read( customersWithOrdersJson, "$.results[*].data[*].row[0]" );
+            assertThat( customers.size(), is( 29 ) );
+            assertThat( customersWithOrders.size(), is( 15 ) );
 
+            String newOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
+                    "MATCH (o)--(os) " +
+                            "WHERE (os:orders_status{status_name:'New'})--(o:orders) RETURN o" );
+            List<String> newOrders = JsonPath.read( newOrdersJson, "$.results[*].data[*].row[0]" );
+
+            assertThat( newOrders.size(), is( 16 ) );
+
+            String employeeWithPrivilegesResponse = neo4j.get().executeHttp( NEO_TX_URI,
+                    "MATCH (e:employees)-[:EMPLOYEE_PRIVILEGES]->(p) RETURN e,p;" );
+            List<String> city = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[0].city" );
+            List<String> privilegeName = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[1]" +
+                    ".privilege_name" );
+
+            assertThat( city.get( 0 ), is( "Bellevue" ) );
+            assertThat( privilegeName.get( 0 ), is( "Purchase Approvals" ) );
+
+            String productsOnHold = neo4j.get().executeHttp( NEO_TX_URI,
+                    "MATCH (p:products)<--(n:inventory_transactions)-->" +
+                            "(it:inventory_transaction_types{type_name:'On Hold'}) " +
+                            "RETURN DISTINCT p" );
+            List<String> productName = JsonPath.read( productsOnHold, "$.results[*].data[*].row[0].product_name" );
+            assertThat( productName.get( 0 ), is( "Northwind Traders Gnocchi" ) );
         }
         finally
         {
