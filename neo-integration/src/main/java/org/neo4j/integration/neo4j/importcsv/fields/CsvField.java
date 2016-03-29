@@ -1,5 +1,7 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatter;
+
 public interface CsvField
 {
     static CsvField startId()
@@ -57,10 +59,10 @@ public interface CsvField
         return new Data( name, type );
     }
 
-    static CsvField array( String name, Neo4jDataType type )
+    static CsvField array( String name, Neo4jDataType type, Formatter formatter )
     {
         return new Data( name, type, true );
     }
 
-    String value();
+    String value( Formatter formatter );
 }

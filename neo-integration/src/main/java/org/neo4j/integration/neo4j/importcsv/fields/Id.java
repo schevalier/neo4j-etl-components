@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.config.DefaultPropertyFormatter;
+import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.util.Strings;
 
 import static java.lang.String.format;
@@ -36,7 +38,7 @@ class Id implements CsvField
     }
 
     @Override
-    public String value()
+    public String value( Formatter formatter )
     {
         if ( name.isPresent() && idSpace.isPresent() )
         {
@@ -54,13 +56,6 @@ class Id implements CsvField
         {
             return ":ID";
         }
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return value();
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

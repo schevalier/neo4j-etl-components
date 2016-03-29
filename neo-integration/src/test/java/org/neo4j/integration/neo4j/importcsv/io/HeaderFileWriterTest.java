@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.neo4j.integration.neo4j.importcsv.config.DefaultPropertyFormatter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
@@ -38,7 +39,7 @@ public class HeaderFileWriterTest
         fields.add( CsvField.id( "personId", new IdSpace( "person" ) ) );
         fields.add( CsvField.label() );
         fields.add( CsvField.data( "name", Neo4jDataType.String ) );
-        fields.add( CsvField.array( "addresses", Neo4jDataType.String ) );
+        fields.add( CsvField.array( "addresses", Neo4jDataType.String, new DefaultPropertyFormatter() ) );
 
         Path file = headerFileWriter.writeHeaderFile( fields, "nodes" );
 

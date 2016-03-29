@@ -16,6 +16,7 @@ public class Formatting
     private final QuoteChar quote;
     private final Formatter labelFormatter;
     private final Formatter relationshipFormatter;
+    private final Formatter propertyFormatter;
 
     Formatting( FormattingConfigBuilder builder )
     {
@@ -25,6 +26,8 @@ public class Formatting
         this.labelFormatter = Preconditions.requireNonNull( builder.labelFormatter, "LabelFormatter" );
         this.relationshipFormatter = Preconditions.requireNonNull( builder.relationshipFormatter,
                 "RelationshipFormatter" );
+        this.propertyFormatter = Preconditions.requireNonNull( builder.propertyFormatter,
+                "PropertyFormatter" );
     }
 
     public Delimiter delimiter()
@@ -52,6 +55,11 @@ public class Formatting
         return relationshipFormatter;
     }
 
+    public Formatter propertyFormatter()
+    {
+        return propertyFormatter;
+    }
+
     public interface Builder
     {
         Builder delimiter( Delimiter delimiter );
@@ -63,6 +71,8 @@ public class Formatting
         Builder labelFormatter( Formatter labelFormatter );
 
         Builder relationshipFormatter( Formatter relationshipFormatter );
+
+        Builder propertyFormatter( Formatter propertyFormatter );
 
         Formatting build();
     }

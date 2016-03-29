@@ -28,7 +28,7 @@ public class HeaderFileWriter
     {
         Loggers.Default.log( Level.INFO, format( "Writing headers for %s", filenamePrefix ) );
         String headers = fields.stream()
-                .map( CsvField::value )
+                .map( f -> f.value( formatting.propertyFormatter() ) )
                 .collect( Collectors.joining( formatting.delimiter().value() ) );
 
         Path headerFile = directory.resolve( format( "%s_headers.csv", filenamePrefix ) );

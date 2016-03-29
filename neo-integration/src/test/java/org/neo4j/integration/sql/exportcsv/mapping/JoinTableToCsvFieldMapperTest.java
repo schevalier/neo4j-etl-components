@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 
 public class JoinTableToCsvFieldMapperTest
 {
-
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test

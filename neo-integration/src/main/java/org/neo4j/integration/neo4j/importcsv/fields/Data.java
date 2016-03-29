@@ -3,6 +3,8 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.config.DefaultPropertyFormatter;
+import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.util.Preconditions;
 
 import static java.lang.String.format;
@@ -26,17 +28,11 @@ class Data implements CsvField
     }
 
     @Override
-    public String value()
+    public String value( Formatter formatter )
     {
         return isArray ?
-                format( "%s:%s[]", name, type.name().toLowerCase() ) :
-                format( "%s:%s", name, type.name().toLowerCase() );
-    }
-
-    @Override
-    public String toString()
-    {
-        return value();
+                format( "%s:%s[]", formatter.format( name ), type.name().toLowerCase() ) :
+                format( "%s:%s", formatter.format( name ), type.name().toLowerCase() );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

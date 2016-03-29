@@ -151,7 +151,7 @@ public class NorthWindDatabaseExportIntegrationTest
 
             String newOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
                     "MATCH (o)--(os) " +
-                            "WHERE (os:OrderStatus{status_name:'New'})--(o:Order) RETURN o" );
+                            "WHERE (os:OrderStatus{statusName:'New'})--(o:Order) RETURN o" );
             List<String> newOrders = JsonPath.read( newOrdersJson, "$.results[*].data[*].row[0]" );
 
             assertThat( newOrders.size(), is( 16 ) );
@@ -160,16 +160,16 @@ public class NorthWindDatabaseExportIntegrationTest
                     "MATCH (e:Employee)-[:EMPLOYEE_PRIVILEGE]->(p) RETURN e,p;" );
             List<String> city = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[0].city" );
             List<String> privilegeName = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[1]" +
-                    ".privilege_name" );
+                    ".privilegeName" );
 
             assertThat( city.get( 0 ), is( "Bellevue" ) );
             assertThat( privilegeName.get( 0 ), is( "Purchase Approvals" ) );
 
             String productsOnHold = neo4j.get().executeHttp( NEO_TX_URI,
                     "MATCH (p:Product)<--(n:InventoryTransaction)-->" +
-                            "(it:InventoryTransactionType{type_name:'On Hold'}) " +
+                            "(it:InventoryTransactionType{typeName:'On Hold'}) " +
                             "RETURN DISTINCT p" );
-            List<String> productName = JsonPath.read( productsOnHold, "$.results[*].data[*].row[0].product_name" );
+            List<String> productName = JsonPath.read( productsOnHold, "$.results[*].data[*].row[0].productName" );
             assertThat( productName.get( 0 ), is( "Northwind Traders Gnocchi" ) );
         }
         finally

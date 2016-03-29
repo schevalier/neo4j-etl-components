@@ -1,19 +1,15 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatter;
+
 class Label implements CsvField
 {
     private final String value = ":LABEL";
 
     @Override
-    public String value()
+    public String value( Formatter formatter )
     {
         return value;
-    }
-
-    @Override
-    public String toString()
-    {
-        return value();
     }
 
     @Override

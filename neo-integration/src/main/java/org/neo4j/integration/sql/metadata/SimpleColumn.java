@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
@@ -93,8 +94,9 @@ public class SimpleColumn implements Column
     }
 
     @Override
-    public void addTo( ColumnToCsvFieldMappings.Builder builder )
+    public void addTo( ColumnToCsvFieldMappings.Builder builder, Formatter formatter )
     {
-        builder.add( new ColumnToCsvFieldMapping( this, CsvField.data( alias, dataType.toNeo4jDataType() ) ) );
+        builder.add(
+                new ColumnToCsvFieldMapping( this, CsvField.data( alias, dataType.toNeo4jDataType() ) ) );
     }
 }

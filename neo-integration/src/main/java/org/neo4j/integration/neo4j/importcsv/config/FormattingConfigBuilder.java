@@ -7,6 +7,7 @@ class FormattingConfigBuilder implements Formatting.Builder
     QuoteChar quote = QuoteChar.DOUBLE_QUOTES;
     Formatter labelFormatter = new DefaultLabelFormatter();
     Formatter relationshipFormatter = new DefaultRelationshipFormatter();
+    Formatter propertyFormatter = new DefaultPropertyFormatter();
 
     @Override
     public Formatting.Builder delimiter( Delimiter delimiter )
@@ -40,6 +41,13 @@ class FormattingConfigBuilder implements Formatting.Builder
     public Formatting.Builder relationshipFormatter( Formatter relationshipFormatter )
     {
         this.relationshipFormatter = relationshipFormatter;
+        return this;
+    }
+
+    @Override
+    public Formatting.Builder propertyFormatter( Formatter propertyFormatter )
+    {
+        this.propertyFormatter = propertyFormatter;
         return this;
     }
 
