@@ -9,7 +9,6 @@ import java.util.logging.LogManager;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -35,11 +34,8 @@ import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
-import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
-
-import static java.util.Arrays.asList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,7 +55,8 @@ public class NorthWindDatabaseExportIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(),
+                    "local" ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -83,31 +80,9 @@ public class NorthWindDatabaseExportIntegrationTest
     }
 
     @Test
-    @Ignore
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
         // when
-        List<String> tableNames = asList(
-                "customers",
-                "employee_privileges",
-                "employees",
-                "inventory_transaction_types",
-                "inventory_transactions",
-                "invoices",
-                "order_details",
-                "order_details_status",
-                "orders",
-                "orders_status",
-                "orders_tax_status",
-                "privileges",
-                "products",
-                "purchase_order_details",
-                "purchase_order_status",
-                "purchase_orders",
-//                "sales_reports",
-                "shippers",
-//                "strings",
-                "suppliers" );
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL ).host( "localhost" )
                 .port( DatabaseType.MySQL.defaultPort() )
                 .database( "northwind" ).username( "neo" ).password( "neo" ).build();
@@ -116,17 +91,17 @@ public class NorthWindDatabaseExportIntegrationTest
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
         JoinMetadataProducer joinMetadataProducer = new JoinMetadataProducer( databaseClient );
         JoinTableMetadataProducer joinTableMetadataProducer = new JoinTableMetadataProducer( databaseClient );
-        DatabaseExport databaseExport = new DatabaseExport( tableMetadataProducer, joinMetadataProducer,
-                joinTableMetadataProducer, databaseClient );
+
         ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
                 .destination( tempDirectory.get() )
                 .connectionConfig( connectionConfig )
                 .formatting( Formatting.builder().delimiter( Delimiter.TAB ).build() );
-        for ( String tableName : tableNames )
-        {
-            databaseExport.updateConfig( builder, new TableName( "northwind", tableName ) );
 
-        }
+        DatabaseExport databaseExport = new DatabaseExport( tableMetadataProducer, joinMetadataProducer,
+                joinTableMetadataProducer, databaseClient );
+
+        databaseExport.addTablesToConfig( builder );
+
         ExportToCsvConfig config = builder.build();
 
         Manifest manifest = new ExportToCsvCommand( config, new MySqlExportService() ).execute();

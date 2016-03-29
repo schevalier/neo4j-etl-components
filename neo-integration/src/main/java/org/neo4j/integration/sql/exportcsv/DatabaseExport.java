@@ -38,7 +38,15 @@ public class DatabaseExport
         this.databaseClient = databaseClient;
     }
 
-    public void updateConfig( ExportToCsvConfig.Builder config, TableName tableName ) throws Exception
+    public void addTablesToConfig( ExportToCsvConfig.Builder builder ) throws Exception
+    {
+        for ( TableName tableName : databaseClient.tableNames() )
+        {
+            addTableToConfig( builder, tableName );
+        }
+    }
+
+    public void addTableToConfig( ExportToCsvConfig.Builder config, TableName tableName ) throws Exception
     {
         QueryResults results = databaseClient.executeQuery( listKeys( tableName ) ).await();
 

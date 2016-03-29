@@ -61,7 +61,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.updateConfig( config, address );
+        databaseExport.addTableToConfig( config, address );
 
         // then
         verify( config ).addTables( argThat( matchesCollection( expectedTables ) ) );
@@ -94,7 +94,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.updateConfig( config, person );
+        databaseExport.addTableToConfig( config, person );
 
         // then
         verify( config ).addTables( argThat( matchesCollection( expectedTables ) ) );
@@ -125,7 +125,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.updateConfig( config, joinTable );
+        databaseExport.addTableToConfig( config, joinTable );
 
         // then
         verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
@@ -157,7 +157,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.updateConfig( config, joinTable );
+        databaseExport.addTableToConfig( config, joinTable );
 
         // then
         verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
