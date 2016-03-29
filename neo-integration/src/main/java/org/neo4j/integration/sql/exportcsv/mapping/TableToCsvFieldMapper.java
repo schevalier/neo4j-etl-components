@@ -50,14 +50,14 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
             }
         }
 
-        final SimpleColumn from = new SimpleColumn(
+        SimpleColumn label = new SimpleColumn(
                 table.name(),
-                formatting.quote().enquote( table.name().simpleName() ),
+                formatting.quote().enquote( formatting.labelFormatter().format( table.name().simpleName() ) ),
                 table.name().simpleName(),
                 ColumnType.Literal,
                 SqlDataType.LABEL_DATA_TYPE );
-        builder.add(
-                new ColumnToCsvFieldMapping( from, CsvField.label() ) );
+
+        builder.add( new ColumnToCsvFieldMapping( label, CsvField.label() ) );
 
         return builder.build();
     }

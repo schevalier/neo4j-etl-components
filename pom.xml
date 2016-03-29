@@ -84,6 +84,12 @@
       </dependency>
 
       <dependency>
+        <groupId>edu.washington.cs.knowitall</groupId>
+        <artifactId>morpha-stemmer</artifactId>
+        <version>1.0.5</version>
+      </dependency>
+
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.12</version>

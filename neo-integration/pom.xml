@@ -29,6 +29,11 @@
     </dependency>
 
     <dependency>
+      <groupId>edu.washington.cs.knowitall</groupId>
+      <artifactId>morpha-stemmer</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

@@ -35,24 +35,23 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        final CsvField to = CsvField.startId( new IdSpace( joinTable.join().keyOneTargetColumn().table().fullName() ) );
-        builder.add(
-                new ColumnToCsvFieldMapping( joinTable.join().keyOneSourceColumn(), to ) );
-        final CsvField to1 = CsvField.endId( new IdSpace( joinTable.join().keyTwoTargetColumn().table().fullName() ) );
-        builder.add(
-                new ColumnToCsvFieldMapping( joinTable.join().keyTwoSourceColumn(), to1 ) );
+        CsvField to1 = CsvField.startId( new IdSpace( joinTable.join().keyOneTargetColumn().table().fullName() ) );
+        builder.add( new ColumnToCsvFieldMapping( joinTable.join().keyOneSourceColumn(), to1 ) );
+
+        CsvField to2 = CsvField.endId( new IdSpace( joinTable.join().keyTwoTargetColumn().table().fullName() ) );
+        builder.add( new ColumnToCsvFieldMapping( joinTable.join().keyTwoSourceColumn(), to2 ) );
 
         TableName table = joinTable.joinTableName();
 
-        String relationshipType = table.simpleName().toUpperCase();
+        String relationshipType = formatting.relationshipFormatter().format( table.simpleName() );
 
-        final SimpleColumn from = new SimpleColumn( table,
+        SimpleColumn from = new SimpleColumn( table,
                 formatting.quote().enquote( relationshipType ),
                 relationshipType,
                 ColumnType.Literal,
                 SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
-        builder.add(
-                new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
+
+        builder.add( new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
 
         addProperties( joinTable, builder );
 
@@ -70,8 +69,9 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
                     builder.add( new ColumnToCsvFieldMapping( column, id ) );
                     break;
                 case Data:
-                    builder.add( new ColumnToCsvFieldMapping( column, CsvField.data( column.alias(), column.dataType
-                            ().toNeo4jDataType() ) ) );
+                    builder.add( new ColumnToCsvFieldMapping(
+                            column,
+                            CsvField.data( column.alias(), column.dataType().toNeo4jDataType() ) ) );
                     break;
                 default:
                     // Do nothing

@@ -67,13 +67,13 @@ public class CsvFileWriter
             throws Exception
     {
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
+
         int maxIndex = columns.length - 1;
 
         try ( BufferedWriter writer = Files.newBufferedWriter( file, Charset.forName( "UTF8" ) ) )
         {
             while ( results.next() )
             {
-
                 if ( writeRowWithNullsStrategy.test( results, mappings.columns() ) )
                 {
                     for ( int i = 0; i < maxIndex; i++ )

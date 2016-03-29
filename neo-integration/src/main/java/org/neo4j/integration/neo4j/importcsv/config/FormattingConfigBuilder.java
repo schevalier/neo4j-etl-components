@@ -5,6 +5,8 @@ class FormattingConfigBuilder implements Formatting.Builder
     Delimiter delimiter = Delimiter.COMMA;
     Delimiter arrayDelimiter = Delimiter.SEMICOLON;
     QuoteChar quote = QuoteChar.DOUBLE_QUOTES;
+    Formatter labelFormatter = new DefaultLabelFormatter();
+    Formatter relationshipFormatter = new DefaultRelationshipFormatter();
 
     @Override
     public Formatting.Builder delimiter( Delimiter delimiter )
@@ -24,6 +26,20 @@ class FormattingConfigBuilder implements Formatting.Builder
     public Formatting.Builder quote( QuoteChar quote )
     {
         this.quote = quote;
+        return this;
+    }
+
+    @Override
+    public Formatting.Builder labelFormatter( Formatter labelFormatter )
+    {
+        this.labelFormatter = labelFormatter;
+        return this;
+    }
+
+    @Override
+    public Formatting.Builder relationshipFormatter( Formatter relationshipFormatter )
+    {
+        this.relationshipFormatter = relationshipFormatter;
         return this;
     }
 
