@@ -29,7 +29,8 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
     @Override
     public Collection<JoinTable> createMetadataFor( JoinTableInfo source ) throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Generating join table metadata for %s", source ) );
+        Loggers.Default.log( Level.INFO, format( "Generating join table metadata for join table [%s <- %s -> %s]",
+                source.tableOne(), source.table(), source.tableTwo() ) );
         Collection<Join> joins = joinMetadataProducer.createMetadataFor( source );
         Collection<Table> tables = tableMetadataProducer.createMetadataFor( source.joinTableName() );
 
