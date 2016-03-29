@@ -9,8 +9,10 @@ import java.util.logging.LogManager;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import org.neo4j.integration.commands.DatabaseInspector;
 import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.neo4j.Neo4j;
 import org.neo4j.integration.neo4j.Neo4jVersion;
@@ -27,13 +29,9 @@ import org.neo4j.integration.provisioning.scripts.MySqlScripts;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.exportcsv.DatabaseExport;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
@@ -41,7 +39,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 
-public class NorthWindDatabaseExportIntegrationTest
+public class NorthWindDatabaseInspectorIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
 
@@ -80,6 +78,7 @@ public class NorthWindDatabaseExportIntegrationTest
     }
 
     @Test
+    @Ignore
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
         // when
@@ -88,19 +87,15 @@ public class NorthWindDatabaseExportIntegrationTest
                 .database( "northwind" ).username( "neo" ).password( "neo" ).build();
 
         DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
-        TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
-        JoinMetadataProducer joinMetadataProducer = new JoinMetadataProducer( databaseClient );
-        JoinTableMetadataProducer joinTableMetadataProducer = new JoinTableMetadataProducer( databaseClient );
 
         ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
                 .destination( tempDirectory.get() )
                 .connectionConfig( connectionConfig )
                 .formatting( Formatting.builder().delimiter( Delimiter.TAB ).build() );
 
-        DatabaseExport databaseExport = new DatabaseExport( tableMetadataProducer, joinMetadataProducer,
-                joinTableMetadataProducer, databaseClient );
+        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
 
-        databaseExport.addTablesToConfig( builder );
+        databaseInspector.addTablesToConfig( builder );
 
         ExportToCsvConfig config = builder.build();
 

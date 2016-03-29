@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv;
+package org.neo4j.integration.commands;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
@@ -20,18 +21,28 @@ import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static java.lang.String.format;
 
-public class DatabaseExport
+public class DatabaseInspector
 {
     private final TableMetadataProducer tableMetadataProducer;
     private final JoinMetadataProducer joinMetadataProducer;
     private final JoinTableMetadataProducer joinTableMetadataProducer;
     private final DatabaseClient databaseClient;
 
-    public DatabaseExport( TableMetadataProducer tableMetadataProducer,
-                           JoinMetadataProducer joinMetadataProducer,
-                           JoinTableMetadataProducer joinTableMetadataProducer,
-                           DatabaseClient databaseClient )
+    public DatabaseInspector( DatabaseClient databaseClient )
+
     {
+        this( new TableMetadataProducer( databaseClient ),
+                new JoinMetadataProducer( databaseClient ),
+                new JoinTableMetadataProducer( databaseClient ),
+                databaseClient );
+    }
+
+    public DatabaseInspector( TableMetadataProducer tableMetadataProducer,
+                              JoinMetadataProducer joinMetadataProducer,
+                              JoinTableMetadataProducer joinTableMetadataProducer,
+                              DatabaseClient databaseClient )
+    {
+
         this.tableMetadataProducer = tableMetadataProducer;
         this.joinMetadataProducer = joinMetadataProducer;
         this.joinTableMetadataProducer = joinTableMetadataProducer;

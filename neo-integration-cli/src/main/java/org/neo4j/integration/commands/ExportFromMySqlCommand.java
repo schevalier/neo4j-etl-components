@@ -23,7 +23,6 @@ public class ExportFromMySqlCommand
     private final String user;
     private final String password;
     private final Environment environment;
-    private final SchemaExportService schemaExportService;
     private final SchemaDetails schemaDetails;
     private MySqlExportService databaseExportService;
 
@@ -40,7 +39,6 @@ public class ExportFromMySqlCommand
         this.password = password;
         this.schemaDetails = schemaDetails;
         this.environment = environment;
-        this.schemaExportService = new SchemaExportService();
         this.databaseExportService = new MySqlExportService();
     }
 
@@ -62,7 +60,11 @@ public class ExportFromMySqlCommand
 
         print( "Exporting from MySQL to CSV..." );
 
-        Manifest manifest = exportAndCreateManifest( csvDirectory, formatting, connectionConfig );
+        ExportToCsvConfig config =
+                buildConfig( connectionConfig, csvDirectory, formatting,
+                        new DatabaseInspector( new DatabaseClient( connectionConfig ) ) );
+
+        Manifest manifest = new ExportToCsvCommand( config, databaseExportService ).execute();
 
         print( "Creating Neo4j store from CSV..." );
 
@@ -72,22 +74,20 @@ public class ExportFromMySqlCommand
         printResult( environment.destinationDirectory() );
     }
 
-    private Manifest exportAndCreateManifest( Path csvDirectory,
-                                              Formatting formatting,
-                                              ConnectionConfig connectionConfig ) throws Exception
+    private ExportToCsvConfig buildConfig( ConnectionConfig connectionConfig,
+                                           Path csvDirectory,
+                                           Formatting formatting,
+                                           DatabaseInspector databaseInspector )
+            throws Exception
     {
-        SchemaExport schemaExport = schemaExportService
-                .doExport( schemaDetails, () -> new DatabaseClient( connectionConfig ) );
-        ExportToCsvConfig config = ExportToCsvConfig.builder()
+
+        ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
                 .destination( csvDirectory )
                 .connectionConfig( connectionConfig )
-                .formatting( formatting )
-                .addTables( schemaExport.tables() )
-                .addJoins( schemaExport.joins() )
-                .addJoinTables( schemaExport.joinTables() )
-                .build();
+                .formatting( formatting );
 
-        return new ExportToCsvCommand( config, databaseExportService ).execute();
+        databaseInspector.addTablesToConfig( builder );
+        return builder.build();
     }
 
     private void doImport( Formatting formatting, Manifest manifest ) throws Exception

@@ -1,4 +1,4 @@
-package org.neo4j.integration.sql.exportcsv;
+package org.neo4j.integration.commands;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
+import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
@@ -30,14 +31,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DatabaseExportTest
+public class DatabaseInspectorTest
 {
 
     private TableMetadataProducer tableMetadataProducer = mock( TableMetadataProducer.class );
     private JoinMetadataProducer joinMetadataProducer = mock( JoinMetadataProducer.class );
     private JoinTableMetadataProducer joinTableMetadataProducer = mock( JoinTableMetadataProducer.class );
     private DatabaseClient databaseClient = mock( DatabaseClient.class );
-    private DatabaseExport databaseExport = new DatabaseExport(
+    private DatabaseInspector databaseInspector = new DatabaseInspector(
             tableMetadataProducer,
             joinMetadataProducer,
             joinTableMetadataProducer,
@@ -61,7 +62,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.addTableToConfig( config, address );
+        databaseInspector.addTableToConfig( config, address );
 
         // then
         verify( config ).addTables( argThat( matchesCollection( expectedTables ) ) );
@@ -94,7 +95,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.addTableToConfig( config, person );
+        databaseInspector.addTableToConfig( config, person );
 
         // then
         verify( config ).addTables( argThat( matchesCollection( expectedTables ) ) );
@@ -125,7 +126,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.addTableToConfig( config, joinTable );
+        databaseInspector.addTableToConfig( config, joinTable );
 
         // then
         verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
@@ -157,7 +158,7 @@ public class DatabaseExportTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseExport.addTableToConfig( config, joinTable );
+        databaseInspector.addTableToConfig( config, joinTable );
 
         // then
         verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
