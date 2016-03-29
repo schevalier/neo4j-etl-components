@@ -89,7 +89,7 @@ public class SimpleColumn implements Column
     @Override
     public String aliasedColumn()
     {
-        return format( "%s AS %s", name, alias );
+        return format( "%s AS `%s`", name, alias );
     }
 
     @Override

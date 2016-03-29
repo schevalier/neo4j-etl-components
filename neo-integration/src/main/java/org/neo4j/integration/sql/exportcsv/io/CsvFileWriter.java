@@ -39,7 +39,7 @@ public class CsvFileWriter
                                  BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy )
             throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Writing Data for %s", filenamePrefix ) );
+        Loggers.Default.log( Level.INFO, format( "Writing data for %s", filenamePrefix ) );
         Path exportFile = createExportFile( filenamePrefix );
         QueryResults results = executeSql( sqlSupplier.sql( mappings ) );
 

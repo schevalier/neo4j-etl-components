@@ -28,7 +28,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
     @Override
     public Collection<Join> createMetadataFor( JoinQueryInfo source ) throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Generating Join Metadata for %s", source ) );
+        Loggers.Default.log( Level.INFO, format( "Generating join metadata for %s", source ) );
         String sql = select( source );
 
         Collection<Join> joins = new ArrayList<>();
@@ -53,7 +53,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
 
     private String select( JoinQueryInfo source )
     {
-        return "SELECT join_table.TABLE_SCHEMA AS SOURCE_TABLE_SCHEMA," +
+        return "SELECT DISTINCT join_table.TABLE_SCHEMA AS SOURCE_TABLE_SCHEMA," +
                 "        CASE ( SELECT COUNT(referenced_table.REFERENCED_TABLE_NAME) " +
                 "               FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE referenced_table " +
                 "               WHERE source_column.TABLE_SCHEMA = referenced_table.TABLE_SCHEMA " +

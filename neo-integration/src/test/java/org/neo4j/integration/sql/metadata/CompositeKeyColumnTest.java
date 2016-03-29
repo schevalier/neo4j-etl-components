@@ -28,7 +28,7 @@ public class CompositeKeyColumnTest
 
         //then
         assertThat( column.aliasedColumn(),
-                is( "test.Author.first_name AS first_name, test.Author.last_name AS last_name" ) );
+                is( "test.Author.first_name AS `first_name`, test.Author.last_name AS `last_name`" ) );
     }
 
     @Test

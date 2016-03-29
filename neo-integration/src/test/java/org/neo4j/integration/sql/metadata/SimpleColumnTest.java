@@ -21,7 +21,7 @@ public class SimpleColumnTest
         Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
 
         // then
-        assertThat( column1.aliasedColumn(), is( "test.Person.id AS id" ) );
-        assertThat( column2.aliasedColumn(), is( "test.Person.username AS username" ) );
+        assertThat( column1.aliasedColumn(), is( "test.Person.id AS `id`" ) );
+        assertThat( column2.aliasedColumn(), is( "test.Person.username AS `username`" ) );
     }
 }

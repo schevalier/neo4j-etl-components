@@ -47,9 +47,9 @@ public class MySqlExportSqlSupplierTest
 
         // then
         String expectedSql = "SELECT " +
-                "test.Person.id AS id, " +
-                "test.Person.username AS username, " +
-                "test.Person.age AS age " +
+                "test.Person.id AS `id`, " +
+                "test.Person.username AS `username`, " +
+                "test.Person.age AS `age` " +
                 "FROM test.Person";
 
         assertEquals( expectedSql, sql );
@@ -77,8 +77,8 @@ public class MySqlExportSqlSupplierTest
         String sql = sqlSupplier.sql( mappings );
 
         // then
-        String expectedSql = "SELECT test.Author.first_name AS first_name, " +
-                "test.Author.last_name AS last_name " +
+        String expectedSql = "SELECT test.Author.first_name AS `first_name`, " +
+                "test.Author.last_name AS `last_name` " +
                 "FROM test.Author";
 
         assertEquals( expectedSql, sql );

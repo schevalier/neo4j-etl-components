@@ -26,7 +26,7 @@ public class HeaderFileWriter
 
     public Path writeHeaderFile( Collection<CsvField> fields, String filenamePrefix ) throws IOException
     {
-        Loggers.Default.log( Level.INFO, format( "Writing Headers for %s", filenamePrefix ) );
+        Loggers.Default.log( Level.INFO, format( "Writing headers for %s", filenamePrefix ) );
         String headers = fields.stream()
                 .map( CsvField::value )
                 .collect( Collectors.joining( formatting.delimiter().value() ) );
