@@ -27,6 +27,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 public class ExportFromMySqlIntegrationTest
@@ -67,6 +68,8 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
             List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
@@ -97,6 +100,8 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p)-[r]->(c) RETURN p, type(r), c" );
             List<String> books = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
             List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
@@ -125,6 +130,8 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (n) RETURN n" );
 
             List<Map<String, String>> stringFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
@@ -151,6 +158,8 @@ public class ExportFromMySqlIntegrationTest
         try
         {
             neo4j.get().start();
+
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
             String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (n) RETURN n" );
 
@@ -180,6 +189,8 @@ public class ExportFromMySqlIntegrationTest
         try
         {
             neo4j.get().start();
+
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
             String response = neo4j.get()
                     .executeHttp( NEO_TX_URI, "MATCH (p:Student)<-[r]-(c:Course) RETURN p, c, r.credits" );
@@ -224,6 +235,8 @@ public class ExportFromMySqlIntegrationTest
         {
             neo4j.get().start();
 
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
             String response = neo4j.get()
                     .executeHttp( NEO_TX_URI, "MATCH (a:Author)-[r]->(p:Publisher) RETURN a, p" );
 
@@ -252,7 +265,7 @@ public class ExportFromMySqlIntegrationTest
                         "--database", MySqlClient.Parameters.Database.value(),
                         "--import-tool", neo4j.get().binDirectory().toString(),
                         "--csv-directory", tempDirectory.get().toString(),
-                        "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
+                        "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--start", start,
                         "--end", end,
                         "--force"} );
@@ -268,7 +281,7 @@ public class ExportFromMySqlIntegrationTest
                         "--database", MySqlClient.Parameters.Database.value(),
                         "--import-tool", neo4j.get().binDirectory().toString(),
                         "--csv-directory", tempDirectory.get().toString(),
-                        "--destination", neo4j.get().databasesDirectory().resolve( "graph.db" ).toString(),
+                        "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--start", start,
                         "--end", end,
                         "--join-table", joinTable,

@@ -19,6 +19,8 @@ import org.neo4j.integration.process.Result;
 
 public class Neo4j implements AutoCloseable
 {
+    public static final String DEFAULT_DATABASE = "graph.db";
+
     private final Path directory;
 
     public Neo4j( Path directory )
@@ -49,6 +51,11 @@ public class Neo4j implements AutoCloseable
         {
             properties.store( writer, "Disabled Auth" );
         }
+    }
+
+    public boolean containsImportErrorLog( String database )
+    {
+        return Files.exists( databasesDirectory().resolve( database ).resolve( "bad.log" ) );
     }
 
     public void start() throws Exception

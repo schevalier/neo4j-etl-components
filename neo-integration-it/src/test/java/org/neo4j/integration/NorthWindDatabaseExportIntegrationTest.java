@@ -43,6 +43,7 @@ import static java.util.Arrays.asList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 
 public class NorthWindDatabaseExportIntegrationTest
 {
@@ -137,6 +138,8 @@ public class NorthWindDatabaseExportIntegrationTest
         {
             neo4j.get().start();
 
+            assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
             String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c) WHERE (c:customers) RETURN c" );
             String customersWithOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
                     "MATCH (c)--(o) " +
@@ -179,7 +182,7 @@ public class NorthWindDatabaseExportIntegrationTest
     {
         ImportConfig.Builder builder = ImportConfig.builder()
                 .importToolDirectory( neo4j.get().binDirectory() )
-                .destination( neo4j.get().databasesDirectory().resolve( "graph.db" ) )
+                .destination( neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ) )
                 .formatting( formatting )
                 .idType( IdType.String );
 
