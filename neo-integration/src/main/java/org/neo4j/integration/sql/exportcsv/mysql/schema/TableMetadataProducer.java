@@ -44,7 +44,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
     @Override
     public Collection<Table> createMetadataFor( TableName source ) throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Generating Table Metadata for %s", source ) );
+        Loggers.Default.log( Level.INFO, format( "Generating table metadata for %s", source ) );
         String sql = select( source );
 
         Table.Builder builder = Table.builder().name( source );
