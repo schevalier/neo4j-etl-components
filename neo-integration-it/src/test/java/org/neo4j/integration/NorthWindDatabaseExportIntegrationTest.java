@@ -110,7 +110,7 @@ public class NorthWindDatabaseExportIntegrationTest
                 "suppliers" );
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL ).host( "localhost" )
                 .port( DatabaseType.MySQL.defaultPort() )
-                .database( "northwind" ).username( "root" ).password( "password" ).build();
+                .database( "northwind" ).username( "neo" ).password( "neo" ).build();
 
         DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
@@ -140,10 +140,10 @@ public class NorthWindDatabaseExportIntegrationTest
 
             assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
-            String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c) WHERE (c:customers) RETURN c" );
+            String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c) WHERE (c:Customer) RETURN c" );
             String customersWithOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
                     "MATCH (c)--(o) " +
-                            "WHERE (c:customers)<-[:CUSTOMERS]-(o:orders) RETURN DISTINCT c" );
+                            "WHERE (c:Customer)<-[:CUSTOMER]-(o:Order) RETURN DISTINCT c" );
             List<String> customers = JsonPath.read( customersJson, "$.results[*].data[*].row[0]" );
             List<String> customersWithOrders = JsonPath.read( customersWithOrdersJson, "$.results[*].data[*].row[0]" );
             assertThat( customers.size(), is( 29 ) );
@@ -151,13 +151,13 @@ public class NorthWindDatabaseExportIntegrationTest
 
             String newOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
                     "MATCH (o)--(os) " +
-                            "WHERE (os:orders_status{status_name:'New'})--(o:orders) RETURN o" );
+                            "WHERE (os:OrderStatus{status_name:'New'})--(o:Order) RETURN o" );
             List<String> newOrders = JsonPath.read( newOrdersJson, "$.results[*].data[*].row[0]" );
 
             assertThat( newOrders.size(), is( 16 ) );
 
             String employeeWithPrivilegesResponse = neo4j.get().executeHttp( NEO_TX_URI,
-                    "MATCH (e:employees)-[:EMPLOYEE_PRIVILEGES]->(p) RETURN e,p;" );
+                    "MATCH (e:Employee)-[:EMPLOYEE_PRIVILEGE]->(p) RETURN e,p;" );
             List<String> city = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[0].city" );
             List<String> privilegeName = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[1]" +
                     ".privilege_name" );
@@ -166,8 +166,8 @@ public class NorthWindDatabaseExportIntegrationTest
             assertThat( privilegeName.get( 0 ), is( "Purchase Approvals" ) );
 
             String productsOnHold = neo4j.get().executeHttp( NEO_TX_URI,
-                    "MATCH (p:products)<--(n:inventory_transactions)-->" +
-                            "(it:inventory_transaction_types{type_name:'On Hold'}) " +
+                    "MATCH (p:Product)<--(n:InventoryTransaction)-->" +
+                            "(it:InventoryTransactionType{type_name:'On Hold'}) " +
                             "RETURN DISTINCT p" );
             List<String> productName = JsonPath.read( productsOnHold, "$.results[*].data[*].row[0].product_name" );
             assertThat( productName.get( 0 ), is( "Northwind Traders Gnocchi" ) );
