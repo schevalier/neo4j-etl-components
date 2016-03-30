@@ -23,23 +23,23 @@ public class ExportFromMySqlCommand
     private final String user;
     private final String password;
     private final Environment environment;
-    private final SchemaDetails schemaDetails;
     private MySqlExportService databaseExportService;
+    private String database;
 
     public ExportFromMySqlCommand( String host,
                                    int port,
                                    String user,
                                    String password,
                                    Environment environment,
-                                   SchemaDetails schemaDetails )
+                                   String database )
     {
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password;
-        this.schemaDetails = schemaDetails;
         this.environment = environment;
         this.databaseExportService = new MySqlExportService();
+        this.database = database;
     }
 
     public void execute() throws Exception
@@ -53,7 +53,7 @@ public class ExportFromMySqlCommand
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
                 .port( port )
-                .database( schemaDetails.database() )
+                .database( database )
                 .username( user )
                 .password( password )
                 .build();

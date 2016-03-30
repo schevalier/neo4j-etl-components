@@ -1,7 +1,6 @@
 package org.neo4j.integration.cli;
 
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
@@ -9,7 +8,6 @@ import io.airlift.airline.OptionType;
 
 import org.neo4j.integration.commands.Environment;
 import org.neo4j.integration.commands.ExportFromMySqlCommand;
-import org.neo4j.integration.commands.SchemaDetails;
 
 @Command(name = "mysql-export", description = "Export from MySQL.")
 public class ExportFromMySqlCliCommand implements Runnable
@@ -114,7 +112,7 @@ public class ExportFromMySqlCliCommand implements Runnable
                             Paths.get( destinationDirectory ),
                             Paths.get( csvRootDirectory ),
                             force ),
-                    new SchemaDetails( database, startTable, endTable, Optional.ofNullable( joinTable ) )
+                    database
             ).execute();
         }
         catch ( Exception e )
