@@ -40,6 +40,7 @@ public class CsvFileWriter
             throws Exception
     {
         Loggers.Default.log( Level.INFO, format( "Writing data for %s", filenamePrefix ) );
+
         Path exportFile = createExportFile( filenamePrefix );
         QueryResults results = executeSql( sqlSupplier.sql( mappings ) );
 
@@ -61,7 +62,8 @@ public class CsvFileWriter
         return databaseClient.executeQuery( sql ).await();
     }
 
-    private void writeResultsToFile( QueryResults results, Path file,
+    private void writeResultsToFile( QueryResults results,
+                                     Path file,
                                      ColumnToCsvFieldMappings mappings,
                                      BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy )
             throws Exception
