@@ -12,7 +12,7 @@ import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
+import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static org.junit.Assert.assertEquals;
@@ -64,7 +64,7 @@ public class MySqlExportSqlSupplierTest
 
         Column lastName = columnUtil.column( forTable, "last_name", ColumnType.PrimaryKey );
 
-        final CompositeKeyColumn from = new CompositeKeyColumn(
+        final CompositeColumn from = new CompositeColumn(
                 forTable, Arrays.asList( firstName, lastName ) );
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add(

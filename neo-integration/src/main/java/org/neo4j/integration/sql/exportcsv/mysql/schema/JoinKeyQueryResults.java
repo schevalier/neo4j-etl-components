@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
+import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
@@ -74,6 +74,6 @@ class JoinKeyQueryResults
             columns.add( simpleColumn( row, prefix ) );
         }
 
-        return new CompositeKeyColumn( table, columns );
+        return new CompositeColumn( table, columns );
     }
 }

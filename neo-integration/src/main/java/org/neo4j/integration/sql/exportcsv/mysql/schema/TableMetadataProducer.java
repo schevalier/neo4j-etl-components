@@ -10,11 +10,10 @@ import java.util.logging.Level;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.sql.exportcsv.mapping.TableToCsvFieldMapper;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
+import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
@@ -112,7 +111,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                 .filter( Optional::isPresent )
                 .map( Optional::get )
                 .collect( toList() );
-        builder.addColumn( new CompositeKeyColumn( source, primaryKeyColumns ) );
+        builder.addColumn( new CompositeColumn( source, primaryKeyColumns ) );
     }
 
     private void addSimpleColumn( TableName source, Table.Builder builder, Map<String, String> row )

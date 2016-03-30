@@ -5,10 +5,10 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.DefaultPropertyFormatter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.util.Strings;
 
@@ -16,6 +16,28 @@ import static java.lang.String.format;
 
 class Id implements CsvField
 {
+    static CsvField fromJson( JsonNode node )
+    {
+        String name = node.path( "name" ).textValue();
+        String idSpace = node.path( "id-space" ).textValue();
+        if ( StringUtils.isNotEmpty( name ) && StringUtils.isNotEmpty( idSpace ) )
+        {
+            return new Id( name, new IdSpace( idSpace ) );
+        }
+        else if ( StringUtils.isNotEmpty( name ) )
+        {
+            return new Id( name );
+        }
+        else if ( StringUtils.isNotEmpty( idSpace ) )
+        {
+            return new Id( new IdSpace( idSpace ) );
+        }
+        else
+        {
+            return new Id();
+        }
+    }
+
     private final Optional<String> name;
     private final Optional<IdSpace> idSpace;
 

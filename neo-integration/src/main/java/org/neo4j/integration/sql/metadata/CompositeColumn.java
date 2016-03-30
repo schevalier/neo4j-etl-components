@@ -19,14 +19,14 @@ import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
 import static java.lang.String.format;
 
-public class CompositeKeyColumn implements Column
+public class CompositeColumn implements Column
 {
     private static final String SEPARATOR = "\0";
 
     private final TableName table;
     private final Collection<Column> columns;
 
-    public CompositeKeyColumn( TableName table, Collection<Column> columns )
+    public CompositeColumn( TableName table, Collection<Column> columns )
     {
         this.table = table;
         this.columns = columns;

@@ -11,7 +11,7 @@ import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
+import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -128,7 +128,7 @@ public class TableMetadataProducerTest
         assertEquals( "test.Author", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                new CompositeKeyColumn(
+                new CompositeColumn(
                         forTable,
                         asList(
                                 new SimpleColumn(

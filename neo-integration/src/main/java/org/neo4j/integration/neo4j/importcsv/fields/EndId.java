@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -14,6 +15,19 @@ import static java.lang.String.format;
 
 class EndId implements CsvField
 {
+    static CsvField fromJson( JsonNode node )
+    {
+        String idSpace = node.path( "id-space" ).textValue();
+        if ( StringUtils.isNotEmpty( idSpace ) )
+        {
+            return new EndId( new IdSpace( idSpace ) );
+        }
+        else
+        {
+            return new EndId();
+        }
+    }
+
     private final Optional<IdSpace> idSpace;
 
     EndId()

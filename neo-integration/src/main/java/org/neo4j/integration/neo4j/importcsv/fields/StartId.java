@@ -5,16 +5,29 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.DefaultPropertyFormatter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 
 import static java.lang.String.format;
 
 class StartId implements CsvField
 {
+    static CsvField fromJson( JsonNode node )
+    {
+        String idSpace = node.path( "id-space" ).textValue();
+        if ( StringUtils.isNotEmpty( idSpace ) )
+        {
+            return new StartId( new IdSpace( idSpace ) );
+        }
+        else
+        {
+            return new StartId();
+        }
+    }
+
     private final Optional<IdSpace> idSpace;
 
     StartId()
@@ -39,7 +52,7 @@ class StartId implements CsvField
         ObjectNode root = JsonNodeFactory.instance.objectNode();
 
         root.put( "type", getClass().getSimpleName() );
-        root.put( "id-space", idSpace.isPresent() ? idSpace.get().value(): "" );
+        root.put( "id-space", idSpace.isPresent() ? idSpace.get().value() : "" );
 
         return root;
     }

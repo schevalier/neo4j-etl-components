@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
-import org.neo4j.integration.sql.metadata.CompositeKeyColumn;
+import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -35,7 +35,7 @@ public class ColumnUtil
 
     public Column compositeKeyColumn( TableName tableName, List<String> columnNames, ColumnType keyType )
     {
-        return new CompositeKeyColumn( tableName,
+        return new CompositeColumn( tableName,
                 columnNames.stream()
                         .map( name -> keyColumn( tableName, name, keyType ) )
                         .collect( Collectors.toList() ) );

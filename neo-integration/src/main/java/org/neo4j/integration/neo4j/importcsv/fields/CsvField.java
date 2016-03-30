@@ -4,8 +4,44 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 
+import static java.lang.String.format;
+
 public interface CsvField
 {
+    static CsvField fromJson( JsonNode root )
+    {
+        String type = root.path( "type" ).textValue();
+
+        if ( type.equalsIgnoreCase( StartId.class.getSimpleName() ) )
+        {
+            return StartId.fromJson( root );
+        }
+        else if ( type.equalsIgnoreCase( EndId.class.getSimpleName() ) )
+        {
+            return EndId.fromJson( root );
+        }
+        else if ( type.equalsIgnoreCase( RelationshipType.class.getSimpleName() ) )
+        {
+            return new RelationshipType();
+        }
+        else if ( type.equalsIgnoreCase( Id.class.getSimpleName() ) )
+        {
+            return Id.fromJson( root );
+        }
+        else if ( type.equalsIgnoreCase( Label.class.getSimpleName() ) )
+        {
+            return new Label();
+        }
+        else if ( type.equalsIgnoreCase( Data.class.getSimpleName() ) )
+        {
+            return Data.fromJson( root );
+        }
+        else
+        {
+            throw new IllegalStateException( format( "Unrecognized CsvField type: '%s'", type ) );
+        }
+    }
+
     static CsvField startId()
     {
         return new StartId();
@@ -61,7 +97,7 @@ public interface CsvField
         return new Data( name, type );
     }
 
-    static CsvField array( String name, Neo4jDataType type, Formatter formatter )
+    static CsvField array( String name, Neo4jDataType type )
     {
         return new Data( name, type, true );
     }
