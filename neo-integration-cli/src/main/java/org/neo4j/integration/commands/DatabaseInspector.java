@@ -97,10 +97,10 @@ public class DatabaseInspector
         if ( primaryKeys.isEmpty() && foreignKeys.size() == 2 )
         {
             Iterator<String> iterator = foreignKeys.iterator();
-            TableName start = new TableName( tableName.schema(), iterator.next() );
-            TableName end = new TableName( tableName.schema(), iterator.next() );
+            TableName tableOne = new TableName( tableName.schema(), iterator.next() );
+            TableName tableTwo = new TableName( tableName.schema(), iterator.next() );
             joinTables.addAll( joinTableMetadataProducer.createMetadataFor(
-                    new JoinTableInfo( tableName, new TableNamePair( start, end ) ) ) );
+                    new JoinTableInfo( tableName, new TableNamePair( tableOne, tableTwo ) ) ) );
         }
         else
         {

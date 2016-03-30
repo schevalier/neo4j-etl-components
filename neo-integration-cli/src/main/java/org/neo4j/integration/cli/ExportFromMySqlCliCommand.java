@@ -71,27 +71,6 @@ public class ExportFromMySqlCliCommand implements Runnable
     private String destinationDirectory;
 
     @Option(type = OptionType.COMMAND,
-            name = {"--start"},
-            description = "Table representing nodes at the start of the relationship.",
-            title = "name",
-            required = true)
-    private String startTable;
-
-    @Option(type = OptionType.COMMAND,
-            name = {"--end"},
-            description = "Table representing nodes at the end of the relationship.",
-            title = "name",
-            required = true)
-    private String endTable;
-
-    @Option(type = OptionType.COMMAND,
-            name = {"--join-table"},
-            description = "Table representing join table between the start and end tables.",
-            title = "name",
-            required = false)
-    private String joinTable;
-
-    @Option(type = OptionType.COMMAND,
             name = {"--force"},
             description = "Force delete destination store directory if it already exists.",
             title = "boolean")

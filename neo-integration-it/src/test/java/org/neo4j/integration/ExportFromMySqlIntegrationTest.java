@@ -44,7 +44,8 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(),
+                    "local" ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -257,8 +258,6 @@ public class ExportFromMySqlIntegrationTest
                         "--import-tool", neo4j.get().binDirectory().toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                        "--start", "RandomI",
-                        "--end", "RandomII",
                         "--force"} );
     }
 
