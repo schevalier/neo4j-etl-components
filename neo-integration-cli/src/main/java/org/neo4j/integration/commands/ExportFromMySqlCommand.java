@@ -60,19 +60,15 @@ public class ExportFromMySqlCommand
 
         print( "Exporting from MySQL to CSV..." );
 
-
         ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
                 .destination( csvDirectory )
                 .connectionConfig( connectionConfig )
                 .formatting( formatting );
 
         SchemaExport schemaExport = buildSchemaExport( connectionConfig );
-        builder.addTables( schemaExport.tables() );
-        builder.addJoins( schemaExport.joins() );
-        builder.addJoinTables( schemaExport.joinTables() );
-        ExportToCsvConfig config = builder.build();
+        schemaExport.updateConfig( builder, formatting, databaseExportService.sqlSupplier() );
 
-        Manifest manifest = new ExportToCsvCommand( config, databaseExportService ).execute();
+        Manifest manifest = new ExportToCsvCommand( builder.build(), databaseExportService ).execute();
 
         print( "Creating Neo4j store from CSV..." );
 

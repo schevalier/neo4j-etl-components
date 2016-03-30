@@ -6,18 +6,14 @@ import java.util.Collection;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.JoinTable;
-import org.neo4j.integration.sql.metadata.Table;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 
 class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
         ExportToCsvConfig.Builder.SetDestination,
         ExportToCsvConfig.Builder.SetFormatting,
         ExportToCsvConfig.Builder.SetMySqlConnectionConfig
 {
-    final Collection<Table> tables = new ArrayList<>();
-    final Collection<Join> joins = new ArrayList<>();
-    final Collection<JoinTable> joinTables = new ArrayList<>();
+    final Collection<CsvResource> csvResources = new ArrayList<>();
     Path destination;
     ConnectionConfig connectionConfig;
     Formatting formatting;
@@ -44,47 +40,10 @@ class ExportToCsvConfigBuilder implements ExportToCsvConfig.Builder,
     }
 
     @Override
-    public ExportToCsvConfig.Builder addTable( Table table )
+    public ExportToCsvConfig.Builder addCsvResource( CsvResource csvResource )
     {
-        tables.add( table );
+        csvResources.add( csvResource );
         return this;
-    }
-
-    @Override
-    public ExportToCsvConfig.Builder addTables( Collection<Table> tables )
-    {
-        this.tables.addAll( tables );
-        return this;
-    }
-
-    @Override
-    public ExportToCsvConfig.Builder addJoin(  Join join )
-    {
-        joins.add( join );
-        return this;
-    }
-
-    @Override
-    public ExportToCsvConfig.Builder addJoins( Collection<Join> joins )
-    {
-        this.joins.addAll( joins );
-        return this;
-    }
-
-    @Override
-    public ExportToCsvConfig.Builder addJoinTable( JoinTable joinTable )
-    {
-        joinTables.add( joinTable );
-        return this;
-
-    }
-
-    @Override
-    public ExportToCsvConfig.Builder addJoinTables( Collection<JoinTable> joinTables )
-    {
-        this.joinTables.addAll( joinTables );
-        return this;
-
     }
 
     @Override

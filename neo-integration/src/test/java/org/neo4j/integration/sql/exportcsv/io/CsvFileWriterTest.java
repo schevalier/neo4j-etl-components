@@ -18,7 +18,7 @@ import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
-import org.neo4j.integration.sql.exportcsv.mapping.Resource;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
@@ -68,12 +68,12 @@ public class CsvFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ) ) );
 
-        Resource resource = new Resource(
+        CsvResource resource = new CsvResource(
                 table.fullName(),
                 GraphObjectType.Node,
                 "SELECT ...",
-                mappings,
-                RowStrategy.WriteRowWithNullKey );
+                mappings
+        );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
@@ -120,12 +120,12 @@ public class CsvFileWriterTest
                         columnUtil.column( table, "username", ColumnType.Data ),
                         columnUtil.column( table, "age", ColumnType.Data ) ) );
 
-        Resource resource = new Resource(
+        CsvResource resource = new CsvResource(
                 table.fullName(),
                 GraphObjectType.Node,
                 "SELECT ...",
-                mappings,
-                RowStrategy.WriteRowWithNullKey );
+                mappings
+        );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
@@ -171,12 +171,12 @@ public class CsvFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ) ) );
 
-        Resource resource = new Resource(
+        CsvResource resource = new CsvResource(
                 table.fullName(),
                 GraphObjectType.Relationship,
                 "SELECT ...",
-                mappings,
-                RowStrategy.IgnoreRowWithNullKey );
+                mappings
+        );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );

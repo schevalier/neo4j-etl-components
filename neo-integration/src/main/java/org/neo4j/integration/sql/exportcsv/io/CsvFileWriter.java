@@ -13,7 +13,7 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
-import org.neo4j.integration.sql.exportcsv.mapping.Resource;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.util.Loggers;
 
@@ -30,7 +30,7 @@ public class CsvFileWriter
         this.databaseClient = databaseClient;
     }
 
-    public Path writeExportFile( Resource resource ) throws Exception
+    public Path writeExportFile( CsvResource resource ) throws Exception
     {
         Loggers.Default.log( Level.INFO, format( "Writing data for %s", resource.name() ) );
 
@@ -55,8 +55,10 @@ public class CsvFileWriter
         return databaseClient.executeQuery( sql ).await();
     }
 
-    private void writeResultsToFile( QueryResults results, Path file, Resource resource ) throws Exception
+    private void writeResultsToFile( QueryResults results, Path file, CsvResource resource ) throws Exception
     {
+        RowStrategy rowStrategy = RowStrategy.select( resource.graphObjectType() );
+
         ColumnToCsvFieldMappings mappings = resource.mappings();
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
 
@@ -66,7 +68,7 @@ public class CsvFileWriter
         {
             while ( results.next() )
             {
-                if ( resource.rowStrategy().test( results, mappings.columns() ) )
+                if ( rowStrategy.test( results, mappings.columns() ) )
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {

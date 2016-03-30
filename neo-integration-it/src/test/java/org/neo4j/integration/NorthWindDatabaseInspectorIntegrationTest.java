@@ -97,9 +97,9 @@ public class NorthWindDatabaseInspectorIntegrationTest
         DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
 
         SchemaExport schemaExport = databaseInspector.buildSchemaExport();
-        builder.addTables( schemaExport.tables() );
-        builder.addJoins( schemaExport.joins() );
-        builder.addJoinTables( schemaExport.joinTables() );
+//        builder.addTables( schemaExport.tables() );
+//        builder.addJoins( schemaExport.joins() );
+//        builder.addJoinTables( schemaExport.joinTables() );
 
         ExportToCsvConfig config = builder.build();
 

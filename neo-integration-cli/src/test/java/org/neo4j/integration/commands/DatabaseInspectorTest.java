@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 public class DatabaseInspectorTest
 {
-
     private DatabaseClient databaseClient = mock( DatabaseClient.class );
 
     @Test

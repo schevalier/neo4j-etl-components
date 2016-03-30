@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
@@ -25,23 +26,16 @@ public class ExportToCsvConfig
     }
 
     private final Path destination;
-
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
-    private final Collection<Table> tables;
-    private final Collection<Join> joins;
-    private final Collection<JoinTable> joinTables;
+    private final Collection<CsvResource> csvResources;
 
     ExportToCsvConfig( ExportToCsvConfigBuilder builder )
     {
         this.destination = Preconditions.requireNonNull( builder.destination, "Destination" );
         this.connectionConfig = Preconditions.requireNonNull( builder.connectionConfig, "ConnectionConfig" );
         this.formatting = Preconditions.requireNonNull( builder.formatting, "Formatting" );
-        this.tables = Preconditions.requireNonNull( builder.tables, "Tables" );
-        this.joins = Preconditions.requireNonNull( builder.joins, "Joins" );
-        this.joinTables = Preconditions.requireNonNull( builder.joinTables, "JoinTables" );
-
-        validate();
+        this.csvResources = Preconditions.requireNonNull( builder.csvResources, "CsvResources" );
     }
 
     public Path destination()
@@ -59,34 +53,9 @@ public class ExportToCsvConfig
         return formatting;
     }
 
-    public Collection<DatabaseObject> databaseObjects()
+    public Collection<CsvResource> csvResources()
     {
-        Collection<DatabaseObject> results = new ArrayList<>();
-        results.addAll( tables );
-        results.addAll( joins );
-        results.addAll( joinTables );
-        return results;
-    }
-
-    private void validate()
-    {
-        List<TableName> allTableNames = tables.stream().map( Table::name ).collect( Collectors.toList() );
-
-        joins.forEach(
-                join -> join.tableNames().forEach(
-                        tableName ->
-                        {
-                            if ( !allTableNames.contains( tableName ) )
-                            {
-                                throw new IllegalStateException(
-                                        format( "Config is missing table definition '%s' for join [%s]",
-                                                tableName.fullName(),
-                                                join.tableNames().stream()
-                                                                    .map( TableName::fullName )
-                                                                    .collect( Collectors.joining(" -> ") ) ) );
-                            }
-                        } ) );
-
+        return csvResources;
     }
 
     public interface Builder
@@ -106,17 +75,7 @@ public class ExportToCsvConfig
             Builder formatting( Formatting formatting );
         }
 
-        Builder addTable( Table table );
-
-        Builder addTables( Collection<Table> tables );
-
-        Builder addJoin( Join join );
-
-        Builder addJoins( Collection<Join> joins );
-
-        Builder addJoinTable( JoinTable joinTable );
-
-        Builder addJoinTables( Collection<JoinTable> joinTables );
+        Builder addCsvResource(CsvResource csvResource);
 
         ExportToCsvConfig build();
     }
