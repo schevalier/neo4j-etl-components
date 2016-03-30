@@ -10,6 +10,7 @@ import java.util.logging.Level;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.exportcsv.mapping.TableToCsvFieldMapper;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;

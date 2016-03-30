@@ -3,12 +3,13 @@ package org.neo4j.integration.sql.exportcsv;
 import java.nio.file.Files;
 
 import org.neo4j.integration.neo4j.importcsv.config.Manifest;
-import org.neo4j.integration.neo4j.importcsv.config.ManifestEntry;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.services.csv.ExportToCsvServiceProvider;
+import org.neo4j.integration.sql.exportcsv.mapping.Resource;
+import org.neo4j.integration.sql.exportcsv.mapping.ResourceProvider;
+import org.neo4j.integration.sql.exportcsv.services.ResourceToCsvFilesService;
 import org.neo4j.integration.sql.metadata.DatabaseObject;
 import org.neo4j.integration.util.OperatingSystem;
 
@@ -42,14 +43,15 @@ public class ExportToCsvCommand
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
             CsvFileWriter csvFileWriter = databaseExportService.createExportFileWriter( config, databaseClient );
 
-            ExportToCsvServiceProvider exportToCsvServiceProvider = new ExportToCsvServiceProvider();
+            ResourceProvider resourceProvider =
+                    new ResourceProvider( config.formatting(), databaseExportService.sqlSupplier() );
+            ResourceToCsvFilesService exportService = new ResourceToCsvFilesService( headerFileWriter, csvFileWriter );
 
             for ( DatabaseObject databaseObject : config.databaseObjects() )
             {
-                ManifestEntry manifestEntry = databaseObject.createService( exportToCsvServiceProvider )
-                        .exportToCsv( databaseExportService.sqlSupplier(), headerFileWriter, csvFileWriter, config );
+                Resource resource = databaseObject.invoke( resourceProvider );
 
-                manifest.add( manifestEntry );
+                manifest.add( exportService.exportToCsv( resource ) );
             }
         }
 

@@ -36,7 +36,7 @@ public class JoinTable implements DatabaseObject
     }
 
     @Override
-    public <T> T createService( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider )
+    public <T> T invoke( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider )
     {
         return databaseObjectServiceProvider.joinTableService( this );
     }

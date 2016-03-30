@@ -61,10 +61,4 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
 
         return builder.build();
     }
-
-    @Override
-    public BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy()
-    {
-        return ( r, c ) -> true;
-    }
 }

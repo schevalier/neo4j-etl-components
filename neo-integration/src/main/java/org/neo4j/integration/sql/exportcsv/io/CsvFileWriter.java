@@ -14,9 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.RowAccessor;
-import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
+import org.neo4j.integration.sql.exportcsv.mapping.Resource;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.util.Loggers;
 
@@ -27,24 +27,21 @@ public class CsvFileWriter
     private final ExportToCsvConfig config;
     private final DatabaseClient databaseClient;
 
-    public CsvFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
+    public CsvFileWriter( ExportToCsvConfig config,
+                          DatabaseClient databaseClient )
     {
         this.config = config;
         this.databaseClient = databaseClient;
     }
 
-    public Path writeExportFile( ColumnToCsvFieldMappings mappings,
-                                 DatabaseExportSqlSupplier sqlSupplier,
-                                 String filenamePrefix,
-                                 BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy )
-            throws Exception
+    public Path writeExportFile( Resource resource ) throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Writing data for %s", filenamePrefix ) );
+        Loggers.Default.log( Level.INFO, format( "Writing data for %s", resource.name() ) );
 
-        Path exportFile = createExportFile( filenamePrefix );
-        QueryResults results = executeSql( sqlSupplier.sql( mappings ) );
+        Path exportFile = createExportFile( resource.name() );
+        QueryResults results = executeSql( resource.sql() );
 
-        writeResultsToFile( results, exportFile, mappings, writeRowWithNullsStrategy );
+        writeResultsToFile( results, exportFile, resource.mappings(), resource.rowStrategy() );
 
         return exportFile;
     }

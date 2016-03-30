@@ -18,9 +18,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class WriteRowWithNullsStrategyTest
+public class RowStrategyTest
 {
-
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
@@ -42,7 +41,7 @@ public class WriteRowWithNullsStrategyTest
                 columnUtil.compositeKeyColumn( table, asList( "first_name", "last_name" ), ColumnType.PrimaryKey ) );
 
         // when
-        WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
+        RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
@@ -65,7 +64,7 @@ public class WriteRowWithNullsStrategyTest
                 columnUtil.column( table, "age", ColumnType.Data ) );
 
         // when
-        WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
+        RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
@@ -88,7 +87,7 @@ public class WriteRowWithNullsStrategyTest
                 columnUtil.column( table, "age", ColumnType.Data ) );
 
         // when
-        WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
+        RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
@@ -106,7 +105,7 @@ public class WriteRowWithNullsStrategyTest
                 columnUtil.column( table, "age", ColumnType.Data ) );
 
         // when
-        WriteRowWithNullsStrategy strategy = new WriteRowWithNullsStrategy();
+        RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> {

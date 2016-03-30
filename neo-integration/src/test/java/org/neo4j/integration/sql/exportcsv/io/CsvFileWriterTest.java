@@ -10,14 +10,15 @@ import org.junit.Test;
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
-import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
+import org.neo4j.integration.sql.exportcsv.mapping.Resource;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
@@ -67,13 +68,18 @@ public class CsvFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ) ) );
 
+        Resource resource = new Resource(
+                table.fullName(),
+                GraphObjectType.Node,
+                "SELECT ...",
+                mappings,
+                RowStrategy.WriteRowWithNullKey );
 
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
 
         // when
-        Path exportFile = writer.writeExportFile( mappings, mock( DatabaseExportSqlSupplier.class ),
-                table.fullName(), new WriteRowWithNullsStrategy() );
+        Path exportFile = writer.writeExportFile( resource );
 
         // then
         List<String> contents = Files.readAllLines( exportFile );
@@ -114,12 +120,18 @@ public class CsvFileWriterTest
                         columnUtil.column( table, "username", ColumnType.Data ),
                         columnUtil.column( table, "age", ColumnType.Data ) ) );
 
+        Resource resource = new Resource(
+                table.fullName(),
+                GraphObjectType.Node,
+                "SELECT ...",
+                mappings,
+                RowStrategy.WriteRowWithNullKey );
+
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
 
         // when
-        Path exportFile = writer.writeExportFile( mappings, mock( DatabaseExportSqlSupplier.class ), table.fullName()
-                , new WriteRowWithNullsStrategy() );
+        Path exportFile = writer.writeExportFile( resource );
 
         // then
         List<String> contents = Files.readAllLines( exportFile );
@@ -127,7 +139,7 @@ public class CsvFileWriterTest
     }
 
     @Test
-    public void shouldWriteSkipWritingRowForRelationshipsIfAnyColumnHasNullOrEmptyValues() throws Exception
+    public void shouldSkipWritingRowForRelationshipsIfAnyColumnHasNullOrEmptyValues() throws Exception
     {
         // given
         TableName table = new TableName( "users" );
@@ -159,15 +171,18 @@ public class CsvFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnType.Data ) ) );
 
+        Resource resource = new Resource(
+                table.fullName(),
+                GraphObjectType.Relationship,
+                "SELECT ...",
+                mappings,
+                RowStrategy.IgnoreRowWithNullKey );
+
         // create writer under test
         CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
 
         // when
-        Path exportFile = writer.writeExportFile(
-                mappings,
-                mock( DatabaseExportSqlSupplier.class ),
-                table.fullName(),
-                new WriteRowWithNullsStrategy() );
+        Path exportFile = writer.writeExportFile( resource );
 
         // then
         List<String> contents = Files.readAllLines( exportFile );

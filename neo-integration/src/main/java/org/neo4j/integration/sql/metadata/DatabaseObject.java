@@ -4,5 +4,5 @@ public interface DatabaseObject
 {
     String descriptor();
 
-    <T> T createService( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider );
+    <T> T invoke( DatabaseObjectServiceProvider<T> databaseObjectServiceProvider );
 }

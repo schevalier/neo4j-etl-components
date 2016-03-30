@@ -10,6 +10,4 @@ import org.neo4j.integration.sql.metadata.DatabaseObject;
 public interface DatabaseObjectToCsvFieldMapper<T extends DatabaseObject>
 {
     ColumnToCsvFieldMappings createMappings( T source );
-
-    BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy();
 }
