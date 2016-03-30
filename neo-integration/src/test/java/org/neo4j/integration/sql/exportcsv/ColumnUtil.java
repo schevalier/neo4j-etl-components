@@ -20,7 +20,7 @@ public class ColumnUtil
 
     public Column column( TableName table, String name, String alias, ColumnType type )
     {
-        return new SimpleColumn( table, name, alias, type, MySqlDataType.TEXT );
+        return new SimpleColumn( table, name, alias, type, MySqlDataType.TEXT.toNeo4jDataType() );
     }
 
     public SimpleColumn keyColumn( TableName tableName, String nameAndAlias, ColumnType type )
@@ -30,7 +30,7 @@ public class ColumnUtil
                 tableName.fullyQualifiedColumnName( nameAndAlias ),
                 nameAndAlias,
                 type,
-                SqlDataType.KEY_DATA_TYPE );
+                SqlDataType.KEY_DATA_TYPE.toNeo4jDataType() );
     }
 
     public Column compositeKeyColumn( TableName tableName, List<String> columnNames, ColumnType keyType )

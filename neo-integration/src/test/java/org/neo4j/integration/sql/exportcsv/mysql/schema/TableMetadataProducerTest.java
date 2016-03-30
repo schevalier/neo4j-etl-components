@@ -62,14 +62,14 @@ public class TableMetadataProducerTest
                         forTable.fullyQualifiedColumnName( "id" ),
                         "id",
                         ColumnType.PrimaryKey,
-                        MySqlDataType.INT ),
+                        MySqlDataType.INT.toNeo4jDataType() ),
                 columnUtil.column( forTable, "username", ColumnType.Data ),
                 new SimpleColumn(
                         forTable,
                         forTable.fullyQualifiedColumnName( "addressId" ),
                         "addressId",
                         ColumnType.ForeignKey,
-                        MySqlDataType.INT ) ) );
+                        MySqlDataType.INT.toNeo4jDataType() ) ) );
     }
 
     @Test
@@ -136,13 +136,13 @@ public class TableMetadataProducerTest
                                         forTable.fullyQualifiedColumnName( "first_name" ),
                                         "first_name",
                                         ColumnType.PrimaryKey,
-                                        MySqlDataType.VARCHAR ),
+                                        MySqlDataType.VARCHAR.toNeo4jDataType() ),
                                 new SimpleColumn(
                                         forTable,
                                         forTable.fullyQualifiedColumnName( "last_name" ),
                                         "last_name",
                                         ColumnType.PrimaryKey,
-                                        MySqlDataType.VARCHAR ) ) ) ) );
+                                        MySqlDataType.VARCHAR.toNeo4jDataType() ) ) ) ) );
     }
 }
 

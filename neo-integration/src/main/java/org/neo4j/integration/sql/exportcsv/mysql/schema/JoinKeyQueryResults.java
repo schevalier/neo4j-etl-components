@@ -58,7 +58,7 @@ class JoinKeyQueryResults
                 targetTable.fullyQualifiedColumnName( targetColumn ),
                 targetColumn,
                 targetColumnType,
-                SqlDataType.KEY_DATA_TYPE );
+                SqlDataType.KEY_DATA_TYPE.toNeo4jDataType() );
     }
 
     private Column compositeColumn( List<Map<String, String>> rows, Function<String, String> prefix )

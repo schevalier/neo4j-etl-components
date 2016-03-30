@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
@@ -18,7 +19,7 @@ public interface Column
 
     ColumnType type();
 
-    SqlDataType dataType();
+    Neo4jDataType neo4jDataType();
 
     String selectFrom( RowAccessor row );
 

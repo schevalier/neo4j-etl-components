@@ -39,7 +39,7 @@ public class TableToCsvFieldMapperTest
                         personTable.fullyQualifiedColumnName( "age" ),
                         "age",
                         ColumnType.Data,
-                        MySqlDataType.INT ) )
+                        MySqlDataType.INT.toNeo4jDataType() ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

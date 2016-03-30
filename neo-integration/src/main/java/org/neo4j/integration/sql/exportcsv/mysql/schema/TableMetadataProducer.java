@@ -136,7 +136,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                     source.fullyQualifiedColumnName( columnName ),
                     columnName,
                     columnType,
-                    dataType ) );
+                    dataType.toNeo4jDataType() ) );
         }
         else
         {
