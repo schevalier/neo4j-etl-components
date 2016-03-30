@@ -12,26 +12,14 @@ import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.neo4j.integration.commands.DatabaseInspector;
-import org.neo4j.integration.commands.SchemaExport;
 import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.neo4j.Neo4j;
 import org.neo4j.integration.neo4j.Neo4jVersion;
-import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
-import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
-import org.neo4j.integration.neo4j.importcsv.config.Manifest;
-import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.provisioning.Neo4jFixture;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFixture;
 import org.neo4j.integration.provisioning.scripts.MySqlScripts;
-import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
@@ -69,6 +57,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
+            exportFromMySqlToNeo4j();
         }
         catch ( IOException e )
         {
@@ -82,31 +71,6 @@ public class NorthWindDatabaseInspectorIntegrationTest
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
         // when
-        ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL ).host( "localhost" )
-                .port( DatabaseType.MySQL.defaultPort() )
-                .database( "northwind" ).username( "neo" ).password( "neo" ).build();
-
-        DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
-
-        ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
-                .destination( tempDirectory.get() )
-                .connectionConfig( connectionConfig )
-                .formatting( Formatting.builder().delimiter( Delimiter.TAB ).build() );
-
-        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
-
-        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
-//        builder.addTables( schemaExport.tables() );
-//        builder.addJoins( schemaExport.joins() );
-//        builder.addJoinTables( schemaExport.joinTables() );
-
-        ExportToCsvConfig config = builder.build();
-
-        Manifest manifest = new ExportToCsvCommand( config ).execute();
-
-        doImport( Formatting.builder().delimiter( Delimiter.TAB ).build(), manifest );
-
-        // then
         try
         {
             neo4j.get().start();
@@ -151,22 +115,24 @@ public class NorthWindDatabaseInspectorIntegrationTest
         }
     }
 
-    private void doImport( Formatting formatting, Manifest manifest ) throws Exception
-    {
-        ImportConfig.Builder builder = ImportConfig.builder()
-                .importToolDirectory( neo4j.get().binDirectory() )
-                .destination( neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ) )
-                .formatting( formatting )
-                .idType( IdType.String );
-
-        manifest.addNodesAndRelationshipsToBuilder( builder );
-
-        new ImportFromCsvCommand( builder.build() ).execute();
-    }
-
     private static void populateMySqlDatabase() throws Exception
     {
         MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
         client.execute( MySqlScripts.setupDatabaseScript().value() );
+    }
+
+    private static void exportFromMySqlToNeo4j()
+    {
+        NeoIntegrationCli.executeMainReturnSysOut(
+                new String[]{"mysql-export",
+                        "--host", mySqlServer.get().ipAddress(),
+                        "--user", MySqlClient.Parameters.DBUser.value(),
+                        "--password", MySqlClient.Parameters.DBPassword.value(),
+                        "--database", "northwind",
+                        "--import-tool", neo4j.get().binDirectory().toString(),
+                        "--csv-directory", tempDirectory.get().toString(),
+                        "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
+                        "--delimiter", "\t",
+                        "--force"} );
     }
 }

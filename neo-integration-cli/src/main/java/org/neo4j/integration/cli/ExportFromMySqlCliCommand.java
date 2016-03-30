@@ -1,6 +1,7 @@
 package org.neo4j.integration.cli;
 
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
@@ -8,6 +9,7 @@ import io.airlift.airline.OptionType;
 
 import org.neo4j.integration.commands.Environment;
 import org.neo4j.integration.commands.ExportFromMySqlCommand;
+import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 
 @Command(name = "mysql-export", description = "Export from MySQL.")
 public class ExportFromMySqlCliCommand implements Runnable
@@ -70,29 +72,40 @@ public class ExportFromMySqlCliCommand implements Runnable
             required = true)
     private String destinationDirectory;
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--force"},
             description = "Force delete destination store directory if it already exists.",
             title = "boolean")
     private boolean force = false;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--delimiter"},
+            description = "Delimiter to separate fields in CSV",
+            title = "delimiter",
+            required = false)
+    private String delimiter;
+
     @Override
     public void run()
     {
         try
         {
+            Delimiter delimiter = new Delimiter( Optional.ofNullable( this.delimiter ).orElse( "," ) );
             new ExportFromMySqlCommand(
                     host,
                     port,
                     user,
                     password,
+                    database,
+                    delimiter,
                     new Environment(
                             Paths.get( importToolDirectory ),
                             Paths.get( destinationDirectory ),
                             Paths.get( csvRootDirectory ),
-                            force ),
-                    database
-            ).execute();
+                            force ) )
+                    .execute();
         }
         catch ( Exception e )
         {

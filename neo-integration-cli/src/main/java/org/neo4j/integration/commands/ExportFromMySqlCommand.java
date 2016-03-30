@@ -3,6 +3,7 @@ package org.neo4j.integration.commands;
 import java.nio.file.Path;
 
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
+import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.config.Manifest;
@@ -26,13 +27,15 @@ public class ExportFromMySqlCommand
     private final Environment environment;
     private final DatabaseExportSqlSupplier sqlSupplier;
     private final String database;
+    private final Formatting formatting;
 
     public ExportFromMySqlCommand( String host,
                                    int port,
                                    String user,
                                    String password,
-                                   Environment environment,
-                                   String database )
+                                   String database,
+                                   Delimiter delimiter,
+                                   Environment environment )
     {
         this.host = host;
         this.port = port;
@@ -41,6 +44,7 @@ public class ExportFromMySqlCommand
         this.environment = environment;
         this.sqlSupplier = new MySqlExportSqlSupplier();
         this.database = database;
+        this.formatting = Formatting.builder().delimiter( delimiter ).build();
     }
 
     public void execute() throws Exception
@@ -48,8 +52,6 @@ public class ExportFromMySqlCommand
         Path csvDirectory = environment.prepare();
 
         print( format( "CSV directory: %s", csvDirectory ) );
-
-        Formatting formatting = Formatting.DEFAULT;
 
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
