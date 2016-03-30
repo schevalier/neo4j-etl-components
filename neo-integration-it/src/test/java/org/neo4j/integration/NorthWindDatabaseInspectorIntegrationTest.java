@@ -57,7 +57,6 @@ public class NorthWindDatabaseInspectorIntegrationTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
-            exportFromMySqlToNeo4j();
         }
         catch ( IOException e )
         {
@@ -71,6 +70,8 @@ public class NorthWindDatabaseInspectorIntegrationTest
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
         // when
+        exportFromMySqlToNeo4j();
+
         try
         {
             neo4j.get().start();
