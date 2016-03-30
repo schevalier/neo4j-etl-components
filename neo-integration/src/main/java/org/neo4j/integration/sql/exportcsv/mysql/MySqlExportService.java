@@ -8,7 +8,6 @@ import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 
 public class MySqlExportService implements DatabaseExportService
 {
-
     private final MySqlExportSqlSupplier sqlSupplier;
 
     public MySqlExportService()

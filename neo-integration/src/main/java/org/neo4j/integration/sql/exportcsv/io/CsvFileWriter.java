@@ -27,8 +27,7 @@ public class CsvFileWriter
     private final ExportToCsvConfig config;
     private final DatabaseClient databaseClient;
 
-    public CsvFileWriter( ExportToCsvConfig config,
-                          DatabaseClient databaseClient )
+    public CsvFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
     {
         this.config = config;
         this.databaseClient = databaseClient;
