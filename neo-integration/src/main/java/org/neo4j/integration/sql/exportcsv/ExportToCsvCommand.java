@@ -14,12 +14,10 @@ import org.neo4j.integration.util.OperatingSystem;
 public class ExportToCsvCommand
 {
     private final ExportToCsvConfig config;
-    private final DatabaseExportService databaseExportService;
 
-    public ExportToCsvCommand( ExportToCsvConfig config, DatabaseExportService databaseExportService )
+    public ExportToCsvCommand( ExportToCsvConfig config )
     {
         this.config = config;
-        this.databaseExportService = databaseExportService;
     }
 
     public Manifest execute() throws Exception
@@ -39,7 +37,7 @@ public class ExportToCsvCommand
         try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
-            CsvFileWriter csvFileWriter = databaseExportService.createExportFileWriter( config, databaseClient );
+            CsvFileWriter csvFileWriter = new CsvFileWriter( config, databaseClient );
             ResourceToCsvFilesService exportService = new ResourceToCsvFilesService( headerFileWriter, csvFileWriter );
 
             for ( CsvResource resource : config.csvResources() )

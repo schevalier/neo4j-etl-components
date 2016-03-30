@@ -32,7 +32,6 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
@@ -103,7 +102,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
 
         ExportToCsvConfig config = builder.build();
 
-        Manifest manifest = new ExportToCsvCommand( config, new MySqlExportService() ).execute();
+        Manifest manifest = new ExportToCsvCommand( config ).execute();
 
         doImport( Formatting.builder().delimiter( Delimiter.TAB ).build(), manifest );
 

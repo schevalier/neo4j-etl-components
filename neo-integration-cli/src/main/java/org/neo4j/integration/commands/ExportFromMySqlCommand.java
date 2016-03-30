@@ -10,9 +10,10 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
+import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportService;
+import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 
 import static java.lang.String.format;
 
@@ -23,7 +24,7 @@ public class ExportFromMySqlCommand
     private final String user;
     private final String password;
     private final Environment environment;
-    private MySqlExportService databaseExportService;
+    private DatabaseExportSqlSupplier sqlSupplier;
     private String database;
 
     public ExportFromMySqlCommand( String host,
@@ -38,7 +39,7 @@ public class ExportFromMySqlCommand
         this.user = user;
         this.password = password;
         this.environment = environment;
-        this.databaseExportService = new MySqlExportService();
+        this.sqlSupplier = new MySqlExportSqlSupplier();
         this.database = database;
     }
 
@@ -66,9 +67,9 @@ public class ExportFromMySqlCommand
                 .formatting( formatting );
 
         SchemaExport schemaExport = buildSchemaExport( connectionConfig );
-        schemaExport.updateConfig( builder, formatting, databaseExportService.sqlSupplier() );
+        schemaExport.updateConfig( builder, formatting, sqlSupplier );
 
-        Manifest manifest = new ExportToCsvCommand( builder.build(), databaseExportService ).execute();
+        Manifest manifest = new ExportToCsvCommand( builder.build() ).execute();
 
         print( "Creating Neo4j store from CSV..." );
 
