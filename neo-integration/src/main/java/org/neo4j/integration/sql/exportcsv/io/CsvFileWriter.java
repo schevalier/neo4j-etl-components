@@ -5,15 +5,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.function.BiPredicate;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.Resource;
@@ -40,7 +37,7 @@ public class CsvFileWriter
         Path exportFile = createExportFile( resource.name() );
         QueryResults results = executeSql( resource.sql() );
 
-        writeResultsToFile( results, exportFile, resource.mappings(), resource.rowStrategy() );
+        writeResultsToFile( results, exportFile, resource );
 
         return exportFile;
     }
@@ -58,12 +55,9 @@ public class CsvFileWriter
         return databaseClient.executeQuery( sql ).await();
     }
 
-    private void writeResultsToFile( QueryResults results,
-                                     Path file,
-                                     ColumnToCsvFieldMappings mappings,
-                                     BiPredicate<RowAccessor, Collection<Column>> writeRowWithNullsStrategy )
-            throws Exception
+    private void writeResultsToFile( QueryResults results, Path file, Resource resource ) throws Exception
     {
+        ColumnToCsvFieldMappings mappings = resource.mappings();
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
 
         int maxIndex = columns.length - 1;
@@ -72,7 +66,7 @@ public class CsvFileWriter
         {
             while ( results.next() )
             {
-                if ( writeRowWithNullsStrategy.test( results, mappings.columns() ) )
+                if ( resource.rowStrategy().test( results, mappings.columns() ) )
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {
