@@ -1,7 +1,6 @@
 package org.neo4j.integration.commands;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.hamcrest.Description;
@@ -12,7 +11,6 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
@@ -23,6 +21,7 @@ import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.sql.metadata.TableNamePair;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
@@ -48,9 +47,6 @@ public class DatabaseInspectorTest
     @Test
     public void shouldAddTableToConfigForTableWithPrimaryKeyAndNoForeignKeys() throws Exception
     {
-        // given
-        ExportToCsvConfig.Builder config = mock( ExportToCsvConfig.Builder.class );
-
         TableName address = new TableName( "test.Address" );
         Collection<Table> expectedTables = singletonList( mock( Table.class ) );
 
@@ -63,23 +59,18 @@ public class DatabaseInspectorTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        HashSet<Table> actualTables = new HashSet<>();
-        HashSet<Join> actualJoins = new HashSet<>();
-        HashSet<JoinTable> actualJoinTable = new HashSet<>();
-        databaseInspector.addTableToConfig( address, actualTables, actualJoins, actualJoinTable );
+        when( databaseClient.tableNames() ).thenReturn( asList( address ) );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
 
         // then
-        assertThat( actualTables, is( matchesCollection( expectedTables ) ) );
-        assertThat( actualJoins, is( matchesCollection( emptyList() ) ) );
-        assertThat( actualJoinTable, is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.tables(), is( matchesCollection( expectedTables ) ) );
+        assertThat( schemaExport.joins(), is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.joinTables(), is( matchesCollection( emptyList() ) ) );
     }
 
     @Test
     public void shouldAddTableAndJoinToConfigForTableWithPrimaryKeyAndForeignKey() throws Exception
     {
-        // given
-        ExportToCsvConfig.Builder config = mock( ExportToCsvConfig.Builder.class );
-
         Table personTable = mock( Table.class );
         List<Table> expectedTables = singletonList( personTable );
         List<Join> expectedJoins = singletonList( mock( Join.class ) );
@@ -98,23 +89,18 @@ public class DatabaseInspectorTest
                 .thenReturn( expectedJoins );
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
-        HashSet<Table> actualTables = new HashSet<>();
-        HashSet<Join> actualJoins = new HashSet<>();
-        HashSet<JoinTable> actualJoinTable = new HashSet<>();
-        databaseInspector.addTableToConfig( person, actualTables, actualJoins, actualJoinTable );
+        when( databaseClient.tableNames() ).thenReturn( asList( person ) );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
 
         // then
-        assertThat( actualTables, is( matchesCollection( expectedTables ) ) );
-        assertThat( actualJoins, is( matchesCollection( expectedJoins ) ) );
-        assertThat( actualJoinTable, is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.tables(), is( matchesCollection( expectedTables ) ) );
+        assertThat( schemaExport.joins(), is( matchesCollection( expectedJoins ) ) );
+        assertThat( schemaExport.joinTables(), is( matchesCollection( emptyList() ) ) );
     }
 
     @Test
     public void shouldAddJoinTableForTableWithTwoForeignKeysAndNoPrimaryKey() throws Exception
     {
-        // given
-        ExportToCsvConfig.Builder config = mock( ExportToCsvConfig.Builder.class );
-
         TableName joinTable = new TableName( "test.Student_Course" );
         TableName student = new TableName( "test.Student" );
         TableName course = new TableName( "test.Course" );
@@ -132,24 +118,18 @@ public class DatabaseInspectorTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        HashSet<Table> actualTables = new HashSet<>();
-        HashSet<Join> actualJoins = new HashSet<>();
-        HashSet<JoinTable> actualJoinTable = new HashSet<>();
-        databaseInspector.addTableToConfig( joinTable, actualTables, actualJoins, actualJoinTable );
+        when( databaseClient.tableNames() ).thenReturn( asList( joinTable ) );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
 
         // then
-        assertThat( actualTables, is( matchesCollection( emptyList() ) ) );
-        assertThat( actualJoins, is( matchesCollection( emptyList() ) ) );
-        assertThat( actualJoinTable, is( matchesCollection( joinTables ) ) );
-
+        assertThat( schemaExport.tables(), is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.joins(), is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.joinTables(), is( matchesCollection( joinTables ) ) );
     }
 
     @Test
     public void shouldAddJoinTableForTableWithCandidateKey() throws Exception
     {
-        // given
-        ExportToCsvConfig.Builder config = mock( ExportToCsvConfig.Builder.class );
-
         TableName joinTable = new TableName( "test.Student_Course" );
         TableName student = new TableName( "test.Student" );
         TableName course = new TableName( "test.Course" );
@@ -162,20 +142,18 @@ public class DatabaseInspectorTest
                 .addRow( "courseId", "Course", "id", "PRI" )
                 .build();
 
-        when( joinTableMetadataProducer.createMetadataFor( new JoinTableInfo( joinTable, referencedTables ) ) )
-                .thenReturn( joinTables );
-        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        HashSet<Table> actualTables = new HashSet<>();
-        HashSet<Join> actualJoins = new HashSet<>();
-        HashSet<JoinTable> actualJoinTable = new HashSet<>();
-        databaseInspector.addTableToConfig( joinTable, actualTables, actualJoins, actualJoinTable );
+        when( databaseClient.tableNames() ).thenReturn( asList( joinTable ) );
+        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        when( joinTableMetadataProducer.createMetadataFor( new JoinTableInfo( joinTable, referencedTables ) ) )
+                .thenReturn( joinTables );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
 
         // then
-        assertThat( actualTables, is( matchesCollection( emptyList() ) ) );
-        assertThat( actualJoins, is( matchesCollection( emptyList() ) ) );
-        assertThat( actualJoinTable, is( matchesCollection( joinTables ) ) );
+        assertThat( schemaExport.tables(), is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.joins(), is( matchesCollection( emptyList() ) ) );
+        assertThat( schemaExport.joinTables(), is( matchesCollection( joinTables ) ) );
     }
 
     private <T> TypeSafeMatcher<Collection<T>> matchesCollection( final Collection<T> expected )

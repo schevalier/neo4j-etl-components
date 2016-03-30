@@ -56,15 +56,15 @@ public class DatabaseInspector
 
         for ( TableName tableName : databaseClient.tableNames() )
         {
-            addTableToConfig( tableName, tables, joins, joinTables );
+            buildSchema( tableName, tables, joins, joinTables );
         }
         return new SchemaExport( tables, joins, joinTables );
     }
 
-    public void addTableToConfig( TableName tableName,
-                                  Collection<Table> tables,
-                                  Collection<Join> joins,
-                                  Collection<JoinTable> joinTables ) throws Exception
+    private void buildSchema( TableName tableName,
+                              Collection<Table> tables,
+                              Collection<Join> joins,
+                              Collection<JoinTable> joinTables ) throws Exception
     {
         QueryResults results = databaseClient.executeQuery( listKeys( tableName ) ).await();
 
