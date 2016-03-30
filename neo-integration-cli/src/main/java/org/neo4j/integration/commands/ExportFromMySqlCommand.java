@@ -24,8 +24,8 @@ public class ExportFromMySqlCommand
     private final String user;
     private final String password;
     private final Environment environment;
-    private DatabaseExportSqlSupplier sqlSupplier;
-    private String database;
+    private final DatabaseExportSqlSupplier sqlSupplier;
+    private final String database;
 
     public ExportFromMySqlCommand( String host,
                                    int port,
