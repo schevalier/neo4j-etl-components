@@ -1,7 +1,9 @@
 package org.neo4j.integration.commands;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
@@ -11,149 +13,183 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
-import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
-import org.neo4j.integration.sql.metadata.TableNamePair;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.anyString;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DatabaseInspectorTest
 {
 
-    private TableMetadataProducer tableMetadataProducer = mock( TableMetadataProducer.class );
-    private JoinMetadataProducer joinMetadataProducer = mock( JoinMetadataProducer.class );
-    private JoinTableMetadataProducer joinTableMetadataProducer = mock( JoinTableMetadataProducer.class );
     private DatabaseClient databaseClient = mock( DatabaseClient.class );
-    private DatabaseInspector databaseInspector = new DatabaseInspector(
-            tableMetadataProducer,
-            joinMetadataProducer,
-            joinTableMetadataProducer,
-            databaseClient );
 
     @Test
-    public void shouldAddTableToConfigForTableWithPrimaryKeyAndNoForeignKeys() throws Exception
+    public void buildSchemaExportShouldExportTablesAndJoinsForTwoTableJoin() throws Exception
     {
-        TableName address = new TableName( "test.Address" );
-        Collection<Table> expectedTables = singletonList( mock( Table.class ) );
-
-        QueryResults results = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "REFERENCED_COLUMN_NAME", "COLUMN_KEY" )
-                .addRow( "id", null, null, "PRI" )
+        // given
+        QueryResults personTableSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "id", null, "PRI" )
+                .addRow( "username", null, "Data" )
+                .addRow( "addressId", "Address", "MUL" )
                 .build();
 
-        when( tableMetadataProducer.createMetadataFor( address ) ).thenReturn( expectedTables );
-        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
-        // when
-        when( databaseClient.tableNames() ).thenReturn( asList( address ) );
-        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
+        QueryResults personResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "username", "TEXT", "Data" )
+                .addRow( "addressId", "int", "ForeignKey" )
+                .build();
 
-        // then
-        assertThat( schemaExport.tables(), is( matchesCollection( expectedTables ) ) );
-        assertThat( schemaExport.joins(), is( matchesCollection( emptyList() ) ) );
-        assertThat( schemaExport.joinTables(), is( matchesCollection( emptyList() ) ) );
-    }
+        QueryResults addressTableSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "id", null, "PRI" )
+                .addRow( "postcode", null, "Data" )
+                .build();
 
-    @Test
-    public void shouldAddTableAndJoinToConfigForTableWithPrimaryKeyAndForeignKey() throws Exception
-    {
-        Table personTable = mock( Table.class );
-        List<Table> expectedTables = singletonList( personTable );
-        List<Join> expectedJoins = singletonList( mock( Join.class ) );
+        QueryResults addressResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "postcode", "TEXT", "Data" )
+                .build();
+
+        QueryResults joinResults = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Person", "id", "PrimaryKey", "test", "Person", "id", "PrimaryKey" )
+                .addRow( "test", "Person", "addressId", "ForeignKey", "test", "Address", "id", "PrimaryKey" )
+                .build();
+
 
         TableName person = new TableName( "test.Person" );
         TableName address = new TableName( "test.Address" );
 
-        QueryResults results = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "REFERENCED_COLUMN_NAME", "COLUMN_KEY" )
-                .addRow( "id", null, null, "PRI" )
-                .addRow( "addressId", "Address", "id", "MUL" )
-                .build();
+        when( databaseClient.tableNames() ).thenReturn( asList( person, address ) );
+        when( databaseClient.executeQuery( any( String.class ) ) )
+                .thenReturn( AwaitHandle.forReturnValue( personTableSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( personResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( addressTableSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( addressResults ) );
 
-        when( tableMetadataProducer.createMetadataFor( person ) ).thenReturn( expectedTables );
-        when( joinMetadataProducer.createMetadataFor( new TableNamePair( person, address ) ) )
-                .thenReturn( expectedJoins );
-        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
-
-        when( databaseClient.tableNames() ).thenReturn( asList( person ) );
+        // when
+        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
         SchemaExport schemaExport = databaseInspector.buildSchemaExport();
 
         // then
-        assertThat( schemaExport.tables(), is( matchesCollection( expectedTables ) ) );
-        assertThat( schemaExport.joins(), is( matchesCollection( expectedJoins ) ) );
-        assertThat( schemaExport.joinTables(), is( matchesCollection( emptyList() ) ) );
+        List<TableName> tableNames = schemaExport.tables().stream().map( Table::name ).collect( Collectors.toList() );
+        Join join = schemaExport.joins().stream().findFirst().get();
+
+
+        assertThat( tableNames, matchesCollection( asList( person, address ) ) );
+        assertThat( join.tableNames(), hasItems( person, address ) );
+        assertEquals( asList( "test.Person.addressId",
+                "test.Address.id",
+                "test.Person.id",
+                "test.Person.id" ),
+                keyNames( join ) );
+        assertTrue( schemaExport.joinTables().isEmpty() );
     }
 
     @Test
-    public void shouldAddJoinTableForTableWithTwoForeignKeysAndNoPrimaryKey() throws Exception
+    public void buildSchemaShouldExportTablesAndJoinsForThreeTableJoin() throws Exception
     {
-        TableName joinTable = new TableName( "test.Student_Course" );
-        TableName student = new TableName( "test.Student" );
-        TableName course = new TableName( "test.Course" );
-        TableNamePair referencedTables = new TableNamePair( student, course );
-        Collection<JoinTable> joinTables = singletonList( mock( JoinTable.class ) );
-
-        QueryResults results = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "REFERENCED_COLUMN_NAME", "COLUMN_KEY" )
-                .addRow( "studentId", "Student", "id", "MUL" )
-                .addRow( "courseId", "Course", "id", "MUL" )
+        // given
+        QueryResults studentTableSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "id", null, "PRI" )
+                .addRow( "username", null, "Data" )
                 .build();
 
-        when( joinTableMetadataProducer.createMetadataFor( new JoinTableInfo( joinTable, referencedTables ) ) )
-                .thenReturn( joinTables );
-        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+        QueryResults studentResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "username", "TEXT", "Data" )
+                .build();
+
+        QueryResults courseTableSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "id", null, "PRI" )
+                .addRow( "name", null, "Data" )
+                .build();
+
+        QueryResults courseResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "name", "TEXT", "Data" )
+                .build();
+
+        QueryResults joinTableSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "studentId", "Student", "MUL" )
+                .addRow( "courseId", "Course", "MUL" )
+                .build();
+
+        QueryResults joinTableResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "studentId", "INT", "ForeignKey" )
+                .addRow( "courseId", "INT", "ForeignKey" )
+                .build();
+
+        QueryResults joinResults = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Student_Course", "studentId", "ForeignKey", "test", "Student", "id", "PrimaryKey" )
+                .addRow( "test", "Student_Course", "courseId", "ForeignKey", "test", "Course", "id", "PrimaryKey" )
+                .build();
+
+        TableName student = new TableName( "test.Student" );
+        TableName course = new TableName( "test.Course" );
+        TableName studentCourse = new TableName( "test.Student_Course" );
+        when( databaseClient.tableNames() ).thenReturn( asList( student, course, studentCourse ) );
+        when( databaseClient.executeQuery( any( String.class ) ) )
+                .thenReturn( AwaitHandle.forReturnValue( studentTableSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( studentResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( courseTableSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( courseResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinTableSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinTableResults ) );
 
         // when
-        when( databaseClient.tableNames() ).thenReturn( asList( joinTable ) );
+        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
         SchemaExport schemaExport = databaseInspector.buildSchemaExport();
 
         // then
-        assertThat( schemaExport.tables(), is( matchesCollection( emptyList() ) ) );
-        assertThat( schemaExport.joins(), is( matchesCollection( emptyList() ) ) );
-        assertThat( schemaExport.joinTables(), is( matchesCollection( joinTables ) ) );
-    }
+        List<TableName> tableNames = schemaExport.tables().stream().map( Table::name ).collect( Collectors.toList() );
+        JoinTable joinTable = new ArrayList<>( schemaExport.joinTables() ).get( 0 );
 
-    @Test
-    public void shouldAddJoinTableForTableWithCandidateKey() throws Exception
-    {
-        TableName joinTable = new TableName( "test.Student_Course" );
-        TableName student = new TableName( "test.Student" );
-        TableName course = new TableName( "test.Course" );
-        TableNamePair referencedTables = new TableNamePair( student, course );
-        Collection<JoinTable> joinTables = singletonList( mock( JoinTable.class ) );
-
-        QueryResults results = StubQueryResults.builder()
-                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "REFERENCED_COLUMN_NAME", "COLUMN_KEY" )
-                .addRow( "studentId", "Student", "id", "PRI" )
-                .addRow( "courseId", "Course", "id", "PRI" )
-                .build();
-
-
-        // when
-        when( databaseClient.tableNames() ).thenReturn( asList( joinTable ) );
-        when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
-        when( joinTableMetadataProducer.createMetadataFor( new JoinTableInfo( joinTable, referencedTables ) ) )
-                .thenReturn( joinTables );
-        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
-
-        // then
-        assertThat( schemaExport.tables(), is( matchesCollection( emptyList() ) ) );
-        assertThat( schemaExport.joins(), is( matchesCollection( emptyList() ) ) );
-        assertThat( schemaExport.joinTables(), is( matchesCollection( joinTables ) ) );
+        assertThat( tableNames, matchesCollection( asList( student, course ) ) );
+        assertThat( joinTable.join().tableNames(), matchesCollection( asList( student, studentCourse ) ) );
+        assertEquals( asList( "test.Student_Course.studentId",
+                "test.Student.id",
+                "test.Student_Course.courseId",
+                "test.Course.id" ),
+                keyNames( joinTable.join() ) );
+        assertTrue( schemaExport.joins().isEmpty() );
     }
 
     private <T> TypeSafeMatcher<Collection<T>> matchesCollection( final Collection<T> expected )
@@ -172,5 +208,15 @@ public class DatabaseInspectorTest
                 description.appendText( expected.toString() );
             }
         };
+    }
+
+    private Collection<String> keyNames( Join join )
+    {
+        Collection<String> results = new ArrayList<>();
+        results.add( join.keyTwoSourceColumn().name() );
+        results.add( join.keyTwoTargetColumn().name() );
+        results.add( join.keyOneSourceColumn().name() );
+        results.add( join.keyOneTargetColumn().name() );
+        return results;
     }
 }
