@@ -1,5 +1,7 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 
 public interface CsvField
@@ -65,4 +67,6 @@ public interface CsvField
     }
 
     String value( Formatter formatter );
+
+    JsonNode toJson();
 }

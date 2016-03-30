@@ -1,5 +1,8 @@
 package org.neo4j.integration.sql.metadata;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -98,5 +101,20 @@ public class SimpleColumn implements Column
     {
         builder.add(
                 new ColumnToCsvFieldMapping( this, CsvField.data( alias, dataType.toNeo4jDataType() ) ) );
+    }
+
+    @Override
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "type", getClass().getSimpleName() );
+        root.put( "table", table.fullName() );
+        root.put( "name", name );
+        root.put( "alias", alias );
+        root.put( "column-type", columnType.name() );
+        root.put( "sql-data-type", dataType.toString() );
+
+        return root;
     }
 }

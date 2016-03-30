@@ -2,6 +2,9 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -56,6 +59,18 @@ class Id implements CsvField
         {
             return ":ID";
         }
+    }
+
+    @Override
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "type", getClass().getSimpleName() );
+        root.put( "name", name.isPresent() ? name.get() : "" );
+        root.put( "id-space", idSpace.isPresent() ? idSpace.get().value() : "" );
+
+        return root;
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

@@ -2,6 +2,10 @@ package org.neo4j.integration.sql;
 
 import java.net.URI;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.neo4j.integration.util.Preconditions;
 
 public class ConnectionConfig
@@ -46,6 +50,19 @@ public class ConnectionConfig
     public String password()
     {
         return password;
+    }
+
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "database-type", databaseType.name());
+        root.put( "host", host );
+        root.put( "port", port );
+        root.put( "database", database );
+        root.put( "username", username );
+
+        return root;
     }
 
     public interface Builder

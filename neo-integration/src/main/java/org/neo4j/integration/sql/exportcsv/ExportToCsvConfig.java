@@ -6,6 +6,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
@@ -56,6 +61,26 @@ public class ExportToCsvConfig
     public Collection<CsvResource> csvResources()
     {
         return csvResources;
+    }
+
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "destination", destination.toString() );
+        root.set( "connection-config", connectionConfig.toJson() );
+        root.put( "formatting", "TODO" );
+
+        ArrayNode array = JsonNodeFactory.instance.arrayNode();
+
+        for ( CsvResource csvResource : csvResources )
+        {
+            array.add( csvResource.toJson() );
+        }
+
+        root.set( "csv-resources", array );
+
+        return root;
     }
 
     public interface Builder

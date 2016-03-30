@@ -5,6 +5,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -49,6 +54,18 @@ public class ColumnToCsvFieldMappings
                 .distinct()
                 .map( TableName::fullName )
                 .collect( Collectors.toCollection( LinkedHashSet::new ) );
+    }
+
+    public JsonNode toJson()
+    {
+        ArrayNode root = JsonNodeFactory.instance.arrayNode();
+
+        for ( ColumnToCsvFieldMapping mapping : mappings )
+        {
+            root.add( mapping.toJson() );
+        }
+
+       return root;
     }
 
     public interface Builder

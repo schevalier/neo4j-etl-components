@@ -4,6 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -120,5 +124,25 @@ public class CompositeKeyColumn implements Column
     public void addTo( ColumnToCsvFieldMappings.Builder builder, Formatter formatter )
     {
         columns.forEach( column -> column.addTo( builder, formatter ) );
+    }
+
+    @Override
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "type", getClass().getSimpleName() );
+        root.put( "table", table.fullName() );
+
+        ArrayNode array = JsonNodeFactory.instance.arrayNode();
+
+        for ( Column column : columns )
+        {
+            array.add( column.toJson() );
+        }
+
+        root.set( "columns", array );
+
+        return root;
     }
 }

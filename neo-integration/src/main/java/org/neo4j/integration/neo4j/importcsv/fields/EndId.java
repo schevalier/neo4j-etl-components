@@ -2,10 +2,12 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.DefaultPropertyFormatter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 
 import static java.lang.String.format;
@@ -28,6 +30,17 @@ class EndId implements CsvField
     public String value( Formatter formatter )
     {
         return idSpace.isPresent() ? format( ":END_ID(%s)", idSpace.get().value() ) : ":END_ID";
+    }
+
+    @Override
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "type", getClass().getSimpleName() );
+        root.put( "id-space", idSpace.isPresent() ? idSpace.get().value() : "" );
+
+        return root;
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

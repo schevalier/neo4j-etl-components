@@ -1,5 +1,8 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -33,6 +36,19 @@ class Data implements CsvField
         return isArray ?
                 format( "%s:%s[]", formatter.format( name ), type.name().toLowerCase() ) :
                 format( "%s:%s", formatter.format( name ), type.name().toLowerCase() );
+    }
+
+    @Override
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.put( "type", getClass().getSimpleName() );
+        root.put( "name", name );
+        root.put( "neo4j-data-type", type.value() );
+        root.put( "is-array", isArray );
+
+        return root;
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
