@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.commands.DatabaseInspector;
+import org.neo4j.integration.commands.SchemaExport;
 import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.neo4j.Neo4j;
 import org.neo4j.integration.neo4j.Neo4jVersion;
@@ -95,7 +96,10 @@ public class NorthWindDatabaseInspectorIntegrationTest
 
         DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
 
-        databaseInspector.addTablesToConfig( builder );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
+        builder.addTables( schemaExport.tables() );
+        builder.addJoins( schemaExport.joins() );
+        builder.addJoinTables( schemaExport.joinTables() );
 
         ExportToCsvConfig config = builder.build();
 

@@ -1,6 +1,7 @@
 package org.neo4j.integration.commands;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.hamcrest.Description;
@@ -25,10 +26,10 @@ import org.neo4j.integration.sql.metadata.TableNamePair;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DatabaseInspectorTest
@@ -62,12 +63,15 @@ public class DatabaseInspectorTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseInspector.addTableToConfig( config, address );
+        HashSet<Table> actualTables = new HashSet<>();
+        HashSet<Join> actualJoins = new HashSet<>();
+        HashSet<JoinTable> actualJoinTable = new HashSet<>();
+        databaseInspector.addTableToConfig( address, actualTables, actualJoins, actualJoinTable );
 
         // then
-        verify( config ).addTables( argThat( matchesCollection( expectedTables ) ) );
-        verify( config ).addJoins( argThat( matchesCollection( emptyList() ) ) );
-        ;
+        assertThat( actualTables, is( matchesCollection( expectedTables ) ) );
+        assertThat( actualJoins, is( matchesCollection( emptyList() ) ) );
+        assertThat( actualJoinTable, is( matchesCollection( emptyList() ) ) );
     }
 
     @Test
@@ -94,13 +98,15 @@ public class DatabaseInspectorTest
                 .thenReturn( expectedJoins );
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
-        // when
-        databaseInspector.addTableToConfig( config, person );
+        HashSet<Table> actualTables = new HashSet<>();
+        HashSet<Join> actualJoins = new HashSet<>();
+        HashSet<JoinTable> actualJoinTable = new HashSet<>();
+        databaseInspector.addTableToConfig( person, actualTables, actualJoins, actualJoinTable );
 
         // then
-        verify( config ).addTables( argThat( matchesCollection( expectedTables ) ) );
-        verify( config ).addJoins( argThat( matchesCollection( expectedJoins ) ) );
-        verify( config ).addJoinTables( argThat( matchesCollection( emptyList() ) ) );
+        assertThat( actualTables, is( matchesCollection( expectedTables ) ) );
+        assertThat( actualJoins, is( matchesCollection( expectedJoins ) ) );
+        assertThat( actualJoinTable, is( matchesCollection( emptyList() ) ) );
     }
 
     @Test
@@ -126,13 +132,16 @@ public class DatabaseInspectorTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseInspector.addTableToConfig( config, joinTable );
+        HashSet<Table> actualTables = new HashSet<>();
+        HashSet<Join> actualJoins = new HashSet<>();
+        HashSet<JoinTable> actualJoinTable = new HashSet<>();
+        databaseInspector.addTableToConfig( joinTable, actualTables, actualJoins, actualJoinTable );
 
         // then
-        verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
+        assertThat( actualTables, is( matchesCollection( emptyList() ) ) );
+        assertThat( actualJoins, is( matchesCollection( emptyList() ) ) );
+        assertThat( actualJoinTable, is( matchesCollection( joinTables ) ) );
 
-        verify( config ).addTables( argThat( matchesCollection( emptyList() ) ) );
-        verify( config ).addJoins( argThat( matchesCollection( emptyList() ) ) );
     }
 
     @Test
@@ -158,13 +167,15 @@ public class DatabaseInspectorTest
         when( databaseClient.executeQuery( anyString() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // when
-        databaseInspector.addTableToConfig( config, joinTable );
+        HashSet<Table> actualTables = new HashSet<>();
+        HashSet<Join> actualJoins = new HashSet<>();
+        HashSet<JoinTable> actualJoinTable = new HashSet<>();
+        databaseInspector.addTableToConfig( joinTable, actualTables, actualJoins, actualJoinTable );
 
         // then
-        verify( config ).addJoinTables( argThat( matchesCollection( joinTables ) ) );
-
-        verify( config ).addTables( argThat( matchesCollection( emptyList() ) ) );
-        verify( config ).addJoins( argThat( matchesCollection( emptyList() ) ) );
+        assertThat( actualTables, is( matchesCollection( emptyList() ) ) );
+        assertThat( actualJoins, is( matchesCollection( emptyList() ) ) );
+        assertThat( actualJoinTable, is( matchesCollection( joinTables ) ) );
     }
 
     private <T> TypeSafeMatcher<Collection<T>> matchesCollection( final Collection<T> expected )

@@ -60,9 +60,17 @@ public class ExportFromMySqlCommand
 
         print( "Exporting from MySQL to CSV..." );
 
-        ExportToCsvConfig config =
-                buildConfig( connectionConfig, csvDirectory, formatting,
-                        new DatabaseInspector( new DatabaseClient( connectionConfig ) ) );
+
+        ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
+                .destination( csvDirectory )
+                .connectionConfig( connectionConfig )
+                .formatting( formatting );
+
+        SchemaExport schemaExport = buildSchemaExport( connectionConfig );
+        builder.addTables( schemaExport.tables() );
+        builder.addJoins( schemaExport.joins() );
+        builder.addJoinTables( schemaExport.joinTables() );
+        ExportToCsvConfig config = builder.build();
 
         Manifest manifest = new ExportToCsvCommand( config, databaseExportService ).execute();
 
@@ -74,20 +82,10 @@ public class ExportFromMySqlCommand
         printResult( environment.destinationDirectory() );
     }
 
-    private ExportToCsvConfig buildConfig( ConnectionConfig connectionConfig,
-                                           Path csvDirectory,
-                                           Formatting formatting,
-                                           DatabaseInspector databaseInspector )
-            throws Exception
+    private SchemaExport buildSchemaExport( ConnectionConfig connectionConfig ) throws Exception
     {
-
-        ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
-                .destination( csvDirectory )
-                .connectionConfig( connectionConfig )
-                .formatting( formatting );
-
-        databaseInspector.addTablesToConfig( builder );
-        return builder.build();
+        DatabaseInspector databaseInspector = new DatabaseInspector( new DatabaseClient( connectionConfig ) );
+        return databaseInspector.buildSchemaExport();
     }
 
     private void doImport( Formatting formatting, Manifest manifest ) throws Exception

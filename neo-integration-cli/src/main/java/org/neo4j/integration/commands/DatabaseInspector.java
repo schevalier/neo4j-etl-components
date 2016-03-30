@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
@@ -49,24 +48,28 @@ public class DatabaseInspector
         this.databaseClient = databaseClient;
     }
 
-    public void addTablesToConfig( ExportToCsvConfig.Builder builder ) throws Exception
+    public SchemaExport buildSchemaExport() throws Exception
     {
+        HashSet<Table> tables = new HashSet<>();
+        HashSet<Join> joins = new HashSet<>();
+        HashSet<JoinTable> joinTables = new HashSet<>();
+
         for ( TableName tableName : databaseClient.tableNames() )
         {
-            addTableToConfig( builder, tableName );
+            addTableToConfig( tableName, tables, joins, joinTables );
         }
+        return new SchemaExport( tables, joins, joinTables );
     }
 
-    public void addTableToConfig( ExportToCsvConfig.Builder config, TableName tableName ) throws Exception
+    public void addTableToConfig( TableName tableName,
+                                  Collection<Table> tables,
+                                  Collection<Join> joins,
+                                  Collection<JoinTable> joinTables ) throws Exception
     {
         QueryResults results = databaseClient.executeQuery( listKeys( tableName ) ).await();
 
         Collection<String> primaryKeys = new HashSet<>();
         Collection<String> foreignKeys = new HashSet<>();
-
-        Collection<Table> tables = new HashSet<>();
-        Collection<Join> joins = new HashSet<>();
-        Collection<JoinTable> joinTables = new HashSet<>();
 
         while ( results.next() )
         {
@@ -108,10 +111,6 @@ public class DatabaseInspector
                         tableName.schema(), foreignKey ) ) ) );
             }
         }
-
-        config.addTables( tables );
-        config.addJoins( joins );
-        config.addJoinTables( joinTables );
     }
 
     private String listKeys( TableName tableName )
