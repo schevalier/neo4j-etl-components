@@ -24,6 +24,7 @@ import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.sort;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
@@ -45,7 +46,8 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(),
+                    "local") );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -55,8 +57,9 @@ public class ExportFromMySqlIntegrationTest
     @BeforeClass
     public static void setUp() throws Exception
     {
-        populateMySqlDatabase();
-        exportFromMySqlToNeo4j();
+        MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
+        client.execute( MySqlScripts.setupDatabaseScript().value() );
+        exportFromMySqlToNeo4j( "javabase" );
         neo4j.get().start();
     }
 
@@ -175,19 +178,15 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    @Ignore
     public void shouldExportFromMySqlAndImportIntoGraphForCompositeThreeTableJoinWithProperties() throws Exception
     {
-        // when
-//        exportFromMySqlToNeo4j( "Author", "Publisher", "Author_Publisher" );
-
-
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
         String response = neo4j.get()
                 .executeHttp( NEO_TX_URI, "MATCH (a:Author)-[r]->(p:Publisher) RETURN a, p" );
 
-        List<String> authors = JsonPath.read( response, "$.results[*].data[*].row[0].last_name" );
+        System.out.println(response);
+        List<String> authors = JsonPath.read( response, "$.results[*].data[*].row[0].lastName" );
         List<String> publishers = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
 
         assertThat( authors.size(), is( 2 ) );
@@ -197,24 +196,18 @@ public class ExportFromMySqlIntegrationTest
         assertThat( publishers, hasItems( "Pearson", "O'Reilly" ) );
     }
 
-    private static void exportFromMySqlToNeo4j()
+    private static void exportFromMySqlToNeo4j( String database )
     {
         NeoIntegrationCli.executeMainReturnSysOut(
                 new String[]{"mysql-export",
                         "--host", mySqlServer.get().ipAddress(),
                         "--user", MySqlClient.Parameters.DBUser.value(),
                         "--password", MySqlClient.Parameters.DBPassword.value(),
-                        "--database", "javabase",
+                        "--database", database,
                         "--import-tool", neo4j.get().binDirectory().toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--delimiter", "\t",
                         "--force"} );
-    }
-
-    private static void populateMySqlDatabase() throws Exception
-    {
-        MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-        client.execute( MySqlScripts.setupDatabaseScript().value() );
     }
 }
