@@ -97,24 +97,17 @@ public class NorthWindDatabaseInspectorIntegrationTest
         String employeeWithPrivilegesResponse = neo4j.get().executeHttp( NEO_TX_URI,
                 "MATCH (e:Employee)-[:EMPLOYEE_PRIVILEGE]->(p) RETURN e,p;" );
         List<String> city = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[0].city" );
-        List<String> privilegeName = JsonPath.read( employeeWithPrivilegesResponse, "$.results[*].data[*].row[1]" +
-                ".privilegeName" );
+        List<String> privilegeName = JsonPath.read( employeeWithPrivilegesResponse,
+                "$.results[*].data[*].row[1].privilegeName" );
 
         assertThat( city.get( 0 ), is( "Bellevue" ) );
         assertThat( privilegeName.get( 0 ), is( "Purchase Approvals" ) );
 
         String productsOnHold = neo4j.get().executeHttp( NEO_TX_URI,
-                "MATCH (p:Product)<--(n:InventoryTransaction)-->" +
-                        "(it:InventoryTransactionType{typeName:'On Hold'}) " +
+                "MATCH (p:Product)<--(n:InventoryTransaction)-->(it:InventoryTransactionType{typeName:'On Hold'}) " +
                         "RETURN DISTINCT p" );
         List<String> productName = JsonPath.read( productsOnHold, "$.results[*].data[*].row[0].productName" );
         assertThat( productName.get( 0 ), is( "Northwind Traders Gnocchi" ) );
-    }
-
-    private static void populateMySqlDatabase() throws Exception
-    {
-        MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-        client.execute( MySqlScripts.northwindScript().value() );
     }
 
     private static void exportFromMySqlToNeo4j( String database )

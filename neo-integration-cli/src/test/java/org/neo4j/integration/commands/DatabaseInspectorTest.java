@@ -33,7 +33,7 @@ public class DatabaseInspectorTest
     private DatabaseClient databaseClient = mock( DatabaseClient.class );
 
     @Test
-    public void buildSchemaExportShouldExportTablesAndJoinsForTwoTableJoin() throws Exception
+    public void shouldExportTablesAndJoinsForTwoTableJoin() throws Exception
     {
         // given
         QueryResults personTableSchema = StubQueryResults.builder()
@@ -108,7 +108,86 @@ public class DatabaseInspectorTest
     }
 
     @Test
-    public void buildSchemaShouldExportTablesAndJoinsForThreeTableJoin() throws Exception
+    public void shouldExportTablesAndJoinsForTwoTableJoinUsingCompositeKey() throws Exception
+    {
+        // given
+        QueryResults bookSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "id", null, "PRI" )
+                .addRow( "name", null, "Data" )
+                .addRow( "author_first_name", "Author", "MUL" )
+                .addRow( "author_last_name", "Author", "MUL" )
+                .build();
+
+
+        QueryResults bookResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "name", "TEXT", "Data" )
+                .addRow( "author_first_name", "TEXT", "ForeignKey" )
+                .addRow( "author_last_name", "TEXT", "ForeignKey" )
+                .build();
+
+        QueryResults authorTableSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "first_name", null, "PRI" )
+                .addRow( "last_name", null, "PRI" )
+                .addRow( "age", null, "INT" )
+                .build();
+
+        QueryResults addressResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "first_name", "TEXT", "PrimaryKey" )
+                .addRow( "last_name", "TEXT", "PrimaryKey" )
+                .addRow( "age", "INT", "Data" )
+                .build();
+
+        QueryResults joinResults = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Book", "id", "PrimaryKey", "test", "Book", "id", "PrimaryKey" )
+                .addRow( "test", "Book", "author_first_name", "ForeignKey", "test", "Author", "first_name", "PrimaryKey" )
+                .addRow( "test", "Book", "author_last_name", "ForeignKey", "test", "Author", "last_name", "PrimaryKey" )
+                .build();
+
+        TableName book = new TableName( "test.Book" );
+        TableName author = new TableName( "test.Author" );
+
+        when( databaseClient.tableNames() ).thenReturn( asList( book, author ) );
+        when( databaseClient.executeQuery( any( String.class ) ) )
+                .thenReturn( AwaitHandle.forReturnValue( bookSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( bookResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( authorTableSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( addressResults ) );
+
+        // when
+        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
+
+        // then
+        List<TableName> tableNames = schemaExport.tables().stream().map( Table::name ).collect( Collectors.toList() );
+        Join join = schemaExport.joins().stream().findFirst().get();
+
+
+        assertThat( tableNames, matchesCollection( asList( book, author ) ) );
+        assertThat( join.tableNames(), hasItems( book, author ) );
+        assertEquals( asList( "test.Book.author_first_name\0test.Book.author_last_name",
+                "test.Author.first_name\0test.Author.last_name",
+                "test.Book.id",
+                "test.Book.id" ),
+                keyNames( join ) );
+        assertTrue( schemaExport.joinTables().isEmpty() );
+    }
+
+    @Test
+    public void shouldExportTablesAndJoinsForThreeTableJoin() throws Exception
     {
         // given
         QueryResults studentTableSchema = StubQueryResults.builder()
