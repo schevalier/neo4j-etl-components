@@ -13,7 +13,7 @@ public class MySqlClient
 
     public enum Parameters
     {
-        DBRootPassword( "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" ), Database( "javabase" );
+        DBRootPassword( "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" );
 
         private final String value;
 
@@ -32,7 +32,8 @@ public class MySqlClient
 
     public void execute( String sql ) throws Exception
     {
-        DatabaseClient client = new DatabaseClient( ConnectionConfig.forDatabase( DatabaseType.MySQL )
+        DatabaseClient client = new DatabaseClient(
+                ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
                 .port( DatabaseType.MySQL.defaultPort() )
                 .username( Parameters.DBUser.value() )

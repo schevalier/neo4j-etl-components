@@ -21,7 +21,12 @@ public class MySqlScripts
         return createScript( "/scripts/setup-db.sql" );
     }
 
-    private static Script createScript(String path)
+    public static Script northwindScript()
+    {
+        return createScript( "/scripts/northwind.sql" );
+    }
+
+    private static Script createScript( String path )
     {
         return new Script()
         {

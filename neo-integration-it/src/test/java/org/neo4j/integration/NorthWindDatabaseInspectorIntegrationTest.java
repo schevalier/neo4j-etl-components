@@ -52,7 +52,6 @@ public class NorthWindDatabaseInspectorIntegrationTest
     @BeforeClass
     public static void setUp() throws Exception
     {
-        populateMySqlDatabase();
         try
         {
             LogManager.getLogManager().readConfiguration(
@@ -70,8 +69,8 @@ public class NorthWindDatabaseInspectorIntegrationTest
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
         // when
+        populateMySqlDatabase();
         exportFromMySqlToNeo4j();
-
         try
         {
             neo4j.get().start();
@@ -119,7 +118,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
     private static void populateMySqlDatabase() throws Exception
     {
         MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-        client.execute( MySqlScripts.setupDatabaseScript().value() );
+        client.execute( MySqlScripts.northwindScript().value() );
     }
 
     private static void exportFromMySqlToNeo4j()
