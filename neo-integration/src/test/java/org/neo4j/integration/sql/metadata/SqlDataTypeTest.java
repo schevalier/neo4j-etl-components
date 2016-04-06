@@ -3,7 +3,6 @@ package org.neo4j.integration.sql.metadata;
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
-import org.neo4j.integration.sql.metadata.SqlDataType;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -57,4 +56,11 @@ public class SqlDataTypeTest
         assertThat( SqlDataType.TIME.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( SqlDataType.YEAR.toNeo4jDataType(), is( Neo4jDataType.String ) );
     }
+
+    @Test
+    public void toNeo4jDataTypeMappingOfBit() throws Exception
+    {
+        assertThat( SqlDataType.BIT.toNeo4jDataType(), is( Neo4jDataType.Byte ) );
+    }
+
 }

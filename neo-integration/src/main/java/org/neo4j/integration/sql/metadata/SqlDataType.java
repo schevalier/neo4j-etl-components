@@ -15,8 +15,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 
 public enum SqlDataType
 {
-
-
+    BIT( Neo4jDataType.Byte ),
     INT( Neo4jDataType.Int ),
     TINYINT( Neo4jDataType.Byte ),
     SMALLINT( Neo4jDataType.Short ),
