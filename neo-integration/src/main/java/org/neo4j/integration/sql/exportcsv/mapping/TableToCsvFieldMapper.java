@@ -51,7 +51,7 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                 formatting.quote().enquote( formatting.labelFormatter().format( table.name().simpleName() ) ),
                 table.name().simpleName(),
                 ColumnType.Literal,
-                SqlDataType.LABEL_DATA_TYPE.toNeo4jDataType() );
+                SqlDataType.LABEL_DATA_TYPE );
 
         builder.add( new ColumnToCsvFieldMapping( label, CsvField.label() ) );
 

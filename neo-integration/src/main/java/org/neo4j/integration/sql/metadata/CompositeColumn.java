@@ -14,7 +14,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
-import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
@@ -72,9 +71,9 @@ public class CompositeColumn implements Column
     }
 
     @Override
-    public Neo4jDataType neo4jDataType()
+    public SqlDataType sqlDataType()
     {
-        return SqlDataType.COMPOSITE_KEY_TYPE.toNeo4jDataType();
+        return SqlDataType.COMPOSITE_KEY_TYPE;
     }
 
     @Override

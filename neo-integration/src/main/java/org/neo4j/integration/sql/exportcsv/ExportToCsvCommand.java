@@ -18,6 +18,15 @@ public class ExportToCsvCommand
     public ExportToCsvCommand( ExportToCsvConfig config )
     {
         this.config = config;
+//        ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//        try
+//        {
+//            Loggers.Default.log( Level.INFO, objectWriter.writeValueAsString( config.toJson() ) );
+//        }
+//        catch ( JsonProcessingException e )
+//        {
+//            throw new RuntimeException( e );
+//        }
     }
 
     public Manifest execute() throws Exception

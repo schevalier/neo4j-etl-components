@@ -9,7 +9,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
-import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
@@ -23,9 +22,9 @@ public class SimpleColumn implements Column
     private final String name;
     private final String alias;
     private final ColumnType columnType;
-    private final Neo4jDataType dataType;
+    private final SqlDataType dataType;
 
-    public SimpleColumn( TableName table, String name, String alias, ColumnType columnType, Neo4jDataType dataType )
+    public SimpleColumn( TableName table, String name, String alias, ColumnType columnType, SqlDataType dataType )
     {
         this.table = Preconditions.requireNonNull( table, "Table" );
         this.name = Preconditions.requireNonNullString( name, "Name" );
@@ -61,7 +60,7 @@ public class SimpleColumn implements Column
     }
 
     @Override
-    public Neo4jDataType neo4jDataType()
+    public SqlDataType sqlDataType()
     {
         return dataType;
     }
@@ -100,8 +99,7 @@ public class SimpleColumn implements Column
     @Override
     public void addTo( ColumnToCsvFieldMappings.Builder builder, Formatter formatter )
     {
-        builder.add(
-                new ColumnToCsvFieldMapping( this, CsvField.data( alias, dataType ) ) );
+        builder.add( new ColumnToCsvFieldMapping( this, CsvField.data( alias, dataType.toNeo4jDataType() ) ) );
     }
 
     @Override
@@ -114,7 +112,7 @@ public class SimpleColumn implements Column
         root.put( "name", name );
         root.put( "alias", alias );
         root.put( "column-type", columnType.name() );
-        root.put( "data-type", dataType.name() );
+        root.put( "sql-data-type", dataType.name() );
 
         return root;
     }

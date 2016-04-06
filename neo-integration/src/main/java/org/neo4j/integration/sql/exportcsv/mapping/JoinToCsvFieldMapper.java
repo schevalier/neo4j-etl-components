@@ -36,7 +36,7 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
                 formatting.quote().enquote( relationshipType ),
                 relationshipType,
                 ColumnType.Literal,
-                SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE.toNeo4jDataType() );
+                SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
         builder.add(
                 new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
 

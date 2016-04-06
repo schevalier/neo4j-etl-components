@@ -19,7 +19,7 @@ public interface Column
 
     ColumnType type();
 
-    Neo4jDataType neo4jDataType();
+    SqlDataType sqlDataType();
 
     String selectFrom( RowAccessor row );
 

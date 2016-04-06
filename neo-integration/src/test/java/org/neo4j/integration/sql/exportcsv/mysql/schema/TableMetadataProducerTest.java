@@ -9,10 +9,10 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -62,14 +62,14 @@ public class TableMetadataProducerTest
                         forTable.fullyQualifiedColumnName( "id" ),
                         "id",
                         ColumnType.PrimaryKey,
-                        MySqlDataType.INT.toNeo4jDataType() ),
+                        SqlDataType.INT ),
                 columnUtil.column( forTable, "username", ColumnType.Data ),
                 new SimpleColumn(
                         forTable,
                         forTable.fullyQualifiedColumnName( "addressId" ),
                         "addressId",
                         ColumnType.ForeignKey,
-                        MySqlDataType.INT.toNeo4jDataType() ) ) );
+                        SqlDataType.INT ) ) );
     }
 
     @Test
@@ -136,13 +136,13 @@ public class TableMetadataProducerTest
                                         forTable.fullyQualifiedColumnName( "first_name" ),
                                         "first_name",
                                         ColumnType.PrimaryKey,
-                                        MySqlDataType.VARCHAR.toNeo4jDataType() ),
+                                        SqlDataType.VARCHAR ),
                                 new SimpleColumn(
                                         forTable,
                                         forTable.fullyQualifiedColumnName( "last_name" ),
                                         "last_name",
                                         ColumnType.PrimaryKey,
-                                        MySqlDataType.VARCHAR.toNeo4jDataType() ) ) ) ) );
+                                        SqlDataType.VARCHAR ) ) ) ) );
     }
 }
 

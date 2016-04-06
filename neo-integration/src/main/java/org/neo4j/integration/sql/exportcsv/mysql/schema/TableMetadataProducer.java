@@ -10,7 +10,6 @@ import java.util.logging.Level;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.sql.exportcsv.mysql.MySqlDataType;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnType;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
@@ -129,14 +128,14 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         if ( columnFilter.test( columnType ) )
         {
             String columnName = row.get( "COLUMN_NAME" );
-            SqlDataType dataType = MySqlDataType.parse( row.get( "DATA_TYPE" ) );
+            SqlDataType dataType = SqlDataType.parse( row.get( "DATA_TYPE" ) );
 
             return Optional.of( new SimpleColumn(
                     source,
                     source.fullyQualifiedColumnName( columnName ),
                     columnName,
                     columnType,
-                    dataType.toNeo4jDataType() ) );
+                    dataType ) );
         }
         else
         {
