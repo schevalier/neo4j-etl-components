@@ -80,11 +80,13 @@ public class ColumnToCsvFieldMappingsTest
     {
         // given
         TableName authorTable = new TableName( "test.Author" );
-        Column column1 = columnUtil.compositeKeyColumn( authorTable, asList( "first_name", "last_name" ), ColumnType
-                .PrimaryKey );
+        Column column1 = columnUtil.compositeKeyColumn(
+                authorTable,
+                asList( "first_name", "last_name" ),
+                ColumnType.PrimaryKey );
 
 
-        Column column2 = columnUtil.column( authorTable, "test.Author.age", "age", ColumnType.Data );
+        Column column2 = columnUtil.column( authorTable, "age", "age", ColumnType.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )
@@ -109,8 +111,11 @@ public class ColumnToCsvFieldMappingsTest
 
         Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
 
-        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
-        Column column3 = columnUtil.column( new TableName( "test.Address" ), "test.Address.postcode", "postcode",
+        Column column2 = columnUtil.column( personTable, "username", "username", ColumnType.Data );
+        Column column3 = columnUtil.column(
+                new TableName( "test.Address" ),
+                "postcode",
+                "postcode",
                 ColumnType.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()

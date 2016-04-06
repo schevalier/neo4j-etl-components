@@ -32,7 +32,7 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
         String relationshipType =
                 formatting.relationshipFormatter().format( join.keyTwoTargetColumn().table().simpleName() );
 
-        final SimpleColumn from = new SimpleColumn( join.keyOneSourceColumn().table(),
+        SimpleColumn from = new SimpleColumn( join.keyOneSourceColumn().table(),
                 formatting.quote().enquote( relationshipType ),
                 relationshipType,
                 ColumnType.Literal,

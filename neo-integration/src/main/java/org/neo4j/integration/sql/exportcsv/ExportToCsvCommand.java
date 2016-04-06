@@ -1,6 +1,11 @@
 package org.neo4j.integration.sql.exportcsv;
 
 import java.nio.file.Files;
+import java.util.logging.Level;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.neo4j.integration.neo4j.importcsv.config.Manifest;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
@@ -9,6 +14,7 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.exportcsv.services.ResourceToCsvFilesService;
+import org.neo4j.integration.util.Loggers;
 import org.neo4j.integration.util.OperatingSystem;
 
 public class ExportToCsvCommand

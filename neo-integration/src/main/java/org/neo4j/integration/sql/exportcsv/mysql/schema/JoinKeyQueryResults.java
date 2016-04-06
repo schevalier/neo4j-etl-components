@@ -53,12 +53,7 @@ class JoinKeyQueryResults
         String targetColumn = row.get( prefix.apply( "_COLUMN_NAME" ) );
         ColumnType targetColumnType = ColumnType.valueOf( row.get( prefix.apply( "_COLUMN_TYPE" ) ) );
 
-        return new SimpleColumn(
-                targetTable,
-                targetTable.fullyQualifiedColumnName( targetColumn ),
-                targetColumn,
-                targetColumnType,
-                SqlDataType.KEY_DATA_TYPE );
+        return new SimpleColumn( targetTable, targetColumn, targetColumnType, SqlDataType.KEY_DATA_TYPE );
     }
 
     private Column compositeColumn( List<Map<String, String>> rows, Function<String, String> prefix )

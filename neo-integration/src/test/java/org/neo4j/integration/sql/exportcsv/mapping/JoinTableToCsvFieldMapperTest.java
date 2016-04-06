@@ -109,7 +109,7 @@ public class JoinTableToCsvFieldMapperTest
 
         assertEquals(
                 asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"",
-                        "credits" )
+                        "test.Student_Course.credits" )
                 , columns );
     }
 }

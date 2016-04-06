@@ -35,11 +35,7 @@ public class TableToCsvFieldMapperTest
                 .name( personTable )
                 .addColumn( columnUtil.column( personTable, "id", ColumnType.PrimaryKey ) )
                 .addColumn( columnUtil.column( personTable, "username", ColumnType.Data ) )
-                .addColumn( new SimpleColumn( personTable,
-                        personTable.fullyQualifiedColumnName( "age" ),
-                        "age",
-                        ColumnType.Data,
-                        SqlDataType.INT ) )
+                .addColumn( new SimpleColumn( personTable, "age", ColumnType.Data, SqlDataType.INT ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

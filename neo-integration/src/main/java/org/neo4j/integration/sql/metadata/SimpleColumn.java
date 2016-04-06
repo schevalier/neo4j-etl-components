@@ -24,6 +24,11 @@ public class SimpleColumn implements Column
     private final ColumnType columnType;
     private final SqlDataType dataType;
 
+    public SimpleColumn( TableName table, String name, ColumnType columnType, SqlDataType dataType )
+    {
+        this(table, name, name, columnType, dataType);
+    }
+
     public SimpleColumn( TableName table, String name, String alias, ColumnType columnType, SqlDataType dataType )
     {
         this.table = Preconditions.requireNonNull( table, "Table" );
@@ -43,7 +48,7 @@ public class SimpleColumn implements Column
     @Override
     public String name()
     {
-        return name;
+        return columnType.fullyQualifiedColumnName( table, name );
     }
 
     // Column alias
@@ -93,7 +98,7 @@ public class SimpleColumn implements Column
     @Override
     public String aliasedColumn()
     {
-        return format( "%s AS `%s`", name, alias );
+        return format( "%s AS `%s`", name(), alias );
     }
 
     @Override

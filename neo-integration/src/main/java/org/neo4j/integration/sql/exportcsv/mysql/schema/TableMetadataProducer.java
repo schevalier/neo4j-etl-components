@@ -132,7 +132,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
             return Optional.of( new SimpleColumn(
                     source,
-                    source.fullyQualifiedColumnName( columnName ),
+                    columnName,
                     columnName,
                     columnType,
                     dataType ) );

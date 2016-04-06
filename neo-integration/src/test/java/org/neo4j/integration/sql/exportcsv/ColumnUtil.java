@@ -14,7 +14,7 @@ public class ColumnUtil
 {
     public Column column( TableName table, String nameAndAlias, ColumnType type )
     {
-        return column( table, table.fullyQualifiedColumnName( nameAndAlias ), nameAndAlias, type );
+        return column( table, nameAndAlias, nameAndAlias, type );
     }
 
     public Column column( TableName table, String name, String alias, ColumnType type )
@@ -26,7 +26,7 @@ public class ColumnUtil
     {
         return new SimpleColumn(
                 tableName,
-                tableName.fullyQualifiedColumnName( nameAndAlias ),
+                nameAndAlias,
                 nameAndAlias,
                 type,
                 SqlDataType.KEY_DATA_TYPE );

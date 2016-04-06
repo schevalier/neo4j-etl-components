@@ -57,19 +57,9 @@ public class TableMetadataProducerTest
         assertEquals( "test.Person", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                new SimpleColumn(
-                        forTable,
-                        forTable.fullyQualifiedColumnName( "id" ),
-                        "id",
-                        ColumnType.PrimaryKey,
-                        SqlDataType.INT ),
+                new SimpleColumn( forTable, "id", ColumnType.PrimaryKey, SqlDataType.INT ),
                 columnUtil.column( forTable, "username", ColumnType.Data ),
-                new SimpleColumn(
-                        forTable,
-                        forTable.fullyQualifiedColumnName( "addressId" ),
-                        "addressId",
-                        ColumnType.ForeignKey,
-                        SqlDataType.INT ) ) );
+                new SimpleColumn( forTable, "addressId", ColumnType.ForeignKey, SqlDataType.INT ) ) );
     }
 
     @Test
@@ -131,18 +121,9 @@ public class TableMetadataProducerTest
                 new CompositeColumn(
                         forTable,
                         asList(
-                                new SimpleColumn(
-                                        forTable,
-                                        forTable.fullyQualifiedColumnName( "first_name" ),
-                                        "first_name",
-                                        ColumnType.PrimaryKey,
-                                        SqlDataType.VARCHAR ),
-                                new SimpleColumn(
-                                        forTable,
-                                        forTable.fullyQualifiedColumnName( "last_name" ),
-                                        "last_name",
-                                        ColumnType.PrimaryKey,
-                                        SqlDataType.VARCHAR ) ) ) ) );
+                                new SimpleColumn( forTable, "first_name", ColumnType.PrimaryKey, SqlDataType.VARCHAR ),
+                                new SimpleColumn( forTable, "last_name", ColumnType.PrimaryKey, SqlDataType.VARCHAR )
+                        ) ) ) );
     }
 }
 
