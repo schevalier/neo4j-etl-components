@@ -35,14 +35,15 @@ public class MySqlScripts
             {
                 String script = IOUtils.toString( getClass().getResourceAsStream( path ) );
 
-                ST template = new ST( script );
-
-                for ( MySqlClient.Parameters parameter : MySqlClient.Parameters.values() )
-                {
-                    template.add( parameter.name(), parameter.value() );
-                }
-
-                return template.render();
+//                ST template = new ST( script );
+//
+//                for ( MySqlClient.Parameters parameter : MySqlClient.Parameters.values() )
+//                {
+//                    template.add( parameter.name(), parameter.value() );
+//                }
+//
+//                return template.render();
+                return script;
             }
         };
     }
