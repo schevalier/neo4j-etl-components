@@ -8,7 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
@@ -27,11 +27,11 @@ public class ColumnToCsvFieldMappingsTest
         // given
         TableName personTable = new TableName( "test.Person" );
 
-        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnRole.PrimaryKey );
 
-        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
+        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnRole.Data );
 
-        Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
+        Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnRole.Data );
 
         CsvField idField = CsvField.id();
         CsvField usernameField = CsvField.data( "username", Neo4jDataType.String );
@@ -56,11 +56,11 @@ public class ColumnToCsvFieldMappingsTest
         // given
         TableName personTable = new TableName( "test.Person" );
 
-        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnRole.PrimaryKey );
 
-        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnType.Data );
+        Column column2 = columnUtil.column( personTable, "test.Person.username", "username", ColumnRole.Data );
 
-        Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnType.Data );
+        Column column3 = columnUtil.column( personTable, "test.Person.age", "age", ColumnRole.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )
@@ -83,10 +83,10 @@ public class ColumnToCsvFieldMappingsTest
         Column column1 = columnUtil.compositeKeyColumn(
                 authorTable,
                 asList( "first_name", "last_name" ),
-                ColumnType.PrimaryKey );
+                ColumnRole.PrimaryKey );
 
 
-        Column column2 = columnUtil.column( authorTable, "age", "age", ColumnType.Data );
+        Column column2 = columnUtil.column( authorTable, "age", "age", ColumnRole.Data );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )
@@ -109,14 +109,14 @@ public class ColumnToCsvFieldMappingsTest
         // given
         TableName personTable = new TableName( "test.Person" );
 
-        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.keyColumn( personTable, "id", ColumnRole.PrimaryKey );
 
-        Column column2 = columnUtil.column( personTable, "username", "username", ColumnType.Data );
+        Column column2 = columnUtil.column( personTable, "username", "username", ColumnRole.Data );
         Column column3 = columnUtil.column(
                 new TableName( "test.Address" ),
                 "postcode",
                 "postcode",
-                ColumnType.PrimaryKey );
+                ColumnRole.PrimaryKey );
 
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add( new ColumnToCsvFieldMapping( column1, CsvField.id() ) )

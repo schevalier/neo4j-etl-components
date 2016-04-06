@@ -12,9 +12,9 @@ public class SimpleColumnTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = new SimpleColumn( personTable, "id", "id-alias", ColumnType.PrimaryKey, SqlDataType.INT );
+        Column column1 = new SimpleColumn( personTable, "id", "id-alias", ColumnRole.PrimaryKey, SqlDataType.INT );
 
-        Column column2 = new SimpleColumn( personTable, "username", ColumnType.Data, SqlDataType.TEXT );
+        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT );
 
         // then
         assertThat( column1.aliasedColumn(), is( "test.Person.id AS `id-alias`" ) );

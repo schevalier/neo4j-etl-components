@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 
 import static java.lang.String.format;
@@ -13,9 +13,9 @@ import static java.lang.String.format;
 class JoinKeysQueryResults
 {
     private static final Predicate<Map<String, String>> IS_PRIMARY_KEY =
-            row -> ColumnType.PrimaryKey.name().equalsIgnoreCase( row.get( "SOURCE_COLUMN_TYPE" ) );
+            row -> ColumnRole.PrimaryKey.name().equalsIgnoreCase( row.get( "SOURCE_COLUMN_TYPE" ) );
     private static final Predicate<Map<String, String>> IS_FOREIGN_KEY =
-            row -> ColumnType.ForeignKey.name().equalsIgnoreCase( row.get( "SOURCE_COLUMN_TYPE" ) );
+            row -> ColumnRole.ForeignKey.name().equalsIgnoreCase( row.get( "SOURCE_COLUMN_TYPE" ) );
 
     private final List<JoinKeyQueryResults> primaryKeyQueryResults;
     private final List<JoinKeyQueryResults> foreignKeyQueryResults;

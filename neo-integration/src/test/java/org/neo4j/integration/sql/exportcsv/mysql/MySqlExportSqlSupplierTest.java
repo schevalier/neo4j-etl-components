@@ -11,7 +11,7 @@ import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.TableName;
 
@@ -27,11 +27,11 @@ public class MySqlExportSqlSupplierTest
     {
         // given
         TableName table = new TableName( "test.Person" );
-        Column column1 = columnUtil.column( table, "id", ColumnType.PrimaryKey );
+        Column column1 = columnUtil.column( table, "id", ColumnRole.PrimaryKey );
 
-        Column column2 = columnUtil.column( table, "username", ColumnType.Data );
+        Column column2 = columnUtil.column( table, "username", ColumnRole.Data );
 
-        Column column3 = columnUtil.column( table, "age", ColumnType.Data );
+        Column column3 = columnUtil.column( table, "age", ColumnRole.Data );
 
         final CsvField id = CsvField.id( new IdSpace( table.fullName() ) );
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
@@ -60,9 +60,9 @@ public class MySqlExportSqlSupplierTest
     {
         // given
         TableName forTable = new TableName( "test.Author" );
-        Column firstName = columnUtil.column( forTable, "first_name", ColumnType.PrimaryKey );
+        Column firstName = columnUtil.column( forTable, "first_name", ColumnRole.PrimaryKey );
 
-        Column lastName = columnUtil.column( forTable, "last_name", ColumnType.PrimaryKey );
+        Column lastName = columnUtil.column( forTable, "last_name", ColumnRole.PrimaryKey );
 
         final CompositeColumn from = new CompositeColumn(
                 forTable, Arrays.asList( firstName, lastName ) );

@@ -4,7 +4,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
@@ -25,7 +25,7 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
 
         for ( Column column : table.columns() )
         {
-            switch ( column.type() )
+            switch ( column.role() )
             {
                 case PrimaryKey:
                     CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
@@ -50,7 +50,7 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                 table.name(),
                 formatting.quote().enquote( formatting.labelFormatter().format( table.name().simpleName() ) ),
                 table.name().simpleName(),
-                ColumnType.Literal,
+                ColumnRole.Literal,
                 SqlDataType.LABEL_DATA_TYPE );
 
         builder.add( new ColumnToCsvFieldMapping( label, CsvField.label() ) );

@@ -1,6 +1,6 @@
 package org.neo4j.integration.sql.metadata;
 
-public enum ColumnType
+public enum ColumnRole
 {
     PrimaryKey,
     ForeignKey,

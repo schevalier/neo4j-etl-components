@@ -4,13 +4,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ColumnTypeTest
+public class ColumnRoleTest
 {
     @Test
     public void shouldReturnNameOnlyForLiteralColumnType()
     {
         // when
-        String value = ColumnType.Literal.fullyQualifiedColumnName( new TableName( "test.db" ), "a-value" );
+        String value = ColumnRole.Literal.fullyQualifiedColumnName( new TableName( "test.db" ), "a-value" );
 
         // then
         assertEquals( "a-value", value );
@@ -19,12 +19,12 @@ public class ColumnTypeTest
     @Test
     public void shouldReturnFullyQualifiedNameForAllOtherColumnTypes()
     {
-        for ( ColumnType columnType : ColumnType.values() )
+        for ( ColumnRole columnRole : ColumnRole.values() )
         {
-            if ( columnType != ColumnType.Literal )
+            if ( columnRole != ColumnRole.Literal )
             {
                 // when
-                String value = columnType.fullyQualifiedColumnName( new TableName( "test.db" ), "a-value" );
+                String value = columnRole.fullyQualifiedColumnName( new TableName( "test.db" ), "a-value" );
 
                 // then
                 assertEquals( "test.db.a-value", value );

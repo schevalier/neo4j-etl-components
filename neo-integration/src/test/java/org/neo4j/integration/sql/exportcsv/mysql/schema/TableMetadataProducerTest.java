@@ -9,7 +9,7 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
@@ -57,9 +57,9 @@ public class TableMetadataProducerTest
         assertEquals( "test.Person", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                new SimpleColumn( forTable, "id", ColumnType.PrimaryKey, SqlDataType.INT ),
-                columnUtil.column( forTable, "username", ColumnType.Data ),
-                new SimpleColumn( forTable, "addressId", ColumnType.ForeignKey, SqlDataType.INT ) ) );
+                new SimpleColumn( forTable, "id", ColumnRole.PrimaryKey, SqlDataType.INT ),
+                columnUtil.column( forTable, "username", ColumnRole.Data ),
+                new SimpleColumn( forTable, "addressId", ColumnRole.ForeignKey, SqlDataType.INT ) ) );
     }
 
     @Test
@@ -76,7 +76,7 @@ public class TableMetadataProducerTest
                 columnProjectionResults ) );
 
         TableMetadataProducer tableMetadataProducer =
-                new TableMetadataProducer( databaseClient, c -> c == ColumnType.Data );
+                new TableMetadataProducer( databaseClient, c -> c == ColumnRole.Data );
 
         // when
         TableName forTable = new TableName( "test.Student_Course" );
@@ -89,7 +89,7 @@ public class TableMetadataProducerTest
         assertEquals( "test.Student_Course", table.descriptor() );
 
         assertThat( table.columns(), contains(
-                columnUtil.column( forTable, "credits", ColumnType.Data ) ) );
+                columnUtil.column( forTable, "credits", ColumnRole.Data ) ) );
     }
 
     @Test
@@ -121,8 +121,8 @@ public class TableMetadataProducerTest
                 new CompositeColumn(
                         forTable,
                         asList(
-                                new SimpleColumn( forTable, "first_name", ColumnType.PrimaryKey, SqlDataType.VARCHAR ),
-                                new SimpleColumn( forTable, "last_name", ColumnType.PrimaryKey, SqlDataType.VARCHAR )
+                                new SimpleColumn( forTable, "first_name", ColumnRole.PrimaryKey, SqlDataType.VARCHAR ),
+                                new SimpleColumn( forTable, "last_name", ColumnRole.PrimaryKey, SqlDataType.VARCHAR )
                         ) ) ) );
     }
 }

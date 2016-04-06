@@ -21,20 +21,20 @@ public class SimpleColumn implements Column
     private final TableName table;
     private final String name;
     private final String alias;
-    private final ColumnType columnType;
+    private final ColumnRole columnRole;
     private final SqlDataType dataType;
 
-    public SimpleColumn( TableName table, String name, ColumnType columnType, SqlDataType dataType )
+    public SimpleColumn( TableName table, String name, ColumnRole columnRole, SqlDataType dataType )
     {
-        this(table, name, name, columnType, dataType);
+        this(table, name, name, columnRole, dataType);
     }
 
-    public SimpleColumn( TableName table, String name, String alias, ColumnType columnType, SqlDataType dataType )
+    public SimpleColumn( TableName table, String name, String alias, ColumnRole columnRole, SqlDataType dataType )
     {
         this.table = Preconditions.requireNonNull( table, "Table" );
         this.name = Preconditions.requireNonNullString( name, "Name" );
         this.alias = Preconditions.requireNonNullString( alias, "Alias" );
-        this.columnType = Preconditions.requireNonNull( columnType, "ColumnType" );
+        this.columnRole = Preconditions.requireNonNull( columnRole, "ColumnRole" );
         this.dataType = Preconditions.requireNonNull( dataType, "DataType" );
     }
 
@@ -48,7 +48,7 @@ public class SimpleColumn implements Column
     @Override
     public String name()
     {
-        return columnType.fullyQualifiedColumnName( table, name );
+        return columnRole.fullyQualifiedColumnName( table, name );
     }
 
     // Column alias
@@ -59,9 +59,9 @@ public class SimpleColumn implements Column
     }
 
     @Override
-    public ColumnType type()
+    public ColumnRole role()
     {
-        return columnType;
+        return columnRole;
     }
 
     @Override
@@ -113,10 +113,10 @@ public class SimpleColumn implements Column
         ObjectNode root = JsonNodeFactory.instance.objectNode();
 
         root.put( "type", getClass().getSimpleName() );
+        root.put( "role", columnRole.name() );
         root.put( "table", table.fullName() );
         root.put( "name", name );
         root.put( "alias", alias );
-        root.put( "column-type", columnType.name() );
         root.put( "sql-data-type", dataType.name() );
 
         return root;

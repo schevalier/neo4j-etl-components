@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 
 public enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
 {
@@ -28,7 +28,7 @@ public enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
                     boolean allowWriteLine = true;
                     for ( Column column : columns )
                     {
-                        if ( isKeyColumn( column.type() ) )
+                        if ( isKeyColumn( column.role() ) )
                         {
                             if ( StringUtils.isEmpty( column.selectFrom( row ) ) )
                             {
@@ -53,8 +53,8 @@ public enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
         }
     }
 
-    private static boolean isKeyColumn( ColumnType type )
+    private static boolean isKeyColumn( ColumnRole type )
     {
-        return ColumnType.ForeignKey == type || ColumnType.PrimaryKey == type || ColumnType.CompositeKey == type;
+        return ColumnRole.ForeignKey == type || ColumnRole.PrimaryKey == type || ColumnRole.CompositeKey == type;
     }
 }

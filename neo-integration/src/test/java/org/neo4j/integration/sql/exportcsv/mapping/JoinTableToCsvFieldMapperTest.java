@@ -12,7 +12,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.JoinTable;
@@ -36,11 +36,11 @@ public class JoinTableToCsvFieldMapperTest
         TableName leftTable = new TableName( "test.Student" );
         TableName rightTable = new TableName( "test.Course" );
 
-        Column keyOneSourceColumn = columnUtil.keyColumn( joinTableName, "studentId", ColumnType.ForeignKey );
-        Column keyOneTargetColumn = columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey );
+        Column keyOneSourceColumn = columnUtil.keyColumn( joinTableName, "studentId", ColumnRole.ForeignKey );
+        Column keyOneTargetColumn = columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey );
 
-        Column keyTwoSourceColumn = columnUtil.keyColumn( joinTableName, "courseId", ColumnType.ForeignKey );
-        Column keyTwoTargetColumn = columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey );
+        Column keyTwoSourceColumn = columnUtil.keyColumn( joinTableName, "courseId", ColumnRole.ForeignKey );
+        Column keyTwoTargetColumn = columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey );
 
         JoinTable joinTable = new JoinTable(
                 new Join(
@@ -76,11 +76,11 @@ public class JoinTableToCsvFieldMapperTest
         TableName leftTable = new TableName( "test.Student" );
         TableName rightTable = new TableName( "test.Course" );
 
-        Column keyOneSourceColumn = columnUtil.keyColumn( joinTableName, "studentId", ColumnType.ForeignKey );
-        Column keyOneTargetColumn = columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey );
+        Column keyOneSourceColumn = columnUtil.keyColumn( joinTableName, "studentId", ColumnRole.ForeignKey );
+        Column keyOneTargetColumn = columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey );
 
-        Column keyTwoSourceColumn = columnUtil.keyColumn( joinTableName, "courseId", ColumnType.ForeignKey );
-        Column keyTwoTargetColumn = columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey );
+        Column keyTwoSourceColumn = columnUtil.keyColumn( joinTableName, "courseId", ColumnRole.ForeignKey );
+        Column keyTwoTargetColumn = columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey );
 
         JoinTable joinTable = new JoinTable(
                 new Join(
@@ -89,7 +89,7 @@ public class JoinTableToCsvFieldMapperTest
                 ),
                 Table.builder()
                         .name( joinTableName )
-                        .addColumn( columnUtil.column( joinTableName, "credits", "credits", ColumnType.Data ) )
+                        .addColumn( columnUtil.column( joinTableName, "credits", "credits", ColumnRole.Data ) )
                         .build() );
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );

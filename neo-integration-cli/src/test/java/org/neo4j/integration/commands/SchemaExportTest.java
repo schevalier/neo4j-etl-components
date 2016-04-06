@@ -9,7 +9,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.JoinTable;
@@ -36,17 +36,17 @@ public class SchemaExportTest
 
             Collection<Table> tables = Collections.singletonList( Table.builder()
                     .name( rightTable )
-                    .addColumn( columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey ) )
-                    .addColumn( columnUtil.column( rightTable, "postcode", ColumnType.Data ) )
+                    .addColumn( columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey ) )
+                    .addColumn( columnUtil.column( rightTable, "postcode", ColumnRole.Data ) )
                     .build() );
 
             Collection<Join> joins = Collections.singletonList( new Join(
                     new JoinKey(
-                            columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ),
-                            columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ) ),
+                            columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey ),
+                            columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey ) ),
                     new JoinKey(
-                            columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                            columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey ) )
+                            columnUtil.column( leftTable, "addressId", ColumnRole.ForeignKey ),
+                            columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey ) )
             ) );
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
@@ -77,18 +77,18 @@ public class SchemaExportTest
 
             Collection<Table> tables = Collections.singletonList( Table.builder()
                     .name( leftTable )
-                    .addColumn( columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ) )
-                    .addColumn( columnUtil.column( leftTable, "username", ColumnType.Data ) )
-                    .addColumn( columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ) )
+                    .addColumn( columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey ) )
+                    .addColumn( columnUtil.column( leftTable, "username", ColumnRole.Data ) )
+                    .addColumn( columnUtil.column( leftTable, "addressId", ColumnRole.ForeignKey ) )
                     .build() );
 
             Collection<Join> joins = Collections.singletonList( new Join(
                     new JoinKey(
-                            columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ),
-                            columnUtil.keyColumn( leftTable, "id", ColumnType.PrimaryKey ) ),
+                            columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey ),
+                            columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey ) ),
                     new JoinKey(
-                            columnUtil.column( leftTable, "addressId", ColumnType.ForeignKey ),
-                            columnUtil.keyColumn( rightTable, "id", ColumnType.PrimaryKey ) )
+                            columnUtil.column( leftTable, "addressId", ColumnRole.ForeignKey ),
+                            columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey ) )
             ) );
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );

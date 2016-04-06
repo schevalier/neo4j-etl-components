@@ -9,7 +9,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
@@ -33,9 +33,9 @@ public class TableToCsvFieldMapperTest
 
         Table table = Table.builder()
                 .name( personTable )
-                .addColumn( columnUtil.column( personTable, "id", ColumnType.PrimaryKey ) )
-                .addColumn( columnUtil.column( personTable, "username", ColumnType.Data ) )
-                .addColumn( new SimpleColumn( personTable, "age", ColumnType.Data, SqlDataType.INT ) )
+                .addColumn( columnUtil.column( personTable, "id", ColumnRole.PrimaryKey ) )
+                .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
+                .addColumn( new SimpleColumn( personTable, "age", ColumnRole.Data, SqlDataType.INT ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
@@ -63,7 +63,7 @@ public class TableToCsvFieldMapperTest
         Table table = Table.builder()
                 .name( authorTable )
                 .addColumn( new ColumnUtil().compositeKeyColumn( authorTable, asList( "first_name", "last_name" ),
-                        ColumnType.PrimaryKey ) )
+                        ColumnRole.PrimaryKey ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
@@ -89,9 +89,9 @@ public class TableToCsvFieldMapperTest
 
         Table table = Table.builder()
                 .name( personTable )
-                .addColumn( columnUtil.column( personTable, "id", ColumnType.PrimaryKey ) )
-                .addColumn( columnUtil.column( personTable, "username", ColumnType.Data ) )
-                .addColumn( columnUtil.column( personTable, "addressId", ColumnType.ForeignKey ) )
+                .addColumn( columnUtil.column( personTable, "id", ColumnRole.PrimaryKey ) )
+                .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
+                .addColumn( columnUtil.column( personTable, "addressId", ColumnRole.ForeignKey ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

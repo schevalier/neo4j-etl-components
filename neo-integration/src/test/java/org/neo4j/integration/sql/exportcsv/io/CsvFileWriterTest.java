@@ -19,7 +19,7 @@ import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
@@ -65,8 +65,8 @@ public class CsvFileWriterTest
 
         when( mappings.columns() ).thenReturn(
                 asList(
-                        columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
-                        columnUtil.column( table, "username", ColumnType.Data ) ) );
+                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
+                        columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
         CsvResource resource = new CsvResource(
                 table.fullName(),
@@ -116,9 +116,9 @@ public class CsvFileWriterTest
 
         when( mappings.columns() ).thenReturn(
                 asList(
-                        columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
-                        columnUtil.column( table, "username", ColumnType.Data ),
-                        columnUtil.column( table, "age", ColumnType.Data ) ) );
+                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
+                        columnUtil.column( table, "username", ColumnRole.Data ),
+                        columnUtil.column( table, "age", ColumnRole.Data ) ) );
 
         CsvResource resource = new CsvResource(
                 table.fullName(),
@@ -168,8 +168,8 @@ public class CsvFileWriterTest
 
         when( mappings.columns() ).thenReturn(
                 asList(
-                        columnUtil.keyColumn( table, "id", ColumnType.PrimaryKey ),
-                        columnUtil.column( table, "username", ColumnType.Data ) ) );
+                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
+                        columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
         CsvResource resource = new CsvResource(
                 table.fullName(),

@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.MetadataProducer;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
@@ -27,14 +27,14 @@ import static java.util.stream.Collectors.toList;
 public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 {
     private final DatabaseClient databaseClient;
-    private final Predicate<ColumnType> columnFilter;
+    private final Predicate<ColumnRole> columnFilter;
 
     public TableMetadataProducer( DatabaseClient databaseClient )
     {
         this( databaseClient, c -> true );
     }
 
-    public TableMetadataProducer( DatabaseClient databaseClient, Predicate<ColumnType> columnFilter )
+    public TableMetadataProducer( DatabaseClient databaseClient, Predicate<ColumnRole> columnFilter )
     {
         this.databaseClient = databaseClient;
         this.columnFilter = columnFilter;
@@ -124,8 +124,8 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 
     private Optional<SimpleColumn> buildSimpleColumn( TableName source, Map<String, String> row )
     {
-        ColumnType columnType = ColumnType.valueOf( row.get( "COLUMN_TYPE" ) );
-        if ( columnFilter.test( columnType ) )
+        ColumnRole columnRole = ColumnRole.valueOf( row.get( "COLUMN_TYPE" ) );
+        if ( columnFilter.test( columnRole ) )
         {
             String columnName = row.get( "COLUMN_NAME" );
             SqlDataType dataType = SqlDataType.parse( row.get( "DATA_TYPE" ) );
@@ -134,7 +134,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
                     source,
                     columnName,
                     columnName,
-                    columnType,
+                    columnRole,
                     dataType ) );
         }
         else

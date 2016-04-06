@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.logging.Level;
 
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
@@ -23,7 +23,7 @@ public class JoinTableMetadataProducer implements MetadataProducer<JoinTableInfo
     public JoinTableMetadataProducer( DatabaseClient databaseClient )
     {
         this.joinMetadataProducer = new JoinMetadataProducer( databaseClient );
-        this.tableMetadataProducer = new TableMetadataProducer( databaseClient, c -> c == ColumnType.Data );
+        this.tableMetadataProducer = new TableMetadataProducer( databaseClient, c -> c == ColumnRole.Data );
     }
 
     @Override

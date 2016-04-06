@@ -12,7 +12,7 @@ import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
@@ -116,18 +116,18 @@ public class JoinTableMetadataProducerTest
         Join join = joinTable.join();
 
         assertEquals( columnUtil.compositeKeyColumn( authorPublisher,
-                asList( "author_first_name", "author_last_name" ), ColumnType.ForeignKey ), join.keyOneSourceColumn() );
+                asList( "author_first_name", "author_last_name" ), ColumnRole.ForeignKey ), join.keyOneSourceColumn() );
 
         assertEquals(
-                columnUtil.keyColumn( authorPublisher, "publisherId", ColumnType.ForeignKey ),
+                columnUtil.keyColumn( authorPublisher, "publisherId", ColumnRole.ForeignKey ),
                 join.keyTwoSourceColumn() );
 
         assertEquals(
-                columnUtil.keyColumn( publisher, "id", ColumnType.PrimaryKey ),
+                columnUtil.keyColumn( publisher, "id", ColumnRole.PrimaryKey ),
                 join.keyTwoTargetColumn() );
 
         assertEquals(
-                columnUtil.compositeKeyColumn( author, asList( "first_name", "last_name" ), ColumnType.PrimaryKey ),
+                columnUtil.compositeKeyColumn( author, asList( "first_name", "last_name" ), ColumnRole.PrimaryKey ),
                 join.keyOneTargetColumn() );
 
         assertTrue( joinTables.size() == 1 );
@@ -167,7 +167,7 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                columnUtil.column( studentCourse, "credits", ColumnType.Data ) ) );
+                columnUtil.column( studentCourse, "credits", ColumnRole.Data ) ) );
 
         assertFalse( iterator.hasNext() );
     }
@@ -208,7 +208,7 @@ public class JoinTableMetadataProducerTest
         assertJoinTableKeyMappings( joinTable );
 
         assertThat( joinTable.columns(), contains(
-                columnUtil.column( studentCourse, "credits", ColumnType.Data ) ) );
+                columnUtil.column( studentCourse, "credits", ColumnRole.Data ) ) );
 
         assertFalse( iterator.hasNext() );
     }
@@ -216,17 +216,17 @@ public class JoinTableMetadataProducerTest
     private void assertJoinTableKeyMappings( JoinTable joinTable )
     {
         TableName studentCourse = joinTable.joinTableName();
-        Column expectedStudentId = columnUtil.keyColumn( studentCourse, "studentId", ColumnType.ForeignKey );
-        Column expectedCourseId = columnUtil.keyColumn( studentCourse, "courseId", ColumnType.ForeignKey );
+        Column expectedStudentId = columnUtil.keyColumn( studentCourse, "studentId", ColumnRole.ForeignKey );
+        Column expectedCourseId = columnUtil.keyColumn( studentCourse, "courseId", ColumnRole.ForeignKey );
 
         assertEquals( expectedStudentId, joinTable.join().keyTwoSourceColumn() );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnType.PrimaryKey ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnRole.PrimaryKey ),
                 joinTable.join().keyTwoTargetColumn() );
 
         assertEquals( expectedCourseId, joinTable.join().keyOneSourceColumn() );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnType.PrimaryKey ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnRole.PrimaryKey ),
                 joinTable.join().keyOneTargetColumn() );
     }
 

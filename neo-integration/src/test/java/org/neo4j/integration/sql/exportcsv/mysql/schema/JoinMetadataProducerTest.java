@@ -13,7 +13,7 @@ import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -68,19 +68,19 @@ public class JoinMetadataProducerTest
         ArrayList<Join> joins = new ArrayList<>( joinCollection );
         Join livesIn = joins.get( 1 );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Person" ), "id", ColumnType.PrimaryKey ), livesIn
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Person" ), "id", ColumnRole.PrimaryKey ), livesIn
                 .keyOneSourceColumn() );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Person" ), "addressId", ColumnType.ForeignKey
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Person" ), "addressId", ColumnRole.ForeignKey
         ), livesIn.keyTwoSourceColumn() );
 
         assertEquals( address, livesIn.keyTwoTargetColumn().table() );
 
         Join ownedBy = joins.get( 0 );
 
-        assertEquals( columnUtil.keyColumn( address, "id", ColumnType.PrimaryKey ), ownedBy.keyOneSourceColumn() );
+        assertEquals( columnUtil.keyColumn( address, "id", ColumnRole.PrimaryKey ), ownedBy.keyOneSourceColumn() );
 
-        assertEquals( columnUtil.keyColumn( address, "ownerId", ColumnType.ForeignKey ), ownedBy
+        assertEquals( columnUtil.keyColumn( address, "ownerId", ColumnRole.ForeignKey ), ownedBy
                 .keyTwoSourceColumn() );
 
         assertEquals( new TableName( "test.Person" ), ownedBy.keyTwoTargetColumn().table() );
@@ -156,15 +156,15 @@ public class JoinMetadataProducerTest
         ArrayList<Join> joins = new ArrayList<>( joinCollection );
         Join writtenBy = joins.get( 0 );
 
-        assertEquals( columnUtil.keyColumn( book, "id", ColumnType.PrimaryKey ), writtenBy.keyOneSourceColumn() );
+        assertEquals( columnUtil.keyColumn( book, "id", ColumnRole.PrimaryKey ), writtenBy.keyOneSourceColumn() );
 
         assertEquals(
-                columnUtil.compositeKeyColumn( book, asList( "author_first_name", "author_last_name" ), ColumnType
+                columnUtil.compositeKeyColumn( book, asList( "author_first_name", "author_last_name" ), ColumnRole
                         .ForeignKey ),
                 writtenBy.keyTwoSourceColumn() );
 
         assertEquals(
-                columnUtil.compositeKeyColumn( author, asList( "first_name", "last_name" ), ColumnType.PrimaryKey ),
+                columnUtil.compositeKeyColumn( author, asList( "first_name", "last_name" ), ColumnRole.PrimaryKey ),
                 writtenBy.keyTwoTargetColumn() );
 
         assertEquals( author, writtenBy.keyTwoTargetColumn().table() );
@@ -203,17 +203,17 @@ public class JoinMetadataProducerTest
 
     private void assertJoinTableKeyMappings( TableName studentCourse, Join join )
     {
-        Column expectedStudentId = columnUtil.keyColumn( studentCourse, "studentId", ColumnType.ForeignKey );
-        Column expectedCourseId = columnUtil.keyColumn( studentCourse, "courseId", ColumnType.ForeignKey );
+        Column expectedStudentId = columnUtil.keyColumn( studentCourse, "studentId", ColumnRole.ForeignKey );
+        Column expectedCourseId = columnUtil.keyColumn( studentCourse, "courseId", ColumnRole.ForeignKey );
 
         assertEquals( expectedCourseId, join.keyOneSourceColumn() );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnType.PrimaryKey ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Course" ), "id", ColumnRole.PrimaryKey ),
                 join.keyOneTargetColumn() );
 
         assertEquals( expectedStudentId, join.keyTwoSourceColumn() );
 
-        assertEquals( columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnType.PrimaryKey ),
+        assertEquals( columnUtil.keyColumn( new TableName( "test.Student" ), "id", ColumnRole.PrimaryKey ),
                 join.keyTwoTargetColumn() );
 
     }

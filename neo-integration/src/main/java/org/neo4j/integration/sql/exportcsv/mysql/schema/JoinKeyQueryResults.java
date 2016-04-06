@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.ColumnType;
+import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
@@ -51,9 +51,9 @@ class JoinKeyQueryResults
         TableName targetTable = new TableName(
                 row.get( prefix.apply( "_TABLE_SCHEMA" ) ), row.get( prefix.apply( "_TABLE_NAME" ) ) );
         String targetColumn = row.get( prefix.apply( "_COLUMN_NAME" ) );
-        ColumnType targetColumnType = ColumnType.valueOf( row.get( prefix.apply( "_COLUMN_TYPE" ) ) );
+        ColumnRole targetColumnRole = ColumnRole.valueOf( row.get( prefix.apply( "_COLUMN_TYPE" ) ) );
 
-        return new SimpleColumn( targetTable, targetColumn, targetColumnType, SqlDataType.KEY_DATA_TYPE );
+        return new SimpleColumn( targetTable, targetColumn, targetColumnRole, SqlDataType.KEY_DATA_TYPE );
     }
 
     private Column compositeColumn( List<Map<String, String>> rows, Function<String, String> prefix )

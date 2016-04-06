@@ -24,7 +24,7 @@ public class CompositeColumnTest
     {
         // given
         TableName authorTable = new TableName( "test.Author" );
-        Column column = columnUtil.compositeKeyColumn( authorTable, asList( "first_name", "last_name" ), ColumnType
+        Column column = columnUtil.compositeKeyColumn( authorTable, asList( "first_name", "last_name" ), ColumnRole
                 .PrimaryKey );
 
         //then
@@ -37,7 +37,7 @@ public class CompositeColumnTest
     {
         // given
         Column compositeColumn = columnUtil.compositeKeyColumn( new TableName( "test.Users" ),
-                asList( "first_name", "last_name" ), ColumnType.PrimaryKey );
+                asList( "first_name", "last_name" ), ColumnRole.PrimaryKey );
 
         RowAccessor stubRowAccessor = columnLabel ->
                 singletonList( Collections.<String, String>emptyMap() ).get( 0 ).get( columnLabel );
@@ -58,7 +58,7 @@ public class CompositeColumnTest
         rowOne.put( "last_name", null );
 
         Column compositeColumn = columnUtil.compositeKeyColumn( new TableName( "test.Users" ),
-                asList( "first_name", "last_name" ), ColumnType.PrimaryKey );
+                asList( "first_name", "last_name" ), ColumnRole.PrimaryKey );
 
         RowAccessor stubRowAccessor = columnLabel ->
                 singletonList( rowOne ).get( 0 ).get( columnLabel );
@@ -79,7 +79,7 @@ public class CompositeColumnTest
         rowOne.put( "last_name", "Mc.Boatface" );
 
         Column compositeColumn = columnUtil.compositeKeyColumn( new TableName( "test.Users" ),
-                asList( "first_name", "last_name" ), ColumnType.PrimaryKey );
+                asList( "first_name", "last_name" ), ColumnRole.PrimaryKey );
 
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
         // when

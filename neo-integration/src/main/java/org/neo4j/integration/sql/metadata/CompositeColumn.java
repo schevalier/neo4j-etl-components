@@ -65,9 +65,9 @@ public class CompositeColumn implements Column
     }
 
     @Override
-    public ColumnType type()
+    public ColumnRole role()
     {
-        return ColumnType.CompositeKey;
+        return ColumnRole.CompositeKey;
     }
 
     @Override
