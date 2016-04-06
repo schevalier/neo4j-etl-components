@@ -30,10 +30,9 @@ public class CompositeColumnTest
                 authorTable,
                 asList( "first_name", "last_name" ),
                 ColumnRole.PrimaryKey );
-
         //then
         assertThat( column.aliasedColumn(),
-                is( "test.Author.first_name AS `first_name`, test.Author.last_name AS `last_name`" ) );
+                is( "`test`.`Author`.`first_name` AS `first_name`, `test`.`Author`.`last_name` AS `last_name`" ) );
     }
 
     @Test
@@ -79,7 +78,7 @@ public class CompositeColumnTest
     }
 
     @Test
-    public void selectFromRowReturnsStringJoinedBy_ForCompositeKeyColumnValues() throws Exception
+    public void selectFromRowReturnsStringJoinedByNullCharacterForCompositeKeyColumnValues() throws Exception
     {
         // given
         HashMap<String, String> rowOne = new HashMap<>();
@@ -96,7 +95,7 @@ public class CompositeColumnTest
         String value = compositeColumn.selectFrom( stubRowAccessor );
 
         // then
-        assertThat( value, is( "Boaty\0Mc.Boatface" ) );
+        assertThat( value, is( "\"Boaty\0Mc.Boatface\"" ) );
     }
 
     @Test

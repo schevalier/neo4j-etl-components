@@ -83,7 +83,7 @@ public class CsvFileWriterTest
 
         // then
         List<String> contents = Files.readAllLines( exportFile );
-        assertEquals( asList( "1,user-1", "2,user-2" ), contents );
+        assertEquals( asList( "\"1\",\"user-1\"", "\"2\",\"user-2\"" ), contents );
     }
 
     @Test
@@ -135,7 +135,9 @@ public class CsvFileWriterTest
 
         // then
         List<String> contents = Files.readAllLines( exportFile );
-        assertEquals( asList( "1\tuser-1\t45", "2\t\t32", "3\tuser-3\t", "4\tuser-4\t" ), contents );
+        assertEquals(
+                asList( "\"1\"\t\"user-1\"\t\"45\"", "\"2\"\t\t\"32\"", "\"3\"\t\"user-3\"\t", "\"4\"\t\"user-4\"\t" ),
+                contents );
     }
 
     @Test
@@ -186,6 +188,6 @@ public class CsvFileWriterTest
 
         // then
         List<String> contents = Files.readAllLines( exportFile );
-        assertEquals( asList( "1\tuser-1", "2\t", "3\t" ), contents );
+        assertEquals( asList( "\"1\"\t\"user-1\"", "\"2\"\t", "\"3\"\t" ), contents );
     }
 }

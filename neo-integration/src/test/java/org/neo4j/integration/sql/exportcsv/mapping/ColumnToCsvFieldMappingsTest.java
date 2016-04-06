@@ -98,8 +98,8 @@ public class ColumnToCsvFieldMappingsTest
         // then
         assertThat( aliasedColumns,
                 hasItems(
-                        "test.Author.first_name AS `first_name`, test.Author.last_name AS `last_name`",
-                        "test.Author.age AS `age`" ) );
+                        "`test`.`Author`.`first_name` AS `first_name`, `test`.`Author`.`last_name` AS `last_name`",
+                        "`test`.`Author`.`age` AS `age`" ) );
     }
 
     @Test
@@ -127,6 +127,6 @@ public class ColumnToCsvFieldMappingsTest
         Collection<String> tableNames = mappings.tableNames();
 
         // then
-        assertThat( tableNames, hasItems( "test.Person", "test.Address" ) );
+        assertThat( tableNames, hasItems( "`test`.`Person`", "`test`.`Address`" ) );
     }
 }

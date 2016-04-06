@@ -2,11 +2,10 @@ package org.neo4j.integration.neo4j.importcsv.config;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 
+import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.CommandsSupplier;
-import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.util.OperatingSystem;
 import org.neo4j.integration.util.Preconditions;
 
@@ -65,6 +64,9 @@ public class ImportConfig implements CommandsSupplier
 
         commands.addCommand( "--id-type" );
         commands.addCommand( idType.name().toUpperCase() );
+
+        commands.addCommand( "--multiline-fields" );
+        commands.addCommand( "true" );
     }
 
     public interface Builder

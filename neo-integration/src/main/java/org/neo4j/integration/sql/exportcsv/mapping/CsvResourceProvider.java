@@ -24,12 +24,7 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
     {
         ColumnToCsvFieldMappings mappings = new TableToCsvFieldMapper( formatting ).createMappings( table );
 
-        return new CsvResource(
-                table.descriptor(),
-                GraphObjectType.Node,
-                sqlSupplier.sql( mappings ),
-                mappings
-        );
+        return new CsvResource( table.descriptor(), GraphObjectType.Node, sqlSupplier.sql( mappings ), mappings );
     }
 
     @Override
@@ -41,8 +36,7 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
                 join.descriptor(),
                 GraphObjectType.Relationship,
                 sqlSupplier.sql( mappings ),
-                mappings
-        );
+                mappings);
     }
 
     @Override
@@ -54,7 +48,6 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
                 joinTable.descriptor(),
                 GraphObjectType.Relationship,
                 sqlSupplier.sql( mappings ),
-                mappings
-        );
+                mappings);
     }
 }

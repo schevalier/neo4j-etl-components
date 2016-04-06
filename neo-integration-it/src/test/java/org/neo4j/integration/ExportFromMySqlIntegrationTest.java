@@ -2,7 +2,6 @@ package org.neo4j.integration;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
 import static java.util.Arrays.asList;
-import static java.util.Arrays.sort;
 import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -121,9 +119,9 @@ public class ExportFromMySqlIntegrationTest
 
         assertThat( books.size(), is( 1 ) );
 
-        assertThat( books, hasItems( "Database Management Systems") );
+        assertThat( books, hasItems( "Database Management Systems" ) );
         assertEquals( singletonList( "BOOK" ), relationships );
-        assertThat( referencedBook, hasItems( "Database System Concepts") );
+        assertThat( referencedBook, hasItems( "Database System Concepts" ) );
     }
 
     @Test

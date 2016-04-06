@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.sql.metadata.Column;
@@ -64,6 +65,7 @@ public class ColumnToCsvFieldMappings
                 .map( Column::table )
                 .distinct()
                 .map( TableName::fullName )
+                .map( name -> "`" + StringUtils.join( name.split( "\\." ), "`.`" ) + "`" )
                 .collect( Collectors.toCollection( LinkedHashSet::new ) );
     }
 

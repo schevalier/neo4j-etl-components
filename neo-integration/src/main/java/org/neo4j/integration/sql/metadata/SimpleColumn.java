@@ -3,12 +3,14 @@ package org.neo4j.integration.sql.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
@@ -84,7 +86,16 @@ public class SimpleColumn implements Column
     @Override
     public String selectFrom( RowAccessor row )
     {
-        return row.getString( alias );
+        String rowValue = row.getString( alias );
+        if ( Neo4jDataType.String.equals( dataType.toNeo4jDataType() ) || Neo4jDataType.Char.equals( dataType
+                .toNeo4jDataType() ) )
+        {
+            return StringUtils.isNotEmpty( rowValue ) ? format( "\"%s\"", rowValue ) : null;
+        }
+        else
+        {
+            return rowValue;
+        }
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
@@ -109,7 +120,15 @@ public class SimpleColumn implements Column
     @Override
     public String aliasedColumn()
     {
-        return format( "%s AS `%s`", name(), alias );
+        if ( columnRole == ColumnRole.Literal )
+        {
+            return format( "%s AS `%s`", name(), alias );
+        }
+        else
+        {
+            String nameWithTicks = StringUtils.join( name().split( "\\." ), "`.`" );
+            return format( "`%s` AS `%s`", nameWithTicks, alias );
+        }
     }
 
     @Override
