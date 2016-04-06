@@ -2,6 +2,7 @@ package org.neo4j.integration;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,6 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -25,6 +25,7 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
@@ -100,12 +101,29 @@ public class ExportFromMySqlIntegrationTest
         List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
         List<String> lastNames = JsonPath.read( response, "$.results[*].data[*].row[2].lastName" );
 
-        assertThat( books.size(), is( 2 ) );
+        assertThat( books.size(), is( 3 ) );
 
-        assertThat( books, hasItems( "Database System Concepts" ) );
-        assertEquals( asList( "AUTHOR", "AUTHOR" ), relationships );
-        assertEquals( asList( "Silberschatz", "Tanenbaum" ), lastNames );
+        assertThat( books, hasItems( "Database System Concepts", "Database Management Systems", "Computer Networks" ) );
+        assertEquals( asList( "AUTHOR", "AUTHOR", "AUTHOR" ), relationships );
+        assertEquals( asList( "Silberschatz", "Tanenbaum", "Ramakrishnan" ), lastNames );
+    }
 
+    @Test
+    public void shouldExportTableWithSelfJoins() throws Exception
+    {
+        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
+        String response = neo4j.get().executeHttp( NEO_TX_URI,
+                "MATCH (b1:Book)-[r]->(b2:Book) RETURN b1, type(r),b2" );
+        List<String> books = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
+        List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
+        List<String> referencedBook = JsonPath.read( response, "$.results[*].data[*].row[2].name" );
+
+        assertThat( books.size(), is( 1 ) );
+
+        assertThat( books, hasItems( "Database Management Systems") );
+        assertEquals( singletonList( "BOOK" ), relationships );
+        assertThat( referencedBook, hasItems( "Database System Concepts") );
     }
 
     @Test
@@ -184,7 +202,7 @@ public class ExportFromMySqlIntegrationTest
         String response = neo4j.get()
                 .executeHttp( NEO_TX_URI, "MATCH (a:Author)-[r]->(p:Publisher) RETURN a, p" );
 
-        System.out.println(response);
+        System.out.println( response );
         List<String> authors = JsonPath.read( response, "$.results[*].data[*].row[0].lastName" );
         List<String> publishers = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
 

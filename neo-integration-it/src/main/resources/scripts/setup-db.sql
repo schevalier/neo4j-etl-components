@@ -109,7 +109,9 @@ CREATE TABLE javabase.Book
   name              TEXT NOT NULL,
   author_first_name VARCHAR(20),
   author_last_name  VARCHAR(20),
-  FOREIGN KEY (author_first_name, author_last_name) REFERENCES javabase.Author (first_name, last_name)
+  reference_book_id INT,
+  FOREIGN KEY (author_first_name, author_last_name) REFERENCES javabase.Author (first_name, last_name),
+  FOREIGN KEY (reference_book_id) REFERENCES javabase.Book (id)
 );
 GRANT ALL ON javabase.Book TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
@@ -227,6 +229,7 @@ INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, ti
 
 INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Abraham', 'Silberschatz', 45);
 INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Andrew', 'Tanenbaum', 56);
+INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Raghu', 'Ramakrishnan', 32);
 
 INSERT INTO javabase.Publisher (name) VALUES ('O\'Reilly');
 INSERT INTO javabase.Publisher (name) VALUES ('Pearson');
@@ -251,6 +254,14 @@ INSERT INTO javabase.Book (name, author_first_name, author_last_name)
 VALUES ('Database System Concepts', 'Abraham', 'Silberschatz');
 INSERT INTO javabase.Book (name, author_first_name, author_last_name)
 VALUES ('Computer Networks', 'Andrew', 'Tanenbaum');
+INSERT INTO javabase.Book (name, author_first_name, author_last_name, reference_book_id)
+  SELECT
+    'Database Management Systems',
+    'Raghu',
+    'Ramakrishnan',
+    id
+  FROM javabase.Book
+  WHERE author_first_name = 'Abraham';
 
 INSERT INTO javabase.Student (username) VALUES ('jim');
 INSERT INTO javabase.Student (username) VALUES ('mark');

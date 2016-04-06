@@ -2,6 +2,7 @@ package org.neo4j.integration.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableName;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
@@ -152,7 +154,8 @@ public class DatabaseInspectorTest
                         "TARGET_COLUMN_NAME",
                         "TARGET_COLUMN_TYPE" )
                 .addRow( "test", "Book", "id", "PrimaryKey", "test", "Book", "id", "PrimaryKey" )
-                .addRow( "test", "Book", "author_first_name", "ForeignKey", "test", "Author", "first_name", "PrimaryKey" )
+                .addRow( "test", "Book", "author_first_name", "ForeignKey", "test", "Author", "first_name",
+                        "PrimaryKey" )
                 .addRow( "test", "Book", "author_last_name", "ForeignKey", "test", "Author", "last_name", "PrimaryKey" )
                 .build();
 
@@ -187,7 +190,66 @@ public class DatabaseInspectorTest
     }
 
     @Test
-    public void shouldExportTablesAndJoinsForThreeTableJoin() throws Exception
+    public void shouldExportTablesAndJoinsForSelfJoin() throws Exception
+    {
+        // given
+        QueryResults employeeSchema = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "REFERENCED_TABLE_NAME", "COLUMN_KEY" )
+                .addRow( "id", null, "PRI" )
+                .addRow( "name", null, "Data" )
+                .addRow( "managerId", "Employee", "MUL" )
+                .build();
+
+
+        QueryResults employeeResults = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "name", "TEXT", "Data" )
+                .addRow( "managerId", "INT", "ForeignKey" )
+                .build();
+
+        QueryResults joinResults = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "Employee", "id", "PrimaryKey", "test", "Employee", "id", "PrimaryKey" )
+                .addRow( "test", "Employee", "managerId", "ForeignKey", "test", "Employee", "id", "PrimaryKey" )
+                .build();
+
+        TableName employee = new TableName( "test.Employee" );
+
+        when( databaseClient.tableNames() ).thenReturn( singletonList( employee ) );
+        when( databaseClient.executeQuery( any( String.class ) ) )
+                .thenReturn( AwaitHandle.forReturnValue( employeeSchema ) )
+                .thenReturn( AwaitHandle.forReturnValue( employeeResults ) )
+                .thenReturn( AwaitHandle.forReturnValue( joinResults ) );
+
+        // when
+        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
+        SchemaExport schemaExport = databaseInspector.buildSchemaExport();
+
+        // then
+        List<TableName> tableNames = schemaExport.tables().stream().map( Table::name ).collect( Collectors.toList() );
+        Join join = schemaExport.joins().stream().findFirst().get();
+
+
+        assertThat( tableNames, matchesCollection( singletonList( employee ) ) );
+        assertThat( join.tableNames(), hasItems( employee) );
+        assertEquals( asList("test.Employee.managerId",
+                "test.Employee.id",
+                "test.Employee.id",
+                "test.Employee.id" ),
+                keyNames( join ) );
+        assertTrue( schemaExport.joinTables().isEmpty() );
+    }
+
+    @Test
+    public void shouldExportTablesAndJoinTableForThreeTableJoin() throws Exception
     {
         // given
         QueryResults studentTableSchema = StubQueryResults.builder()
