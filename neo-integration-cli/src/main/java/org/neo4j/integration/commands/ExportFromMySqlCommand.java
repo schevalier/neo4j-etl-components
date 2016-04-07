@@ -53,6 +53,8 @@ public class ExportFromMySqlCommand
 
         print( format( "CSV directory: %s", csvDirectory ) );
 
+        print( "Creating MySQL to CSV mappings..." );
+
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
                 .port( port )
@@ -60,8 +62,6 @@ public class ExportFromMySqlCommand
                 .username( user )
                 .password( password )
                 .build();
-
-        print( "Exporting from MySQL to CSV..." );
 
         ExportToCsvConfig.Builder builder = ExportToCsvConfig.builder()
                 .destination( csvDirectory )
@@ -71,7 +71,11 @@ public class ExportFromMySqlCommand
         SchemaExport schemaExport = buildSchemaExport( connectionConfig );
         schemaExport.updateConfig( builder, formatting, sqlSupplier );
 
-        Manifest manifest = new ExportToCsvCommand( builder.build() ).execute();
+        ExportToCsvConfig config = builder.build();
+
+        print( "Exporting from MySQL to CSV..." );
+
+        Manifest manifest = new ExportToCsvCommand( config ).execute();
 
         print( "Creating Neo4j store from CSV..." );
 
