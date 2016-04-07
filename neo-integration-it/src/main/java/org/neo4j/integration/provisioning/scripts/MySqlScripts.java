@@ -23,7 +23,14 @@ public class MySqlScripts
 
     public static Script northwindScript()
     {
-        return createScript( "/scripts/northwind.sql" );
+        return new Script()
+        {
+            @Override
+            public String value() throws IOException
+            {
+                return IOUtils.toString( getClass().getResourceAsStream( "/scripts/northwind.sql" ) );
+            }
+        };
     }
 
     private static Script createScript( String path )
@@ -35,15 +42,14 @@ public class MySqlScripts
             {
                 String script = IOUtils.toString( getClass().getResourceAsStream( path ) );
 
-//                ST template = new ST( script );
-//
-//                for ( MySqlClient.Parameters parameter : MySqlClient.Parameters.values() )
-//                {
-//                    template.add( parameter.name(), parameter.value() );
-//                }
-//
-//                return template.render();
-                return script;
+                ST template = new ST( script );
+
+                for ( MySqlClient.Parameters parameter : MySqlClient.Parameters.values() )
+                {
+                    template.add( parameter.name(), parameter.value() );
+                }
+
+                return template.render();
             }
         };
     }
