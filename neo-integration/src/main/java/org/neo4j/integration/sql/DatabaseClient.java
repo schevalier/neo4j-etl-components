@@ -36,8 +36,8 @@ public class DatabaseClient implements AutoCloseable
 
         connection = DriverManager.getConnection(
                 connectionConfig.uri().toString(),
-                connectionConfig.username(),
-                connectionConfig.password() );
+                connectionConfig.credentials().username(),
+                connectionConfig.credentials().password() );
 
         Loggers.Sql.log().fine( "Connected to database" );
     }

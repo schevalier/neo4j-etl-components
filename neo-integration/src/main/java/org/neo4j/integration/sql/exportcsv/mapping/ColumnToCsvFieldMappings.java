@@ -1,5 +1,6 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -8,7 +9,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.sql.metadata.Column;
@@ -17,6 +17,17 @@ import org.neo4j.integration.util.Preconditions;
 
 public class ColumnToCsvFieldMappings
 {
+    public static ColumnToCsvFieldMappings fromJson( JsonNode root )
+    {
+        ArrayNode mappingArray = (ArrayNode) root;
+        Collection<ColumnToCsvFieldMapping> mappings = new ArrayList<>();
+        for ( JsonNode jsonNode : mappingArray )
+        {
+            mappings.add( ColumnToCsvFieldMapping.fromJson( jsonNode ) );
+        }
+        return new ColumnToCsvFieldMappings( mappings );
+    }
+
     public static Builder builder()
     {
         return new ColumnToCsvFieldMappingsBuilder();
@@ -65,7 +76,7 @@ public class ColumnToCsvFieldMappings
             root.add( mapping.toJson() );
         }
 
-       return root;
+        return root;
     }
 
     public interface Builder

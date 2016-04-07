@@ -1,5 +1,6 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,20 @@ import static java.lang.String.format;
 
 public class CompositeColumn implements Column
 {
+    public static Column fromJson( JsonNode root )
+    {
+        TableName table = new TableName( root.path( "table" ).textValue() );
+        Collection<Column> columns = new ArrayList<>();
+
+        ArrayNode columnArray = (ArrayNode) root.path( "columns" );
+        for ( JsonNode jsonNode : columnArray )
+        {
+            columns.add( Column.fromJson( jsonNode ) );
+        }
+
+        return new CompositeColumn( table, columns );
+    }
+
     private static final String SEPARATOR = "\0";
 
     private final TableName table;

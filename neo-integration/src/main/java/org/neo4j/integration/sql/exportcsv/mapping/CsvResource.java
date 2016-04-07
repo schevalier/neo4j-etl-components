@@ -8,6 +8,16 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 
 public class CsvResource
 {
+    public static CsvResource fromJson(JsonNode root)
+    {
+        return new CsvResource(
+                root.path( "name" ).textValue(),
+                GraphObjectType.valueOf( root.path( "graph-object-type" ).textValue() ),
+                root.path( "sql" ).textValue(),
+                ColumnToCsvFieldMappings.fromJson( root.path( "mappings" ) ) );
+    }
+
+
     private final String name;
     private final GraphObjectType graphObjectType;
     private final String sql;

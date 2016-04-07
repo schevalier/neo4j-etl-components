@@ -5,6 +5,8 @@ import java.net.URI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import org.neo4j.integration.util.Preconditions;
 
@@ -15,12 +17,24 @@ public class ConnectionConfig
         return new ConnectionConfigBuilder( databaseType );
     }
 
+    public static ConnectionConfig fromJson(JsonNode root, Credentials credentials)
+    {
+        DatabaseType databaseType = DatabaseType.valueOf( root.path( "database-type" ).textValue() );
+
+        return forDatabase( databaseType )
+                .host( root.path( "host" ).textValue() )
+                .port( root.path( "port" ).intValue() )
+                .database( root.path( "database" ).textValue() )
+                .username( credentials.username() )
+                .password( credentials.password() )
+                .build();
+    }
+
     private final DatabaseType databaseType;
     private final String host;
     private final int port;
     private final String database;
-    private final String username;
-    private final String password;
+    private final Credentials credentials;
 
     ConnectionConfig( ConnectionConfigBuilder builder )
     {
@@ -28,8 +42,9 @@ public class ConnectionConfig
         this.host = Preconditions.requireNonNullString( builder.host, "Host" );
         this.port = builder.port;
         this.database = Preconditions.requireNonNull( builder.database, "Database" );
-        this.username = Preconditions.requireNonNullString( builder.username, "Username" );
-        this.password = Preconditions.requireNonNullString( builder.password, "Password" );
+        this.credentials = new Credentials(
+                Preconditions.requireNonNullString( builder.username, "Username" ),
+                Preconditions.requireNonNullString( builder.password, "Password" ) );
     }
 
     public String driverClassName()
@@ -42,14 +57,9 @@ public class ConnectionConfig
         return databaseType.createUri( host, port, database );
     }
 
-    public String username()
+    public Credentials credentials()
     {
-        return username;
-    }
-
-    public String password()
-    {
-        return password;
+        return credentials;
     }
 
     public JsonNode toJson()
@@ -60,9 +70,21 @@ public class ConnectionConfig
         root.put( "host", host );
         root.put( "port", port );
         root.put( "database", database );
-        root.put( "username", username );
 
         return root;
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals( Object o )
+    {
+        return EqualsBuilder.reflectionEquals( this, o );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode( this );
     }
 
     public interface Builder

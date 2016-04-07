@@ -18,6 +18,17 @@ import static java.lang.String.format;
 
 public class SimpleColumn implements Column
 {
+    public static Column fromJson( JsonNode root )
+    {
+        return new SimpleColumn(
+                new TableName( root.path( "table" ).textValue() ),
+                root.path( "name" ).textValue(),
+                root.path( "alias" ).textValue(),
+                ColumnRole.valueOf( root.path( "role" ).textValue() ),
+                SqlDataType.valueOf( root.path( "sql-data-type" ).textValue() )
+        );
+    }
+
     private final TableName table;
     private final String name;
     private final String alias;
@@ -26,7 +37,7 @@ public class SimpleColumn implements Column
 
     public SimpleColumn( TableName table, String name, ColumnRole columnRole, SqlDataType dataType )
     {
-        this(table, name, name, columnRole, dataType);
+        this( table, name, name, columnRole, dataType );
     }
 
     public SimpleColumn( TableName table, String name, String alias, ColumnRole columnRole, SqlDataType dataType )

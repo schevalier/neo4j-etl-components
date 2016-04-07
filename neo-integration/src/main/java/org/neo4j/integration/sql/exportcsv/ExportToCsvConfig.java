@@ -1,10 +1,8 @@
 package org.neo4j.integration.sql.exportcsv;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,21 +11,31 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
+import org.neo4j.integration.sql.Credentials;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
-import org.neo4j.integration.sql.metadata.DatabaseObject;
-import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.JoinTable;
-import org.neo4j.integration.sql.metadata.Table;
-import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.Preconditions;
-
-import static java.lang.String.format;
 
 public class ExportToCsvConfig
 {
     public static Builder.SetDestination builder()
     {
         return new ExportToCsvConfigBuilder();
+    }
+
+    public static ExportToCsvConfig fromJson( JsonNode root, Credentials credentials )
+    {
+        Builder builder = builder()
+                .destination( Paths.get( root.path( "destination" ).textValue() ) )
+                .connectionConfig( ConnectionConfig.fromJson( root.path( "connection-config" ), credentials ) )
+                .formatting( Formatting.fromJson( root.path( "formatting" ) ) );
+
+        ArrayNode csvResources = (ArrayNode) root.path( "csv-resources" );
+        for ( JsonNode csvResource : csvResources )
+        {
+            builder.addCsvResource( CsvResource.fromJson( csvResource ) );
+        }
+
+        return builder.build();
     }
 
     private final Path destination;
@@ -69,7 +77,7 @@ public class ExportToCsvConfig
 
         root.put( "destination", destination.toString() );
         root.set( "connection-config", connectionConfig.toJson() );
-        root.put( "formatting", "TODO" );
+        root.set( "formatting", formatting.toJson() );
 
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
 
@@ -100,7 +108,7 @@ public class ExportToCsvConfig
             Builder formatting( Formatting formatting );
         }
 
-        Builder addCsvResource(CsvResource csvResource);
+        Builder addCsvResource( CsvResource csvResource );
 
         ExportToCsvConfig build();
     }

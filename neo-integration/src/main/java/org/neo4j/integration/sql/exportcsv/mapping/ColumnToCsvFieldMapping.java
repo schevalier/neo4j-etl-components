@@ -9,6 +9,13 @@ import org.neo4j.integration.sql.metadata.Column;
 
 public class ColumnToCsvFieldMapping
 {
+    public static ColumnToCsvFieldMapping fromJson(JsonNode root)
+    {
+        return new ColumnToCsvFieldMapping(
+                Column.fromJson( root.path( "column" ) ),
+                CsvField.fromJson( root.path( "field" ) ) );
+    }
+
     private final Column column;
     private final CsvField field;
 

@@ -1,6 +1,12 @@
 package org.neo4j.integration.neo4j.importcsv.config;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.neo4j.integration.util.Preconditions;
+
+import static java.lang.String.format;
 
 public class Formatting
 {
@@ -9,6 +15,40 @@ public class Formatting
     public static Builder builder()
     {
         return new FormattingConfigBuilder();
+    }
+
+    public static Formatting fromJson( JsonNode root )
+    {
+        Delimiter delimiter = Delimiter.fromJson( root.path( "delimiter" ) );
+        Delimiter arrayDelimiter = Delimiter.fromJson( root.path( "array-delimiter" ) );
+        QuoteChar quote = QuoteChar.fromJson( root.path( "quote" ) );
+
+        Formatter labelFormatter = createFormatter( root.path( "label-formatter" ).textValue() );
+        Formatter relationshipFormatter = createFormatter( root.path( "relationship-formatter" ).textValue() );
+        Formatter propertyFormatter = createFormatter( root.path( "property-formatter" ).textValue() );
+
+        return builder()
+                .delimiter( delimiter )
+                .arrayDelimiter( arrayDelimiter )
+                .quote( quote )
+                .labelFormatter( labelFormatter )
+                .relationshipFormatter( relationshipFormatter )
+                .propertyFormatter( propertyFormatter )
+                .build();
+    }
+
+    private static Formatter createFormatter( String className )
+    {
+        try
+        {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class<?> formatterClass = classLoader.loadClass( className );
+            return (Formatter) formatterClass.newInstance();
+        }
+        catch ( ClassNotFoundException | IllegalAccessException | InstantiationException e )
+        {
+            throw new IllegalStateException( format( "Unable to create formatter '%s'", className ), e );
+        }
     }
 
     private final Delimiter delimiter;
@@ -58,6 +98,20 @@ public class Formatting
     public Formatter propertyFormatter()
     {
         return propertyFormatter;
+    }
+
+    public JsonNode toJson()
+    {
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
+
+        root.set( "delimiter", delimiter.toJson() );
+        root.set( "array-delimiter", arrayDelimiter.toJson() );
+        root.set( "quote", quote.toJson() );
+        root.put( "label-formatter", labelFormatter.getClass().getName() );
+        root.put( "relationship-formatter", relationshipFormatter.getClass().getName() );
+        root.put( "property-formatter", propertyFormatter.getClass().getName() );
+
+        return root;
     }
 
     public interface Builder

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 
 public class MySqlExportSqlSupplierTest
 {
-
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
