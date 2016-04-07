@@ -97,7 +97,7 @@ public class CsvFileWriter
     {
         if ( StringUtils.isNotEmpty( value ) )
         {
-            writer.write( value );
+            writer.write( config.formatting().quote().enquote( value ) );
         }
     }
 }

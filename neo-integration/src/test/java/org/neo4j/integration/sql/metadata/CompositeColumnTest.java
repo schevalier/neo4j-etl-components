@@ -95,7 +95,7 @@ public class CompositeColumnTest
         String value = compositeColumn.selectFrom( stubRowAccessor );
 
         // then
-        assertThat( value, is( "\"Boaty\0Mc.Boatface\"" ) );
+        assertThat( value, is( "Boaty\0Mc.Boatface" ) );
     }
 
     @Test

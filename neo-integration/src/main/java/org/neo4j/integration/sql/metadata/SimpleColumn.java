@@ -10,7 +10,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
-import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
@@ -86,16 +85,7 @@ public class SimpleColumn implements Column
     @Override
     public String selectFrom( RowAccessor row )
     {
-        String rowValue = row.getString( alias );
-        if ( Neo4jDataType.String.equals( dataType.toNeo4jDataType() ) || Neo4jDataType.Char.equals( dataType
-                .toNeo4jDataType() ) )
-        {
-            return StringUtils.isNotEmpty( rowValue ) ? format( "\"%s\"", rowValue ) : null;
-        }
-        else
-        {
-            return rowValue;
-        }
+        return row.getString( alias );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

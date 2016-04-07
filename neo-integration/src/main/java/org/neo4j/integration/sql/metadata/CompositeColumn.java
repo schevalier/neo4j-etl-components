@@ -104,10 +104,9 @@ public class CompositeColumn implements Column
         }
         else
         {
-            String compositeRowValue = values.stream()
+            return values.stream()
                     .filter( StringUtils::isNotEmpty )
                     .collect( Collectors.joining( SEPARATOR ) );
-            return format( "\"%s\"", compositeRowValue );
         }
     }
 

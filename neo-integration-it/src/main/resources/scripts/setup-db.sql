@@ -146,6 +146,8 @@ IDENTIFIED BY '<DBPassword>';
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');
 INSERT INTO javabase.Address (postcode) VALUES ('ZZ1 0MN');
+INSERT INTO javabase.Address (postcode) VALUES ('ZZ1
+4MN');
 
 INSERT INTO javabase.Person (username, addressId) SELECT
                                                     'user-1',

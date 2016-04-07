@@ -29,7 +29,7 @@ public class SimpleColumnTest
     }
 
     @Test
-    public void selectRowFromShouldAddQuotesForCharacterOrStringDatatypes() throws Exception
+    public void selectRowShouldGetValueFromResults() throws Exception
     {
         // given
         TableName personTable = new TableName( "test.Person" );
@@ -44,7 +44,7 @@ public class SimpleColumnTest
         // then
         results.next();
         assertThat( column1.selectFrom( results ), is( "1" ) );
-        assertThat( column2.selectFrom( results ), is( "\"user-1\"" ) );
+        assertThat( column2.selectFrom( results ), is( "user-1" ) );
     }
 
     @Test
