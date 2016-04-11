@@ -6,10 +6,12 @@ import java.util.Optional;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import io.airlift.airline.OptionType;
+import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.commands.Environment;
 import org.neo4j.integration.commands.ExportFromMySqlCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
+import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 
 @Command(name = "mysql-export", description = "Export from MySQL.")
 public class ExportFromMySqlCliCommand implements Runnable
@@ -87,12 +89,26 @@ public class ExportFromMySqlCliCommand implements Runnable
             required = false)
     private String delimiter;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--quote"},
+            description = "Character to treat as quotation character for values in CSV data",
+            title = "quote",
+            required = false)
+    private String quote;
+
     @Override
     public void run()
     {
         try
         {
             Delimiter delimiter = new Delimiter( Optional.ofNullable( this.delimiter ).orElse( "," ) );
+            QuoteChar quoteChar = QuoteChar.DOUBLE_QUOTES;
+            if ( StringUtils.isNotEmpty( quote ) )
+            {
+                quoteChar = new QuoteChar( quote, quote );
+            }
+
             new ExportFromMySqlCommand(
                     host,
                     port,
@@ -100,6 +116,7 @@ public class ExportFromMySqlCliCommand implements Runnable
                     password,
                     database,
                     delimiter,
+                    quoteChar,
                     new Environment(
                             Paths.get( importToolDirectory ),
                             Paths.get( destinationDirectory ),

@@ -221,6 +221,7 @@ public class ExportFromMySqlIntegrationTest
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--delimiter", "\t",
+                        "--quote", "`",
                         "--force"} );
     }
 }

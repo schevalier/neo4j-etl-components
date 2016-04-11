@@ -7,6 +7,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.config.Manifest;
+import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
@@ -36,6 +37,7 @@ public class ExportFromMySqlCommand
                                    String password,
                                    String database,
                                    Delimiter delimiter,
+                                   QuoteChar quoteChar,
                                    Environment environment )
     {
         this.host = host;
@@ -45,7 +47,7 @@ public class ExportFromMySqlCommand
         this.environment = environment;
         this.sqlSupplier = new MySqlExportSqlSupplier();
         this.database = database;
-        this.formatting = Formatting.builder().delimiter( delimiter ).build();
+        this.formatting = Formatting.builder().delimiter( delimiter ).quote( quoteChar ).build();
     }
 
     public void execute() throws Exception

@@ -27,7 +27,7 @@ public class QuoteChar
     private final String quote;
     private final String argValue;
 
-    QuoteChar( String quote, String argValue )
+    public QuoteChar( String quote, String argValue )
     {
         this.quote = quote;
         this.argValue = argValue;
