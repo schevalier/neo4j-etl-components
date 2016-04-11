@@ -1,4 +1,4 @@
-package org.neo4j.integration.commands;
+package org.neo4j.integration.environment;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,32 +13,13 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 
-public class EnvironmentTest
+public class DestinationDirectorySupplierTest
 {
     @Rule
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    @Test()
-    public void shouldThrowExceptionIfImportToolCannotBeFound() throws Exception
-    {
-        // given
-        thrown.expect( IllegalArgumentException.class );
-
-        //when
-        Environment environment = new Environment(
-                tempDirectory.get(),
-                tempDirectory.get(),
-                tempDirectory.get(),
-                false );
-
-        environment.prepare();
-
-        // then
-        thrown.expectMessage( startsWith( "Unable to find import tool" ) );
-    }
 
     @Test
     public void shouldThrowExceptionIfDestinationAlreadyExistsAndForceHasNotBeenSpecified() throws Exception
@@ -55,14 +36,10 @@ public class EnvironmentTest
         Path importTool = importToolDirectory.resolve( ImportConfig.IMPORT_TOOL );
         Files.createFile( importTool );
 
-        // when
-        Environment environment = new Environment(
-                importToolDirectory,
-                destinationDirectory,
-                tempDirectory.get(),
-                false );
+        DestinationDirectorySupplier supplier = new DestinationDirectorySupplier( destinationDirectory, false );
 
-        environment.prepare();
+        // when
+        supplier.supply();
 
         // then
         thrown.expectMessage( startsWith( "Destination already exists" ) );
@@ -82,9 +59,7 @@ public class EnvironmentTest
         Files.createFile( importTool );
 
         // when
-        Environment environment = new Environment( importToolDirectory, destinationDirectory, tempDirectory.get(),
-                true );
-        environment.prepare();
-
+        DestinationDirectorySupplier supplier = new DestinationDirectorySupplier( destinationDirectory, true );
+        supplier.supply();
     }
 }

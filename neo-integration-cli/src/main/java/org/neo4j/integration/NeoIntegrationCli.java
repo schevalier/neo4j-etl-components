@@ -10,7 +10,8 @@ import java.util.logging.LogManager;
 import io.airlift.airline.Cli;
 import io.airlift.airline.help.Help;
 
-import org.neo4j.integration.cli.mysql.ExportCliCommand;
+import org.neo4j.integration.cli.mysql.CreateCsvResourcesCli;
+import org.neo4j.integration.cli.mysql.ExportFromMySqlCli;
 import org.neo4j.integration.util.CliRunner;
 
 import static java.util.Arrays.asList;
@@ -67,7 +68,8 @@ public class NeoIntegrationCli
                 .withCommand( Help.class );
 
         builder.withGroup( "mysql" )
-                .withCommand( ExportCliCommand.class )
+                .withCommand( ExportFromMySqlCli.class )
+                .withCommand( CreateCsvResourcesCli.class )
                 .withCommand( Help.class );
 
         return builder.build();
