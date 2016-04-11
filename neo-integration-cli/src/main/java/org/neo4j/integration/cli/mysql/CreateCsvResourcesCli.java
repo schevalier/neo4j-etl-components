@@ -19,7 +19,7 @@ import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
 
-@Command(name = "create-mappings", description = "Create MySQL to CSV mapping files.")
+@Command(name = "create-csv-resources", description = "Create MySQL to CSV mapping files.")
 public class CreateCsvResourcesCli implements Runnable
 {
     @SuppressWarnings("FieldCanBeLocal")
