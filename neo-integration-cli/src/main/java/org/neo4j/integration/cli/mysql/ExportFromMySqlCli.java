@@ -90,8 +90,7 @@ public class ExportFromMySqlCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--force"},
-            description = "Force delete destination store directory if it already exists.",
-            title = "boolean")
+            description = "Force delete destination store directory if it already exists.")
     private boolean force = false;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -109,6 +108,12 @@ public class ExportFromMySqlCli implements Runnable
             title = "quote",
             required = false)
     private String quote;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--debug"},
+            description = "Print detailed diagnostic output.")
+    private boolean debug = false;
 
     @Override
     public void run()

@@ -28,7 +28,7 @@ public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Joi
     @Override
     public Collection<Join> createMetadataFor( JoinQueryInfo source ) throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Generating join metadata for join [%s -> %s]",
+        Loggers.Default.log( Level.INFO, format( "Generating metadata for join       [%s -> %s]",
                 source.tableOne(), source.tableTwo() ) );
         String sql = select( source );
 

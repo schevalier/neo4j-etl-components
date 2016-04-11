@@ -18,22 +18,30 @@ import static java.util.Arrays.asList;
 
 public class NeoIntegrationCli
 {
-    static
+    public static void main( String[] args )
     {
         try
         {
-            LogManager.getLogManager().readConfiguration(
-                    NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
+            for ( String arg : args )
+            {
+                if ( arg.equalsIgnoreCase( "--debug" ) )
+                {
+                    LogManager.getLogManager().readConfiguration(
+                            NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
+                }
+                else
+                {
+                    LogManager.getLogManager().readConfiguration(
+                            NeoIntegrationCli.class.getResourceAsStream( "/minimal-logging.properties" ) );
+                }
+            }
         }
         catch ( IOException e )
         {
             System.err.println( "Error in loading configuration" );
             e.printStackTrace( System.err );
         }
-    }
 
-    public static void main( String[] args )
-    {
         CliRunner.run( parser(), args );
     }
 
@@ -68,6 +76,8 @@ public class NeoIntegrationCli
                 .withCommand( Help.class );
 
         builder.withGroup( "mysql" )
+                .withDescription( "MySQL export tools." )
+                .withDefaultCommand( Help.class )
                 .withCommand( ExportFromMySqlCli.class )
                 .withCommand( CreateCsvResourcesCli.class )
                 .withCommand( Help.class );

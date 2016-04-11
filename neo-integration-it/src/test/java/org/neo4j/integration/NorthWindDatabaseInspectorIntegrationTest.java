@@ -10,7 +10,6 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -56,7 +55,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
         try
         {
             LogManager.getLogManager().readConfiguration(
-                    NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
+                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
             MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
             client.execute( MySqlScripts.northwindScript().value() );
             exportFromMySqlToNeo4j( "northwind" );

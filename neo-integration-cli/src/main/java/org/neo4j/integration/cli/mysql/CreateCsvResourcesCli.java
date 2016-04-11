@@ -82,6 +82,12 @@ public class CreateCsvResourcesCli implements Runnable
             required = false)
     private String quote;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--debug"},
+            description = "Print detailed diagnostic output.")
+    private boolean debug = false;
+
     @Override
     public void run()
     {
