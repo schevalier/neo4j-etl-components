@@ -126,7 +126,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
     {
         ColumnRole columnRole = ColumnRole.valueOf( row.get( "COLUMN_TYPE" ) );
         SqlDataType dataType = SqlDataType.parse( row.get( "DATA_TYPE" ) );
-        if ( columnFilter.test( columnRole ) && (!dataType.skipImport()) )
+        if ( canImport( columnRole, dataType ) )
         {
             String columnName = row.get( "COLUMN_NAME" );
 
@@ -141,5 +141,10 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         {
             return Optional.empty();
         }
+    }
+
+    private boolean canImport( ColumnRole columnRole, SqlDataType dataType )
+    {
+        return columnFilter.test( columnRole ) && (!dataType.skipImport());
     }
 }

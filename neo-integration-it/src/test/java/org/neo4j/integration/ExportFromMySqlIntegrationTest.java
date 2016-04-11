@@ -136,7 +136,7 @@ public class ExportFromMySqlIntegrationTest
         List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[1]" );
 
         assertThat( stringFields.get( 0 ).values(), hasItems(
-                "val-1", "mediumtext_field", "tinytext_field", "mediumblob_field",
+                "val-1", "mediumtext_field", "tinytext_field",
                 "char-field", "text_field", "varchar-field", "longtext_field" ) );
         assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.0, 1.232343445E7, 1 ) );
     }

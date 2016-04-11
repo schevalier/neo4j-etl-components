@@ -29,7 +29,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 
-@Ignore
 public class NorthWindDatabaseInspectorIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
@@ -60,8 +59,8 @@ public class NorthWindDatabaseInspectorIntegrationTest
                     NeoIntegrationCli.class.getResourceAsStream( "/logging.properties" ) );
             MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
             client.execute( MySqlScripts.northwindScript().value() );
-//            exportFromMySqlToNeo4j( "northwind" );
-//            neo4j.get().start();
+            exportFromMySqlToNeo4j( "northwind" );
+            neo4j.get().start();
         }
         catch ( IOException e )
         {
@@ -73,7 +72,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
     @AfterClass
     public static void tearDown() throws Exception
     {
-//        neo4j.get().stop();
+        neo4j.get().stop();
     }
 
     @Test
@@ -122,6 +121,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--delimiter", "\t",
+                        "--quote", "`",
                         "--force"} );
     }
 }
