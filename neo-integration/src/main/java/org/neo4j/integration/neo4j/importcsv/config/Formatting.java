@@ -1,12 +1,6 @@
 package org.neo4j.integration.neo4j.importcsv.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.neo4j.integration.util.Preconditions;
-
-import static java.lang.String.format;
 
 public class Formatting
 {
@@ -15,20 +9,6 @@ public class Formatting
     public static Builder builder()
     {
         return new FormattingConfigBuilder();
-    }
-
-    private static Formatter createFormatter( String className )
-    {
-        try
-        {
-            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-            Class<?> formatterClass = classLoader.loadClass( className );
-            return (Formatter) formatterClass.newInstance();
-        }
-        catch ( ClassNotFoundException | IllegalAccessException | InstantiationException e )
-        {
-            throw new IllegalStateException( format( "Unable to create formatter '%s'", className ), e );
-        }
     }
 
     private final Delimiter delimiter;
