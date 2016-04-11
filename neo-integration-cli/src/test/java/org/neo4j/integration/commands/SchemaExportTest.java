@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
@@ -51,10 +50,7 @@ public class SchemaExportTest
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
-            schemaExport.updateConfig(
-                    mock( ExportToCsvConfig.Builder.class ),
-                    Formatting.DEFAULT,
-                    mock( DatabaseExportSqlSupplier.class ) );
+            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ) );
 
             fail( "Expected IllegalStatException" );
         }
@@ -93,10 +89,7 @@ public class SchemaExportTest
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
-            schemaExport.updateConfig(
-                    mock( ExportToCsvConfig.Builder.class ),
-                    Formatting.DEFAULT,
-                    mock( DatabaseExportSqlSupplier.class ) );
+            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ) );
 
             fail( "Expected IllegalStateException" );
         }

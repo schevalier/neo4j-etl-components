@@ -133,7 +133,6 @@ public class ExportFromMySqlIntegrationTest
 
         String response = neo4j.get().executeHttp( NEO_TX_URI,
                 "MATCH (p:StringTable)-[r]->(c:NumericTable) RETURN p, c" );
-        System.out.println( response );
 
         List<Map<String, String>> stringFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
         List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[1]" );
@@ -202,7 +201,6 @@ public class ExportFromMySqlIntegrationTest
         String response = neo4j.get()
                 .executeHttp( NEO_TX_URI, "MATCH (a:Author)-[r]->(p:Publisher) RETURN a, p" );
 
-        System.out.println( response );
         List<String> authors = JsonPath.read( response, "$.results[*].data[*].row[0].lastName" );
         List<String> publishers = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
 

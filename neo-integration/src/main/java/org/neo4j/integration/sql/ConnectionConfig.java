@@ -17,19 +17,6 @@ public class ConnectionConfig
         return new ConnectionConfigBuilder( databaseType );
     }
 
-    public static ConnectionConfig fromJson(JsonNode root, Credentials credentials)
-    {
-        DatabaseType databaseType = DatabaseType.valueOf( root.path( "database-type" ).textValue() );
-
-        return forDatabase( databaseType )
-                .host( root.path( "host" ).textValue() )
-                .port( root.path( "port" ).intValue() )
-                .database( root.path( "database" ).textValue() )
-                .username( credentials.username() )
-                .password( credentials.password() )
-                .build();
-    }
-
     private final DatabaseType databaseType;
     private final String host;
     private final int port;
@@ -60,18 +47,6 @@ public class ConnectionConfig
     public Credentials credentials()
     {
         return credentials;
-    }
-
-    public JsonNode toJson()
-    {
-        ObjectNode root = JsonNodeFactory.instance.objectNode();
-
-        root.put( "database-type", databaseType.name());
-        root.put( "host", host );
-        root.put( "port", port );
-        root.put( "database", database );
-
-        return root;
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

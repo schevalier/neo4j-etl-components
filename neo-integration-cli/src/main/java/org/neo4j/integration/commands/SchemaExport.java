@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResourceProvider;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
@@ -28,17 +29,18 @@ public class SchemaExport
         this.joinTables = joinTables;
     }
 
-    public void updateConfig( ExportToCsvConfig.Builder config,
-                              Formatting formatting,
-                              DatabaseExportSqlSupplier sqlSupplier )
+    public CsvResources createCsvResources( Formatting formatting, DatabaseExportSqlSupplier sqlSupplier )
     {
         validate();
 
         CsvResourceProvider csvResourceProvider = new CsvResourceProvider( formatting, sqlSupplier );
+        CsvResources csvResources = new CsvResources();
 
-        tables.forEach( o -> config.addCsvResource( o.invoke( csvResourceProvider ) ) );
-        joins.forEach( o -> config.addCsvResource( o.invoke( csvResourceProvider ) ) );
-        joinTables.forEach( o -> config.addCsvResource( o.invoke( csvResourceProvider ) ) );
+        tables.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );
+        joins.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );
+        joinTables.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );
+
+        return csvResources;
     }
 
     Collection<Table> tables()
