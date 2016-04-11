@@ -14,6 +14,7 @@ public class QuoteChar
 {
     public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"", OperatingSystem.isWindows() ? "\\\"" : "\"" );
     public static final QuoteChar SINGLE_QUOTES = new QuoteChar( "'", "'" );
+    public static final QuoteChar TICK_QUOTES = new QuoteChar( "`", "`" );
 
     public static QuoteChar fromJson( JsonNode root )
     {
@@ -44,15 +45,15 @@ public class QuoteChar
 
     public String enquote( String value )
     {
-        return format ("%s%s%s", quote, value, quote);
+        return format( "%s%s%s", quote, value, quote );
     }
 
     public JsonNode toJson()
     {
         ObjectNode root = JsonNodeFactory.instance.objectNode();
 
-        root.put("quote", quote);
-        root.put("arg-value", argValue);
+        root.put( "quote", quote );
+        root.put( "arg-value", argValue );
 
         return root;
     }

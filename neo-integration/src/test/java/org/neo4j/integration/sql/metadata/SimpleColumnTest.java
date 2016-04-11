@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 
+import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 
@@ -20,12 +21,17 @@ public class SimpleColumnTest
         // given
         TableName personTable = new TableName( "test.Person" );
         Column column1 = new SimpleColumn( personTable, "id", "id-alias", ColumnRole.PrimaryKey, SqlDataType.INT );
-
         Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT );
+        Column column3 = new SimpleColumn( personTable,
+                QuoteChar.DOUBLE_QUOTES.enquote( "PERSON" ),
+                "PERSON",
+                ColumnRole.Literal,
+                SqlDataType.TEXT );
 
         // then
         assertThat( column1.aliasedColumn(), is( "`test`.`Person`.`id` AS `id-alias`" ) );
         assertThat( column2.aliasedColumn(), is( "`test`.`Person`.`username` AS `username`" ) );
+        assertThat( column3.aliasedColumn(), is( "\"PERSON\" AS `PERSON`" ) );
     }
 
     @Test

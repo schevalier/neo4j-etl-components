@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
@@ -35,7 +36,7 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
         String relationshipType = formatting.relationshipFormatter().format( table.simpleName() );
 
         SimpleColumn from = new SimpleColumn( table,
-                formatting.quote().enquote( relationshipType ),
+                QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),
                 relationshipType,
                 ColumnRole.Literal,
                 SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
