@@ -49,4 +49,14 @@ public class CliRunner
             onCommandFinished.apply( -1 );
         }
     }
+
+    public static void print( Object message )
+    {
+        System.err.println( message );
+    }
+
+    public static void printResult( Object message )
+    {
+        System.out.println( message );
+    }
 }

@@ -10,7 +10,7 @@ import java.util.logging.LogManager;
 import io.airlift.airline.Cli;
 import io.airlift.airline.help.Help;
 
-import org.neo4j.integration.cli.ExportFromMySqlCliCommand;
+import org.neo4j.integration.cli.mysql.ExportCliCommand;
 import org.neo4j.integration.util.CliRunner;
 
 import static java.util.Arrays.asList;
@@ -31,16 +31,9 @@ public class NeoIntegrationCli
         }
     }
 
-    private static final Cli<Runnable> PARSER = Cli.<Runnable>builder( "neo-integration" )
-            .withDescription( "Neo4j integration tools." )
-            .withDefaultCommand( Help.class )
-            .withCommand( ExportFromMySqlCliCommand.class )
-            .withCommand( Help.class )
-            .build();
-
     public static void main( String[] args )
     {
-        CliRunner.run( PARSER, args );
+        CliRunner.run( parser(), args );
     }
 
     static Collection<String> executeMainReturnSysOut( String[] args )
@@ -50,7 +43,7 @@ public class NeoIntegrationCli
         ByteArrayOutputStream newOut = new ByteArrayOutputStream();
         System.setOut( new PrintStream( newOut ) );
 
-        CliRunner.run( PARSER, args, CliRunner.OnCommandFinished.DoNothing );
+        CliRunner.run( parser(), args, CliRunner.OnCommandFinished.DoNothing );
 
         try
         {
@@ -64,5 +57,19 @@ public class NeoIntegrationCli
         {
             System.setOut( oldOut );
         }
+    }
+
+    private static Cli<Runnable> parser()
+    {
+        Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder( "neo-integration" )
+                .withDescription( "Neo4j integration tools." )
+                .withDefaultCommand( Help.class )
+                .withCommand( Help.class );
+
+        builder.withGroup( "mysql" )
+                .withCommand( ExportCliCommand.class )
+                .withCommand( Help.class );
+
+        return builder.build();
     }
 }

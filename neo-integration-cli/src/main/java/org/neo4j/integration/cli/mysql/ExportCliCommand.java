@@ -1,4 +1,4 @@
-package org.neo4j.integration.cli;
+package org.neo4j.integration.cli.mysql;
 
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -9,12 +9,14 @@ import io.airlift.airline.OptionType;
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.commands.Environment;
-import org.neo4j.integration.commands.ExportFromMySqlCommand;
+import org.neo4j.integration.commands.mysql.ExportCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
+import org.neo4j.integration.sql.ConnectionConfig;
+import org.neo4j.integration.sql.DatabaseType;
 
-@Command(name = "mysql-export", description = "Export from MySQL.")
-public class ExportFromMySqlCliCommand implements Runnable
+@Command(name = "export", description = "Export from MySQL.")
+public class ExportCliCommand implements Runnable
 {
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
@@ -103,13 +105,22 @@ public class ExportFromMySqlCliCommand implements Runnable
         try
         {
             Delimiter delimiter = new Delimiter( Optional.ofNullable( this.delimiter ).orElse( "," ) );
+
             QuoteChar quoteChar = QuoteChar.DOUBLE_QUOTES;
             if ( StringUtils.isNotEmpty( quote ) )
             {
                 quoteChar = new QuoteChar( quote, quote );
             }
 
-            new ExportFromMySqlCommand(
+            ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
+                    .host( host )
+                    .port( port )
+                    .database( database )
+                    .username( user )
+                    .password( password )
+                    .build();
+
+            new ExportCommand(
                     host,
                     port,
                     user,

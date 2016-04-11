@@ -112,7 +112,8 @@ public class NorthWindDatabaseInspectorIntegrationTest
     private static void exportFromMySqlToNeo4j( String database )
     {
         NeoIntegrationCli.executeMainReturnSysOut(
-                new String[]{"mysql-export",
+                new String[]{"mysql",
+                        "export",
                         "--host", mySqlServer.get().ipAddress(),
                         "--user", MySqlClient.Parameters.DBUser.value(),
                         "--password", MySqlClient.Parameters.DBPassword.value(),

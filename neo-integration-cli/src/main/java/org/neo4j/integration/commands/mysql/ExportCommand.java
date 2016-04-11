@@ -1,7 +1,10 @@
-package org.neo4j.integration.commands;
+package org.neo4j.integration.commands.mysql;
 
 import java.nio.file.Path;
 
+import org.neo4j.integration.commands.DatabaseInspector;
+import org.neo4j.integration.commands.Environment;
+import org.neo4j.integration.commands.SchemaExport;
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
@@ -17,10 +20,11 @@ import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
+import org.neo4j.integration.util.CliRunner;
 
 import static java.lang.String.format;
 
-public class ExportFromMySqlCommand
+public class ExportCommand
 {
     private final String host;
     private final int port;
@@ -31,7 +35,7 @@ public class ExportFromMySqlCommand
     private final String database;
     private final Formatting formatting;
 
-    public ExportFromMySqlCommand( String host,
+    public ExportCommand( String host,
                                    int port,
                                    String user,
                                    String password,
@@ -54,8 +58,8 @@ public class ExportFromMySqlCommand
     {
         Path csvDirectory = environment.prepare();
 
-        print( format( "CSV directory: %s", csvDirectory ) );
-        print( "Creating MySQL to CSV mappings..." );
+        CliRunner.print( format( "CSV directory: %s", csvDirectory ) );
+        CliRunner.print( "Creating MySQL to CSV mappings..." );
 
         ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                 .host( host )
@@ -74,16 +78,16 @@ public class ExportFromMySqlCommand
                 .formatting( formatting )
                 .build();
 
-        print( "Exporting from MySQL to CSV..." );
+        CliRunner.print( "Exporting from MySQL to CSV..." );
 
         Manifest manifest = new ExportToCsvCommand( config, csvResources ).execute();
 
-        print( "Creating Neo4j store from CSV..." );
+        CliRunner.print( "Creating Neo4j store from CSV..." );
 
         doImport( formatting, manifest );
 
-        print( "Done" );
-        printResult( environment.destinationDirectory() );
+        CliRunner.print( "Done" );
+        CliRunner.printResult( environment.destinationDirectory() );
     }
 
     private SchemaExport buildSchemaExport( ConnectionConfig connectionConfig ) throws Exception
@@ -104,15 +108,4 @@ public class ExportFromMySqlCommand
 
         new ImportFromCsvCommand( builder.build() ).execute();
     }
-
-    private void print( Object message )
-    {
-        System.err.println( message );
-    }
-
-    private void printResult( Object message )
-    {
-        System.out.println( message );
-    }
-
 }
