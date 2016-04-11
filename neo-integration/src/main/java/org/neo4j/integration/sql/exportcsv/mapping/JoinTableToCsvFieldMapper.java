@@ -59,9 +59,7 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
                     builder.add( new ColumnToCsvFieldMapping( column, id ) );
                     break;
                 case Data:
-                    builder.add( new ColumnToCsvFieldMapping(
-                            column,
-                            CsvField.data( column.alias(), column.sqlDataType().toNeo4jDataType() ) ) );
+                    column.addData( builder );
                     break;
                 default:
                     // Do nothing

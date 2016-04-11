@@ -31,15 +31,15 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                 case PrimaryKey:
                     CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
                     builder.add( new ColumnToCsvFieldMapping( column, id ) );
-                    column.addTo( builder, formatting.propertyFormatter() );
+                    column.addData( builder );
                     break;
                 case CompositeKey:
                     CsvField id1 = CsvField.id( new IdSpace( table.name().fullName() ) );
                     builder.add( new ColumnToCsvFieldMapping( column, id1 ) );
-                    column.addTo( builder, formatting.propertyFormatter() );
+                    column.addData( builder );
                     break;
                 case Data:
-                    column.addTo( builder, formatting.propertyFormatter() );
+                    column.addData( builder );
                     break;
                 default:
                     // Do nothing

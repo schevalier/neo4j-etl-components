@@ -14,7 +14,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatter;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
@@ -136,9 +135,9 @@ public class CompositeColumn implements Column
     }
 
     @Override
-    public void addTo( ColumnToCsvFieldMappings.Builder builder, Formatter formatter )
+    public void addData( ColumnToCsvFieldMappings.Builder builder )
     {
-        columns.forEach( column -> column.addTo( builder, formatter ) );
+        columns.forEach( column -> column.addData( builder ) );
     }
 
     @Override
