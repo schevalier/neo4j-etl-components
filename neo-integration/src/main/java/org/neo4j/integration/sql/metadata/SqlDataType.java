@@ -28,20 +28,21 @@ public enum SqlDataType
     CHAR( Neo4jDataType.String ),
     VARCHAR( Neo4jDataType.String ),
     TEXT( Neo4jDataType.String ),
-    BLOB( Neo4jDataType.String ),
-    TINYBLOB( Neo4jDataType.String ),
     TINYTEXT( Neo4jDataType.String ),
     MEDIUMTEXT( Neo4jDataType.String ),
-    MEDIUMBLOB( Neo4jDataType.String ),
     LONGTEXT( Neo4jDataType.String ),
-    LONGBLOB( Neo4jDataType.String ),
     ENUM( Neo4jDataType.String ),
 
-    DATE(Neo4jDataType.String ),
+    DATE( Neo4jDataType.String ),
     DATETIME( Neo4jDataType.String ),
     TIMESTAMP( Neo4jDataType.String ),
     TIME( Neo4jDataType.String ),
-    YEAR( Neo4jDataType.String );
+    YEAR( Neo4jDataType.String ),
+
+    BLOB( null ),
+    TINYBLOB( null ),
+    MEDIUMBLOB( null ),
+    LONGBLOB( null );
 
     public static SqlDataType parse( String value )
     {
@@ -63,5 +64,10 @@ public enum SqlDataType
     public Neo4jDataType toNeo4jDataType()
     {
         return neo4jDataType;
+    }
+
+    public boolean skipImport()
+    {
+        return BLOB == this || TINYBLOB == this || MEDIUMBLOB == this || LONGBLOB == this;
     }
 }

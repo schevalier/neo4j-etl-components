@@ -5,7 +5,10 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SqlDataTypeTest
 {
@@ -37,14 +40,30 @@ public class SqlDataTypeTest
     {
         assertThat( SqlDataType.CHAR.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( SqlDataType.VARCHAR.toNeo4jDataType(), is( Neo4jDataType.String ) );
-        assertThat( SqlDataType.BLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
-        assertThat( SqlDataType.TINYBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
-        assertThat( SqlDataType.TINYTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( SqlDataType.MEDIUMTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
-        assertThat( SqlDataType.MEDIUMBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( SqlDataType.LONGTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
-        assertThat( SqlDataType.LONGBLOB.toNeo4jDataType(), is( Neo4jDataType.String ) );
         assertThat( SqlDataType.ENUM.toNeo4jDataType(), is( Neo4jDataType.String ) );
+        assertThat( SqlDataType.TINYTEXT.toNeo4jDataType(), is( Neo4jDataType.String ) );
+    }
+
+    @Test
+    public void toNeo4jDataTypeMappingOfBlobTypesShoulReturnNull() throws Exception
+    {
+        assertNull( SqlDataType.BLOB.toNeo4jDataType() );
+        assertNull( SqlDataType.TINYBLOB.toNeo4jDataType() );
+        assertNull( SqlDataType.MEDIUMBLOB.toNeo4jDataType() );
+        assertNull( SqlDataType.LONGBLOB.toNeo4jDataType() );
+    }
+
+    @Test
+    public void blobDataTypesShouldReturnTrueIfAskedAboutSupportedData() throws Exception
+    {
+        assertTrue( SqlDataType.BLOB.skipImport() );
+        assertTrue( SqlDataType.TINYBLOB.skipImport() );
+        assertTrue( SqlDataType.MEDIUMBLOB.skipImport() );
+        assertTrue( SqlDataType.LONGBLOB.skipImport() );
+
+        assertFalse( SqlDataType.INT.skipImport() );
     }
 
     @Test

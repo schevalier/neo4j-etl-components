@@ -53,8 +53,8 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
             Map<String, List<Map<String, String>>> groupedByColumnType = results.stream()
                     .collect( groupingBy( row -> row.get( "COLUMN_TYPE" ) ) );
             groupedByColumnType.entrySet().stream()
-                    .forEach( columnTypeRowAndValues -> addColumnsForColumnType( source, builder,
-                            columnTypeRowAndValues ) );
+                    .forEach( columnTypeRowAndValues ->
+                            addColumnsForColumnType( source, builder, columnTypeRowAndValues ) );
         }
 
         return Collections.singletonList( builder.build() );
@@ -88,7 +88,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         List<Map<String, String>> columnsAsMap = columnTypeRowAndValues.getValue();
         if ( hasCompositeKeys( columnTypeRowAndValues, columnsAsMap ) )
         {
-            addCompositeKey( source, builder, columnsAsMap );
+            addCompositeColumn( source, builder, columnsAsMap );
         }
         else
         {
@@ -103,7 +103,7 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
         return "PrimaryKey".equalsIgnoreCase( columnTypeRowAndValues.getKey() ) && columnsAsMap.size() > 1;
     }
 
-    private void addCompositeKey( TableName source, Table.Builder builder, List<Map<String, String>> primaryKeyRows )
+    private void addCompositeColumn( TableName source, Table.Builder builder, List<Map<String, String>> primaryKeyRows )
     {
         List<Column> primaryKeyColumns = primaryKeyRows.stream()
                 .map( row -> buildSimpleColumn( source, row ) )
@@ -125,10 +125,10 @@ public class TableMetadataProducer implements MetadataProducer<TableName, Table>
     private Optional<SimpleColumn> buildSimpleColumn( TableName source, Map<String, String> row )
     {
         ColumnRole columnRole = ColumnRole.valueOf( row.get( "COLUMN_TYPE" ) );
-        if ( columnFilter.test( columnRole ) )
+        SqlDataType dataType = SqlDataType.parse( row.get( "DATA_TYPE" ) );
+        if ( columnFilter.test( columnRole ) && (!dataType.skipImport()) )
         {
             String columnName = row.get( "COLUMN_NAME" );
-            SqlDataType dataType = SqlDataType.parse( row.get( "DATA_TYPE" ) );
 
             return Optional.of( new SimpleColumn(
                     source,

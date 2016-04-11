@@ -19,6 +19,7 @@ import org.neo4j.integration.sql.metadata.TableName;
 import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -60,6 +61,36 @@ public class TableMetadataProducerTest
                 new SimpleColumn( forTable, "id", ColumnRole.PrimaryKey, SqlDataType.INT ),
                 columnUtil.column( forTable, "username", ColumnRole.Data ),
                 new SimpleColumn( forTable, "addressId", ColumnRole.ForeignKey, SqlDataType.INT ) ) );
+    }
+
+    @Test
+    public void shouldNotAddColumnsWithBlobDataType() throws Exception
+    {
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
+                .addRow( "id", "INT", "PrimaryKey" )
+                .addRow( "photo", "BLOB", "Data" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+
+        TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
+
+        // when
+        TableName forTable = new TableName( "test.Person" );
+        Collection<Table> metadata = tableMetadataProducer.createMetadataFor( forTable );
+
+        // then
+        Table table = metadata.stream().findFirst().get();
+
+        assertEquals( forTable, table.name() );
+        assertEquals( "test.Person", table.descriptor() );
+
+        assertThat( table.columns().size(), is( 1 ) );
+        assertThat( table.columns(), contains(
+                new SimpleColumn( forTable, "id", ColumnRole.PrimaryKey, SqlDataType.INT ) ) );
     }
 
     @Test
