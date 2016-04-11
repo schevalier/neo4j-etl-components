@@ -23,14 +23,7 @@ public class MySqlScripts
 
     public static Script northwindScript()
     {
-        return new Script()
-        {
-            @Override
-            public String value() throws IOException
-            {
-                return IOUtils.toString( getClass().getResourceAsStream( "/scripts/northwind.sql" ) );
-            }
-        };
+        return createScript( "/scripts/northwind.sql" );
     }
 
     private static Script createScript( String path )
