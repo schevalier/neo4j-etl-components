@@ -4,9 +4,12 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.concurrent.Callable;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -18,8 +21,17 @@ import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 
-public class CreateCsvResources
+public class CreateCsvResources implements Callable<CsvResources>
 {
+    public static Callable<CsvResources> fromExistingFile( String uri )
+    {
+        return () ->
+        {
+            JsonNode root = new ObjectMapper().readTree( URI.create( uri ).toURL() );
+            return CsvResources.fromJson( root );
+        };
+    }
+
     public interface Events
     {
         Events EMPTY = new Events()
@@ -69,7 +81,8 @@ public class CreateCsvResources
         this.sqlSupplier = sqlSupplier;
     }
 
-    public CsvResources execute() throws Exception
+    @Override
+    public CsvResources call() throws Exception
     {
         events.onCreatingCsvMappings();
 

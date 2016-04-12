@@ -116,7 +116,7 @@ public class CreateCsvResourcesCli implements Runnable
                     new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ).supply(),
                     connectionConfig,
                     formatting,
-                    new MySqlExportSqlSupplier() ).execute();
+                    new MySqlExportSqlSupplier() ).call();
         }
         catch ( Exception e )
         {

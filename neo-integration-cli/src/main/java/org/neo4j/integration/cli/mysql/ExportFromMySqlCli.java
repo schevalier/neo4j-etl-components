@@ -3,6 +3,7 @@ package org.neo4j.integration.cli.mysql;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
@@ -21,6 +22,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
 
@@ -93,6 +95,13 @@ public class ExportFromMySqlCli implements Runnable
             description = "Force delete destination store directory if it already exists.")
     private boolean force = false;
 
+    @Option(type = OptionType.COMMAND,
+            name = {"--csv-resources-uri"},
+            description = "URI of an existing CSV resources definitions file.",
+            title = "uri",
+            required = false)
+    private String csvResourcesUri;
+
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--delimiter"},
@@ -143,19 +152,21 @@ public class ExportFromMySqlCli implements Runnable
                     new DestinationDirectorySupplier( Paths.get( destinationDirectory ), force ),
                     new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ) ).supply();
 
-            CreateCsvResources createCsvResources = new CreateCsvResources(
-                    new CreateCsvResourcesEventHandler(),
-                    environment.csvDirectory(),
-                    connectionConfig,
-                    formatting,
-                    new MySqlExportSqlSupplier() );
+            Callable<CsvResources> createCsvResources = StringUtils.isNotEmpty( csvResourcesUri ) ?
+                    CreateCsvResources.fromExistingFile( csvResourcesUri ) :
+                    new CreateCsvResources(
+                            new CreateCsvResourcesEventHandler(),
+                            environment.csvDirectory(),
+                            connectionConfig,
+                            formatting,
+                            new MySqlExportSqlSupplier() );
 
             new ExportFromMySql(
                     new ExportMySqlEventHandler(),
                     createCsvResources,
                     connectionConfig,
                     formatting,
-                    environment ).execute();
+                    environment ).call();
         }
         catch ( Exception e )
         {

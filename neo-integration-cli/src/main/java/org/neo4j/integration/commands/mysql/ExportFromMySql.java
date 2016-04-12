@@ -1,6 +1,9 @@
 package org.neo4j.integration.commands.mysql;
 
 import java.nio.file.Path;
+import java.util.concurrent.Callable;
+
+import jdk.nashorn.internal.codegen.CompilerConstants;
 
 import org.neo4j.integration.environment.Environment;
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
@@ -11,9 +14,10 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 
-public class ExportFromMySql
+public class ExportFromMySql implements Callable<Void>
 {
     public interface Events
     {
@@ -46,12 +50,12 @@ public class ExportFromMySql
     }
 
     private final Events events;
-    private final CreateCsvResources createCsvResources;
+    private final Callable<CsvResources> createCsvResources;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final Environment environment;
 
-    public ExportFromMySql( CreateCsvResources createCsvResources,
+    public ExportFromMySql( Callable<CsvResources> createCsvResources,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
                             Environment environment )
@@ -60,7 +64,7 @@ public class ExportFromMySql
     }
 
     public ExportFromMySql( Events events,
-                            CreateCsvResources createCsvResources,
+                            Callable<CsvResources> createCsvResources,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
                             Environment environment )
@@ -72,9 +76,10 @@ public class ExportFromMySql
         this.environment = environment;
     }
 
-    public void execute() throws Exception
+    @Override
+    public Void call() throws Exception
     {
-        CsvResources csvResources = createCsvResources.execute();
+        CsvResources csvResources = createCsvResources.call();
 
         ExportToCsvConfig config = ExportToCsvConfig.builder()
                 .destination( environment.csvDirectory() )
@@ -91,6 +96,8 @@ public class ExportFromMySql
         doImport( formatting, manifest );
 
         events.onExportComplete( environment.destinationDirectory() );
+
+        return null;
     }
 
     private void doImport( Formatting formatting, Manifest manifest ) throws Exception
