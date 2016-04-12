@@ -96,7 +96,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
         assertThat( customersWithOrdersToLyon.size(), is( 1 ) );
 
         String territoriesWithEmployeesResponse = neo4j.get().executeHttp( NEO_TX_URI,
-                "MATCH (e:Employee)-[:EMPLOYEETERRITORY]->(t:Territory) RETURN e,t;" );
+                "MATCH (e:Employee)-->(t:Territory) RETURN e,t;" );
         List<String> territories = JsonPath.read( territoriesWithEmployeesResponse, "$.results[*].data[*].row[1]" );
 
         assertThat( territories.size(), is( 49 ) );
