@@ -1,10 +1,13 @@
 package org.neo4j.integration;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -209,8 +212,15 @@ public class ExportFromMySqlIntegrationTest
         assertThat( publishers, hasItems( "Pearson", "O'Reilly" ) );
     }
 
-    private static void exportFromMySqlToNeo4j( String database )
+    private static void exportFromMySqlToNeo4j( String database ) throws IOException
     {
+        Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
+        ObjectMapper objectMapper = new ObjectMapper();
+        HashMap<Object, Object> options = new HashMap<>();
+        options.put( "delimiter", "\t" );
+        options.put( "quote", "`" );
+        objectMapper.writeValue( importToolOptions.toFile(), options );
+
         NeoIntegrationCli.executeMainReturnSysOut(
                 new String[]{"mysql",
                         "export",
@@ -219,10 +229,9 @@ public class ExportFromMySqlIntegrationTest
                         "--password", MySqlClient.Parameters.DBPassword.value(),
                         "--database", database,
                         "--import-tool", neo4j.get().binDirectory().toString(),
+                        "--import-tool-options", importToolOptions.toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                        "--delimiter", "\t",
-                        "--quote", "`",
                         "--force"} );
     }
 }
