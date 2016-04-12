@@ -3,8 +3,6 @@ package org.neo4j.integration.commands.mysql;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-import jdk.nashorn.internal.codegen.CompilerConstants;
-
 import org.neo4j.integration.environment.Environment;
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
@@ -14,7 +12,6 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 
 public class ExportFromMySql implements Callable<Void>
@@ -104,6 +101,7 @@ public class ExportFromMySql implements Callable<Void>
     {
         ImportConfig.Builder builder = ImportConfig.builder()
                 .importToolDirectory( environment.importToolDirectory() )
+                .importToolOptions( environment.importToolOptions() )
                 .destination( environment.destinationDirectory() )
                 .formatting( formatting )
                 .idType( IdType.String );

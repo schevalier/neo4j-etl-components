@@ -11,12 +11,15 @@ import org.neo4j.integration.util.Preconditions;
 
 public class ImportConfig implements CommandsSupplier
 {
+
     public static Builder.SetImportToolDirectory builder()
     {
         return new ImportConfigBuilder();
     }
 
     public static final String IMPORT_TOOL = OperatingSystem.isWindows() ? "Neo4jImport.bat" : "neo4j-import";
+
+    private final ImportToolOptions importToolOptions;
 
     private final Path importToolDirectory;
     private final Path destination;
@@ -33,6 +36,7 @@ public class ImportConfig implements CommandsSupplier
         this.idType = Preconditions.requireNonNull( builder.idType, "IdType" );
         this.nodes = builder.nodes;
         this.relationships = builder.relationships;
+        this.importToolOptions = builder.importToolOptions;
     }
 
     @Override
@@ -65,15 +69,19 @@ public class ImportConfig implements CommandsSupplier
         commands.addCommand( "--id-type" );
         commands.addCommand( idType.name().toUpperCase() );
 
-        commands.addCommand( "--multiline-fields" );
-        commands.addCommand( "true" );
+        importToolOptions.addOptionsAsCommands( commands );
     }
 
     public interface Builder
     {
         interface SetImportToolDirectory
         {
-            SetDestination importToolDirectory( Path directory );
+            SetImportToolOptions importToolDirectory( Path directory );
+        }
+
+        interface SetImportToolOptions
+        {
+            SetDestination importToolOptions( ImportToolOptions importToolOptions );
         }
 
         interface SetDestination

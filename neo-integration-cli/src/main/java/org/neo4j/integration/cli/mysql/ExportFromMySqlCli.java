@@ -1,17 +1,9 @@
 package org.neo4j.integration.cli.mysql;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import io.airlift.airline.OptionType;
@@ -24,23 +16,19 @@ import org.neo4j.integration.environment.DestinationDirectorySupplier;
 import org.neo4j.integration.environment.Environment;
 import org.neo4j.integration.environment.EnvironmentSupplier;
 import org.neo4j.integration.environment.ImportToolDirectorySupplier;
-import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
+import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
-import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
 @Command(name = "export", description = "Export from MySQL.")
 public class ExportFromMySqlCli implements Runnable
 {
-    public static final Delimiter DEFAULT_DELIMITER = new Delimiter( "," );
-    public static final QuoteChar DEFAULT_QUOTE_CHAR = QuoteChar.DOUBLE_QUOTES;
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"-h", "--host"},
@@ -145,7 +133,6 @@ public class ExportFromMySqlCli implements Runnable
     {
         try
         {
-            Formatting formatting = buildFormatting();
 
             ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                     .host( host )
@@ -158,7 +145,15 @@ public class ExportFromMySqlCli implements Runnable
             Environment environment = new EnvironmentSupplier(
                     new ImportToolDirectorySupplier( Paths.get( importToolDirectory ) ),
                     new DestinationDirectorySupplier( Paths.get( destinationDirectory ), force ),
-                    new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ) ).supply();
+                    new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ),
+                    importToolOptionsDirectory ).supply();
+
+            ImportToolOptions importToolOptions = environment.importToolOptions();
+
+            Formatting formatting = Formatting.builder()
+                    .delimiter( importToolOptions.getDelimiter( this.delimiter ) )
+                    .quote( importToolOptions.getQuoteCharacter( this.quote ) )
+                    .build();
 
             Callable<CsvResources> createCsvResources = StringUtils.isNotEmpty( csvResourcesUri ) ?
                     CreateCsvResources.fromExistingFile( csvResourcesUri ) :
@@ -180,74 +175,6 @@ public class ExportFromMySqlCli implements Runnable
         {
             e.printStackTrace( System.err );
             System.exit( -1 );
-        }
-    }
-
-    private Formatting buildFormatting() throws IOException
-    {
-
-        Map<String, String> importToolOptions = readImportToolOptionsFromFile();
-
-        return Formatting.builder()
-                .delimiter( getDelimiter( importToolOptions ) )
-                .quote( getQuoteCharacter( importToolOptions ) )
-                .build();
-    }
-
-    private Map<String, String> readImportToolOptionsFromFile()
-    {
-        ObjectMapper objectMapper = new ObjectMapper();
-        if ( StringUtils.isNotEmpty( importToolOptionsDirectory ) &&
-                Files.exists( Paths.get( importToolOptionsDirectory ) ) )
-        {
-            File path = Paths.get( importToolOptionsDirectory ).toFile();
-            try
-            {
-                return objectMapper.readValue( path, new HashMap<String, String>().getClass() );
-            }
-            catch ( IOException e )
-            {
-                Loggers.Default.log( Level.WARNING, "Skipping reading options from file due to error.", e );
-                return Collections.emptyMap();
-            }
-        }
-        else
-        {
-            Loggers.Default.log( Level.INFO, "Skipping reading import options from file. File doesn't exist" );
-            return Collections.emptyMap();
-        }
-    }
-
-    private Delimiter getDelimiter( Map<String, String> importToolOptions )
-    {
-        if ( StringUtils.isNotEmpty( this.delimiter ) )
-        {
-            return new Delimiter( this.delimiter );
-        }
-        else if ( !importToolOptions.isEmpty() )
-        {
-            return new Delimiter( importToolOptions.get( "delimiter" ) );
-        }
-        else
-        {
-            return DEFAULT_DELIMITER;
-        }
-    }
-
-    private QuoteChar getQuoteCharacter( Map<String, String> importToolOptions )
-    {
-        if ( StringUtils.isNotEmpty( this.quote ) )
-        {
-            return new QuoteChar( this.quote, this.quote );
-        }
-        else if ( !importToolOptions.isEmpty() )
-        {
-            return new QuoteChar(
-                    importToolOptions.get( "quote" ), importToolOptions.get( "quote" ) );
-        }
-        else
-        {
-            return DEFAULT_QUOTE_CHAR;
         }
     }
 

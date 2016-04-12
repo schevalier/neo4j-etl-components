@@ -219,6 +219,7 @@ public class ExportFromMySqlIntegrationTest
         HashMap<Object, Object> options = new HashMap<>();
         options.put( "delimiter", "\t" );
         options.put( "quote", "`" );
+        options.put( "multiline-fields", "true" );
         objectMapper.writeValue( importToolOptions.toFile(), options );
 
         NeoIntegrationCli.executeMainReturnSysOut(

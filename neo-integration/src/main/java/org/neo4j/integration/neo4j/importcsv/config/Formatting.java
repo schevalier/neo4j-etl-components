@@ -4,6 +4,8 @@ import org.neo4j.integration.util.Preconditions;
 
 public class Formatting
 {
+    public static final Delimiter DEFAULT_DELIMITER = new Delimiter( "," );
+    public static final QuoteChar DEFAULT_QUOTE_CHAR = QuoteChar.DOUBLE_QUOTES;
     public static final Formatting DEFAULT = builder().build();
 
     public static Builder builder()

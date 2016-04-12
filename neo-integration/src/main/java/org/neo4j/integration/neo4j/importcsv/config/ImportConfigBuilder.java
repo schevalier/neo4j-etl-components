@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 
 class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory,
+        ImportConfig.Builder.SetImportToolOptions,
         ImportConfig.Builder.SetDestination,
         ImportConfig.Builder.SetFormatting,
         ImportConfig.Builder.SetIdType,
@@ -15,14 +16,22 @@ class ImportConfigBuilder implements ImportConfig.Builder.SetImportToolDirectory
     Path importToolDirectory;
     Path destination;
     Formatting formatting;
+    ImportToolOptions importToolOptions;
     IdType idType = IdType.String;
-    final Collection<NodeConfig> nodes = new ArrayList<>(  );
-    final Collection<RelationshipConfig> relationships = new ArrayList<>(  );
+    final Collection<NodeConfig> nodes = new ArrayList<>();
+    final Collection<RelationshipConfig> relationships = new ArrayList<>();
 
     @Override
-    public SetDestination importToolDirectory( Path directory )
+    public SetImportToolOptions importToolDirectory( Path directory )
     {
         this.importToolDirectory = directory;
+        return this;
+    }
+
+    @Override
+    public SetDestination importToolOptions( ImportToolOptions importToolOptions )
+    {
+        this.importToolOptions = importToolOptions;
         return this;
     }
 
