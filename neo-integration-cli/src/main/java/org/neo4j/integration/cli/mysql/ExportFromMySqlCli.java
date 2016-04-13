@@ -14,7 +14,6 @@ import org.neo4j.integration.commands.mysql.ExportFromMySql;
 import org.neo4j.integration.environment.CsvDirectorySupplier;
 import org.neo4j.integration.environment.DestinationDirectorySupplier;
 import org.neo4j.integration.environment.Environment;
-import org.neo4j.integration.environment.EnvironmentSupplier;
 import org.neo4j.integration.environment.ImportToolDirectorySupplier;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
@@ -142,11 +141,11 @@ public class ExportFromMySqlCli implements Runnable
                     .password( password )
                     .build();
 
-            Environment environment = new EnvironmentSupplier(
-                    new ImportToolDirectorySupplier( Paths.get( importToolDirectory ) ),
-                    new DestinationDirectorySupplier( Paths.get( destinationDirectory ), force ),
-                    new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ),
-                    Paths.get( importToolOptionsFile ) ).supply();
+            Environment environment = new Environment(
+                    new ImportToolDirectorySupplier( Paths.get( importToolDirectory ) ).supply(),
+                    new DestinationDirectorySupplier( Paths.get( destinationDirectory ), force ).supply(),
+                    new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ).supply(),
+                    ImportToolOptions.initialiseFromFile( Paths.get( importToolOptionsFile ) ) );
 
             ImportToolOptions importToolOptions = environment.importToolOptions();
 
@@ -210,7 +209,7 @@ public class ExportFromMySqlCli implements Runnable
         @Override
         public void onCsvResourcesFileCreated( Path csvResourcesFile )
         {
-            CliRunner.print( format("CSV resources file: %s", csvResourcesFile ) );
+            CliRunner.print( format( "CSV resources file: %s", csvResourcesFile ) );
         }
     }
 }
