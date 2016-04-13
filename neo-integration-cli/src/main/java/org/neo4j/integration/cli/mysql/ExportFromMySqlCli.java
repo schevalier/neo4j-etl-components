@@ -151,8 +151,8 @@ public class ExportFromMySqlCli implements Runnable
             ImportToolOptions importToolOptions = environment.importToolOptions();
 
             Formatting formatting = Formatting.builder()
-                    .delimiter( importToolOptions.getDelimiter( this.delimiter ) )
-                    .quote( importToolOptions.getQuoteCharacter( this.quote ) )
+                    .delimiter( importToolOptions.getDelimiter( delimiter ) )
+                    .quote( importToolOptions.getQuoteCharacter( quote ) )
                     .build();
 
             Callable<CsvResources> createCsvResources = StringUtils.isNotEmpty( csvResourcesUri ) ?
