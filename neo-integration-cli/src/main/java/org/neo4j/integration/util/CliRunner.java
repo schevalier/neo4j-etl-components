@@ -5,6 +5,8 @@ import java.util.logging.Level;
 import io.airlift.airline.Cli;
 import io.airlift.airline.ParseException;
 
+import static java.lang.String.format;
+
 public class CliRunner
 {
     public enum OnCommandFinished
@@ -48,6 +50,22 @@ public class CliRunner
             parser.parse( "help" ).run();
             onCommandFinished.apply( -1 );
         }
+    }
+
+    public static void handleException( Exception e, boolean debug )
+    {
+        if ( debug )
+        {
+            e.printStackTrace( System.err );
+        }
+        else
+        {
+            print( format( "Command failed due to error (%s: %s). " +
+                            "Rerun with --debug flag for detailed diagnostic information.",
+                    e.getClass().getSimpleName(),
+                    e.getMessage() ) );
+        }
+        System.exit( -1 );
     }
 
     public static void print( Object message )

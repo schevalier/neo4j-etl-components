@@ -173,18 +173,7 @@ public class ExportFromMySqlCli implements Runnable
         }
         catch ( Exception e )
         {
-            if ( debug )
-            {
-                e.printStackTrace( System.err );
-            }
-            else
-            {
-                CliRunner.print( format( "Command failed due to error (%s: %s). " +
-                                "Rerun with --debug flag for detailed diagnostic information.",
-                        e.getClass().getSimpleName(),
-                        e.getMessage() ) );
-            }
-            System.exit( -1 );
+            CliRunner.handleException( e, debug );
         }
     }
 

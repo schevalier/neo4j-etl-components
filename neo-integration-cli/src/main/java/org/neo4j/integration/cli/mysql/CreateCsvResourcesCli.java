@@ -69,7 +69,7 @@ public class CreateCsvResourcesCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--delimiter"},
-            description = "Delimiter to separate fields in CSV",
+            description = "Delimiter to separate fields in CSV.",
             title = "delimiter",
             required = false)
     private String delimiter;
@@ -77,7 +77,7 @@ public class CreateCsvResourcesCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--quote"},
-            description = "Character to treat as quotation character for values in CSV data",
+            description = "Character to treat as quotation character for values in CSV data.",
             title = "quote",
             required = false)
     private String quote;
@@ -120,8 +120,7 @@ public class CreateCsvResourcesCli implements Runnable
         }
         catch ( Exception e )
         {
-            e.printStackTrace( System.err );
-            System.exit( -1 );
+            CliRunner.handleException( e, debug );
         }
     }
 
