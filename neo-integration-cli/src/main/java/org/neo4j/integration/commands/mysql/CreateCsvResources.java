@@ -37,21 +37,21 @@ public class CreateCsvResources implements Callable<CsvResources>
         Events EMPTY = new Events()
         {
             @Override
-            public void onCreatingCsvMappings()
+            public void onCreatingCsvResourcesFile()
             {
                 // Do nothing
             }
 
             @Override
-            public void onMappingsCreated( Path mappingsFile )
+            public void onCsvResourcesFileCreated( Path csvResourcesFile )
             {
                 // Do nothing
             }
         };
 
-        void onCreatingCsvMappings();
+        void onCreatingCsvResourcesFile();
 
-        void onMappingsCreated( Path mappingsFile );
+        void onCsvResourcesFileCreated( Path csvResourcesFile );
     }
 
     private final Events events;
@@ -84,7 +84,7 @@ public class CreateCsvResources implements Callable<CsvResources>
     @Override
     public CsvResources call() throws Exception
     {
-        events.onCreatingCsvMappings();
+        events.onCreatingCsvResourcesFile();
 
         SchemaExport schemaExport = new DatabaseInspector( new DatabaseClient( connectionConfig ) ).buildSchemaExport();
         CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier );
@@ -98,7 +98,7 @@ public class CreateCsvResources implements Callable<CsvResources>
             writer.write( objectWriter.writeValueAsString( csvResources.toJson() ) );
         }
 
-        events.onMappingsCreated( mappingsFile );
+        events.onCsvResourcesFileCreated( mappingsFile );
 
         return csvResources;
     }

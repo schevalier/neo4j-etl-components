@@ -73,11 +73,12 @@ public class ExportFromMySqlCli implements Runnable
             required = true)
     private String importToolDirectory;
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
-            name = {"--import-tool-options"},
-            description = "Path to directory containing options to Neo4j import tool.",
-            title = "directory")
-    private String importToolOptionsDirectory;
+            name = {"--options-file"},
+            description = "Path to file containing Neo4j import tool options.",
+            title = "file")
+    private String importToolOptionsFile = "";
 
     @Option(type = OptionType.COMMAND,
             name = {"--csv-directory"},
@@ -109,7 +110,7 @@ public class ExportFromMySqlCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--delimiter"},
-            description = "Delimiter to separate fields in CSV",
+            description = "Delimiter to separate fields in CSV.",
             title = "delimiter",
             required = false)
     private String delimiter;
@@ -117,7 +118,7 @@ public class ExportFromMySqlCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--quote"},
-            description = "Character to treat as quotation character for values in CSV data",
+            description = "Character to treat as quotation character for values in CSV data.",
             title = "quote",
             required = false)
     private String quote;
@@ -133,7 +134,6 @@ public class ExportFromMySqlCli implements Runnable
     {
         try
         {
-
             ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                     .host( host )
                     .port( port )
@@ -146,7 +146,7 @@ public class ExportFromMySqlCli implements Runnable
                     new ImportToolDirectorySupplier( Paths.get( importToolDirectory ) ),
                     new DestinationDirectorySupplier( Paths.get( destinationDirectory ), force ),
                     new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ),
-                    importToolOptionsDirectory ).supply();
+                    Paths.get( importToolOptionsFile ) ).supply();
 
             ImportToolOptions importToolOptions = environment.importToolOptions();
 
@@ -173,7 +173,17 @@ public class ExportFromMySqlCli implements Runnable
         }
         catch ( Exception e )
         {
-            e.printStackTrace( System.err );
+            if ( debug )
+            {
+                e.printStackTrace( System.err );
+            }
+            else
+            {
+                CliRunner.print( format( "Command failed due to error (%s: %s). " +
+                                "Rerun with --debug flag for detailed diagnostic information.",
+                        e.getClass().getSimpleName(),
+                        e.getMessage() ) );
+            }
             System.exit( -1 );
         }
     }
@@ -196,24 +206,22 @@ public class ExportFromMySqlCli implements Runnable
         @Override
         public void onExportComplete( Path destinationDirectory )
         {
-            CliRunner.print( "Done" );
             CliRunner.printResult( destinationDirectory );
         }
     }
 
     private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events
     {
-
         @Override
-        public void onCreatingCsvMappings()
+        public void onCreatingCsvResourcesFile()
         {
             CliRunner.print( "Creating MySQL to CSV mappings..." );
         }
 
         @Override
-        public void onMappingsCreated( Path mappingsFile )
+        public void onCsvResourcesFileCreated( Path csvResourcesFile )
         {
-            CliRunner.printResult( mappingsFile );
+            CliRunner.print( format("CSV resources file: %s", csvResourcesFile ) );
         }
     }
 }

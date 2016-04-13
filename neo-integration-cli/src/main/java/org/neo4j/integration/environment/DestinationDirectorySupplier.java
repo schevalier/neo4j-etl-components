@@ -23,7 +23,8 @@ public class DestinationDirectorySupplier implements Supplier<Path>
     {
         if ( Files.exists( destinationDirectory ) && !overwriteByForce )
         {
-            throw new IllegalStateException( "Destination already exists" );
+            throw new IllegalStateException(
+                    "Destination directory already exists. Use --force flag to force delete this directory." );
         }
         else
         {

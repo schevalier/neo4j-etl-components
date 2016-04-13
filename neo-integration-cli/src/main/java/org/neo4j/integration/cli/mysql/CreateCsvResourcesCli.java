@@ -128,15 +128,15 @@ public class CreateCsvResourcesCli implements Runnable
     private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events
     {
         @Override
-        public void onCreatingCsvMappings()
+        public void onCreatingCsvResourcesFile()
         {
             CliRunner.print( "Creating MySQL to CSV mappings..." );
         }
 
         @Override
-        public void onMappingsCreated( Path mappingsFile )
+        public void onCsvResourcesFileCreated( Path csvResourcesFile )
         {
-            CliRunner.printResult( mappingsFile );
+            CliRunner.printResult( csvResourcesFile );
         }
     }
 }

@@ -125,7 +125,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
                         "--password", MySqlClient.Parameters.DBPassword.value(),
                         "--database", database,
                         "--import-tool", neo4j.get().binDirectory().toString(),
-                        "--import-tool-options", importToolOptions.toString(),
+                        "--options-file", importToolOptions.toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--delimiter", "\t",

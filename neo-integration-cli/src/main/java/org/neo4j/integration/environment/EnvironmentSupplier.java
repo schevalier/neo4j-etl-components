@@ -1,6 +1,7 @@
 package org.neo4j.integration.environment;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
 import org.neo4j.integration.util.Supplier;
@@ -10,12 +11,12 @@ public class EnvironmentSupplier implements Supplier<Environment>
     private final ImportToolDirectorySupplier importToolDirectorySupplier;
     private final DestinationDirectorySupplier destinationDirectorySupplier;
     private final CsvDirectorySupplier csvDirectorySupplier;
-    private String importToolOptionsFile;
+    private final Path importToolOptionsFile;
 
     public EnvironmentSupplier( ImportToolDirectorySupplier importToolDirectorySupplier,
                                 DestinationDirectorySupplier destinationDirectorySupplier,
                                 CsvDirectorySupplier csvDirectorySupplier,
-                                String importToolOptionsFile )
+                                Path importToolOptionsFile )
     {
         this.importToolDirectorySupplier = importToolDirectorySupplier;
         this.destinationDirectorySupplier = destinationDirectorySupplier;

@@ -42,7 +42,7 @@ public class DestinationDirectorySupplierTest
         supplier.supply();
 
         // then
-        thrown.expectMessage( startsWith( "Destination already exists" ) );
+        thrown.expectMessage( startsWith( "Destination directory already exists" ) );
     }
 
     @Test

@@ -1,6 +1,8 @@
 package org.neo4j.integration.neo4j.importcsv.config;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,9 +27,9 @@ public class ImportToolOptionsTest
     public final ResourceRule<Path> tempDirectory = new ResourceRule<>( temporaryDirectory() );
 
     @Test
-    public void intialiseWithEmptyMapIfTheFileIsEmpty() throws Exception
+    public void initialiseWithEmptyMapIfTheFileIsEmpty() throws Exception
     {
-        ImportToolOptions nonExistentOptions = ImportToolOptions.initialiseFromFile( "non-existent" );
+        ImportToolOptions nonExistentOptions = ImportToolOptions.initialiseFromFile( Paths.get( "non-existent" ) );
         assertTrue( nonExistentOptions.options().isEmpty() );
 
         Path fileWithErrors = tempDirectory.get().resolve( "fileWithErrors.json" );
@@ -35,7 +37,7 @@ public class ImportToolOptionsTest
 
         objectMapper.writeValue( fileWithErrors.toFile(), new HashMap<>() );
 
-        ImportToolOptions fileWithErrorsOptions = ImportToolOptions.initialiseFromFile( fileWithErrors.toString() );
+        ImportToolOptions fileWithErrorsOptions = ImportToolOptions.initialiseFromFile( fileWithErrors );
         assertTrue( fileWithErrorsOptions.options().isEmpty() );
 
         Path optionsFile = tempDirectory.get().resolve( "options.json" );
@@ -45,8 +47,8 @@ public class ImportToolOptionsTest
         options.put( "multiline-fields", "true" );
         objectMapper.writeValue( optionsFile.toFile(), options );
 
-        ImportToolOptions importToolOptions = ImportToolOptions.initialiseFromFile( optionsFile.toString() );
-        assertThat( importToolOptions.options().size(), is(3) );
+        ImportToolOptions importToolOptions = ImportToolOptions.initialiseFromFile( optionsFile );
+        assertThat( importToolOptions.options().size(), is( 3 ) );
     }
 
     @Test
@@ -78,7 +80,7 @@ public class ImportToolOptionsTest
         assertThat( importToolOptions.getDelimiter( "" ), is( Formatting.DEFAULT_DELIMITER ) );
         assertThat( importToolOptions.getDelimiter( null ), is( Formatting.DEFAULT_DELIMITER ) );
 
-        assertThat( importToolOptions.getQuoteCharacter( "'" ).argValue(), is("'") );
+        assertThat( importToolOptions.getQuoteCharacter( "'" ).argValue(), is( "'" ) );
         assertThat( importToolOptions.getQuoteCharacter( "" ), is( Formatting.DEFAULT_QUOTE_CHAR ) );
         assertThat( importToolOptions.getQuoteCharacter( null ), is( Formatting.DEFAULT_QUOTE_CHAR ) );
     }

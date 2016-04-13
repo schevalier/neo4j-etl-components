@@ -9,7 +9,7 @@ public class Environment
     private final Path importToolDirectory;
     private final Path destinationDirectory;
     private final Path csvDirectory;
-    private ImportToolOptions importToolOptions;
+    private final ImportToolOptions importToolOptions;
 
     public Environment( Path importToolDirectory,
                         Path destinationDirectory,
