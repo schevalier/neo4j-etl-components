@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.exportcsv.mysql.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -86,6 +87,59 @@ public class JoinMetadataProducerTest
         assertEquals( new TableName( "test.Person" ), ownedBy.keyTwoTargetColumn().table() );
 
         assertTrue( joins.size() == 2 );
+    }
+
+    @Test
+    @Ignore
+    public void shouldReturnJoinMetadataForCompositeWithPrimaryKey() throws Exception
+    {
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "SOURCE_TABLE_SCHEMA",
+                        "SOURCE_TABLE_NAME",
+                        "SOURCE_COLUMN_NAME",
+                        "SOURCE_COLUMN_TYPE",
+                        "TARGET_TABLE_SCHEMA",
+                        "TARGET_TABLE_NAME",
+                        "TARGET_COLUMN_NAME",
+                        "TARGET_COLUMN_TYPE" )
+                .addRow( "test", "dbmirror_pendingdata", "SeqId", "ForeignKey", "test", "dbmirror_pending", "SeqId",
+                        "PrimaryKey" )
+                .addRow( "test", "dbmirror_pendingdata", "SeqId", "ForeignKey", "test", "dbmirror_pendingdata", "SeqId",
+                        "ForeignKey" )
+                .addRow( "test", "dbmirror_pendingdata", "IsKey", "PrimaryKey", "test", "dbmirror_pendingdata", "IsKey",
+                        "PrimaryKey" )
+                .build();
+
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
+
+        JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
+
+        // when
+        TableName book = new TableName( "test.Book" );
+        TableName author = new TableName( "test.Author" );
+        Collection<Join> joinCollection = getJoinMetadata.createMetadataFor(
+                new TableNamePair( book, author ) );
+
+        // then
+        ArrayList<Join> joins = new ArrayList<>( joinCollection );
+        Join writtenBy = joins.get( 0 );
+
+        assertEquals( columnUtil.keyColumn( book, "id", ColumnRole.PrimaryKey ), writtenBy.keyOneSourceColumn() );
+
+        assertEquals(
+                columnUtil.compositeKeyColumn( book, asList( "author_first_name", "author_last_name" ), ColumnRole
+                        .ForeignKey ),
+                writtenBy.keyTwoSourceColumn() );
+
+        assertEquals(
+                columnUtil.compositeKeyColumn( author, asList( "first_name", "last_name" ), ColumnRole.PrimaryKey ),
+                writtenBy.keyTwoTargetColumn() );
+
+        assertEquals( author, writtenBy.keyTwoTargetColumn().table() );
+
+        assertTrue( joins.size() == 1 );
     }
 
     @Test
