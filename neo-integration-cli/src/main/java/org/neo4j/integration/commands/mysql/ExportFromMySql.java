@@ -47,27 +47,27 @@ public class ExportFromMySql implements Callable<Void>
     }
 
     private final Events events;
-    private final Callable<CsvResources> createCsvResources;
+    private final CsvResources csvResources;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final Environment environment;
 
-    public ExportFromMySql( Callable<CsvResources> createCsvResources,
+    public ExportFromMySql( CsvResources csvResources,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
                             Environment environment )
     {
-        this( Events.EMPTY, createCsvResources, connectionConfig, formatting, environment );
+        this( Events.EMPTY, csvResources, connectionConfig, formatting, environment );
     }
 
     public ExportFromMySql( Events events,
-                            Callable<CsvResources> createCsvResources,
+                            CsvResources csvResources,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
                             Environment environment )
     {
         this.events = events;
-        this.createCsvResources = createCsvResources;
+        this.csvResources = csvResources;
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.environment = environment;
@@ -76,8 +76,6 @@ public class ExportFromMySql implements Callable<Void>
     @Override
     public Void call() throws Exception
     {
-        CsvResources csvResources = createCsvResources.call();
-
         ExportToCsvConfig config = ExportToCsvConfig.builder()
                 .destination( environment.csvDirectory() )
                 .connectionConfig( connectionConfig )

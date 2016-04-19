@@ -2,8 +2,7 @@ package org.neo4j.integration.util;
 
 import java.util.logging.Level;
 
-import io.airlift.airline.Cli;
-import io.airlift.airline.ParseException;
+import com.github.rvesse.airline.Cli;
 
 import static java.lang.String.format;
 
@@ -43,9 +42,10 @@ public class CliRunner
             parser.parse( args ).run();
             onCommandFinished.apply( 0 );
         }
-        catch ( ParseException e )
+        catch ( Exception e )
         {
-            Loggers.Cli.log( Level.SEVERE, "Illegal command", e );
+            Loggers.Cli.log( Level.SEVERE,
+                    format( "Illegal command (%s: %s)%n", e.getClass().getSimpleName(), e.getMessage() ) );
 
             parser.parse( "help" ).run();
             onCommandFinished.apply( -1 );

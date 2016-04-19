@@ -1,12 +1,11 @@
 package org.neo4j.integration.commands.mysql;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,13 +22,19 @@ import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 
 public class CreateCsvResources implements Callable<CsvResources>
 {
-    public static Callable<CsvResources> fromExistingFile( String uri )
+    public static Callable<CsvResources> load( String uri )
     {
         return () ->
         {
-            JsonNode root = new ObjectMapper().readTree( URI.create( uri ).toURL() );
+            JsonNode root = new ObjectMapper().readTree( Paths.get( uri ).toFile() );
             return CsvResources.fromJson( root );
         };
+    }
+
+    public static Callable<CsvResources> load( Reader reader ) throws IOException
+    {
+        JsonNode root = new ObjectMapper().readTree( reader );
+        return () -> CsvResources.fromJson( root );
     }
 
     public interface Events
@@ -43,7 +48,7 @@ public class CreateCsvResources implements Callable<CsvResources>
             }
 
             @Override
-            public void onCsvResourcesFileCreated( Path csvResourcesFile )
+            public void onCsvResourcesCreated()
             {
                 // Do nothing
             }
@@ -51,31 +56,31 @@ public class CreateCsvResources implements Callable<CsvResources>
 
         void onCreatingCsvResourcesFile();
 
-        void onCsvResourcesFileCreated( Path csvResourcesFile );
+        void onCsvResourcesCreated();
     }
 
     private final Events events;
-    private final Path csvDirectory;
+    private final OutputStream output;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
 
-    public CreateCsvResources( Path csvDirectory,
+    public CreateCsvResources( OutputStream output,
                                ConnectionConfig connectionConfig,
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier )
     {
-        this( Events.EMPTY, csvDirectory, connectionConfig, formatting, sqlSupplier );
+        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier );
     }
 
     public CreateCsvResources( Events events,
-                               Path csvDirectory,
+                               OutputStream output,
                                ConnectionConfig connectionConfig,
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier )
     {
         this.events = events;
-        this.csvDirectory = csvDirectory;
+        this.output = output;
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
@@ -89,16 +94,13 @@ public class CreateCsvResources implements Callable<CsvResources>
         SchemaExport schemaExport = new DatabaseInspector( new DatabaseClient( connectionConfig ) ).buildSchemaExport();
         CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier );
 
-        Path mappingsFile = csvDirectory.resolve( "mappings.json" );
-
-        try ( Writer writer = new BufferedWriter(
-                new OutputStreamWriter( new FileOutputStream( mappingsFile.toFile() ), StandardCharsets.UTF_8 ) ) )
+        try ( Writer writer = new OutputStreamWriter( output ) )
         {
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
             writer.write( objectWriter.writeValueAsString( csvResources.toJson() ) );
         }
 
-        events.onCsvResourcesFileCreated( mappingsFile );
+        events.onCsvResourcesCreated();
 
         return csvResources;
     }

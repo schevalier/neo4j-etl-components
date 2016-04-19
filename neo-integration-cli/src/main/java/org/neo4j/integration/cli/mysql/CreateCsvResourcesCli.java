@@ -1,16 +1,14 @@
 package org.neo4j.integration.cli.mysql;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
-import io.airlift.airline.Command;
-import io.airlift.airline.Option;
-import io.airlift.airline.OptionType;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
-import org.neo4j.integration.environment.CsvDirectorySupplier;
 import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
@@ -23,63 +21,53 @@ import org.neo4j.integration.util.CliRunner;
 public class CreateCsvResourcesCli implements Runnable
 {
     @SuppressWarnings("FieldCanBeLocal")
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"-h", "--host"},
             description = "Host to use for connection to MySQL.",
-            title = "name",
-            required = false)
+            title = "name")
     private String host = "localhost";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"-p", "--port"},
             description = "Port number to use for connection to MySQL.",
-            title = "#",
-            required = false)
+            title = "#")
     private int port = 3306;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"-u", "--user"},
             description = "User for login to MySQL.",
-            title = "name",
-            required = true)
+            title = "name")
     private String user;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"--password"},
             description = "Password for login to MySQL.",
-            title = "name",
-            required = true)
+            title = "name")
     private String password;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"-d", "--database"},
             description = "MySQL database.",
-            title = "name",
-            required = true)
+            title = "name")
     private String database;
-
-    @Option(type = OptionType.COMMAND,
-            name = {"--csv-directory"},
-            description = "Path to directory for intermediate CSV files.",
-            title = "directory",
-            required = true)
-    private String csvRootDirectory;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--delimiter"},
             description = "Delimiter to separate fields in CSV.",
-            title = "delimiter",
-            required = false)
+            title = "delimiter")
     private String delimiter;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--quote"},
             description = "Character to treat as quotation character for values in CSV data.",
-            title = "quote",
-            required = false)
+            title = "quote")
     private String quote;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -113,7 +101,7 @@ public class CreateCsvResourcesCli implements Runnable
 
             new CreateCsvResources(
                     new CreateCsvResourcesEventHandler(),
-                    new CsvDirectorySupplier( Paths.get( csvRootDirectory ) ).supply(),
+                    System.out,
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier() ).call();
@@ -133,9 +121,9 @@ public class CreateCsvResourcesCli implements Runnable
         }
 
         @Override
-        public void onCsvResourcesFileCreated( Path csvResourcesFile )
+        public void onCsvResourcesCreated()
         {
-            CliRunner.printResult( csvResourcesFile );
+            // Do nothing
         }
     }
 }

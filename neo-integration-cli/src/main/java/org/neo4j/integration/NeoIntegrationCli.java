@@ -7,8 +7,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.logging.LogManager;
 
-import io.airlift.airline.Cli;
-import io.airlift.airline.help.Help;
+import com.github.rvesse.airline.Cli;
+import com.github.rvesse.airline.builder.CliBuilder;
+import com.github.rvesse.airline.help.Help;
 
 import org.neo4j.integration.cli.mysql.CreateCsvResourcesCli;
 import org.neo4j.integration.cli.mysql.ExportFromMySqlCli;
@@ -70,7 +71,7 @@ public class NeoIntegrationCli
 
     private static Cli<Runnable> parser()
     {
-        Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder( "neo-integration" )
+        CliBuilder<Runnable> builder = Cli.<Runnable>builder( "neo-integration" )
                 .withDescription( "Neo4j integration tools." )
                 .withDefaultCommand( Help.class )
                 .withCommand( Help.class );

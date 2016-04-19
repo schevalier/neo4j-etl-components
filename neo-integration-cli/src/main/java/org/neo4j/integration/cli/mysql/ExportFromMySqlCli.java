@@ -1,12 +1,19 @@
 package org.neo4j.integration.cli.mysql;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
-import io.airlift.airline.Command;
-import io.airlift.airline.Option;
-import io.airlift.airline.OptionType;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
@@ -32,44 +39,42 @@ public class ExportFromMySqlCli implements Runnable
     @Option(type = OptionType.COMMAND,
             name = {"-h", "--host"},
             description = "Host to use for connection to MySQL.",
-            title = "name",
-            required = false)
+            title = "name")
     private String host = "localhost";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"-p", "--port"},
             description = "Port number to use for connection to MySQL.",
-            title = "#",
-            required = false)
+            title = "#")
     private int port = 3306;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"-u", "--user"},
             description = "User for login to MySQL.",
-            title = "name",
-            required = true)
+            title = "name")
     private String user;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"--password"},
             description = "Password for login to MySQL.",
-            title = "name",
-            required = true)
+            title = "name")
     private String password;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"-d", "--database"},
             description = "MySQL database.",
-            title = "name",
-            required = true)
+            title = "name")
     private String database;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"--import-tool"},
             description = "Path to directory containing Neo4j import tool.",
-            title = "directory",
-            required = true)
+            title = "directory")
     private String importToolDirectory;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -79,18 +84,18 @@ public class ExportFromMySqlCli implements Runnable
             title = "file")
     private String importToolOptionsFile = "";
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"--csv-directory"},
             description = "Path to directory for intermediate CSV files.",
-            title = "directory",
-            required = true)
+            title = "directory")
     private String csvRootDirectory;
 
+    @Required
     @Option(type = OptionType.COMMAND,
             name = {"--destination"},
             description = "Path to destination store directory (this will overwrite any exiting directory).",
-            title = "directory",
-            required = true)
+            title = "directory")
     private String destinationDirectory;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -99,27 +104,18 @@ public class ExportFromMySqlCli implements Runnable
             description = "Force delete destination store directory if it already exists.")
     private boolean force = false;
 
-    @Option(type = OptionType.COMMAND,
-            name = {"--csv-resources-uri"},
-            description = "URI of an existing CSV resources definitions file.",
-            title = "uri",
-            required = false)
-    private String csvResourcesUri;
-
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--delimiter"},
             description = "Delimiter to separate fields in CSV.",
-            title = "delimiter",
-            required = false)
+            title = "delimiter")
     private String delimiter;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--quote"},
             description = "Character to treat as quotation character for values in CSV data.",
-            title = "quote",
-            required = false)
+            title = "quote")
     private String quote;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -127,6 +123,16 @@ public class ExportFromMySqlCli implements Runnable
             name = {"--debug"},
             description = "Print detailed diagnostic output.")
     private boolean debug = false;
+
+    @Option(type = OptionType.COMMAND,
+            name = {"--csv-resources"},
+            description = "Path to an existing CSV resources definitions file. " +
+                    "The name 'stdin' will cause the CSV resources definitions to be read from standard input.",
+            title = "file|stdin")
+    @Arguments(description = "Path to an existing CSV resources definitions file. " +
+            "The name 'stdin' will cause the CSV resources definitions to be read from standard input.",
+            title = "file|stdin")
+    private String csvResourcesFile;
 
     @Override
     public void run()
@@ -154,18 +160,11 @@ public class ExportFromMySqlCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( quote ) )
                     .build();
 
-            Callable<CsvResources> createCsvResources = StringUtils.isNotEmpty( csvResourcesUri ) ?
-                    CreateCsvResources.fromExistingFile( csvResourcesUri ) :
-                    new CreateCsvResources(
-                            new CreateCsvResourcesEventHandler(),
-                            environment.csvDirectory(),
-                            connectionConfig,
-                            formatting,
-                            new MySqlExportSqlSupplier() );
+            CsvResources csvResources = createCsvResources( connectionConfig, formatting );
 
             new ExportFromMySql(
                     new ExportMySqlEventHandler(),
-                    createCsvResources,
+                    csvResources,
                     connectionConfig,
                     formatting,
                     environment ).call();
@@ -174,6 +173,42 @@ public class ExportFromMySqlCli implements Runnable
         {
             CliRunner.handleException( e, debug );
         }
+    }
+
+    private CsvResources createCsvResources( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
+    {
+        Callable<CsvResources> createCsvResources;
+//        try ( Reader reader = new InputStreamReader( System.in ); BufferedReader buffer = new BufferedReader( reader ) )
+//        {
+//            if (StringUtils.isNotEmpty( csvResourcesFile ))
+//            {
+//                if (csvResourcesFile.equalsIgnoreCase( "stdin" ))
+//                {
+//                    createCsvResources = CreateCsvResources.load( buffer );
+//                }
+//                else
+//                {
+//                    createCsvResources = CreateCsvResources.load( csvResourcesFile );
+//                }
+//            }
+//            else
+//            {
+                createCsvResources = new CreateCsvResources(
+                        new CreateCsvResourcesEventHandler(),
+                        new OutputStream()
+                        {
+                            @Override
+                            public void write( int b ) throws IOException
+                            {
+                                // Do nothing
+                            }
+                        },
+                        connectionConfig,
+                        formatting,
+                        new MySqlExportSqlSupplier() );
+//            }
+//        }
+        return createCsvResources.call();
     }
 
     private static class ExportMySqlEventHandler implements ExportFromMySql.Events
@@ -207,9 +242,9 @@ public class ExportFromMySqlCli implements Runnable
         }
 
         @Override
-        public void onCsvResourcesFileCreated( Path csvResourcesFile )
+        public void onCsvResourcesCreated()
         {
-            CliRunner.print( format( "CSV resources file: %s", csvResourcesFile ) );
+            // Do nothing
         }
     }
 }
