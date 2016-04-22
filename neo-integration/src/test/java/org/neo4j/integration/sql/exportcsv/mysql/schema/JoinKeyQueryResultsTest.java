@@ -8,14 +8,14 @@ import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.JoinKey;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class JoinKeyQueryResultsTest
 {
     @Test
     public void shouldCreateSimpleJoinKeyFromSingleRowList()
     {
-         // given
+        // given
         QueryResults results = StubQueryResults.builder()
                 .columns( "SOURCE_TABLE_SCHEMA",
                         "SOURCE_TABLE_NAME",
@@ -54,7 +54,8 @@ public class JoinKeyQueryResultsTest
                         "TARGET_COLUMN_TYPE" )
                 .addRow( "test", "Author_Publisher", "author_first_name", "ForeignKey", "test", "Author",
                         "first_name", "PrimaryKey" )
-                .addRow( "test", "Author_Publisher", "author_last_name", "ForeignKey", "test", "Author", "last_name", "PrimaryKey" )
+                .addRow( "test", "Author_Publisher", "author_last_name", "ForeignKey", "test", "Author", "last_name",
+                        "PrimaryKey" )
                 .build();
 
         JoinKeyQueryResults joinKeyQueryResults =
@@ -64,7 +65,8 @@ public class JoinKeyQueryResultsTest
         JoinKey joinKey = joinKeyQueryResults.createJoinKey();
 
         // then
-        assertEquals( "test.Author_Publisher.author_first_name\0test.Author_Publisher.author_last_name", joinKey.sourceColumn().name() );
+        assertEquals( "test.Author_Publisher.author_first_name\0test.Author_Publisher.author_last_name", joinKey
+                .sourceColumn().name() );
         assertEquals( "test.Author.first_name\0test.Author.last_name", joinKey.targetColumn().name() );
     }
 }

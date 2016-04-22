@@ -2,7 +2,6 @@ package org.neo4j.integration.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,9 +101,9 @@ public class DatabaseInspectorTest
         assertThat( tableNames, matchesCollection( asList( person, address ) ) );
         assertThat( join.tableNames(), hasItems( person, address ) );
         assertEquals( asList( "test.Person.addressId",
-                "test.Address.id",
-                "test.Person.id",
-                "test.Person.id" ),
+                        "test.Address.id",
+                        "test.Person.id",
+                        "test.Person.id" ),
                 keyNames( join ) );
         assertTrue( schemaExport.joinTables().isEmpty() );
     }
@@ -182,9 +181,9 @@ public class DatabaseInspectorTest
         assertThat( tableNames, matchesCollection( asList( book, author ) ) );
         assertThat( join.tableNames(), hasItems( book, author ) );
         assertEquals( asList( "test.Book.author_first_name\0test.Book.author_last_name",
-                "test.Author.first_name\0test.Author.last_name",
-                "test.Book.id",
-                "test.Book.id" ),
+                        "test.Author.first_name\0test.Author.last_name",
+                        "test.Book.id",
+                        "test.Book.id" ),
                 keyNames( join ) );
         assertTrue( schemaExport.joinTables().isEmpty() );
     }
@@ -239,11 +238,11 @@ public class DatabaseInspectorTest
 
 
         assertThat( tableNames, matchesCollection( singletonList( employee ) ) );
-        assertThat( join.tableNames(), hasItems( employee) );
-        assertEquals( asList("test.Employee.managerId",
-                "test.Employee.id",
-                "test.Employee.id",
-                "test.Employee.id" ),
+        assertThat( join.tableNames(), hasItems( employee ) );
+        assertEquals( asList( "test.Employee.managerId",
+                        "test.Employee.id",
+                        "test.Employee.id",
+                        "test.Employee.id" ),
                 keyNames( join ) );
         assertTrue( schemaExport.joinTables().isEmpty() );
     }
@@ -325,9 +324,9 @@ public class DatabaseInspectorTest
         assertThat( tableNames, matchesCollection( asList( student, course ) ) );
         assertThat( joinTable.join().tableNames(), matchesCollection( asList( student, studentCourse ) ) );
         assertEquals( asList( "test.Student_Course.studentId",
-                "test.Student.id",
-                "test.Student_Course.courseId",
-                "test.Course.id" ),
+                        "test.Student.id",
+                        "test.Student_Course.courseId",
+                        "test.Course.id" ),
                 keyNames( joinTable.join() ) );
         assertTrue( schemaExport.joins().isEmpty() );
     }

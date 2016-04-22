@@ -11,5 +11,5 @@ public interface StreamEventHandler<T>
 
     void onCompleted() throws IOException;
 
-    T awaitContents(long timeout, TimeUnit unit) throws Exception;
+    T awaitContents( long timeout, TimeUnit unit ) throws Exception;
 }

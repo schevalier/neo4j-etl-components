@@ -34,11 +34,11 @@ public class MySqlClient
     {
         DatabaseClient client = new DatabaseClient(
                 ConnectionConfig.forDatabase( DatabaseType.MySQL )
-                .host( host )
-                .port( DatabaseType.MySQL.defaultPort() )
-                .username( Parameters.DBUser.value() )
-                .password( Parameters.DBPassword.value() )
-                .build() );
+                        .host( host )
+                        .port( DatabaseType.MySQL.defaultPort() )
+                        .username( Parameters.DBUser.value() )
+                        .password( Parameters.DBPassword.value() )
+                        .build() );
 
         for ( String line : sql.split( ";" ) )
         {

@@ -35,5 +35,5 @@ public enum DatabaseType
         return defaultPort;
     }
 
-    public abstract URI createUri(String host, int port, String database);
+    public abstract URI createUri( String host, int port, String database );
 }

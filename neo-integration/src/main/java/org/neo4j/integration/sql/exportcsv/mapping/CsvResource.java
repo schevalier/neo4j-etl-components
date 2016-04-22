@@ -8,7 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 
 public class CsvResource
 {
-    public static CsvResource fromJson(JsonNode root)
+    public static CsvResource fromJson( JsonNode root )
     {
         return new CsvResource(
                 root.path( "name" ).textValue(),

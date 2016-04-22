@@ -1,6 +1,5 @@
 package org.neo4j.integration.neo4j.importcsv.config;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;

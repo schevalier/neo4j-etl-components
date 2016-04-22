@@ -4,8 +4,6 @@ import java.nio.file.Path;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.util.Preconditions;
 
 public class ExportToCsvConfig

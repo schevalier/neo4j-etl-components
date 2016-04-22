@@ -11,7 +11,7 @@ public enum Loggers
 
     private final Logger log;
 
-    Loggers( )
+    Loggers()
     {
         this.log = Logger.getLogger( name() );
     }

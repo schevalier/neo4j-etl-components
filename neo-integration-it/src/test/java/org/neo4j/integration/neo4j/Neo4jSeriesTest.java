@@ -7,7 +7,7 @@ import org.junit.Test;
 import static java.lang.String.format;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class Neo4jSeriesTest
 {

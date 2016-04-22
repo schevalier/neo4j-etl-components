@@ -17,7 +17,7 @@ public class ImportToolDirectorySupplier implements Supplier<Path>
     }
 
     @Override
-    public Path supply( ) throws IOException
+    public Path supply() throws IOException
     {
         Path importTool = importToolDirectory.resolve( ImportConfig.IMPORT_TOOL );
         if ( Files.notExists( importTool ) )

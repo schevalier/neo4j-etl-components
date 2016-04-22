@@ -3,16 +3,8 @@ package org.neo4j.integration.neo4j.importcsv.config;
 import java.nio.file.Paths;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.Arrays.asList;
-
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class ManifestTest
@@ -38,11 +30,11 @@ public class ManifestTest
         manifest.addNodesAndRelationshipsToBuilder( builder );
 
         // then
-        verify(builder).addNodeConfig( NodeConfig.builder().addInputFiles( nodeCsvFiles1.asCollection() ).build() );
-        verify(builder).addNodeConfig( NodeConfig.builder().addInputFiles( nodeCsvFiles2.asCollection() ).build() );
-        verify(builder).addRelationshipConfig(
+        verify( builder ).addNodeConfig( NodeConfig.builder().addInputFiles( nodeCsvFiles1.asCollection() ).build() );
+        verify( builder ).addNodeConfig( NodeConfig.builder().addInputFiles( nodeCsvFiles2.asCollection() ).build() );
+        verify( builder ).addRelationshipConfig(
                 RelationshipConfig.builder().addInputFiles( relationshipCsvFiles1.asCollection() ).build() );
-        verify(builder).addRelationshipConfig(
+        verify( builder ).addRelationshipConfig(
                 RelationshipConfig.builder().addInputFiles( relationshipCsvFiles2.asCollection() ).build() );
     }
 }

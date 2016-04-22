@@ -8,7 +8,12 @@ import static java.lang.String.format;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class Neo4jVersionTest
 {
@@ -138,10 +143,12 @@ public class Neo4jVersionTest
         assertThat( Neo4jVersion.v2_2_0.prerelease( "a1" ), not( isAfter( Neo4jVersion.v2_2_0.prerelease( "a2" ) ) ) );
 
         assertThat( Neo4jVersion.v2_2_0.prerelease( "M01" ), isBefore( Neo4jVersion.v2_2_0.prerelease( "M02" ) ) );
-        assertThat( Neo4jVersion.v2_2_0.prerelease( "M01" ), not( isAfter( Neo4jVersion.v2_2_0.prerelease( "M02" ) ) ) );
+        assertThat( Neo4jVersion.v2_2_0.prerelease( "M01" ), not( isAfter( Neo4jVersion.v2_2_0.prerelease( "M02" ) )
+        ) );
 
         assertThat( Neo4jVersion.v2_2_0.prerelease( "M99" ), isBefore( Neo4jVersion.v2_2_0.prerelease( "RC1" ) ) );
-        assertThat( Neo4jVersion.v2_2_0.prerelease( "M99" ), not( isAfter( Neo4jVersion.v2_2_0.prerelease( "RC1" ) ) ) );
+        assertThat( Neo4jVersion.v2_2_0.prerelease( "M99" ), not( isAfter( Neo4jVersion.v2_2_0.prerelease( "RC1" ) )
+        ) );
     }
 
     @Test
@@ -161,9 +168,9 @@ public class Neo4jVersionTest
         Neo4jVersion version3 = Neo4jVersion.from( "2.2.0-M03" );
 
         // then
-        assertTrue(version1.belongsTo( Neo4jSeries.v2_2_x ));
-        assertTrue(version2.belongsTo( Neo4jSeries.v2_2_x ));
-        assertTrue(version3.belongsTo( Neo4jSeries.v2_2_x ));
+        assertTrue( version1.belongsTo( Neo4jSeries.v2_2_x ) );
+        assertTrue( version2.belongsTo( Neo4jSeries.v2_2_x ) );
+        assertTrue( version3.belongsTo( Neo4jSeries.v2_2_x ) );
 
         assertNotEquals( version1, version2 );
         assertNotEquals( version1, version3 );

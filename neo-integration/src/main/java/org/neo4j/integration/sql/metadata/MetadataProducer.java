@@ -4,5 +4,5 @@ import java.util.Collection;
 
 public interface MetadataProducer<SOURCE, TARGET extends DatabaseObject>
 {
-    Collection<TARGET> createMetadataFor( SOURCE source) throws Exception;
+    Collection<TARGET> createMetadataFor( SOURCE source ) throws Exception;
 }

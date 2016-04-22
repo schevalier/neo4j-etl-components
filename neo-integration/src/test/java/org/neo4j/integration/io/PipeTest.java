@@ -30,7 +30,7 @@ public class PipeTest
     @Test
     public void shouldCreateNamedPipeForWriting() throws Exception
     {
-        if ( OperatingSystem.isWindows())
+        if ( OperatingSystem.isWindows() )
         {
             return;
         }
@@ -73,7 +73,7 @@ public class PipeTest
     @Test
     public void shouldFailOutStreamFastWhenExceptionableThrowsAnException() throws Exception
     {
-        if ( OperatingSystem.isWindows())
+        if ( OperatingSystem.isWindows() )
         {
             return;
         }
@@ -106,7 +106,7 @@ public class PipeTest
     @Test
     public void shouldFailInStreamFastWhenExceptionableThrowsAnException() throws Exception
     {
-        if ( OperatingSystem.isWindows())
+        if ( OperatingSystem.isWindows() )
         {
             return;
         }
@@ -139,7 +139,7 @@ public class PipeTest
     @Test
     public void shouldDeleteFileOnClose() throws Exception
     {
-        if ( OperatingSystem.isWindows())
+        if ( OperatingSystem.isWindows() )
         {
             return;
         }

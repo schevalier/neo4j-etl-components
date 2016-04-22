@@ -18,9 +18,9 @@ import com.amazonaws.services.cloudformation.model.Parameter;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.amazonaws.util.IOUtils;
 
+import org.neo4j.integration.provisioning.Script;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFactory;
-import org.neo4j.integration.provisioning.Script;
 import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;

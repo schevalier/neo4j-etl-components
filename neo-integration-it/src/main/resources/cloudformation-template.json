@@ -1,41 +1,33 @@
 {
-  "AWSTemplateFormatVersion" : "2010-09-09",
-
-  "Description" : "Integration testing third-party server.",
-
-  "Parameters" : {
-
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Integration testing third-party server.",
+  "Parameters": {
     "KeyName": {
-      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "Type": "AWS::EC2::KeyPair::KeyName",
-      "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
     },
-
     "AMI": {
       "Default": "ami-bdfbccca",
-      "Description" : "AMI ID",
+      "Description": "AMI ID",
       "Type": "String",
       "MinLength": "1",
       "MaxLength": "64"
     },
-
     "UserData": {
-      "Description" : "Startup script",
+      "Description": "Startup script",
       "Type": "String"
     },
-
     "InstanceDescription": {
-      "Description" : "Description of the instance",
+      "Description": "Description of the instance",
       "Type": "String"
     },
-
     "Port": {
-      "Description" : "Port to be opened",
+      "Description": "Port to be opened",
       "Type": "Number"
     },
-
-    "ClientLocation" : {
-      "Description" : "The IP address range that can be used to connect to the EC2 instances",
+    "ClientLocation": {
+      "Description": "The IP address range that can be used to connect to the EC2 instances",
       "Type": "String",
       "MinLength": "9",
       "MaxLength": "18",
@@ -44,53 +36,102 @@
       "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
     }
   },
-
-  "Resources" : {
-
+  "Resources": {
     "ServerInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "ImageId" : {"Ref" : "AMI"},
-        "InstanceType"   : "m3.medium",
-        "SecurityGroups" : [ {"Ref" : "ServerSecurityGroup"} ],
-        "KeyName"        : { "Ref" : "KeyName" },
-        "Tags"           : [ { "Key" : "Name", "Value" : {"Ref" : "InstanceDescription"} } ],
-        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
-          { "Ref" : "UserData" }, "\n",
-
-          "apt-get -y install python-setuptools\n",
-          "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
-
-          "# Signal the status from cfn-init\n",
-          "/usr/local/bin/cfn-signal -e $? ",
-          "         --stack ", { "Ref" : "AWS::StackName" },
-          "         --resource ServerInstance ",
-          "         --region ", { "Ref" : "AWS::Region" }, "\n"
-        ]]}}
+        "ImageId": {
+          "Ref": "AMI"
+        },
+        "InstanceType": "m3.medium",
+        "SecurityGroups": [
+          {
+            "Ref": "ServerSecurityGroup"
+          }
+        ],
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "InstanceDescription"
+            }
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Ref": "UserData"
+                },
+                "\n",
+                "apt-get -y install python-setuptools\n",
+                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "# Signal the status from cfn-init\n",
+                "/usr/local/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ServerInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }
       },
-      "CreationPolicy" : {
-        "ResourceSignal" : {
-          "Timeout" : "PT10M"
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT10M"
         }
       }
     },
-
-    "ServerSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "GroupDescription" : "Enable remote access",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "ClientLocation"}},
-          {"IpProtocol" : "tcp", "FromPort" : { "Ref" : "Port"}, "ToPort" : { "Ref" : "Port"}, "CidrIp" : { "Ref" : "ClientLocation"}}
+    "ServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable remote access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": {
+              "Ref": "ClientLocation"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": {
+              "Ref": "Port"
+            },
+            "ToPort": {
+              "Ref": "Port"
+            },
+            "CidrIp": {
+              "Ref": "ClientLocation"
+            }
+          }
         ]
       }
     }
   },
-
-  "Outputs" : {
-    "PublicIpAddress" : {
+  "Outputs": {
+    "PublicIpAddress": {
       "Description": "Public IP address of the server",
-      "Value" : { "Fn::GetAtt" : [ "ServerInstance", "PublicIp" ]}
+      "Value": {
+        "Fn::GetAtt": [
+          "ServerInstance",
+          "PublicIp"
+        ]
+      }
     }
   }
 }

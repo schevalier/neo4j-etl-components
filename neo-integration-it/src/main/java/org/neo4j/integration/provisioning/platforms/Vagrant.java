@@ -14,9 +14,9 @@ import java.util.logging.Level;
 
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.ProcessHandle;
+import org.neo4j.integration.provisioning.Script;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFactory;
-import org.neo4j.integration.provisioning.Script;
 import org.neo4j.integration.util.Loggers;
 import org.neo4j.integration.util.Strings;
 
@@ -35,7 +35,7 @@ public class Vagrant implements ServerFactory
             "  config.vm.provider 'virtualbox' do |vb|",
             "    vb.memory = 2048",
             "  end",
-            "end");
+            "end" );
 
     private static final String DEFAULT_BOX = "ubuntu/trusty64";
 

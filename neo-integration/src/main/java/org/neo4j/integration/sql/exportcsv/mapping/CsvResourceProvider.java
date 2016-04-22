@@ -36,7 +36,7 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
                 join.descriptor(),
                 GraphObjectType.Relationship,
                 sqlSupplier.sql( mappings ),
-                mappings);
+                mappings );
     }
 
     @Override
@@ -48,6 +48,6 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
                 joinTable.descriptor(),
                 GraphObjectType.Relationship,
                 sqlSupplier.sql( mappings ),
-                mappings);
+                mappings );
     }
 }

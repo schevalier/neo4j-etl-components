@@ -2,17 +2,17 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class IdSpaceTest
 {
     @Test
     public void shouldConvertIdSpaceNameToLowercase()
     {
-         // given
+        // given
         IdSpace idSpace = new IdSpace( "test.Person" );
 
-         // then
+        // then
         assertEquals( "test.person", idSpace.value() );
     }
 }

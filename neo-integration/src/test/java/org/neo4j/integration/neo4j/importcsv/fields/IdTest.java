@@ -36,9 +36,9 @@ public class IdTest
     public void shouldImplementEqualityForIdsWithName()
     {
         // given
-        Id id1 = new Id("id");
-        Id id2 = new Id("id");
-        Id id3 = new Id("id", null );
+        Id id1 = new Id( "id" );
+        Id id2 = new Id( "id" );
+        Id id3 = new Id( "id", null );
         Id id4 = new Id( "not-id" );
         Id id5 = new Id( new IdSpace( "id-space" ) );
         Id id6 = new Id( "id", new IdSpace( "id-space" ) );
@@ -57,9 +57,9 @@ public class IdTest
     public void shouldImplementEqualityForIdsWithIdSpace()
     {
         // given
-        Id id1 = new Id("id", new IdSpace( "id-space" ));
-        Id id2 = new Id("id", new IdSpace( "id-space" ));
-        Id id3 = new Id("id");
+        Id id1 = new Id( "id", new IdSpace( "id-space" ) );
+        Id id2 = new Id( "id", new IdSpace( "id-space" ) );
+        Id id3 = new Id( "id" );
         Id id4 = new Id( new IdSpace( "id-space" ) );
         Id id5 = new Id( "not-id", new IdSpace( "id-space" ) );
         Id id6 = new Id( "id", new IdSpace( "not-id-space" ) );

@@ -24,7 +24,8 @@ public class ImportToolDirectorySupplierTest
     {
         // given
         thrown.expect( IllegalArgumentException.class );
-        ImportToolDirectorySupplier importToolDirectorySupplier = new ImportToolDirectorySupplier( tempDirectory.get() );
+        ImportToolDirectorySupplier importToolDirectorySupplier = new ImportToolDirectorySupplier( tempDirectory.get
+                () );
 
         //when
         importToolDirectorySupplier.supply();

@@ -2,7 +2,8 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class StartIdTest
 {
@@ -13,7 +14,7 @@ public class StartIdTest
         StartId startId1 = new StartId();
         StartId startId2 = new StartId();
         StartId startId3 = new StartId( null );
-        StartId startId4 = new StartId(new IdSpace( "id-space"));
+        StartId startId4 = new StartId( new IdSpace( "id-space" ) );
 
         // then
         assertEquals( startId1, startId2 );
@@ -27,8 +28,8 @@ public class StartIdTest
     public void shouldImplementEqualityForEndIdsWithIdSpace()
     {
         // given
-        StartId startId1 = new StartId(new IdSpace( "id-space"));
-        StartId startId2 = new StartId(new IdSpace("id-space"));
+        StartId startId1 = new StartId( new IdSpace( "id-space" ) );
+        StartId startId2 = new StartId( new IdSpace( "id-space" ) );
 
         // then
         assertEquals( startId1, startId2 );

@@ -27,7 +27,7 @@ public enum PackageType
                 {
                     String remainder = input.substring( 1, input.length() - suffix.length() );
                     Partial<Neo4jEdition> edition = edition( remainder );
-                    return Optional.of( new Neo4jPackage( version( edition.remainder ), edition.result, this  ) );
+                    return Optional.of( new Neo4jPackage( version( edition.remainder ), edition.result, this ) );
                 }
 
                 private String format( Neo4jEdition edition )
@@ -85,7 +85,7 @@ public enum PackageType
         String remainder = input.substring( 1, input.length() - suffix.length() );
         Partial<Neo4jEdition> edition = Neo4jEdition.parse( remainder, "-" );
         Neo4jVersion version = Neo4jVersion.from( edition.remainder );
-        return Optional.of( new Neo4jPackage( version, edition.result, this  ) );
+        return Optional.of( new Neo4jPackage( version, edition.result, this ) );
     }
 
     protected boolean matches( String input )
