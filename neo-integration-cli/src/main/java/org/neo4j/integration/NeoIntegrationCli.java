@@ -76,7 +76,8 @@ public class NeoIntegrationCli
                 .withDefaultCommand( Help.class )
                 .withCommand( Help.class );
 
-        builder.withDescription( "MySQL export tools." )
+        builder.withGroup( "mysql" )
+                .withDescription( "MySQL export tools." )
                 .withDefaultCommand( Help.class )
                 .withCommand( ExportFromMySqlCli.class )
                 .withCommand( CreateCsvResourcesCli.class )

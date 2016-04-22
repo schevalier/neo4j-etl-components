@@ -81,7 +81,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
     {
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
-        String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c) WHERE (c:Customer) RETURN c" );
+        String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:Customer) RETURN c" );
         String customersWithOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
                 "MATCH (c)--(o) " +
                         "WHERE (c:Customer)<-[:CUSTOMER]-(o:Order) RETURN DISTINCT c" );
