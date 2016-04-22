@@ -1,7 +1,10 @@
 package org.neo4j.integration.cli.mysql;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
@@ -11,6 +14,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.restrictions.Required;
+import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
 import org.neo4j.integration.commands.mysql.ExportFromMySql;
@@ -174,37 +178,39 @@ public class ExportFromMySqlCli implements Runnable
     private CsvResources createCsvResources( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
     {
         Callable<CsvResources> createCsvResources;
-//        try ( Reader reader = new InputStreamReader( System.in ); BufferedReader buffer = new BufferedReader(
-// reader ) )
-//        {
-//            if (StringUtils.isNotEmpty( csvResourcesFile ))
-//            {
-//                if (csvResourcesFile.equalsIgnoreCase( "stdin" ))
-//                {
-//                    createCsvResources = CreateCsvResources.load( buffer );
-//                }
-//                else
-//                {
-//                    createCsvResources = CreateCsvResources.load( csvResourcesFile );
-//                }
-//            }
-//            else
-//            {
-        createCsvResources = new CreateCsvResources(
-                new CreateCsvResourcesEventHandler(),
-                new OutputStream()
+
+        if ( StringUtils.isNotEmpty( csvResourcesFile ) )
+        {
+            if ( csvResourcesFile.equalsIgnoreCase( "stdin" ) )
+            {
+                try ( Reader reader = new InputStreamReader( System.in );
+                      BufferedReader buffer = new BufferedReader( reader ) )
                 {
-                    @Override
-                    public void write( int b ) throws IOException
+                    createCsvResources = CreateCsvResources.load( buffer );
+                }
+            }
+            else
+            {
+                createCsvResources = CreateCsvResources.load( csvResourcesFile );
+            }
+        }
+        else
+        {
+            createCsvResources = new CreateCsvResources(
+                    new CreateCsvResourcesEventHandler(),
+                    new OutputStream()
                     {
-                        // Do nothing
-                    }
-                },
-                connectionConfig,
-                formatting,
-                new MySqlExportSqlSupplier() );
-//            }
-//        }
+                        @Override
+                        public void write( int b ) throws IOException
+                        {
+                            // Do nothing
+                        }
+                    },
+                    connectionConfig,
+                    formatting,
+                    new MySqlExportSqlSupplier() );
+        }
+
         return createCsvResources.call();
     }
 
