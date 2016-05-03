@@ -1,17 +1,15 @@
 package org.neo4j.integration.cli.mysql;
 
-import java.util.Optional;
+import java.nio.file.Paths;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.restrictions.Required;
-import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
-import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
+import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
@@ -72,6 +70,13 @@ public class CreateCsvResourcesCli implements Runnable
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
+            name = {"--options-file"},
+            description = "Path to file containing Neo4j import tool options.",
+            title = "file")
+    private String importToolOptionsFile = "";
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
             name = {"--debug"},
             description = "Print detailed diagnostic output.")
     private boolean debug = false;
@@ -81,16 +86,6 @@ public class CreateCsvResourcesCli implements Runnable
     {
         try
         {
-            Delimiter delimiter = new Delimiter( Optional.ofNullable( this.delimiter ).orElse( "," ) );
-
-            QuoteChar quoteChar = QuoteChar.DOUBLE_QUOTES;
-            if ( StringUtils.isNotEmpty( quote ) )
-            {
-                quoteChar = new QuoteChar( quote, quote );
-            }
-
-            Formatting formatting = Formatting.builder().delimiter( delimiter ).quote( quoteChar ).build();
-
             ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
                     .host( host )
                     .port( port )
@@ -98,6 +93,14 @@ public class CreateCsvResourcesCli implements Runnable
                     .username( user )
                     .password( password )
                     .build();
+
+            ImportToolOptions importToolOptions =
+                    ImportToolOptions.initialiseFromFile( Paths.get( importToolOptionsFile ) );
+            Formatting formatting = Formatting.builder()
+                    .delimiter( importToolOptions.getDelimiter( this.delimiter ) )
+                    .quote( importToolOptions.getQuoteCharacter( this.quote ) )
+                    .build();
+
 
             new CreateCsvResources(
                     new CreateCsvResourcesEventHandler(),

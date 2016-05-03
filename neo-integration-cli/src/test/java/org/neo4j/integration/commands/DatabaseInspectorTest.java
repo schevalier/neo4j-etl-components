@@ -240,7 +240,7 @@ public class DatabaseInspectorTest
         assertThat( tableNames, matchesCollection( singletonList( employee ) ) );
         assertThat( join.tableNames(), hasItems( employee ) );
         assertEquals( asList( "test.Employee.managerId",
-                        "test.Employee.id",
+                           "test.Employee.id",
                         "test.Employee.id",
                         "test.Employee.id" ),
                 keyNames( join ) );

@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.logging.LogManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -25,6 +27,7 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 import static org.junit.Assert.assertFalse;
 
+@Ignore
 public class MusicBrainzIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
@@ -52,8 +55,6 @@ public class MusicBrainzIntegrationTest
     {
         LogManager.getLogManager().readConfiguration(
                 NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-        MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-        client.execute( MySqlScripts.setupDatabaseScript().value() );
         exportFromMySqlToNeo4j( "ngsdb" );
         neo4j.get().start();
     }
@@ -95,18 +96,20 @@ public class MusicBrainzIntegrationTest
         options.put( "multiline-fields", "true" );
         objectMapper.writeValue( importToolOptions.toFile(), options );
 
+        String[] args = {"mysql",
+                "export",
+                "--host", mySqlServer.get().ipAddress(),
+                "--user", MySqlClient.Parameters.DBUser.value(),
+                "--password", MySqlClient.Parameters.DBPassword.value(),
+                "--database", database,
+                "--import-tool", neo4j.get().binDirectory().toString(),
+                "--options-file", importToolOptions.toString(),
+                "--csv-directory", tempDirectory.get().toString(),
+                "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
+                "--force",
+                "--debug"};
+        System.out.println( ToStringBuilder.reflectionToString( args ) );
         NeoIntegrationCli.executeMainReturnSysOut(
-                new String[]{"mysql",
-                        "export",
-                        "--host", mySqlServer.get().ipAddress(),
-                        "--user", MySqlClient.Parameters.DBUser.value(),
-                        "--password", MySqlClient.Parameters.DBPassword.value(),
-                        "--database", database,
-                        "--import-tool", neo4j.get().binDirectory().toString(),
-                        "--import-tool-options", importToolOptions.toString(),
-                        "--csv-directory", tempDirectory.get().toString(),
-                        "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                        "--force",
-                        "--debug"} );
+                args );
     }
 }
