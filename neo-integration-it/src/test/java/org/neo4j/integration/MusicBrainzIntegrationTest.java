@@ -27,7 +27,6 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 import static org.junit.Assert.assertFalse;
 
-@Ignore
 public class MusicBrainzIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;

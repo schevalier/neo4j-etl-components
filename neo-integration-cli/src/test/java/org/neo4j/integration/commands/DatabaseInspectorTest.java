@@ -1,16 +1,21 @@
 package org.neo4j.integration.commands;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
+import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.Join;
@@ -32,6 +37,26 @@ import static org.mockito.Mockito.when;
 public class DatabaseInspectorTest
 {
     private DatabaseClient databaseClient = mock( DatabaseClient.class );
+
+    @Test
+    @Ignore
+    public void testName() throws Exception
+    {
+        LogManager.getLogManager().readConfiguration( new FileInputStream( "/Users/praveena" +
+                ".gunasekhar/projects/neo/neo-integration-root/neo-integration-cli/src/main/resources/debug-logging" +
+                ".properties" ) );
+        ConnectionConfig connectionConfig = ConnectionConfig.forDatabase( DatabaseType.MySQL )
+                .host( "localhost" )
+                .port( 3306 )
+                .database( "ngsdb" )
+                .username( "neo" )
+                .password( "neo" )
+                .build();
+
+        DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
+        DatabaseInspector databaseInspector = new DatabaseInspector( databaseClient );
+        System.out.println( "********" + databaseInspector.buildSchemaExport() );
+    }
 
     @Test
     public void shouldExportTablesAndJoinsForTwoTableJoin() throws Exception

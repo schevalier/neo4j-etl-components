@@ -77,4 +77,14 @@ public class SchemaExport
                         } ) );
 
     }
+
+    @Override
+    public String toString()
+    {
+        return "SchemaExport{" +
+                "joins=" + joins +
+                ", tables=" + tables.stream().map( t -> t.name() ).collect( Collectors.toList() ) +
+                ", joinTables=" + joinTables +
+                '}';
+    }
 }
