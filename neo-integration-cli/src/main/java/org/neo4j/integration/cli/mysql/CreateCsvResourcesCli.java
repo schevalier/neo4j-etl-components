@@ -19,7 +19,6 @@ import org.neo4j.integration.util.CliRunner;
 public class CreateCsvResourcesCli implements Runnable
 {
     @SuppressWarnings("FieldCanBeLocal")
-    @Required
     @Option(type = OptionType.COMMAND,
             name = {"-h", "--host"},
             description = "Host to use for connection to MySQL.",
