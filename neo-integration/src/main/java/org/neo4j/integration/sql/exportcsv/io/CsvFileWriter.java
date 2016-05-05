@@ -35,9 +35,11 @@ public class CsvFileWriter
         Loggers.Default.log( Level.INFO, format( "Writing data for %s", resource.name() ) );
 
         Path exportFile = createExportFile( resource.name() );
-        QueryResults results = executeSql( resource.sql() );
 
-        writeResultsToFile( results, exportFile, resource );
+        try ( QueryResults results = executeSql( resource.sql() ) )
+        {
+            writeResultsToFile( results, exportFile, resource );
+        }
 
         return exportFile;
     }
@@ -97,10 +99,7 @@ public class CsvFileWriter
     {
         if ( StringUtils.isNotEmpty( value ) )
         {
-            String quoteValue = config.formatting().quote().value();
-            writer.write( quoteValue );
-            writer.write( value );
-            writer.write( quoteValue );
+            config.formatting().quote().writeEnquoted( value, writer );
         }
     }
 }

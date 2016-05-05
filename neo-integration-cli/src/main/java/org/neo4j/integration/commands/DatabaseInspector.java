@@ -36,10 +36,10 @@ public class DatabaseInspector
                 databaseClient );
     }
 
-    public DatabaseInspector( TableMetadataProducer tableMetadataProducer,
-                              JoinMetadataProducer joinMetadataProducer,
-                              JoinTableMetadataProducer joinTableMetadataProducer,
-                              DatabaseClient databaseClient )
+    private DatabaseInspector( TableMetadataProducer tableMetadataProducer,
+                               JoinMetadataProducer joinMetadataProducer,
+                               JoinTableMetadataProducer joinTableMetadataProducer,
+                               DatabaseClient databaseClient )
     {
 
         this.tableMetadataProducer = tableMetadataProducer;
@@ -66,49 +66,50 @@ public class DatabaseInspector
                               Collection<Join> joins,
                               Collection<JoinTable> joinTables ) throws Exception
     {
-        QueryResults results = databaseClient.executeQuery( listKeys( tableName ) ).await();
-
-        Collection<String> primaryKeys = new HashSet<>();
-        Collection<String> foreignKeys = new HashSet<>();
-
-        while ( results.next() )
+        try ( QueryResults results = databaseClient.executeQuery( listKeys( tableName ) ).await() )
         {
-            String columnName = results.getString( "COLUMN_NAME" );
-            String referencedTableName = results.getString( "REFERENCED_TABLE_NAME" );
-            String columnKey = results.getString( "COLUMN_KEY" );
+            Collection<String> primaryKeys = new HashSet<>();
+            Collection<String> foreignKeys = new HashSet<>();
 
-            if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isEmpty( referencedTableName ) )
+            while ( results.next() )
             {
-                primaryKeys.add( columnName );
+                String columnName = results.getString( "COLUMN_NAME" );
+                String referencedTableName = results.getString( "REFERENCED_TABLE_NAME" );
+                String columnKey = results.getString( "COLUMN_KEY" );
+
+                if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isEmpty( referencedTableName ) )
+                {
+                    primaryKeys.add( columnName );
+                }
+
+                if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isNotEmpty( referencedTableName ) )
+                {
+                    primaryKeys.remove( columnName );
+                    foreignKeys.add( referencedTableName );
+                }
+
+                if ( columnKey.equalsIgnoreCase( "MUL" ) )
+                {
+                    foreignKeys.add( referencedTableName );
+                }
             }
 
-            if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isNotEmpty( referencedTableName ) )
+            if ( primaryKeys.isEmpty() && foreignKeys.size() == 2 )
             {
-                primaryKeys.remove( columnName );
-                foreignKeys.add( referencedTableName );
+                Iterator<String> iterator = foreignKeys.iterator();
+                TableName tableOne = new TableName( tableName.schema(), iterator.next() );
+                TableName tableTwo = new TableName( tableName.schema(), iterator.next() );
+                joinTables.addAll( joinTableMetadataProducer.createMetadataFor(
+                        new JoinTableInfo( tableName, new TableNamePair( tableOne, tableTwo ) ) ) );
             }
-
-            if ( columnKey.equalsIgnoreCase( "MUL" ) )
+            else
             {
-                foreignKeys.add( referencedTableName );
-            }
-        }
-
-        if ( primaryKeys.isEmpty() && foreignKeys.size() == 2 )
-        {
-            Iterator<String> iterator = foreignKeys.iterator();
-            TableName tableOne = new TableName( tableName.schema(), iterator.next() );
-            TableName tableTwo = new TableName( tableName.schema(), iterator.next() );
-            joinTables.addAll( joinTableMetadataProducer.createMetadataFor(
-                    new JoinTableInfo( tableName, new TableNamePair( tableOne, tableTwo ) ) ) );
-        }
-        else
-        {
-            tables.addAll( tableMetadataProducer.createMetadataFor( tableName ) );
-            for ( String foreignKey : foreignKeys )
-            {
-                joins.addAll( joinMetadataProducer.createMetadataFor( new TableNamePair( tableName, new TableName(
-                        tableName.schema(), foreignKey ) ) ) );
+                tables.addAll( tableMetadataProducer.createMetadataFor( tableName ) );
+                for ( String foreignKey : foreignKeys )
+                {
+                    joins.addAll( joinMetadataProducer.createMetadataFor( new TableNamePair( tableName, new TableName(
+                            tableName.schema(), foreignKey ) ) ) );
+                }
             }
         }
     }

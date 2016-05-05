@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,16 +39,21 @@ public class DatabaseClient implements AutoCloseable
                 connectionConfig.credentials().username(),
                 connectionConfig.credentials().password() );
 
+
         Loggers.Sql.log().fine( "Connected to database" );
     }
 
     public AwaitHandle<QueryResults> executeQuery( String sql )
     {
         return new DatabaseClientAwaitHandle<>(
-                FutureUtils.<QueryResults>exceptionableFuture( () ->
+                FutureUtils.exceptionableFuture( () ->
                 {
                     Loggers.Sql.log().finest( sql );
-                    return new SqlQueryResults( connection.createStatement().executeQuery( sql ) );
+                    connection.setAutoCommit( false );
+                    Statement statement =
+                            connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY );
+                    statement.setFetchSize( Integer.MIN_VALUE );
+                    return new SqlQueryResults( statement.executeQuery( sql ) );
 
                 }, r -> new Thread( r ).start() ) );
     }
@@ -58,7 +64,8 @@ public class DatabaseClient implements AutoCloseable
                 FutureUtils.exceptionableFuture( () ->
                 {
                     Loggers.Sql.log().finest( sql );
-                    return connection.createStatement().execute( sql );
+                    connection.setAutoCommit( true );
+                    return connection.prepareStatement( sql ).execute();
 
                 }, r -> new Thread( r ).start() ) );
     }
@@ -116,7 +123,7 @@ public class DatabaseClient implements AutoCloseable
     {
         private final ResultSet results;
 
-        public SqlQueryResults( ResultSet results )
+        SqlQueryResults( ResultSet results )
         {
             this.results = results;
         }
@@ -173,7 +180,7 @@ public class DatabaseClient implements AutoCloseable
             private final ResultSet results;
             private final Collection<String> columnLabels;
 
-            public ResultSetSpliterator( ResultSet results, Collection<String> columnLabels )
+            ResultSetSpliterator( ResultSet results, Collection<String> columnLabels )
             {
                 this.results = results;
                 this.columnLabels = columnLabels;
