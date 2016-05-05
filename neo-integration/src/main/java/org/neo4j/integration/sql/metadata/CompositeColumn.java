@@ -159,4 +159,10 @@ public class CompositeColumn implements Column
 
         return root;
     }
+
+    @Override
+    public boolean useQuotes()
+    {
+        return true;
+    }
 }

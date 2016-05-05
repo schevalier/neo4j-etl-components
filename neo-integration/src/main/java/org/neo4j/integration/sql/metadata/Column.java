@@ -46,4 +46,6 @@ public interface Column
     void addData( ColumnToCsvFieldMappings.Builder builder );
 
     JsonNode toJson();
+
+    boolean useQuotes();
 }

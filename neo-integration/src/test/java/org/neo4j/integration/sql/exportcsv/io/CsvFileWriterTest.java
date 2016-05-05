@@ -38,10 +38,9 @@ public class CsvFileWriterTest
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
-    public void shouldCreateCsvFile() throws Exception
+    public void shouldCreateCsvFileAndWriteResultsToIt() throws Exception
     {
         // given
-        TableName table = new TableName( "users" );
 
         // setup sql runner
         QueryResults results = StubQueryResults.builder()
@@ -60,134 +59,21 @@ public class CsvFileWriterTest
                 .formatting( Formatting.DEFAULT )
                 .build();
 
-        // return columns from mappings
+        TableName table = new TableName( "users" );
         ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
-
         when( mappings.columns() ).thenReturn(
                 asList(
                         columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
-        CsvResource resource = new CsvResource(
-                table.fullName(),
-                GraphObjectType.Node,
-                "SELECT ...",
-                mappings
-        );
-
-        // create writer under test
-        CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
+        CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
 
         // when
+        CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
         Path exportFile = writer.writeExportFile( resource );
 
         // then
         List<String> contents = Files.readAllLines( exportFile );
         assertEquals( asList( "\"1\",\"user-1\"", "\"2\",\"user-2\"" ), contents );
-    }
-
-    @Test
-    public void shouldWriteDelimiterForNullOrEmptyValues() throws Exception
-    {
-        // given
-        TableName table = new TableName( "users" );
-
-        // setup sql runner
-        QueryResults results = StubQueryResults.builder()
-                .columns( "id", "username", "age" )
-                .addRow( "1", "user-1", "45" )
-                .addRow( "2", "", "32" )
-                .addRow( "3", "user-3", null )
-                .addRow( "4", "user-4", "" )
-                .build();
-
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
-        when( databaseClient.executeQuery( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
-
-        // setup config
-        ExportToCsvConfig config = ExportToCsvConfig.builder()
-                .destination( tempDirectory.get() )
-                .connectionConfig( mock( ConnectionConfig.class ) )
-                .formatting( Formatting.builder().delimiter( Delimiter.TAB ).build() )
-                .build();
-
-        // return columns from mappings
-        ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
-
-        when( mappings.columns() ).thenReturn(
-                asList(
-                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
-                        columnUtil.column( table, "username", ColumnRole.Data ),
-                        columnUtil.column( table, "age", ColumnRole.Data ) ) );
-
-        CsvResource resource = new CsvResource(
-                table.fullName(),
-                GraphObjectType.Node,
-                "SELECT ...",
-                mappings
-        );
-
-        // create writer under test
-        CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
-
-        // when
-        Path exportFile = writer.writeExportFile( resource );
-
-        // then
-        List<String> contents = Files.readAllLines( exportFile );
-        assertEquals(
-                asList( "\"1\"\t\"user-1\"\t\"45\"", "\"2\"\t\t\"32\"", "\"3\"\t\"user-3\"\t", "\"4\"\t\"user-4\"\t" ),
-                contents );
-    }
-
-    @Test
-    public void shouldSkipWritingRowForRelationshipsIfAnyColumnHasNullOrEmptyValues() throws Exception
-    {
-        // given
-        TableName table = new TableName( "users" );
-
-        // setup sql runner
-        QueryResults results = StubQueryResults.builder()
-                .columns( "id", "username" )
-                .addRow( "1", "user-1" )
-                .addRow( "2", "" )
-                .addRow( "3", null )
-                .addRow( "", "user-4" )
-                .build();
-
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
-        when( databaseClient.executeQuery( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
-
-        // setup config
-        ExportToCsvConfig config = ExportToCsvConfig.builder()
-                .destination( tempDirectory.get() )
-                .connectionConfig( mock( ConnectionConfig.class ) )
-                .formatting( Formatting.builder().delimiter( Delimiter.TAB ).build() )
-                .build();
-
-        // return columns from mappings
-        ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
-
-        when( mappings.columns() ).thenReturn(
-                asList(
-                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
-                        columnUtil.column( table, "username", ColumnRole.Data ) ) );
-
-        CsvResource resource = new CsvResource(
-                table.fullName(),
-                GraphObjectType.Relationship,
-                "SELECT ...",
-                mappings
-        );
-
-        // create writer under test
-        CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
-
-        // when
-        Path exportFile = writer.writeExportFile( resource );
-
-        // then
-        List<String> contents = Files.readAllLines( exportFile );
-        assertEquals( asList( "\"1\"\t\"user-1\"", "\"2\"\t", "\"3\"\t" ), contents );
     }
 }

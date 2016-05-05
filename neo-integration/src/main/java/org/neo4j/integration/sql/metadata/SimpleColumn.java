@@ -140,4 +140,10 @@ public class SimpleColumn implements Column
 
         return root;
     }
+
+    @Override
+    public boolean useQuotes()
+    {
+        return dataType.toNeo4jDataType().shouldUseQuotes();
+    }
 }
