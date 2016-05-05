@@ -1,6 +1,7 @@
 package org.neo4j.integration.neo4j.importcsv.config;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +21,9 @@ public class QuoteChar
     public static final QuoteChar DOUBLE_QUOTES = new QuoteChar( "\"", OperatingSystem.isWindows() ? "\\\"" : "\"" );
     public static final QuoteChar SINGLE_QUOTES = new QuoteChar( "'", "'" );
     public static final QuoteChar TICK_QUOTES = new QuoteChar( "`", "`" );
+
+    private static final Pattern ESCAPE_CHAR_PATTERN = Pattern.compile( "\\\\" );
+    private static final String ESCAPE_CHAR_REPLACEMENT = "\\\\";
 
     public static QuoteChar fromJson( JsonNode root )
     {
@@ -54,7 +58,16 @@ public class QuoteChar
 
     public String enquote( String value )
     {
-        return format( "%s%s%s", quote, value, quote );
+        StringWriter writer = new StringWriter();
+        try
+        {
+            writeEnquoted( value, writer );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
+        return writer.toString();
     }
 
     public void writeEnquoted( String value, Writer writer ) throws IOException
@@ -63,12 +76,12 @@ public class QuoteChar
 
         if ( value.contains( "\\" ) )
         {
-            value = value.replaceAll( "\\\\", "\\\\\\\\" );
+            value = ESCAPE_CHAR_PATTERN.matcher( value ).replaceAll( "\\\\\\\\" );
         }
 
         if ( value.contains( quote ) )
         {
-            value = pattern.matcher( value ).replaceAll( Matcher.quoteReplacement( escaped ) );
+            value = pattern.matcher( value ).replaceAll( escaped );
         }
 
         writer.write( value );

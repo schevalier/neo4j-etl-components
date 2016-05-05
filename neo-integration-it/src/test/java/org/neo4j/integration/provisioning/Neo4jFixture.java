@@ -4,6 +4,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import org.junit.Test;
+
 import org.neo4j.integration.io.DownloadableFile;
 import org.neo4j.integration.neo4j.Neo4j;
 import org.neo4j.integration.neo4j.Neo4jEdition;
@@ -36,5 +38,16 @@ public class Neo4jFixture
                 neo4j.close();
             }
         } );
+    }
+
+    @Test
+    public void should()
+    {
+         // given
+        System.out.println(ReleaseDownloads.uriFor( Neo4jVersion.v3_0_0, Neo4jEdition.Enterprise, PackageType.Tarball ));
+
+         // when
+
+         // then
     }
 }
