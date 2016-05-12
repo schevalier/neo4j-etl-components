@@ -2,6 +2,8 @@ package org.neo4j.integration.sql.metadata;
 
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 
+import static java.lang.String.format;
+
 //public interface SqlDataType
 //{
 //    SqlDataType COMPOSITE_KEY_TYPE = () -> Neo4jDataType.String;
@@ -46,7 +48,14 @@ public enum SqlDataType
 
     public static SqlDataType parse( String value )
     {
-        return valueOf( value.toUpperCase() );
+        try
+        {
+            return valueOf( value.toUpperCase() );
+        }
+        catch ( NullPointerException e )
+        {
+            throw new IllegalArgumentException( format( "Unrecognized SQL data type: %s", value ) );
+        }
     }
 
     public static final SqlDataType COMPOSITE_KEY_TYPE = TEXT;

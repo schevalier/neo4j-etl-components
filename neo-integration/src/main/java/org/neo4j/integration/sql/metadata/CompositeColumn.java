@@ -35,7 +35,7 @@ public class CompositeColumn implements Column
         return new CompositeColumn( table, columns );
     }
 
-    private static final String SEPARATOR = "\0";
+    static final String SEPARATOR = "\0";
 
     private final TableName table;
     private final Collection<Column> columns;

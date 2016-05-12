@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.util.Collection;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.neo4j.integration.sql.RowAccessor;

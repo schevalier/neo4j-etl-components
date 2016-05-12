@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -27,6 +28,7 @@ import static java.lang.String.format;
 public class DatabaseClient implements AutoCloseable
 {
     private final Connection connection;
+    private final DatabaseMetaData metaData;
 
     public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
@@ -39,8 +41,24 @@ public class DatabaseClient implements AutoCloseable
                 connectionConfig.credentials().username(),
                 connectionConfig.credentials().password() );
 
+        metaData = connection.getMetaData();
 
         Loggers.Sql.log().fine( "Connected to database" );
+    }
+
+    public QueryResults primaryKeys( TableName tableName ) throws SQLException
+    {
+        return new SqlQueryResults( metaData.getPrimaryKeys( "", tableName.schema(), tableName.simpleName() ) );
+    }
+
+    public QueryResults foreignKeys( TableName tableName ) throws SQLException
+    {
+        return new SqlQueryResults( metaData.getImportedKeys( "", tableName.schema(), tableName.simpleName() ) );
+    }
+
+    public QueryResults columns( TableName tableName ) throws SQLException
+    {
+        return new SqlQueryResults( metaData.getColumns( "", tableName.schema(), tableName.simpleName(), "" ) );
     }
 
     public AwaitHandle<QueryResults> executeQuery( String sql )
@@ -51,7 +69,7 @@ public class DatabaseClient implements AutoCloseable
                     Loggers.Sql.log().finest( sql );
                     connection.setAutoCommit( false );
                     Statement statement =
-                            connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY );
+                            connection.createStatement( ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY );
                     statement.setFetchSize( Integer.MIN_VALUE );
                     return new SqlQueryResults( statement.executeQuery( sql ) );
 
