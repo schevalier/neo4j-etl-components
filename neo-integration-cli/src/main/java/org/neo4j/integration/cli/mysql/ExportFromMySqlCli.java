@@ -124,6 +124,12 @@ public class ExportFromMySqlCli implements Runnable
             description = "Print detailed diagnostic output.")
     private boolean debug = false;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--columnNameAsRelationshipName"},
+            description = "--columnNameAsRelationshipName")
+    private boolean columnNameAsRelationshipName = false;
+
     @Option(type = OptionType.COMMAND,
             name = {"--csv-resources"},
             description = "Path to an existing CSV resources definitions file. " +
@@ -208,7 +214,7 @@ public class ExportFromMySqlCli implements Runnable
                     },
                     connectionConfig,
                     formatting,
-                    new MySqlExportSqlSupplier() );
+                    new MySqlExportSqlSupplier(), columnNameAsRelationshipName );
         }
 
         return createCsvResources.call();

@@ -12,11 +12,15 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
 {
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
+    private RelationshipNameResolver relationshipNameResolver;
 
-    public CsvResourceProvider( Formatting formatting, DatabaseExportSqlSupplier sqlSupplier )
+    public CsvResourceProvider( Formatting formatting,
+                                DatabaseExportSqlSupplier sqlSupplier,
+                                RelationshipNameResolver relationshipNameResolver )
     {
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
+        this.relationshipNameResolver = relationshipNameResolver;
     }
 
     @Override
@@ -30,7 +34,8 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
     @Override
     public CsvResource joinService( Join join )
     {
-        ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( formatting ).createMappings( join );
+        ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( formatting, relationshipNameResolver )
+                .createMappings( join );
 
         return new CsvResource(
                 join.descriptor(),
@@ -42,7 +47,8 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
     @Override
     public CsvResource joinTableService( JoinTable joinTable )
     {
-        ColumnToCsvFieldMappings mappings = new JoinTableToCsvFieldMapper( formatting ).createMappings( joinTable );
+        ColumnToCsvFieldMappings mappings =
+                new JoinTableToCsvFieldMapper( formatting, relationshipNameResolver ).createMappings( joinTable );
 
         return new CsvResource(
                 joinTable.descriptor(),

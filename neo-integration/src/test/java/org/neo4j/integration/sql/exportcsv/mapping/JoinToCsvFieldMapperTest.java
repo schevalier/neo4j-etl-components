@@ -23,7 +23,8 @@ import static org.junit.Assert.assertEquals;
 public class JoinToCsvFieldMapperTest
 {
 
-    private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT );
+    private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT,
+            new RelationshipNameResolver( false ) );
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
@@ -53,5 +54,35 @@ public class JoinToCsvFieldMapperTest
                 CsvField.relationshipType() ) );
 
         assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"ADDRESS\"" ), columns );
+    }
+
+    @Test
+    public void shouldCreateMappingsForJoinTableUsingColumnNameAsRelationshipName()
+    {
+        // given
+        TableName leftTable = new TableName( "test.Person" );
+        TableName rightTable = new TableName( "test.Address" );
+        Join join = new Join(
+                new JoinKey(
+                        columnUtil.column( leftTable, "id", ColumnRole.PrimaryKey ),
+                        columnUtil.column( leftTable, "id", ColumnRole.PrimaryKey ) ),
+                new JoinKey(
+                        columnUtil.column( leftTable, "addressId", ColumnRole.ForeignKey ),
+                        columnUtil.column( rightTable, "id", ColumnRole.PrimaryKey ) )
+        );
+        // when
+        ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( Formatting.DEFAULT,
+                new RelationshipNameResolver( true ) ).createMappings( join );
+
+        // then
+        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
+        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
+
+        assertEquals( fields, asList(
+                CsvField.startId( new IdSpace( "test.Person" ) ),
+                CsvField.endId( new IdSpace( "test.Address" ) ),
+                CsvField.relationshipType() ) );
+
+        assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"ADDRESS_ID\"" ), columns );
     }
 }

@@ -19,6 +19,7 @@ import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 
 public class CreateCsvResources implements Callable<CsvResources>
 {
@@ -64,26 +65,29 @@ public class CreateCsvResources implements Callable<CsvResources>
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
+    private RelationshipNameResolver relationshipNameResolver;
 
     public CreateCsvResources( OutputStream output,
                                ConnectionConfig connectionConfig,
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier )
     {
-        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier );
+        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier, false );
     }
 
     public CreateCsvResources( Events events,
                                OutputStream output,
                                ConnectionConfig connectionConfig,
                                Formatting formatting,
-                               DatabaseExportSqlSupplier sqlSupplier )
+                               DatabaseExportSqlSupplier sqlSupplier,
+                               boolean columnNameAsRelationshipName )
     {
         this.events = events;
         this.output = output;
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
+        this.relationshipNameResolver = new RelationshipNameResolver( columnNameAsRelationshipName );
     }
 
     @Override
@@ -92,7 +96,8 @@ public class CreateCsvResources implements Callable<CsvResources>
         events.onCreatingCsvResourcesFile();
 
         SchemaExport schemaExport = new DatabaseInspector( new DatabaseClient( connectionConfig ) ).buildSchemaExport();
-        CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier );
+        CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier,
+                relationshipNameResolver );
 
         try ( Writer writer = new OutputStreamWriter( output ) )
         {

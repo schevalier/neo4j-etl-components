@@ -28,46 +28,6 @@ public class JoinTableToCsvFieldMapperTest
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
-    public void shouldCreateMappingsForJoinTable()
-    {
-        // given
-
-        TableName joinTableName = new TableName( "test.Student_Course" );
-        TableName leftTable = new TableName( "test.Student" );
-        TableName rightTable = new TableName( "test.Course" );
-
-        Column keyOneSourceColumn = columnUtil.keyColumn( joinTableName, "studentId", ColumnRole.ForeignKey );
-        Column keyOneTargetColumn = columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey );
-
-        Column keyTwoSourceColumn = columnUtil.keyColumn( joinTableName, "courseId", ColumnRole.ForeignKey );
-        Column keyTwoTargetColumn = columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey );
-
-        JoinTable joinTable = new JoinTable(
-                new Join(
-                        new JoinKey( keyOneSourceColumn, keyOneTargetColumn ),
-                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn )
-                ),
-                Table.builder().name( joinTableName ).build() );
-
-        JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );
-
-        // when
-        ColumnToCsvFieldMappings mappings = mapper.createMappings( joinTable );
-
-        // then
-        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
-        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
-
-        assertEquals( fields, asList(
-                CsvField.startId( new IdSpace( "test.Student" ) ),
-                CsvField.endId( new IdSpace( "test.Course" ) ),
-                CsvField.relationshipType() ) );
-
-        assertEquals( asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"" )
-                , columns );
-    }
-
-    @Test
     public void shouldCreateMappingsForJoinTableWithProperties()
     {
         // given
@@ -92,7 +52,8 @@ public class JoinTableToCsvFieldMapperTest
                         .addColumn( columnUtil.column( joinTableName, "credits", "credits", ColumnRole.Data ) )
                         .build() );
 
-        JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT );
+        JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT,
+                new RelationshipNameResolver( false ) );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( joinTable );
@@ -110,6 +71,48 @@ public class JoinTableToCsvFieldMapperTest
         assertEquals(
                 asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"STUDENT_COURSE\"",
                         "test.Student_Course.credits" )
+                , columns );
+    }
+
+    @Test
+    public void shouldCreateMappingsForJoinTable()
+    {
+        // given
+
+        TableName joinTableName = new TableName( "test.Student_Course" );
+        TableName leftTable = new TableName( "test.Student" );
+        TableName rightTable = new TableName( "test.Course" );
+
+        Column keyOneSourceColumn = columnUtil.keyColumn( joinTableName, "studentId", ColumnRole.ForeignKey );
+        Column keyOneTargetColumn = columnUtil.keyColumn( leftTable, "id", ColumnRole.PrimaryKey );
+
+        Column keyTwoSourceColumn = columnUtil.keyColumn( joinTableName, "courseId", ColumnRole.ForeignKey );
+        Column keyTwoTargetColumn = columnUtil.keyColumn( rightTable, "id", ColumnRole.PrimaryKey );
+
+        JoinTable joinTable = new JoinTable(
+                new Join(
+                        new JoinKey( keyOneSourceColumn, keyOneTargetColumn ),
+                        new JoinKey( keyTwoSourceColumn, keyTwoTargetColumn )
+                ),
+                Table.builder().name( joinTableName ).build() );
+
+        JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper(
+                Formatting.DEFAULT,
+                new RelationshipNameResolver( true ) );
+
+        // when
+        ColumnToCsvFieldMappings mappings = mapper.createMappings( joinTable );
+
+        // then
+        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
+        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
+
+        assertEquals( fields, asList(
+                CsvField.startId( new IdSpace( "test.Student" ) ),
+                CsvField.endId( new IdSpace( "test.Course" ) ),
+                CsvField.relationshipType() ) );
+
+        assertEquals( asList( "test.Student_Course.studentId", "test.Student_Course.courseId", "\"COURSE_ID\"" )
                 , columns );
     }
 }

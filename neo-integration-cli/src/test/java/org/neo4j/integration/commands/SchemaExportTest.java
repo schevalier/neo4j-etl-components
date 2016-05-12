@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
@@ -50,7 +51,8 @@ public class SchemaExportTest
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
-            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ) );
+            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ),
+                    new RelationshipNameResolver( false ) );
 
             fail( "Expected IllegalStatException" );
         }
@@ -89,7 +91,8 @@ public class SchemaExportTest
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
-            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ) );
+            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ), new
+                    RelationshipNameResolver( true ) );
 
             fail( "Expected IllegalStateException" );
         }

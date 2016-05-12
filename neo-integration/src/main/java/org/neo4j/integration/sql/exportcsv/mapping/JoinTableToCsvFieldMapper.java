@@ -14,10 +14,12 @@ import org.neo4j.integration.sql.metadata.TableName;
 public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTable>
 {
     private final Formatting formatting;
+    private final RelationshipNameResolver relationshipNameResolver;
 
-    public JoinTableToCsvFieldMapper( Formatting formatting )
+    public JoinTableToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
     {
         this.formatting = formatting;
+        this.relationshipNameResolver = relationshipNameResolver;
     }
 
     @Override
@@ -33,7 +35,9 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
 
         TableName table = joinTable.joinTableName();
 
-        String relationshipType = formatting.relationshipFormatter().format( table.simpleName() );
+        String resolvedName = relationshipNameResolver.resolve( table.simpleName(),
+                joinTable.join().keyTwoSourceColumn().alias() );
+        String relationshipType = formatting.relationshipFormatter().format( resolvedName );
 
         SimpleColumn from = new SimpleColumn( table,
                 QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),

@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResourceProvider;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
@@ -28,11 +29,14 @@ public class SchemaExport
         this.joinTables = joinTables;
     }
 
-    public CsvResources createCsvResources( Formatting formatting, DatabaseExportSqlSupplier sqlSupplier )
+    public CsvResources createCsvResources( Formatting formatting,
+                                            DatabaseExportSqlSupplier sqlSupplier,
+                                            RelationshipNameResolver relationshipNameResolver )
     {
         validate();
 
-        CsvResourceProvider csvResourceProvider = new CsvResourceProvider( formatting, sqlSupplier );
+        CsvResourceProvider csvResourceProvider =
+                new CsvResourceProvider( formatting, sqlSupplier, relationshipNameResolver );
         CsvResources csvResources = new CsvResources();
 
         tables.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );

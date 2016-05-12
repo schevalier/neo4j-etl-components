@@ -80,6 +80,12 @@ public class CreateCsvResourcesCli implements Runnable
             description = "Print detailed diagnostic output.")
     private boolean debug = false;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--columnNameAsRelationshipName"},
+            description = "Follow column names as relationship name")
+    private boolean columnNameAsRelationshipName = false;
+
     @Override
     public void run()
     {
@@ -106,7 +112,8 @@ public class CreateCsvResourcesCli implements Runnable
                     System.out,
                     connectionConfig,
                     formatting,
-                    new MySqlExportSqlSupplier() ).call();
+                    new MySqlExportSqlSupplier(),
+                    columnNameAsRelationshipName ).call();
         }
         catch ( Exception e )
         {
