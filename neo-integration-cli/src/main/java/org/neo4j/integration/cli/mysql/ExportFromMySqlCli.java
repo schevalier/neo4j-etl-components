@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
@@ -218,28 +217,6 @@ public class ExportFromMySqlCli implements Runnable
         }
 
         return createCsvResources.call();
-    }
-
-    private static class ExportMySqlEventHandler implements ExportFromMySql.Events
-    {
-        @Override
-        public void onExportingToCsv( Path csvDirectory )
-        {
-            CliRunner.print( "Exporting from MySQL to CSV..." );
-            CliRunner.print( format( "CSV directory: %s", csvDirectory ) );
-        }
-
-        @Override
-        public void onCreatingNeo4jStore()
-        {
-            CliRunner.print( "Creating Neo4j store from CSV..." );
-        }
-
-        @Override
-        public void onExportComplete( Path destinationDirectory )
-        {
-            CliRunner.printResult( destinationDirectory );
-        }
     }
 
     private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events
