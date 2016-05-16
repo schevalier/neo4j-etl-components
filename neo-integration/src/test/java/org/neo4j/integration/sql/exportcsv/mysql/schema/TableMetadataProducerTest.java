@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
@@ -42,7 +42,7 @@ public class TableMetadataProducerTest
                 .addRow( "addressId", "int", "ForeignKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
@@ -73,7 +73,7 @@ public class TableMetadataProducerTest
                 .addRow( "photo", "BLOB", "Data" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );
@@ -102,7 +102,7 @@ public class TableMetadataProducerTest
                 .addRow( "credits", "text", "Data" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue(
                 columnProjectionResults ) );
 
@@ -133,7 +133,7 @@ public class TableMetadataProducerTest
                 .addRow( "last_name", "VARCHAR", "PrimaryKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         TableMetadataProducer tableMetadataProducer = new TableMetadataProducer( databaseClient );

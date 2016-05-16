@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 
 class KeyCollectionAssembler
 {
-    private final DatabaseClient databaseClient;
+    private final MySqlDatabaseClient databaseClient;
 
-    KeyCollectionAssembler( DatabaseClient databaseClient )
+    KeyCollectionAssembler( MySqlDatabaseClient databaseClient )
     {
         this.databaseClient = databaseClient;
     }

@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
 import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
@@ -25,9 +25,9 @@ public class DatabaseInspector
     private final TableMetadataProducer tableMetadataProducer;
     private final JoinMetadataProducer joinMetadataProducer;
     private final JoinTableMetadataProducer joinTableMetadataProducer;
-    private final DatabaseClient databaseClient;
+    private final MySqlDatabaseClient databaseClient;
 
-    public DatabaseInspector( DatabaseClient databaseClient )
+    public DatabaseInspector( MySqlDatabaseClient databaseClient )
 
     {
         this( new TableMetadataProducer( databaseClient ),
@@ -39,7 +39,7 @@ public class DatabaseInspector
     private DatabaseInspector( TableMetadataProducer tableMetadataProducer,
                                JoinMetadataProducer joinMetadataProducer,
                                JoinTableMetadataProducer joinTableMetadataProducer,
-                               DatabaseClient databaseClient )
+                               MySqlDatabaseClient databaseClient )
     {
 
         this.tableMetadataProducer = tableMetadataProducer;

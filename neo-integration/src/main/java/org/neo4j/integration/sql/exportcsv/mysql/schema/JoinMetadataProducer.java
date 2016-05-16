@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinQueryInfo;
@@ -18,9 +18,9 @@ import static java.lang.String.format;
 
 public class JoinMetadataProducer implements MetadataProducer<JoinQueryInfo, Join>
 {
-    private final DatabaseClient databaseClient;
+    private final MySqlDatabaseClient databaseClient;
 
-    public JoinMetadataProducer( DatabaseClient databaseClient )
+    public JoinMetadataProducer( MySqlDatabaseClient databaseClient )
     {
         this.databaseClient = databaseClient;
     }

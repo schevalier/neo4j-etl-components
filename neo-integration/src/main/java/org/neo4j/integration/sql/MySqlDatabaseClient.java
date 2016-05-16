@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.neo4j.integration.SqlDatabaseClient;
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.FutureUtils;
@@ -25,12 +26,12 @@ import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
-public class DatabaseClient implements AutoCloseable
+public class MySqlDatabaseClient extends SqlDatabaseClient
 {
     private final Connection connection;
     private final DatabaseMetaData metaData;
 
-    public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
+    public MySqlDatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
         Loggers.Sql.log().fine( "Connecting to database..." );
 

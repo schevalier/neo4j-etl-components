@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.ColumnRole;
@@ -43,7 +43,7 @@ public class JoinMetadataProducerIntegrationTest
                 .password( "neo" )
                 .build();
 
-        DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
+        MySqlDatabaseClient databaseClient = new MySqlDatabaseClient( connectionConfig );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
 
@@ -85,7 +85,7 @@ public class JoinMetadataProducerIntegrationTest
                 .password( "neo" )
                 .build();
 
-        DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
+        MySqlDatabaseClient databaseClient = new MySqlDatabaseClient( connectionConfig );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
 

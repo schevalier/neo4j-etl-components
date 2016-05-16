@@ -10,7 +10,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.Join;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 public class DatabaseInspectorTest
 {
-    private DatabaseClient databaseClient = mock( DatabaseClient.class );
+    private MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
 
     @Test
     public void shouldExportTablesAndJoinsForTwoTableJoin() throws Exception

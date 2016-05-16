@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
@@ -53,7 +53,7 @@ public class JoinMetadataProducerTest
                 .addRow( "test", "Address", "ownerId", "ForeignKey", "test", "Person", "id", "PrimaryKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
@@ -111,7 +111,7 @@ public class JoinMetadataProducerTest
                         "PrimaryKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
@@ -159,7 +159,7 @@ public class JoinMetadataProducerTest
                 .addRow( "test", "Student_Course", "courseId", "ForeignKey", "test", "Course", "id", "PrimaryKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
@@ -195,7 +195,7 @@ public class JoinMetadataProducerTest
                 .addRow( "test", "Book", "id", "PrimaryKey", "test", "Book", "id", "PrimaryKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );
@@ -245,7 +245,7 @@ public class JoinMetadataProducerTest
                 .addRow( "test", "Person", "id", "PrimaryKey", "test", "Person", "id", "PrimaryKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         JoinMetadataProducer getJoinMetadata = new JoinMetadataProducer( databaseClient );

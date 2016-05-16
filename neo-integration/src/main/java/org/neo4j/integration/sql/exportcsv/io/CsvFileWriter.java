@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
@@ -16,10 +16,10 @@ import static java.lang.String.format;
 public class CsvFileWriter
 {
     private final ExportToCsvConfig config;
-    private final DatabaseClient databaseClient;
+    private final MySqlDatabaseClient databaseClient;
     private final ResultsToFileWriter resultsToFileWriter;
 
-    public CsvFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
+    public CsvFileWriter( ExportToCsvConfig config, MySqlDatabaseClient databaseClient )
     {
         this.config = config;
         this.databaseClient = databaseClient;

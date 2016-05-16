@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
@@ -26,15 +26,15 @@ import static java.util.stream.Collectors.toList;
 
 public class TableMetadataProducer implements MetadataProducer<TableName, Table>
 {
-    private final DatabaseClient databaseClient;
+    private final MySqlDatabaseClient databaseClient;
     private final Predicate<ColumnRole> columnFilter;
 
-    public TableMetadataProducer( DatabaseClient databaseClient )
+    public TableMetadataProducer( MySqlDatabaseClient databaseClient )
     {
         this( databaseClient, c -> true );
     }
 
-    public TableMetadataProducer( DatabaseClient databaseClient, Predicate<ColumnRole> columnFilter )
+    public TableMetadataProducer( MySqlDatabaseClient databaseClient, Predicate<ColumnRole> columnFilter )
     {
         this.databaseClient = databaseClient;
         this.columnFilter = columnFilter;

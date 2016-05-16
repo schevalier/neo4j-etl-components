@@ -7,7 +7,7 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.DatabaseClient;
+import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
@@ -43,7 +43,7 @@ public class JoinTableMetadataProducerTest
                 .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) )
                 .thenReturn( AwaitHandle.forReturnValue( stubJoinResults() ) )
                 .thenReturn( AwaitHandle.forReturnValue( columnProjectionResults ) );
@@ -79,7 +79,7 @@ public class JoinTableMetadataProducerTest
                 .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_KEY" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         QueryResults joinResults = StubQueryResults.builder()
                 .columns( "SOURCE_TABLE_SCHEMA",
                         "SOURCE_TABLE_NAME",
@@ -142,7 +142,7 @@ public class JoinTableMetadataProducerTest
                 .addRow( "credits", "text", "Data" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) )
                 .thenReturn( AwaitHandle.forReturnValue( stubJoinResults() ) )
                 .thenReturn( AwaitHandle.forReturnValue( columnProjectionResults ) );
@@ -183,7 +183,7 @@ public class JoinTableMetadataProducerTest
                 .addRow( "addressId", "int", "ForeignKey" )
                 .build();
 
-        DatabaseClient databaseClient = mock( DatabaseClient.class );
+        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
         when( databaseClient.executeQuery( any( String.class ) ) )
                 .thenReturn( AwaitHandle.forReturnValue( stubJoinResults() ) )
                 .thenReturn( AwaitHandle.forReturnValue( columnProjectionResults ) );
