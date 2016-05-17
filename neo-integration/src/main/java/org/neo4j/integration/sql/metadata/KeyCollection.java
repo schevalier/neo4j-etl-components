@@ -13,11 +13,13 @@ class KeyCollection
 {
     private final Optional<Column> primaryKey;
     private final Collection<JoinKey> foreignKeys;
+    private final Collection<Column> columns;
 
-    KeyCollection( Optional<Column> primaryKey, Collection<JoinKey> foreignKeys )
+    KeyCollection( Optional<Column> primaryKey, Collection<JoinKey> foreignKeys, Collection<Column> columns )
     {
         this.primaryKey = primaryKey;
         this.foreignKeys = foreignKeys;
+        this.columns = columns;
     }
 
     Optional<Column> primaryKey()
@@ -28,6 +30,11 @@ class KeyCollection
     Collection<JoinKey> foreignKeys()
     {
         return foreignKeys;
+    }
+
+    Collection<Column> columns()
+    {
+        return columns;
     }
 
     boolean representsJoinTable()

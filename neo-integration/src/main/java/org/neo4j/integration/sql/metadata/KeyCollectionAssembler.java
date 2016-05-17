@@ -2,7 +2,6 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,14 +22,14 @@ class KeyCollectionAssembler
 
     KeyCollection createKeyCollection( TableName tableName ) throws Exception
     {
-        Map<String, String> columnTypes = new HashMap<>();
-
-        databaseClient.columns( tableName ).stream()
-                .forEach( m -> columnTypes.put( m.get( "COLUMN_NAME" ), m.get( "TYPE_NAME" ) ) );
+        Map<String, String> columnTypes = databaseClient.columns( tableName ).stream()
+                .map( m -> new String[]{m.get( "COLUMN_NAME" ), m.get( "TYPE_NAME" )} )
+                .collect( Collectors.toMap( v -> v[0], v -> v[1] ) );
 
         return new KeyCollection(
                 createPrimaryKey( tableName, columnTypes ),
-                createForeignKeys( tableName, columnTypes ) );
+                createForeignKeys( tableName, columnTypes ),
+                createColumns( tableName, columnTypes ) );
     }
 
 
@@ -102,6 +101,16 @@ class KeyCollectionAssembler
         }
 
         return keys;
+    }
+
+    private Collection<Column> createColumns( TableName table, Map<String, String> columnTypes )
+    {
+        Collection<Column> columns = new ArrayList<>();
+
+        columnTypes.entrySet().forEach( e -> columns.add(
+                new SimpleColumn( table, e.getKey(), ColumnRole.Data, SqlDataType.parse( e.getValue() ) ) ) );
+
+        return columns;
     }
 
     private String firstNonNullOrEmpty( String a, String b )
