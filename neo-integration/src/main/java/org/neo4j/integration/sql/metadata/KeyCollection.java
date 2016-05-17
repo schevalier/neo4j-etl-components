@@ -37,6 +37,18 @@ class KeyCollection
         return columns;
     }
 
+    Collection<Column> columnsLessForeignKeys()
+    {
+        List<String> foreignKeyNames = foreignKeys.stream()
+                .map( jk -> jk.sourceColumn().name().split( CompositeColumn.SEPARATOR ) )
+                .flatMap( Stream::of )
+                .collect( Collectors.toList() );
+
+        return columns.stream()
+                .filter( c -> !foreignKeyNames.contains( c.name() ) )
+                .collect( Collectors.toList() );
+    }
+
     boolean representsJoinTable()
     {
         if ( foreignKeys.size() == 2 )

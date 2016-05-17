@@ -12,7 +12,9 @@ import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
 import static java.util.Arrays.asList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class KeyCollectionTest
 {
@@ -181,6 +183,58 @@ public class KeyCollectionTest
 
         // then
         assertFalse( keyCollection.representsJoinTable() );
+    }
+
+    @Test
+    public void shouldReturnCollectionOfColumns()
+    {
+        // given
+        Column column1 = new StubColumn( "column-1" );
+        Column column2 = new StubColumn( "column-2" );
+
+        KeyCollection keyCollection = new KeyCollection(
+                Optional.empty(),
+                Collections.emptyList(),
+                asList( column1, column2 ) );
+
+        // then
+        assertEquals( keyCollection.columns(), asList( column1, column2 ) );
+    }
+
+    @Test
+    public void shouldReturnCollectionOfColumnsLessForeignKeyColumns()
+    {
+        // given
+        Column column1 = new StubColumn( "column-1" );
+        Column column2 = new StubColumn( "column-2" );
+        Column fk1 = new StubColumn( "fk-1" );
+        Column fk2 = new StubColumn( "fk-2" );
+
+        KeyCollection keyCollection = new KeyCollection(
+                Optional.empty(),
+                asList( new JoinKey( new StubColumn( "fk-1" ), null ), new JoinKey( new StubColumn( "fk-2" ), null ) ),
+                asList( fk1, column1, column2, fk2 ) );
+
+        // then
+        assertEquals( keyCollection.columnsLessForeignKeys(), asList( column1, column2 ) );
+    }
+
+    @Test
+    public void shouldReturnCollectionOfColumnsLessCompositeForeignKeyColumns()
+    {
+        // given
+        Column column1 = new StubColumn( "column-1" );
+        Column column2 = new StubColumn( "column-2" );
+        Column fk1 = new StubColumn( "fk-1" );
+        Column fk2 = new StubColumn( "fk-2" );
+
+        KeyCollection keyCollection = new KeyCollection(
+                Optional.empty(),
+                Collections.singletonList( new JoinKey( new StubColumn( join( "fk-1", "fk-2" ) ), null ) ),
+                asList( fk1, column1, column2, fk2 ) );
+
+        // then
+        assertEquals( keyCollection.columnsLessForeignKeys(), asList( column1, column2 ) );
     }
 
     private String join( String... columns )
