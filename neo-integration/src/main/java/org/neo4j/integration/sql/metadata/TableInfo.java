@@ -9,13 +9,13 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
-class KeyCollection
+class TableInfo
 {
     private final Optional<Column> primaryKey;
     private final Collection<JoinKey> foreignKeys;
     private final Collection<Column> columns;
 
-    KeyCollection( Optional<Column> primaryKey, Collection<JoinKey> foreignKeys, Collection<Column> columns )
+    TableInfo( Optional<Column> primaryKey, Collection<JoinKey> foreignKeys, Collection<Column> columns )
     {
         this.primaryKey = primaryKey;
         this.foreignKeys = foreignKeys;

@@ -24,7 +24,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class KeyCollectionAssemblerTest
+public class TableInfoAssemblerTest
 {
     @Test
     public void shouldReturnKeyCollectionWithPrimaryKey() throws Exception
@@ -32,17 +32,17 @@ public class KeyCollectionAssemblerTest
         // given
         MySqlDatabaseClient databaseClient = new DatabaseClientBuilder().setPrimaryKey( "id" ).build();
 
-        KeyCollectionAssembler assembler = new KeyCollectionAssembler( databaseClient );
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
 
         // when
-        KeyCollection keyCollection = assembler.createKeyCollection( new TableName( "javabase.Example" ) );
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
 
         // then
-        assertTrue( keyCollection.primaryKey().isPresent() );
-        assertTrue( keyCollection.foreignKeys().isEmpty() );
-        assertFalse( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.primaryKey().isPresent() );
+        assertTrue( tableInfo.foreignKeys().isEmpty() );
+        assertFalse( tableInfo.representsJoinTable() );
 
-        assertEquals( "javabase.Example.id", keyCollection.primaryKey().orElseGet( () -> null ).name() );
+        assertEquals( "javabase.Example.id", tableInfo.primaryKey().orElseGet( () -> null ).name() );
     }
 
     @Test
@@ -51,18 +51,18 @@ public class KeyCollectionAssemblerTest
         // given
         MySqlDatabaseClient databaseClient = new DatabaseClientBuilder().setPrimaryKey( "first_name", "last_name" ).build();
 
-        KeyCollectionAssembler assembler = new KeyCollectionAssembler( databaseClient );
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
 
         // when
-        KeyCollection keyCollection = assembler.createKeyCollection( new TableName( "javabase.Example" ) );
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
 
         // then
-        assertTrue( keyCollection.primaryKey().isPresent() );
-        assertTrue( keyCollection.foreignKeys().isEmpty() );
-        assertFalse( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.primaryKey().isPresent() );
+        assertTrue( tableInfo.foreignKeys().isEmpty() );
+        assertFalse( tableInfo.representsJoinTable() );
 
         assertEquals( join( "javabase.Example.first_name", "javabase.Example.last_name" ),
-                keyCollection.primaryKey().orElseGet( () -> null ).name() );
+                tableInfo.primaryKey().orElseGet( () -> null ).name() );
     }
 
     @Test
@@ -74,18 +74,18 @@ public class KeyCollectionAssemblerTest
                 .addForeignKey( "book_id" )
                 .build();
 
-        KeyCollectionAssembler assembler = new KeyCollectionAssembler( databaseClient );
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
 
         // when
-        KeyCollection keyCollection = assembler.createKeyCollection( new TableName( "javabase.Example" ) );
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
 
         // then
-        assertFalse( keyCollection.primaryKey().isPresent() );
-        assertEquals( 2, keyCollection.foreignKeys().size() );
-        assertTrue( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.primaryKey().isPresent() );
+        assertEquals( 2, tableInfo.foreignKeys().size() );
+        assertTrue( tableInfo.representsJoinTable() );
 
         assertThat(
-                keyCollection.foreignKeys().stream().map( k -> k.sourceColumn().name() ).collect( Collectors.toList() ),
+                tableInfo.foreignKeys().stream().map( k -> k.sourceColumn().name() ).collect( Collectors.toList() ),
                 hasItems( "javabase.Example.author_id", "javabase.Example.book_id" ) );
     }
 
@@ -98,18 +98,18 @@ public class KeyCollectionAssemblerTest
                 .addForeignKey( "column_3", "column_4" )
                 .build();
 
-        KeyCollectionAssembler assembler = new KeyCollectionAssembler( databaseClient );
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
 
         // when
-        KeyCollection keyCollection = assembler.createKeyCollection( new TableName( "javabase.Example" ) );
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
 
         // then
-        assertFalse( keyCollection.primaryKey().isPresent() );
-        assertEquals( 2, keyCollection.foreignKeys().size() );
-        assertTrue( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.primaryKey().isPresent() );
+        assertEquals( 2, tableInfo.foreignKeys().size() );
+        assertTrue( tableInfo.representsJoinTable() );
 
         assertThat(
-                keyCollection.foreignKeys().stream().map( k -> k.sourceColumn().name() ).collect( Collectors.toList() ),
+                tableInfo.foreignKeys().stream().map( k -> k.sourceColumn().name() ).collect( Collectors.toList() ),
                 hasItems( join( "javabase.Example.column_1", "javabase.Example.column_2" ),
                         join( "javabase.Example.column_3", "javabase.Example.column_4" ) ) );
     }

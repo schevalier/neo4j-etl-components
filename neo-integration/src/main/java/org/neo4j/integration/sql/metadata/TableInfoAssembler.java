@@ -11,22 +11,22 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.MySqlDatabaseClient;
 
-class KeyCollectionAssembler
+class TableInfoAssembler
 {
     private final MySqlDatabaseClient databaseClient;
 
-    KeyCollectionAssembler( MySqlDatabaseClient databaseClient )
+    TableInfoAssembler( MySqlDatabaseClient databaseClient )
     {
         this.databaseClient = databaseClient;
     }
 
-    KeyCollection createKeyCollection( TableName tableName ) throws Exception
+    TableInfo createTableInfo( TableName tableName ) throws Exception
     {
         Map<String, String> columnTypes = databaseClient.columns( tableName ).stream()
                 .map( m -> new String[]{m.get( "COLUMN_NAME" ), m.get( "TYPE_NAME" )} )
                 .collect( Collectors.toMap( v -> v[0], v -> v[1] ) );
 
-        return new KeyCollection(
+        return new TableInfo(
                 createPrimaryKey( tableName, columnTypes ),
                 createForeignKeys( tableName, columnTypes ),
                 createColumns( tableName, columnTypes ) );

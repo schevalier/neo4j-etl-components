@@ -16,65 +16,65 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class KeyCollectionTest
+public class TableInfoTest
 {
     @Test
     public void collectionWithNoKeysDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection =
-                new KeyCollection( Optional.empty(), Collections.emptyList(), Collections.emptyList() );
+        TableInfo tableInfo =
+                new TableInfo( Optional.empty(), Collections.emptyList(), Collections.emptyList() );
 
         // then
-        assertFalse( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithPrimaryKeyAndNoForeignKeysDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn( "javabase.Author.id" ) ),
                 Collections.emptyList(),
                 Collections.emptyList() );
 
         // then
-        assertFalse( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithTwoForeignKeysAndNoPrimaryKeyRepresentsJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
                 Collections.emptyList() );
 
         // then
-        assertTrue( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithOneForeignKeyAndNoPrimaryKeyDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.empty(),
                 Collections.singletonList(
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ) ),
                 Collections.emptyList() );
 
         // then
-        assertFalse( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithThreeForeignKeysAndNoPrimaryKeyDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ),
@@ -82,14 +82,14 @@ public class KeyCollectionTest
                 Collections.emptyList() );
 
         // then
-        assertFalse( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithCompositePrimaryKeyThatComprisesBothForeignKeysRepresentsJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn(
                         join( "javabase.Author_Publisher.author_id", "javabase.Author_Publisher.publisher_id" ) ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
@@ -97,28 +97,28 @@ public class KeyCollectionTest
                 Collections.emptyList() );
 
         // then
-        assertTrue( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithCompositePrimaryKeyThatComprisesSubsetOfBothForeignKeysRepresentsJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn( "javabase.Author_Publisher.author_id" ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
                 Collections.emptyList() );
 
         // then
-        assertTrue( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithCompositePrimaryKeyThatIntersectsBothForeignKeysDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn(
                         join( "javabase.Author_Publisher.author_id", "javabase.Author_Publisher.sequence" ) ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
@@ -126,14 +126,14 @@ public class KeyCollectionTest
                 Collections.emptyList() );
 
         // then
-        assertFalse( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithCompositePrimaryKeyThatComprisesBothCompositeForeignKeysRepresentsJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn(
                         join( "javabase.Example.column_1",
                                 "javabase.Example.column_2",
@@ -144,14 +144,14 @@ public class KeyCollectionTest
                 Collections.emptyList() );
 
         // then
-        assertTrue( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithCompositePrimaryKeyThatComprisesSubsetOfBothCompositeForeignKeysRepresentsJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn(
                         join( "javabase.Example.column_1",
                                 "javabase.Example.column_2",
@@ -163,14 +163,14 @@ public class KeyCollectionTest
                 Collections.emptyList() );
 
         // then
-        assertTrue( keyCollection.representsJoinTable() );
+        assertTrue( tableInfo.representsJoinTable() );
     }
 
     @Test
     public void collectionWithCompositePrimaryKeyThatIntersectsBothCompositeForeignKeysDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.of( new StubColumn(
                         join( "javabase.Example.column_1",
                                 "javabase.Example.column_2",
@@ -182,7 +182,7 @@ public class KeyCollectionTest
                 Collections.emptyList() );
 
         // then
-        assertFalse( keyCollection.representsJoinTable() );
+        assertFalse( tableInfo.representsJoinTable() );
     }
 
     @Test
@@ -192,13 +192,13 @@ public class KeyCollectionTest
         Column column1 = new StubColumn( "column-1" );
         Column column2 = new StubColumn( "column-2" );
 
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.empty(),
                 Collections.emptyList(),
                 asList( column1, column2 ) );
 
         // then
-        assertEquals( keyCollection.columns(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columns(), asList( column1, column2 ) );
     }
 
     @Test
@@ -210,13 +210,13 @@ public class KeyCollectionTest
         Column fk1 = new StubColumn( "fk-1" );
         Column fk2 = new StubColumn( "fk-2" );
 
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "fk-1" ), null ), new JoinKey( new StubColumn( "fk-2" ), null ) ),
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
-        assertEquals( keyCollection.columnsLessForeignKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columnsLessForeignKeys(), asList( column1, column2 ) );
     }
 
     @Test
@@ -228,13 +228,13 @@ public class KeyCollectionTest
         Column fk1 = new StubColumn( "fk-1" );
         Column fk2 = new StubColumn( "fk-2" );
 
-        KeyCollection keyCollection = new KeyCollection(
+        TableInfo tableInfo = new TableInfo(
                 Optional.empty(),
                 Collections.singletonList( new JoinKey( new StubColumn( join( "fk-1", "fk-2" ) ), null ) ),
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
-        assertEquals( keyCollection.columnsLessForeignKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columnsLessForeignKeys(), asList( column1, column2 ) );
     }
 
     private String join( String... columns )
