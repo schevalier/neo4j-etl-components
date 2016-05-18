@@ -1,6 +1,11 @@
 package org.neo4j.integration.sql;
 
 import java.net.URI;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 
@@ -13,6 +18,18 @@ public enum DatabaseType
                 {
                     return URI.create(
                             format( "jdbc:mysql://%s:%s/%s?autoReconnect=true&useSSL=false", host, port, database ) );
+                }
+
+                @Override
+                public DatabaseClient.StatementFactory statementFactory()
+                {
+                    return connection -> {
+                        Statement statement = connection.createStatement(
+                                ResultSet.TYPE_FORWARD_ONLY,
+                                ResultSet.CONCUR_READ_ONLY );
+                        statement.setFetchSize( Integer.MIN_VALUE );
+                        return statement;
+                    };
                 }
             };
 
@@ -36,4 +53,6 @@ public enum DatabaseType
     }
 
     public abstract URI createUri( String host, int port, String database );
+
+    public abstract DatabaseClient.StatementFactory statementFactory();
 }

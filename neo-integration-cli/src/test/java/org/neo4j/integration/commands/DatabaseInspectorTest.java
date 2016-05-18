@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.metadata.Join;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @Ignore
 public class DatabaseInspectorTest
 {
-    private MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
+    private DatabaseClient databaseClient = mock( DatabaseClient.class );
 
     @Test
     public void shouldExportTablesAndJoinsForTwoTableJoin() throws Exception

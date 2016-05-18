@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
@@ -18,9 +18,9 @@ import org.neo4j.integration.sql.metadata.TableName;
 
 public class DatabaseInspector
 {
-    private final MySqlDatabaseClient databaseClient;
+    private final DatabaseClient databaseClient;
 
-    public DatabaseInspector( MySqlDatabaseClient databaseClient )
+    public DatabaseInspector( DatabaseClient databaseClient )
     {
         this.databaseClient = databaseClient;
     }

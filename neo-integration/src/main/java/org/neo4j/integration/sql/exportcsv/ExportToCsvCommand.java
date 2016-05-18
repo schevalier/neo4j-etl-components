@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import org.neo4j.integration.neo4j.importcsv.config.Manifest;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
@@ -38,7 +38,7 @@ public class ExportToCsvCommand
 
         Manifest manifest = new Manifest();
 
-        try ( MySqlDatabaseClient databaseClient = new MySqlDatabaseClient( config.connectionConfig() ) )
+        try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
             CsvFileWriter csvFileWriter = new CsvFileWriter( config, databaseClient );

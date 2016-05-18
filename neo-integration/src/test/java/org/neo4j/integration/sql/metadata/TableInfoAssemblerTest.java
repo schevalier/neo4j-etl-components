@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.StubQueryResults;
 
 import static java.lang.String.format;
@@ -30,7 +30,7 @@ public class TableInfoAssemblerTest
     public void shouldReturnKeyCollectionWithPrimaryKey() throws Exception
     {
         // given
-        MySqlDatabaseClient databaseClient = new DatabaseClientBuilder().setPrimaryKey( "id" ).build();
+        DatabaseClient databaseClient = new DatabaseClientBuilder().setPrimaryKey( "id" ).build();
 
         TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
 
@@ -49,7 +49,7 @@ public class TableInfoAssemblerTest
     public void shouldReturnKeyCollectionWithCompositePrimaryKey() throws Exception
     {
         // given
-        MySqlDatabaseClient databaseClient = new DatabaseClientBuilder().setPrimaryKey( "first_name", "last_name" ).build();
+        DatabaseClient databaseClient = new DatabaseClientBuilder().setPrimaryKey( "first_name", "last_name" ).build();
 
         TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
 
@@ -69,7 +69,7 @@ public class TableInfoAssemblerTest
     public void shouldReturnKeyCollectionWithTwoForeignKeys() throws Exception
     {
         // given
-        MySqlDatabaseClient databaseClient = new DatabaseClientBuilder()
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
                 .addForeignKey( "author_id" )
                 .addForeignKey( "book_id" )
                 .build();
@@ -93,7 +93,7 @@ public class TableInfoAssemblerTest
     public void shouldReturnKeyCollectionWithTwoCompositeForeignKeys() throws Exception
     {
         // given
-        MySqlDatabaseClient databaseClient = new DatabaseClientBuilder()
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
                 .addForeignKey( "column_1", "column_2" )
                 .addForeignKey( "column_3", "column_4" )
                 .build();
@@ -121,7 +121,7 @@ public class TableInfoAssemblerTest
 
     private static class DatabaseClientBuilder
     {
-        private final MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
+        private final DatabaseClient databaseClient = mock( DatabaseClient.class );
         private final Collection<String> columns = new HashSet<>();
         private final List<String> primaryKey = new ArrayList<>();
         private final List<List<String>> foreignKeys = new ArrayList<>();
@@ -146,7 +146,7 @@ public class TableInfoAssemblerTest
             return this;
         }
 
-        public MySqlDatabaseClient build() throws Exception
+        public DatabaseClient build() throws Exception
 
         {
             StubQueryResults.Builder columnsResults = StubQueryResults.builder().columns( "COLUMN_NAME", "TYPE_NAME" );

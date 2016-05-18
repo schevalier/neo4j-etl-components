@@ -36,10 +36,11 @@ public class TableInfo
     public Collection<Column> columnsLessKeys()
     {
         List<String> keyNames = primaryKeyNames();
-        keyNames.addAll( foreignKeyNames() );
+        List<String> foreignKeyNames = foreignKeyNames();
 
         return columns.stream()
                 .filter( c -> !keyNames.contains( c.name() ) )
+                .filter( c -> !foreignKeyNames.contains( c.name() ) )
                 .collect( Collectors.toList() );
     }
 

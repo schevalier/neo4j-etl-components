@@ -31,7 +31,7 @@ public class ConnectionConfig
                 Preconditions.requireNonNullString( builder.password, "Password" ) );
     }
 
-    public String driverClassName()
+    String driverClassName()
     {
         return databaseType.driverClassName();
     }
@@ -41,13 +41,17 @@ public class ConnectionConfig
         return databaseType.createUri( host, port, database );
     }
 
-    public Credentials credentials()
+    Credentials credentials()
     {
         return credentials;
     }
 
+    DatabaseClient.StatementFactory statementFactory()
+    {
+        return databaseType.statementFactory();
+    }
+
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    @Override
     public boolean equals( Object o )
     {
         return EqualsBuilder.reflectionEquals( this, o );

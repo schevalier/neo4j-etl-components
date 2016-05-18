@@ -9,14 +9,14 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 
 public class TableInfoAssembler
 {
-    private final MySqlDatabaseClient databaseClient;
+    private final DatabaseClient databaseClient;
 
-    public TableInfoAssembler( MySqlDatabaseClient databaseClient )
+    public TableInfoAssembler( DatabaseClient databaseClient )
     {
         this.databaseClient = databaseClient;
     }

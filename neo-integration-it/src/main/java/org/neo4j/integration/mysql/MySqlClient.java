@@ -1,7 +1,7 @@
 package org.neo4j.integration.mysql;
 
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.DatabaseType;
 
 public class MySqlClient
@@ -32,7 +32,7 @@ public class MySqlClient
 
     public void execute( String sql ) throws Exception
     {
-        MySqlDatabaseClient client = new MySqlDatabaseClient(
+        DatabaseClient client = new DatabaseClient(
                 ConnectionConfig.forDatabase( DatabaseType.MySQL )
                         .host( host )
                         .port( DatabaseType.MySQL.defaultPort() )
