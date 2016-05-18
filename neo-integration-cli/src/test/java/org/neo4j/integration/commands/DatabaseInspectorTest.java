@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.io.AwaitHandle;
@@ -29,6 +30,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Ignore
 public class DatabaseInspectorTest
 {
     private MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );

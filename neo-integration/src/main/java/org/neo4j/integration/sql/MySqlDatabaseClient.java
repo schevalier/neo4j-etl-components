@@ -93,12 +93,13 @@ public class MySqlDatabaseClient extends SqlDatabaseClient
     {
         Collection<TableName> tableNames = new ArrayList<>();
 
-        ResultSet results =
-                connection.getMetaData().getTables( null, null, null, new String[]{"TABLE"} );
-
-        while ( results.next() )
+        try ( ResultSet results =
+                      connection.getMetaData().getTables( null, null, null, new String[]{"TABLE"} ) )
         {
-            tableNames.add( new TableName( connection.getCatalog(), results.getString( "TABLE_NAME" ) ) );
+            while ( results.next() )
+            {
+                tableNames.add( new TableName( connection.getCatalog(), results.getString( "TABLE_NAME" ) ) );
+            }
         }
 
         return tableNames;

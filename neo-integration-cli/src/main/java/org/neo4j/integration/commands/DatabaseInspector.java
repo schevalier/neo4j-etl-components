@@ -2,49 +2,26 @@ package org.neo4j.integration.commands;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.MySqlDatabaseClient;
-import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.JoinTableMetadataProducer;
-import org.neo4j.integration.sql.exportcsv.mysql.schema.TableMetadataProducer;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.Join;
+import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.JoinTable;
-import org.neo4j.integration.sql.metadata.JoinTableInfo;
 import org.neo4j.integration.sql.metadata.Table;
+import org.neo4j.integration.sql.metadata.TableInfo;
+import org.neo4j.integration.sql.metadata.TableInfoAssembler;
 import org.neo4j.integration.sql.metadata.TableName;
-import org.neo4j.integration.sql.metadata.TableNamePair;
-
-import static java.lang.String.format;
 
 public class DatabaseInspector
 {
-    private final TableMetadataProducer tableMetadataProducer;
-    private final JoinMetadataProducer joinMetadataProducer;
-    private final JoinTableMetadataProducer joinTableMetadataProducer;
     private final MySqlDatabaseClient databaseClient;
 
     public DatabaseInspector( MySqlDatabaseClient databaseClient )
-
     {
-        this( new TableMetadataProducer( databaseClient ),
-                new JoinMetadataProducer( databaseClient ),
-                new JoinTableMetadataProducer( databaseClient ),
-                databaseClient );
-    }
-
-    private DatabaseInspector( TableMetadataProducer tableMetadataProducer,
-                               JoinMetadataProducer joinMetadataProducer,
-                               JoinTableMetadataProducer joinTableMetadataProducer,
-                               MySqlDatabaseClient databaseClient )
-    {
-
-        this.tableMetadataProducer = tableMetadataProducer;
-        this.joinMetadataProducer = joinMetadataProducer;
-        this.joinTableMetadataProducer = joinTableMetadataProducer;
         this.databaseClient = databaseClient;
     }
 
@@ -58,6 +35,7 @@ public class DatabaseInspector
         {
             buildSchema( tableName, tables, joins, joinTables );
         }
+
         return new SchemaExport( tables, joins, joinTables );
     }
 
@@ -66,64 +44,39 @@ public class DatabaseInspector
                               Collection<Join> joins,
                               Collection<JoinTable> joinTables ) throws Exception
     {
-        try ( QueryResults results = databaseClient.executeQuery( listKeys( tableName ) ).await() )
+        TableInfo tableInfo = new TableInfoAssembler( databaseClient ).createTableInfo( tableName );
+
+        Table.Builder tableBuilder = Table.builder().name( tableName );
+        tableInfo.columnsLessKeys().forEach( tableBuilder::addColumn );
+
+        if ( tableInfo.representsJoinTable() )
         {
-            Collection<String> primaryKeys = new HashSet<>();
-            Collection<String> foreignKeys = new HashSet<>();
-
-            while ( results.next() )
+            List<JoinKey> joinKeys = tableInfo.foreignKeys().stream()
+                    .sorted( ( o1, o2 ) -> o1.sourceColumn().name().compareTo( o2.sourceColumn().name() ) )
+                    .collect( Collectors.toList() );
+            joinTables.add( new JoinTable( new Join( joinKeys.get( 0 ), joinKeys.get( 1 ) ), tableBuilder.build() ) );
+        }
+        else
+        {
+            Optional<Column> primaryKeyColumn = tableInfo.primaryKey();
+            if ( primaryKeyColumn.isPresent() )
             {
-                String columnName = results.getString( "COLUMN_NAME" );
-                String referencedTableName = results.getString( "REFERENCED_TABLE_NAME" );
-                String columnKey = results.getString( "COLUMN_KEY" );
-
-                if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isEmpty( referencedTableName ) )
-                {
-                    primaryKeys.add( columnName );
-                }
-
-                if ( columnKey.equalsIgnoreCase( "PRI" ) && StringUtils.isNotEmpty( referencedTableName ) )
-                {
-                    primaryKeys.remove( columnName );
-                    foreignKeys.add( referencedTableName );
-                }
-
-                if ( columnKey.equalsIgnoreCase( "MUL" ) )
-                {
-                    foreignKeys.add( referencedTableName );
-                }
+                tableBuilder.addColumn( primaryKeyColumn.get() );
             }
+            tables.add( tableBuilder.build() );
 
-            if ( primaryKeys.isEmpty() && foreignKeys.size() == 2 )
+            for ( JoinKey joinKey : tableInfo.foreignKeys() )
             {
-                Iterator<String> iterator = foreignKeys.iterator();
-                TableName tableOne = new TableName( tableName.schema(), iterator.next() );
-                TableName tableTwo = new TableName( tableName.schema(), iterator.next() );
-                joinTables.addAll( joinTableMetadataProducer.createMetadataFor(
-                        new JoinTableInfo( tableName, new TableNamePair( tableOne, tableTwo ) ) ) );
-            }
-            else
-            {
-                tables.addAll( tableMetadataProducer.createMetadataFor( tableName ) );
-                for ( String foreignKey : foreignKeys )
+                if ( primaryKeyColumn.isPresent() )
                 {
-                    joins.addAll( joinMetadataProducer.createMetadataFor( new TableNamePair( tableName, new TableName(
-                            tableName.schema(), foreignKey ) ) ) );
+                    joins.add( new Join( new JoinKey( primaryKeyColumn.get(), primaryKeyColumn.get() ), joinKey ) );
+                }
+                else
+                {
+                    throw new IllegalStateException( "Unsupported: foreign key in a table that has no primary key, " +
+                            "and which is not a join table." );
                 }
             }
         }
-    }
-
-    private String listKeys( TableName tableName )
-    {
-        return format( "SELECT kcu.COLUMN_NAME, " +
-                "      kcu.REFERENCED_TABLE_NAME, " +
-                "      kcu.REFERENCED_COLUMN_NAME, " +
-                "      c.COLUMN_KEY " +
-                "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu INNER JOIN INFORMATION_SCHEMA.COLUMNS c " +
-                "ON kcu.COLUMN_NAME = c.COLUMN_NAME AND kcu.TABLE_NAME = c.TABLE_NAME " +
-                "WHERE kcu.TABLE_SCHEMA = '%s' " +
-                "AND kcu.TABLE_NAME = '%s' " +
-                "ORDER BY kcu.COLUMN_NAME, kcu.REFERENCED_TABLE_NAME", tableName.schema(), tableName.simpleName() );
     }
 }

@@ -2,7 +2,6 @@ package org.neo4j.integration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +21,6 @@ import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertThat;
 
 public class CreateCsvResourceslIntegrationTest
@@ -30,17 +28,20 @@ public class CreateCsvResourceslIntegrationTest
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
 
     @ClassRule
-    public static final ResourceRule<Path> tempDirectory = new ResourceRule<>( TemporaryDirectory.temporaryDirectory
-            () );
+    public static final ResourceRule<Path> tempDirectory =
+            new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
 
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
-            ServerFixture.server( "mysql-integration-test", DatabaseType.MySQL.defaultPort(), MySqlScripts
-                    .startupScript(), tempDirectory.get()) );
+            ServerFixture.server(
+                    "mysql-integration-test",
+                    DatabaseType.MySQL.defaultPort(),
+                    MySqlScripts.startupScript(),
+                    tempDirectory.get() ) );
 
     @ClassRule
-    public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>( Neo4jFixture.neo4j( NEO4J_VERSION,
-            tempDirectory.get() ) );
+    public static final ResourceRule<Neo4j> neo4j =
+            new ResourceRule<>( Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
 
     @BeforeClass
     public static void setUp() throws Exception
@@ -52,11 +53,11 @@ public class CreateCsvResourceslIntegrationTest
     @Test
     public void shouldGenerateMappingsFileSuccessfully() throws Exception
     {
-        Collection<String> mapping = createCsvResources( "javabase" );
-        assertThat( mapping, hasItems( containsString( "STUDENT_ID" ) ) );
+        String mapping = createCsvResources( "javabase" );
+        assertThat( mapping, containsString( "STUDENT_ID" ) );
     }
 
-    private static Collection<String> createCsvResources( String database ) throws IOException
+    private static String createCsvResources( String database ) throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
         ObjectMapper objectMapper = new ObjectMapper();
@@ -74,6 +75,7 @@ public class CreateCsvResourceslIntegrationTest
                 "--password", MySqlClient.Parameters.DBPassword.value(),
                 "--database", database,
                 "--options-file", importToolOptions.toString(),
-                "--relationship-name", "column"} );
+                "--relationship-name", "column",
+                "--debug"} );
     }
 }

@@ -46,7 +46,7 @@ public class NeoIntegrationCli
         CliRunner.run( parser(), args );
     }
 
-    static Collection<String> executeMainReturnSysOut( String[] args )
+    static String executeMainReturnSysOut( String[] args )
     {
         PrintStream oldOut = System.out;
 
@@ -57,7 +57,7 @@ public class NeoIntegrationCli
 
         try
         {
-            return asList( newOut.toString( "UTF8" ).split( System.lineSeparator() ) );
+            return newOut.toString( "UTF8" );
         }
         catch ( UnsupportedEncodingException e )
         {

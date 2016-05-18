@@ -200,6 +200,40 @@ public class TableInfoTest
         // then
         assertEquals( tableInfo.columns(), asList( column1, column2 ) );
     }
+    @Test
+    public void shouldReturnCollectionOfColumnsLessPrimaryKeyColumn()
+    {
+        // given
+        Column pk = new StubColumn( "pk" );
+        Column column1 = new StubColumn( "column-1" );
+        Column column2 = new StubColumn( "column-2" );
+
+        TableInfo tableInfo = new TableInfo(
+                Optional.of( pk ),
+                Collections.emptyList(),
+                asList( pk, column1, column2 ) );
+
+        // then
+        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
+    }
+
+    @Test
+    public void shouldReturnCollectionOfColumnsLessCompositePrimaryKeyColumn()
+    {
+        // given
+        Column pk1 = new StubColumn( "pk-1" );
+        Column pk2 = new StubColumn( "pk-2" );
+        Column column1 = new StubColumn( "column-1" );
+        Column column2 = new StubColumn( "column-2" );
+
+        TableInfo tableInfo = new TableInfo(
+                Optional.of( new StubColumn( join( "pk-1", "pk-2" ) ) ),
+                Collections.emptyList(),
+                asList( pk1, pk2, column1, column2) );
+
+        // then
+        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
+    }
 
     @Test
     public void shouldReturnCollectionOfColumnsLessForeignKeyColumns()
@@ -216,7 +250,7 @@ public class TableInfoTest
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
-        assertEquals( tableInfo.columnsLessForeignKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
     }
 
     @Test
@@ -234,7 +268,7 @@ public class TableInfoTest
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
-        assertEquals( tableInfo.columnsLessForeignKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
     }
 
     private String join( String... columns )

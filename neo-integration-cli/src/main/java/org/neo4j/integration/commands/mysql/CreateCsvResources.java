@@ -96,9 +96,10 @@ public class CreateCsvResources implements Callable<CsvResources>
     {
         events.onCreatingCsvResourcesFile();
 
-        SchemaExport schemaExport = new DatabaseInspector( new MySqlDatabaseClient( connectionConfig ) ).buildSchemaExport();
-        CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier,
-                relationshipNameResolver );
+        SchemaExport schemaExport =
+                new DatabaseInspector( new MySqlDatabaseClient( connectionConfig ) ).buildSchemaExport();
+        CsvResources csvResources =
+                schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
 
         try ( Writer writer = new OutputStreamWriter( output ) )
         {

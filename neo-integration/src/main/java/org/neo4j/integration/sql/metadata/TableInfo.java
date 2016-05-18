@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,7 +10,7 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
-class TableInfo
+public class TableInfo
 {
     private final Optional<Column> primaryKey;
     private final Collection<JoinKey> foreignKeys;
@@ -22,58 +23,61 @@ class TableInfo
         this.columns = columns;
     }
 
-    Optional<Column> primaryKey()
+    public Optional<Column> primaryKey()
     {
         return primaryKey;
     }
 
-    Collection<JoinKey> foreignKeys()
+    public Collection<JoinKey> foreignKeys()
     {
         return foreignKeys;
     }
 
-    Collection<Column> columns()
+    public Collection<Column> columns()
     {
         return columns;
     }
 
-    Collection<Column> columnsLessForeignKeys()
+    public Collection<Column> columnsLessKeys()
     {
-        List<String> foreignKeyNames = foreignKeys.stream()
-                .map( jk -> jk.sourceColumn().name().split( CompositeColumn.SEPARATOR ) )
-                .flatMap( Stream::of )
-                .collect( Collectors.toList() );
+        List<String> primaryKeyNames = primaryKeyNames();
+        List<String> foreignKeyNames = foreignKeyNames();
 
         return columns.stream()
+                .filter( c -> !primaryKeyNames.contains( c.name() ) )
                 .filter( c -> !foreignKeyNames.contains( c.name() ) )
                 .collect( Collectors.toList() );
     }
 
-    boolean representsJoinTable()
+    public boolean representsJoinTable()
     {
         if ( foreignKeys.size() == 2 )
         {
-            if ( primaryKey.isPresent() )
-            {
-                List<String> primaryKeyNames = new ArrayList<>(
-                        asList( primaryKey.get().name().split( CompositeColumn.SEPARATOR ) ) );
-                List<String> foreignKeyNames = foreignKeys.stream()
-                        .flatMap( joinKey ->
-                                Stream.of( joinKey.sourceColumn().name().split( CompositeColumn.SEPARATOR ) ) )
-                        .collect( Collectors.toList() );
+            List<String> primaryKeyNames = primaryKeyNames();
+            List<String> foreignKeyNames = foreignKeyNames();
 
-                primaryKeyNames.removeAll( foreignKeyNames );
+            primaryKeyNames.removeAll( foreignKeyNames );
 
-                return primaryKeyNames.isEmpty();
-            }
-            else
-            {
-                return true;
-            }
+            return primaryKeyNames.isEmpty();
         }
         else
         {
             return false;
         }
+    }
+
+    private List<String> foreignKeyNames()
+    {
+        return foreignKeys.stream()
+                .map( jk -> jk.sourceColumn().name().split( CompositeColumn.SEPARATOR ) )
+                .flatMap( Stream::of )
+                .collect( Collectors.toList() );
+    }
+
+    private List<String> primaryKeyNames()
+    {
+        return primaryKey.isPresent() ?
+                new ArrayList<>( asList( primaryKey.get().name().split( CompositeColumn.SEPARATOR ) ) ) :
+                Collections.emptyList();
     }
 }
