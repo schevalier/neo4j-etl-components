@@ -200,7 +200,7 @@ public class TableInfoTest
     }
 
     @Test
-    public void shouldReturnCollectionOfColumnsLessPrimaryKeyColumn()
+    public void shouldReturnCollectionOfColumnsIncludingPrimaryKeyColumn()
     {
         // given
         Column pk = new StubColumn( "javabase.Example.pk" );
@@ -214,11 +214,11 @@ public class TableInfoTest
                 asList( pk, column1, column2 ) );
 
         // then
-        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columns(), asList( pk, column1, column2 ) );
     }
 
     @Test
-    public void shouldReturnCollectionOfColumnsLessCompositePrimaryKeyColumn()
+    public void shouldReturnCollectionOfColumnsIncludingCompositePrimaryKeyColumn()
     {
         // given
         Column pk1 = new StubColumn( "javabase.Example.pk-1" );
@@ -226,14 +226,16 @@ public class TableInfoTest
         Column column1 = new StubColumn( "javabase.Example.column-1" );
         Column column2 = new StubColumn( "javabase.Example.column-2" );
 
+        StubColumn compositePk = new StubColumn( join( "javabase.Example.pk-1", "javabase.Example.pk-2" ) );
+
         TableInfo tableInfo = new TableInfo(
                 new TableName( "javabase.Example" ),
-                Optional.of( new StubColumn( join( "javabase.Example.pk-1", "javabase.Example.pk-2" ) ) ),
+                Optional.of( compositePk ),
                 Collections.emptyList(),
                 asList( pk1, pk2, column1, column2 ) );
 
         // then
-        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columns(), asList( compositePk, column1, column2 ) );
     }
 
     @Test
@@ -253,7 +255,7 @@ public class TableInfoTest
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
-        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columns(), asList( column1, column2 ) );
     }
 
     @Test
@@ -274,7 +276,7 @@ public class TableInfoTest
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
-        assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
+        assertEquals( tableInfo.columns(), asList( column1, column2 ) );
     }
 
     private String join( String... columns )

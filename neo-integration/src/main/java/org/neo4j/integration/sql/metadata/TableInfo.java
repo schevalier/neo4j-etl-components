@@ -55,29 +55,32 @@ public class TableInfo
         }
     }
 
-    public Table createTable( )
+    public Table createTable()
     {
         Table.Builder tableBuilder = Table.builder().name( tableName );
 
-        columnsLessKeys().forEach( tableBuilder::addColumn );
-
-        if ( primaryKey.isPresent() )
-        {
-            tableBuilder.addColumn( primaryKey.get() );
-        }
+        columns().forEach( tableBuilder::addColumn );
 
         return tableBuilder.build();
     }
 
-    Collection<Column> columnsLessKeys()
+    Collection<Column> columns()
     {
         List<String> primaryKeyNames = primaryKeyNames();
         List<String> foreignKeyNames = foreignKeyNames();
 
-        return columns.stream()
+        Stream<Column> columnStream = columns.stream()
                 .filter( c -> !primaryKeyNames.contains( c.name() ) )
-                .filter( c -> !foreignKeyNames.contains( c.name() ) )
-                .collect( Collectors.toList() );
+                .filter( c -> !foreignKeyNames.contains( c.name() ) );
+
+        if ( primaryKey.isPresent() )
+        {
+            return Stream.concat( Stream.of( primaryKey.get() ), columnStream ).collect( Collectors.toList() );
+        }
+        else
+        {
+            return columnStream.collect( Collectors.toList() );
+        }
     }
 
     private List<String> foreignKeyNames()
