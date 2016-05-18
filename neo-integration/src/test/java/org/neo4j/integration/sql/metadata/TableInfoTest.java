@@ -23,7 +23,11 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo =
-                new TableInfo( Optional.empty(), Collections.emptyList(), Collections.emptyList() );
+                new TableInfo(
+                        new TableName( "javabase.Author" ),
+                        Optional.empty(),
+                        Collections.emptyList(),
+                        Collections.emptyList() );
 
         // then
         assertFalse( tableInfo.representsJoinTable() );
@@ -34,6 +38,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author" ),
                 Optional.of( new StubColumn( "javabase.Author.id" ) ),
                 Collections.emptyList(),
                 Collections.emptyList() );
@@ -47,6 +52,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author_Publisher" ),
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
@@ -61,6 +67,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author_Publisher" ),
                 Optional.empty(),
                 Collections.singletonList(
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ) ),
@@ -75,6 +82,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author_Publisher" ),
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ),
@@ -90,6 +98,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author_Publisher" ),
                 Optional.of( new StubColumn(
                         join( "javabase.Author_Publisher.author_id", "javabase.Author_Publisher.publisher_id" ) ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
@@ -105,6 +114,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author_Publisher" ),
                 Optional.of( new StubColumn( "javabase.Author_Publisher.author_id" ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
@@ -119,6 +129,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Author_Publisher" ),
                 Optional.of( new StubColumn(
                         join( "javabase.Author_Publisher.author_id", "javabase.Author_Publisher.sequence" ) ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
@@ -134,6 +145,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Example" ),
                 Optional.of( new StubColumn(
                         join( "javabase.Example.column_1",
                                 "javabase.Example.column_2",
@@ -152,6 +164,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Example" ),
                 Optional.of( new StubColumn(
                         join( "javabase.Example.column_1",
                                 "javabase.Example.column_2",
@@ -171,6 +184,7 @@ public class TableInfoTest
     {
         // given
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Example" ),
                 Optional.of( new StubColumn(
                         join( "javabase.Example.column_1",
                                 "javabase.Example.column_2",
@@ -189,11 +203,12 @@ public class TableInfoTest
     public void shouldReturnCollectionOfColumnsLessPrimaryKeyColumn()
     {
         // given
-        Column pk = new StubColumn( "pk" );
-        Column column1 = new StubColumn( "column-1" );
-        Column column2 = new StubColumn( "column-2" );
+        Column pk = new StubColumn( "javabase.Example.pk" );
+        Column column1 = new StubColumn( "javabase.Example.column-1" );
+        Column column2 = new StubColumn( "javabase.Example.column-2" );
 
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Example" ),
                 Optional.of( pk ),
                 Collections.emptyList(),
                 asList( pk, column1, column2 ) );
@@ -206,15 +221,16 @@ public class TableInfoTest
     public void shouldReturnCollectionOfColumnsLessCompositePrimaryKeyColumn()
     {
         // given
-        Column pk1 = new StubColumn( "pk-1" );
-        Column pk2 = new StubColumn( "pk-2" );
-        Column column1 = new StubColumn( "column-1" );
-        Column column2 = new StubColumn( "column-2" );
+        Column pk1 = new StubColumn( "javabase.Example.pk-1" );
+        Column pk2 = new StubColumn( "javabase.Example.pk-2" );
+        Column column1 = new StubColumn( "javabase.Example.column-1" );
+        Column column2 = new StubColumn( "javabase.Example.column-2" );
 
         TableInfo tableInfo = new TableInfo(
-                Optional.of( new StubColumn( join( "pk-1", "pk-2" ) ) ),
+                new TableName( "javabase.Example" ),
+                Optional.of( new StubColumn( join( "javabase.Example.pk-1", "javabase.Example.pk-2" ) ) ),
                 Collections.emptyList(),
-                asList( pk1, pk2, column1, column2) );
+                asList( pk1, pk2, column1, column2 ) );
 
         // then
         assertEquals( tableInfo.columnsLessKeys(), asList( column1, column2 ) );
@@ -224,14 +240,16 @@ public class TableInfoTest
     public void shouldReturnCollectionOfColumnsLessForeignKeyColumns()
     {
         // given
-        Column column1 = new StubColumn( "column-1" );
-        Column column2 = new StubColumn( "column-2" );
-        Column fk1 = new StubColumn( "fk-1" );
-        Column fk2 = new StubColumn( "fk-2" );
+        Column column1 = new StubColumn( "javabase.Example.column-1" );
+        Column column2 = new StubColumn( "javabase.Example.column-2" );
+        Column fk1 = new StubColumn( "javabase.Example.fk-1" );
+        Column fk2 = new StubColumn( "javabase.Example.fk-2" );
 
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Example" ),
                 Optional.empty(),
-                asList( new JoinKey( new StubColumn( "fk-1" ), null ), new JoinKey( new StubColumn( "fk-2" ), null ) ),
+                asList( new JoinKey( new StubColumn( "javabase.Example.fk-1" ), null ),
+                        new JoinKey( new StubColumn( "javabase.Example.fk-2" ), null ) ),
                 asList( fk1, column1, column2, fk2 ) );
 
         // then
@@ -242,14 +260,17 @@ public class TableInfoTest
     public void shouldReturnCollectionOfColumnsLessCompositeForeignKeyColumns()
     {
         // given
-        Column column1 = new StubColumn( "column-1" );
-        Column column2 = new StubColumn( "column-2" );
-        Column fk1 = new StubColumn( "fk-1" );
-        Column fk2 = new StubColumn( "fk-2" );
+        Column column1 = new StubColumn( "javabase.Example.column-1" );
+        Column column2 = new StubColumn( "javabase.Example.column-2" );
+        Column fk1 = new StubColumn( "javabase.Example.fk-1" );
+        Column fk2 = new StubColumn( "javabase.Example.fk-2" );
 
         TableInfo tableInfo = new TableInfo(
+                new TableName( "javabase.Example" ),
                 Optional.empty(),
-                Collections.singletonList( new JoinKey( new StubColumn( join( "fk-1", "fk-2" ) ), null ) ),
+                Collections.singletonList( new JoinKey(
+                        new StubColumn( join( "javabase.Example.fk-1", "javabase.Example.fk-2" ) ),
+                        null ) ),
                 asList( fk1, column1, column2, fk2 ) );
 
         // then

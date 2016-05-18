@@ -30,6 +30,7 @@ public class TableInfoAssembler
                     .collect( Collectors.toMap( v -> v[0], v -> v[1] ) ) );
 
             return new TableInfo(
+                    tableName,
                     createPrimaryKey( tableName, columnTypes ),
                     createForeignKeys( tableName, columnTypes ),
                     columnTypes.toColumns( tableName ) );
@@ -41,11 +42,7 @@ public class TableInfoAssembler
         try ( QueryResults primaryKeyResults = databaseClient.primaryKeys( table ) )
         {
             List<Column> columns = primaryKeyResults.stream()
-                    .map( pk -> new SimpleColumn(
-                            table,
-                            pk.get( "COLUMN_NAME" ),
-                            ColumnRole.PrimaryKey,
-                            columnTypes.getSqlDataType( pk.get( "COLUMN_NAME" ) ) ) )
+                    .map( pk -> createPrimaryKeyColumn( table, columnTypes, pk ) )
                     .collect( Collectors.toList() );
 
             if ( columns.isEmpty() )
@@ -77,20 +74,10 @@ public class TableInfoAssembler
                 List<Column> sourceColumns = new ArrayList<>();
                 List<Column> targetColumns = new ArrayList<>();
 
-                foreignKeyGroup.forEach( fk -> {
-                    sourceColumns.add( new SimpleColumn(
-                            table,
-                            fk.get( "FKCOLUMN_NAME" ),
-                            ColumnRole.ForeignKey,
-                            columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) ) );
-                    TableName targetTableName = new TableName(
-                            firstNonNullOrEmpty( fk.get( "PKTABLE_CAT" ), fk.get( "PKTABLE_SCHEM" ) ),
-                            fk.get( "PKTABLE_NAME" ) );
-                    targetColumns.add( new SimpleColumn(
-                            targetTableName,
-                            fk.get( "PKCOLUMN_NAME" ),
-                            ColumnRole.PrimaryKey,
-                            columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) ) );
+                foreignKeyGroup.forEach( fk ->
+                {
+                    sourceColumns.add( createForeignKeySourceColumn( table, columnTypes, fk ) );
+                    targetColumns.add( createForeignKeyTargetColumn( columnTypes, fk ) );
                 } );
 
                 if ( sourceColumns.size() == 1 )
@@ -109,33 +96,39 @@ public class TableInfoAssembler
         }
     }
 
+    private Column createPrimaryKeyColumn( TableName table, ColumnTypes columnTypes, Map<String, String> pk )
+    {
+        return new SimpleColumn(
+                table,
+                pk.get( "COLUMN_NAME" ),
+                ColumnRole.PrimaryKey,
+                columnTypes.getSqlDataType( pk.get( "COLUMN_NAME" ) ) );
+    }
+
+    private Column createForeignKeySourceColumn( TableName table, ColumnTypes columnTypes, Map<String, String> fk )
+    {
+        return new SimpleColumn(
+                table,
+                fk.get( "FKCOLUMN_NAME" ),
+                ColumnRole.ForeignKey,
+                columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
+    }
+
+    private Column createForeignKeyTargetColumn( ColumnTypes columnTypes, Map<String, String> fk )
+    {
+        TableName targetTableName = new TableName(
+                firstNonNullOrEmpty( fk.get( "PKTABLE_CAT" ), fk.get( "PKTABLE_SCHEM" ) ),
+                fk.get( "PKTABLE_NAME" ) );
+
+        return new SimpleColumn(
+                targetTableName,
+                fk.get( "PKCOLUMN_NAME" ),
+                ColumnRole.PrimaryKey,
+                columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
+    }
+
     private String firstNonNullOrEmpty( String a, String b )
     {
         return StringUtils.isNotEmpty( a ) ? a : b;
-    }
-
-    private static class ColumnTypes
-    {
-        private final Map<String, String> columnTypes;
-
-        private ColumnTypes( Map<String, String> columnTypes )
-        {
-            this.columnTypes = columnTypes;
-        }
-
-        SqlDataType getSqlDataType( String column )
-        {
-            return SqlDataType.parse( columnTypes.get( column ) );
-        }
-
-        Collection<Column> toColumns( TableName table )
-        {
-            return columnTypes.entrySet().stream()
-                    .map( e ->
-                            new SimpleColumn( table, e.getKey(), ColumnRole.Data, SqlDataType.parse( e.getValue() ) ) )
-                    .filter( c -> !c.sqlDataType().skipImport() )
-                    .collect( Collectors.toList() );
-        }
-
     }
 }

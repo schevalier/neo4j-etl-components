@@ -46,27 +46,21 @@ public class DatabaseInspector
     {
         TableInfo tableInfo = new TableInfoAssembler( databaseClient ).createTableInfo( tableName );
 
-        Table.Builder tableBuilder = Table.builder().name( tableName );
-        tableInfo.columnsLessKeys().forEach( tableBuilder::addColumn );
-
         if ( tableInfo.representsJoinTable() )
         {
             List<JoinKey> joinKeys = tableInfo.foreignKeys().stream()
                     .sorted( ( o1, o2 ) -> o1.sourceColumn().name().compareTo( o2.sourceColumn().name() ) )
                     .collect( Collectors.toList() );
-            joinTables.add( new JoinTable( new Join( joinKeys.get( 0 ), joinKeys.get( 1 ) ), tableBuilder.build() ) );
+            joinTables.add(
+                    new JoinTable( new Join( joinKeys.get( 0 ), joinKeys.get( 1 ) ), tableInfo.createTable() ) );
         }
         else
         {
-            Optional<Column> primaryKeyColumn = tableInfo.primaryKey();
-            if ( primaryKeyColumn.isPresent() )
-            {
-                tableBuilder.addColumn( primaryKeyColumn.get() );
-            }
-            tables.add( tableBuilder.build() );
+            tables.add( tableInfo.createTable() );
 
             for ( JoinKey joinKey : tableInfo.foreignKeys() )
             {
+                Optional<Column> primaryKeyColumn = tableInfo.primaryKey();
                 if ( primaryKeyColumn.isPresent() )
                 {
                     joins.add( new Join( new JoinKey( primaryKeyColumn.get(), primaryKeyColumn.get() ), joinKey ) );
