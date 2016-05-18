@@ -110,11 +110,11 @@ public class CreateCsvResourcesCli implements Runnable
 
             ImportToolOptions importToolOptions =
                     ImportToolOptions.initialiseFromFile( Paths.get( importToolOptionsFile ) );
+
             Formatting formatting = Formatting.builder()
                     .delimiter( importToolOptions.getDelimiter( this.delimiter ) )
                     .quote( importToolOptions.getQuoteCharacter( this.quote ) )
                     .build();
-
 
             new CreateCsvResources(
                     new CreateCsvResourcesEventHandler(),

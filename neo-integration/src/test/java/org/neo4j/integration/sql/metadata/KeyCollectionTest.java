@@ -20,7 +20,8 @@ public class KeyCollectionTest
     public void collectionWithNoKeysDoesNotRepresentJoinTable()
     {
         // given
-        KeyCollection keyCollection = new KeyCollection( Optional.empty(), Collections.emptyList() );
+        KeyCollection keyCollection =
+                new KeyCollection( Optional.empty(), Collections.emptyList(), Collections.emptyList() );
 
         // then
         assertFalse( keyCollection.representsJoinTable() );
@@ -32,6 +33,7 @@ public class KeyCollectionTest
         // given
         KeyCollection keyCollection = new KeyCollection(
                 Optional.of( new StubColumn( "javabase.Author.id" ) ),
+                Collections.emptyList(),
                 Collections.emptyList() );
 
         // then
@@ -45,7 +47,8 @@ public class KeyCollectionTest
         KeyCollection keyCollection = new KeyCollection(
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
-                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertTrue( keyCollection.representsJoinTable() );
@@ -58,7 +61,8 @@ public class KeyCollectionTest
         KeyCollection keyCollection = new KeyCollection(
                 Optional.empty(),
                 Collections.singletonList(
-                        new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertFalse( keyCollection.representsJoinTable() );
@@ -72,7 +76,8 @@ public class KeyCollectionTest
                 Optional.empty(),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
                         new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ),
-                        new JoinKey( new StubColumn( "javabase.Author_Publisher.book_id" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Author_Publisher.book_id" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertFalse( keyCollection.representsJoinTable() );
@@ -86,7 +91,8 @@ public class KeyCollectionTest
                 Optional.of( new StubColumn(
                         join( "javabase.Author_Publisher.author_id", "javabase.Author_Publisher.publisher_id" ) ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
-                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertTrue( keyCollection.representsJoinTable() );
@@ -99,7 +105,8 @@ public class KeyCollectionTest
         KeyCollection keyCollection = new KeyCollection(
                 Optional.of( new StubColumn( "javabase.Author_Publisher.author_id" ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
-                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertTrue( keyCollection.representsJoinTable() );
@@ -113,7 +120,8 @@ public class KeyCollectionTest
                 Optional.of( new StubColumn(
                         join( "javabase.Author_Publisher.author_id", "javabase.Author_Publisher.sequence" ) ) ),
                 asList( new JoinKey( new StubColumn( "javabase.Author_Publisher.author_id" ), null ),
-                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Author_Publisher.publisher_id" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertFalse( keyCollection.representsJoinTable() );
@@ -130,7 +138,8 @@ public class KeyCollectionTest
                                 "javabase.Example.column_3" ) ) ),
                 asList( new JoinKey( new StubColumn(
                                 join( "javabase.Example.column_1", "javabase.Example.column_2" ) ), null ),
-                        new JoinKey( new StubColumn( "javabase.Example.column_3" ), null ) ) );
+                        new JoinKey( new StubColumn( "javabase.Example.column_3" ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertTrue( keyCollection.representsJoinTable() );
@@ -148,7 +157,8 @@ public class KeyCollectionTest
                 asList( new JoinKey( new StubColumn(
                                 join( "javabase.Example.column_1", "javabase.Example.column_2" ) ), null ),
                         new JoinKey( new StubColumn(
-                                join( "javabase.Example.column_3", "javabase.Example.column_4" ) ), null ) ) );
+                                join( "javabase.Example.column_3", "javabase.Example.column_4" ) ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertTrue( keyCollection.representsJoinTable() );
@@ -166,7 +176,8 @@ public class KeyCollectionTest
                 asList( new JoinKey( new StubColumn(
                                 join( "javabase.Example.column_1", "javabase.Example.column_2" ) ), null ),
                         new JoinKey( new StubColumn(
-                                join( "javabase.Example.column_3", "javabase.Example.column_4" ) ), null ) ) );
+                                join( "javabase.Example.column_3", "javabase.Example.column_4" ) ), null ) ),
+                Collections.emptyList() );
 
         // then
         assertFalse( keyCollection.representsJoinTable() );
