@@ -11,12 +11,12 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
-public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTable>
+class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTable>
 {
     private final Formatting formatting;
     private final RelationshipNameResolver relationshipNameResolver;
 
-    public JoinTableToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
+    JoinTableToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
     {
         this.formatting = formatting;
         this.relationshipNameResolver = relationshipNameResolver;

@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.util.Loggers;
 
 public class TableInfoAssembler
 {

@@ -10,11 +10,11 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 
-public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
+class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
 {
     private final Formatting formatting;
 
-    public TableToCsvFieldMapper( Formatting formatting )
+    TableToCsvFieldMapper( Formatting formatting )
     {
         this.formatting = formatting;
     }
