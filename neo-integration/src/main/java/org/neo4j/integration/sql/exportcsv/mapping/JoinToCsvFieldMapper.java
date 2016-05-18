@@ -26,11 +26,10 @@ public class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
         final CsvField to = CsvField.startId( new IdSpace( join.keyOneSourceColumn().table().fullName() ) );
-        builder.add(
-                new ColumnToCsvFieldMapping( join.keyOneSourceColumn(), to ) );
+        builder.add( new ColumnToCsvFieldMapping( join.keyOneSourceColumn(), to ) );
+
         final CsvField to1 = CsvField.endId( new IdSpace( join.keyTwoTargetColumn().table().fullName() ) );
-        builder.add(
-                new ColumnToCsvFieldMapping( join.keyTwoSourceColumn(), to1 ) );
+        builder.add( new ColumnToCsvFieldMapping( join.keyTwoSourceColumn(), to1 ) );
 
         String tableName = join.keyTwoTargetColumn().table().simpleName();
         String columnName = join.keyTwoSourceColumn().alias();

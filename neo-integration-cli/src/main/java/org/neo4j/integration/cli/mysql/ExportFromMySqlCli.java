@@ -15,6 +15,7 @@ import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
+import org.neo4j.integration.FilterOptions;
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
 import org.neo4j.integration.commands.mysql.ExportFromMySql;
 import org.neo4j.integration.environment.CsvDirectorySupplier;
@@ -125,9 +126,17 @@ public class ExportFromMySqlCli implements Runnable
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
-            name = {"--columnNameAsRelationshipName"},
-            description = "--columnNameAsRelationshipName")
-    private boolean columnNameAsRelationshipName = false;
+            name = {"--relationship-name", "--rel-name"},
+            description = "Specifies whether to get the name for relationships from table names (table) or column names (column). Table is default.",
+            title = "relationshipNameFrom")
+    private String relationshipNameFrom = "table";
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--tiny-int"},
+            description = "Specifies whether to get the convert TinyInts to byte (byte) or boolean (boolean). Byte is default.",
+            title = "tinyIntAs")
+    private String tinyIntAs = "byte";
 
     @Option(type = OptionType.COMMAND,
             name = {"--csv-resources"},
@@ -213,10 +222,20 @@ public class ExportFromMySqlCli implements Runnable
                     },
                     connectionConfig,
                     formatting,
-                    new MySqlExportSqlSupplier(), columnNameAsRelationshipName );
+                    new MySqlExportSqlSupplier(), createFilterOptions() );
         }
 
         return createCsvResources.call();
+    }
+
+    private FilterOptions createFilterOptions()
+    {
+        FilterOptions filterOptions = new FilterOptions(  );
+
+        filterOptions.setTinyIntAs( tinyIntAs );
+        filterOptions.setRelationshipNameFrom( relationshipNameFrom );
+
+        return filterOptions;
     }
 
     private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events

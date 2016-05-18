@@ -1,16 +1,28 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import org.neo4j.integration.FilterOptions;
+
 public class RelationshipNameResolver
 {
-    private boolean columnNameAsRelationshipLabel;
+    private FilterOptions.RelationshipNameFrom relationshipNameFrom;
 
-    public RelationshipNameResolver( boolean columnNameAsRelationshipLabel )
+    public RelationshipNameResolver( FilterOptions.RelationshipNameFrom relationshipNameFrom )
     {
-        this.columnNameAsRelationshipLabel = columnNameAsRelationshipLabel;
+        this.relationshipNameFrom = relationshipNameFrom;
     }
 
-    String resolve( String tableName, String columnNameAsRelationship )
+    String resolve( String tableName, String columnName )
     {
-        return columnNameAsRelationshipLabel ? columnNameAsRelationship : tableName;
+        switch ( relationshipNameFrom )
+        {
+            case TABLE_NAME:
+                return tableName;
+
+            case COLUMN_NAME:
+                return columnName;
+
+            default:
+                return tableName;
+        }
     }
 }

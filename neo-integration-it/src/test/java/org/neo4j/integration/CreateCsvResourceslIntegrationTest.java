@@ -74,6 +74,6 @@ public class CreateCsvResourceslIntegrationTest
                 "--password", MySqlClient.Parameters.DBPassword.value(),
                 "--database", database,
                 "--options-file", importToolOptions.toString(),
-                "--columnNameAsRelationshipName"} );
+                "--relationship-name", "column"} );
     }
 }

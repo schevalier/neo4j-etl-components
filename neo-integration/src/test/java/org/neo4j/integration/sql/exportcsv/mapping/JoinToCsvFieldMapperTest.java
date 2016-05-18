@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
+import org.neo4j.integration.FilterOptions;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
@@ -24,7 +25,7 @@ public class JoinToCsvFieldMapperTest
 {
 
     private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT,
-            new RelationshipNameResolver( false ) );
+            new RelationshipNameResolver( FilterOptions.RelationshipNameFrom.TABLE_NAME ) );
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
@@ -72,7 +73,7 @@ public class JoinToCsvFieldMapperTest
         );
         // when
         ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( Formatting.DEFAULT,
-                new RelationshipNameResolver( true ) ).createMappings( join );
+                new RelationshipNameResolver( FilterOptions.RelationshipNameFrom.COLUMN_NAME ) ).createMappings( join );
 
         // then
         Collection<CsvField> fields = new ArrayList<>( mappings.fields() );

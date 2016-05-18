@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import org.junit.Test;
 
+import org.neo4j.integration.FilterOptions;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
@@ -52,7 +53,7 @@ public class SchemaExportTest
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
             schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ),
-                    new RelationshipNameResolver( false ) );
+                    new RelationshipNameResolver( FilterOptions.RelationshipNameFrom.TABLE_NAME ) );
 
             fail( "Expected IllegalStatException" );
         }
@@ -92,7 +93,7 @@ public class SchemaExportTest
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
             schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ), new
-                    RelationshipNameResolver( true ) );
+                    RelationshipNameResolver( FilterOptions.RelationshipNameFrom.COLUMN_NAME ) );
 
             fail( "Expected IllegalStateException" );
         }

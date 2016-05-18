@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import org.neo4j.integration.FilterOptions;
 import org.neo4j.integration.commands.DatabaseInspector;
 import org.neo4j.integration.commands.SchemaExport;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
@@ -72,7 +73,7 @@ public class CreateCsvResources implements Callable<CsvResources>
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier )
     {
-        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier, false );
+        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier, new FilterOptions(  ) );
     }
 
     public CreateCsvResources( Events events,
@@ -80,14 +81,14 @@ public class CreateCsvResources implements Callable<CsvResources>
                                ConnectionConfig connectionConfig,
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier,
-                               boolean columnNameAsRelationshipName )
+                               FilterOptions filterOptions )
     {
         this.events = events;
         this.output = output;
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
-        this.relationshipNameResolver = new RelationshipNameResolver( columnNameAsRelationshipName );
+        this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.getRelationshipNameFrom() );
     }
 
     @Override
