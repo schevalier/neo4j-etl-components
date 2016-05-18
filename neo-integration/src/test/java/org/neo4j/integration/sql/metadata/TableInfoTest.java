@@ -186,21 +186,6 @@ public class TableInfoTest
     }
 
     @Test
-    public void shouldReturnCollectionOfColumns()
-    {
-        // given
-        Column column1 = new StubColumn( "column-1" );
-        Column column2 = new StubColumn( "column-2" );
-
-        TableInfo tableInfo = new TableInfo(
-                Optional.empty(),
-                Collections.emptyList(),
-                asList( column1, column2 ) );
-
-        // then
-        assertEquals( tableInfo.columns(), asList( column1, column2 ) );
-    }
-    @Test
     public void shouldReturnCollectionOfColumnsLessPrimaryKeyColumn()
     {
         // given

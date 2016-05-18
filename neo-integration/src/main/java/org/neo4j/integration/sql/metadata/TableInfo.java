@@ -33,19 +33,13 @@ public class TableInfo
         return foreignKeys;
     }
 
-    public Collection<Column> columns()
-    {
-        return columns;
-    }
-
     public Collection<Column> columnsLessKeys()
     {
-        List<String> primaryKeyNames = primaryKeyNames();
-        List<String> foreignKeyNames = foreignKeyNames();
+        List<String> keyNames = primaryKeyNames();
+        keyNames.addAll( foreignKeyNames() );
 
         return columns.stream()
-                .filter( c -> !primaryKeyNames.contains( c.name() ) )
-                .filter( c -> !foreignKeyNames.contains( c.name() ) )
+                .filter( c -> !keyNames.contains( c.name() ) )
                 .collect( Collectors.toList() );
     }
 
@@ -54,9 +48,8 @@ public class TableInfo
         if ( foreignKeys.size() == 2 )
         {
             List<String> primaryKeyNames = primaryKeyNames();
-            List<String> foreignKeyNames = foreignKeyNames();
 
-            primaryKeyNames.removeAll( foreignKeyNames );
+            primaryKeyNames.removeAll( foreignKeyNames() );
 
             return primaryKeyNames.isEmpty();
         }

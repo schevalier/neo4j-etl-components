@@ -25,30 +25,27 @@ public class TableInfoAssembler
     {
         try ( QueryResults columnsResults = databaseClient.columns( tableName ) )
         {
-            Map<String, String> columnTypes = columnsResults.stream()
+            ColumnTypes columnTypes = new ColumnTypes( columnsResults.stream()
                     .map( m -> new String[]{m.get( "COLUMN_NAME" ), m.get( "TYPE_NAME" )} )
-                    .collect( Collectors.toMap( v -> v[0], v -> v[1] ) );
+                    .collect( Collectors.toMap( v -> v[0], v -> v[1] ) ) );
 
             return new TableInfo(
                     createPrimaryKey( tableName, columnTypes ),
                     createForeignKeys( tableName, columnTypes ),
-                    createColumns( tableName, columnTypes ) );
+                    columnTypes.toColumns( tableName ) );
         }
     }
 
-    private Optional<Column> createPrimaryKey( TableName table, Map<String, String> columnTypes ) throws Exception
+    private Optional<Column> createPrimaryKey( TableName table, ColumnTypes columnTypes ) throws Exception
     {
         try ( QueryResults primaryKeyResults = databaseClient.primaryKeys( table ) )
         {
-            List<Map<String, String>> primaryKeys =
-                    primaryKeyResults.stream().collect( Collectors.toList() );
-
-            List<Column> columns = primaryKeys.stream()
+            List<Column> columns = primaryKeyResults.stream()
                     .map( pk -> new SimpleColumn(
                             table,
                             pk.get( "COLUMN_NAME" ),
                             ColumnRole.PrimaryKey,
-                            SqlDataType.parse( columnTypes.get( pk.get( "COLUMN_NAME" ) ) ) ) )
+                            columnTypes.getSqlDataType( pk.get( "COLUMN_NAME" ) ) ) )
                     .collect( Collectors.toList() );
 
             if ( columns.isEmpty() )
@@ -66,26 +63,26 @@ public class TableInfoAssembler
         }
     }
 
-    private Collection<JoinKey> createForeignKeys( TableName table, Map<String, String> columnTypes ) throws Exception
+    private Collection<JoinKey> createForeignKeys( TableName table, ColumnTypes columnTypes ) throws Exception
     {
         try ( QueryResults foreignKeysResults = databaseClient.foreignKeys( table ) )
         {
-            Map<String, List<Map<String, String>>> foreignKeys = foreignKeysResults.stream()
+            Map<String, List<Map<String, String>>> foreignKeyGroups = foreignKeysResults.stream()
                     .collect( Collectors.groupingBy( r -> r.get( "FK_NAME" ) ) );
 
             Collection<JoinKey> keys = new ArrayList<>();
 
-            for ( List<Map<String, String>> foreignKeyPart : foreignKeys.values() )
+            for ( List<Map<String, String>> foreignKeyGroup : foreignKeyGroups.values() )
             {
                 List<Column> sourceColumns = new ArrayList<>();
                 List<Column> targetColumns = new ArrayList<>();
 
-                foreignKeyPart.forEach( fk -> {
+                foreignKeyGroup.forEach( fk -> {
                     sourceColumns.add( new SimpleColumn(
                             table,
                             fk.get( "FKCOLUMN_NAME" ),
                             ColumnRole.ForeignKey,
-                            SqlDataType.parse( columnTypes.get( fk.get( "FKCOLUMN_NAME" ) ) ) ) );
+                            columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) ) );
                     TableName targetTableName = new TableName(
                             firstNonNullOrEmpty( fk.get( "PKTABLE_CAT" ), fk.get( "PKTABLE_SCHEM" ) ),
                             fk.get( "PKTABLE_NAME" ) );
@@ -93,7 +90,7 @@ public class TableInfoAssembler
                             targetTableName,
                             fk.get( "PKCOLUMN_NAME" ),
                             ColumnRole.PrimaryKey,
-                            SqlDataType.parse( columnTypes.get( fk.get( "FKCOLUMN_NAME" ) ) ) ) );
+                            columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) ) );
                 } );
 
                 if ( sourceColumns.size() == 1 )
@@ -112,16 +109,33 @@ public class TableInfoAssembler
         }
     }
 
-    private Collection<Column> createColumns( TableName table, Map<String, String> columnTypes )
-    {
-        return columnTypes.entrySet().stream()
-                .map( e -> new SimpleColumn( table, e.getKey(), ColumnRole.Data, SqlDataType.parse( e.getValue() ) ) )
-                .filter( c -> !c.sqlDataType().skipImport() )
-                .collect( Collectors.toList() );
-    }
-
     private String firstNonNullOrEmpty( String a, String b )
     {
         return StringUtils.isNotEmpty( a ) ? a : b;
+    }
+
+    private static class ColumnTypes
+    {
+        private final Map<String, String> columnTypes;
+
+        private ColumnTypes( Map<String, String> columnTypes )
+        {
+            this.columnTypes = columnTypes;
+        }
+
+        SqlDataType getSqlDataType( String column )
+        {
+            return SqlDataType.parse( columnTypes.get( column ) );
+        }
+
+        Collection<Column> toColumns( TableName table )
+        {
+            return columnTypes.entrySet().stream()
+                    .map( e ->
+                            new SimpleColumn( table, e.getKey(), ColumnRole.Data, SqlDataType.parse( e.getValue() ) ) )
+                    .filter( c -> !c.sqlDataType().skipImport() )
+                    .collect( Collectors.toList() );
+        }
+
     }
 }
