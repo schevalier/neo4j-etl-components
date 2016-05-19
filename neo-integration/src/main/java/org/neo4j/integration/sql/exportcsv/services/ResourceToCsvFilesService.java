@@ -21,7 +21,11 @@ public class ResourceToCsvFilesService
 
     public ManifestEntry exportToCsv( CsvResource resource ) throws Exception
     {
-        Path headerFile = headerFileWriter.writeHeaderFile( resource.mappings().fields(), resource.name() );
+        Path headerFile = headerFileWriter.writeHeaderFile(
+                resource.graphObjectType().name(),
+                resource.mappings().fields(),
+                resource.name() );
+
         Path exportFile = csvFileWriter.writeExportFile( resource );
 
         return new ManifestEntry( resource.graphObjectType(), new CsvFiles( headerFile, exportFile ) );

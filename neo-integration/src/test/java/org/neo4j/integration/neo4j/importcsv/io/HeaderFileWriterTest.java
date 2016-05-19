@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
@@ -40,7 +41,7 @@ public class HeaderFileWriterTest
         fields.add( CsvField.data( "name", Neo4jDataType.String ) );
         fields.add( CsvField.array( "addresses", Neo4jDataType.String ) );
 
-        Path file = headerFileWriter.writeHeaderFile( fields, "nodes" );
+        Path file = headerFileWriter.writeHeaderFile( GraphObjectType.Node.name(), fields, "nodes" );
 
         // then
         List<String> expectedLines = singletonList( "personId:ID(person),:LABEL,name:string,addresses:string[]" );

@@ -23,12 +23,13 @@ public class CsvFileWriter
     {
         this.config = config;
         this.databaseClient = databaseClient;
-        resultsToFileWriter = new ResultsToFileWriter(config.formatting());
+        this.resultsToFileWriter = new ResultsToFileWriter(config.formatting());
     }
 
     public Path writeExportFile( CsvResource resource ) throws Exception
     {
-        Loggers.Default.log( Level.INFO, format( "Writing data for %s", resource.name() ) );
+        Loggers.Default.log( Level.INFO,
+                format( "Writing %s data for %s", resource.graphObjectType().name().toLowerCase(), resource.name() ) );
 
         Path exportFile = createExportFile( resource.name() );
 
