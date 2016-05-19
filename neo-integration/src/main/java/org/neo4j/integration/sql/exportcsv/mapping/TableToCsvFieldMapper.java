@@ -34,12 +34,6 @@ class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
                 builder.add( new ColumnToCsvFieldMapping( column, id ) );
                 column.addData( builder );
             }
-            else if ( column.roles().contains( ColumnRole.CompositeKey ) )
-            {
-                CsvField id1 = CsvField.id( new IdSpace( table.name().fullName() ) );
-                builder.add( new ColumnToCsvFieldMapping( column, id1 ) );
-                column.addData( builder );
-            }
             else if ( column.roles().contains( ColumnRole.Data ) )
             {
                 column.addData( builder );

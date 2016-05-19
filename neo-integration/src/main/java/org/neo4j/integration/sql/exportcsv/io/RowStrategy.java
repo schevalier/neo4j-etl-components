@@ -57,7 +57,6 @@ enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
     private static boolean isKeyColumn( Set<ColumnRole> roles )
     {
         return roles.contains( ColumnRole.ForeignKey ) ||
-                roles.contains( ColumnRole.PrimaryKey ) ||
-                roles.contains( ColumnRole.CompositeKey );
+                roles.contains( ColumnRole.PrimaryKey ) ;
     }
 }
