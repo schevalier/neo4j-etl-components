@@ -1,9 +1,10 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
@@ -23,11 +24,15 @@ public class SimpleColumn implements Column
 {
     public static Column fromJson( JsonNode root )
     {
+        ArrayNode rolesNode = (ArrayNode) root.path( "roles" );
+        Set<ColumnRole> roles = new HashSet<>();
+        rolesNode.forEach( r -> roles.add(  ColumnRole.valueOf( r.textValue() ) ));
+
         return new SimpleColumn(
                 new TableName( root.path( "table" ).textValue() ),
                 root.path( "name" ).textValue(),
                 root.path( "alias" ).textValue(),
-                ColumnRole.valueOf( root.path( "role" ).textValue() ),
+                roles,
                 SqlDataType.valueOf( root.path( "sql-data-type" ).textValue() )
         );
     }
@@ -35,20 +40,20 @@ public class SimpleColumn implements Column
     private final TableName table;
     private final String name;
     private final String alias;
-    private final ColumnRole columnRole;
+    private final Set<ColumnRole> columnRoles;
     private final SqlDataType dataType;
 
-    public SimpleColumn( TableName table, String name, ColumnRole columnRole, SqlDataType dataType )
+    public SimpleColumn( TableName table, String name, Set<ColumnRole> columnRoles, SqlDataType dataType )
     {
-        this( table, name, name, columnRole, dataType );
+        this( table, name, name, columnRoles, dataType );
     }
 
-    public SimpleColumn( TableName table, String name, String alias, ColumnRole columnRole, SqlDataType dataType )
+    public SimpleColumn( TableName table, String name, String alias, Set<ColumnRole> columnRoles, SqlDataType dataType )
     {
         this.table = Preconditions.requireNonNull( table, "Table" );
         this.name = Preconditions.requireNonNullString( name, "Name" );
         this.alias = Preconditions.requireNonNullString( alias, "Alias" );
-        this.columnRole = Preconditions.requireNonNull( columnRole, "ColumnRole" );
+        this.columnRoles = Preconditions.requireNonNull( columnRoles, "ColumnRole" );
         this.dataType = Preconditions.requireNonNull( dataType, "DataType" );
     }
 
@@ -62,7 +67,7 @@ public class SimpleColumn implements Column
     @Override
     public String name()
     {
-        return columnRole.fullyQualifiedColumnName( table, name );
+        return columnRoles.contains( ColumnRole.Literal ) ? name : table.fullyQualifiedColumnName( name );
     }
 
     // Column alias
@@ -75,7 +80,7 @@ public class SimpleColumn implements Column
     @Override
     public Set<ColumnRole> roles()
     {
-        return EnumSet.of( columnRole );
+        return columnRoles;
     }
 
     @Override
@@ -112,7 +117,7 @@ public class SimpleColumn implements Column
     @Override
     public String aliasedColumn()
     {
-        if ( columnRole == ColumnRole.Literal )
+        if ( columnRoles.contains( ColumnRole.Literal ) )
         {
             return format( "%s AS `%s`", name(), alias );
         }
@@ -135,7 +140,11 @@ public class SimpleColumn implements Column
         ObjectNode root = JsonNodeFactory.instance.objectNode();
 
         root.put( "type", getClass().getSimpleName() );
-        root.put( "role", columnRole.name() );
+
+        ArrayNode roles = JsonNodeFactory.instance.arrayNode();
+        columnRoles.forEach( r -> roles.add( r.name() ) );
+        root.set( "roles", roles );
+
         root.put( "table", table.fullName() );
         root.put( "name", name );
         root.put( "alias", alias );

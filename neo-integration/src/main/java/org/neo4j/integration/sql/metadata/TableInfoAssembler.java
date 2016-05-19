@@ -2,6 +2,7 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -101,7 +102,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 table,
                 pk.get( "COLUMN_NAME" ),
-                ColumnRole.PrimaryKey,
+                EnumSet.of( ColumnRole.PrimaryKey ),
                 columnTypes.getSqlDataType( pk.get( "COLUMN_NAME" ) ) );
     }
 
@@ -110,7 +111,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 table,
                 fk.get( "FKCOLUMN_NAME" ),
-                ColumnRole.ForeignKey,
+                EnumSet.of( ColumnRole.ForeignKey ),
                 columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
     }
 
@@ -123,7 +124,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 targetTableName,
                 fk.get( "PKCOLUMN_NAME" ),
-                ColumnRole.PrimaryKey,
+                EnumSet.of( ColumnRole.PrimaryKey ),
                 columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
     }
 

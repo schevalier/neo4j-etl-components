@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class TableToCsvFieldMapperTest
                 .name( personTable )
                 .addColumn( columnUtil.column( personTable, "id", ColumnRole.PrimaryKey ) )
                 .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
-                .addColumn( new SimpleColumn( personTable, "age", ColumnRole.Data, SqlDataType.INT ) )
+                .addColumn( new SimpleColumn( personTable, "age", EnumSet.of( ColumnRole.Data ), SqlDataType.INT ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

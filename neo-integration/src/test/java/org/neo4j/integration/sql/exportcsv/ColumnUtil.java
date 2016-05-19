@@ -1,5 +1,6 @@
 package org.neo4j.integration.sql.exportcsv;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,18 +18,18 @@ public class ColumnUtil
         return column( table, nameAndAlias, nameAndAlias, type );
     }
 
-    public Column column( TableName table, String name, String alias, ColumnRole type )
+    public Column column( TableName table, String name, String alias, ColumnRole role )
     {
-        return new SimpleColumn( table, name, alias, type, SqlDataType.TEXT );
+        return new SimpleColumn( table, name, alias, EnumSet.of( role ), SqlDataType.TEXT );
     }
 
-    public SimpleColumn keyColumn( TableName tableName, String nameAndAlias, ColumnRole type )
+    public SimpleColumn keyColumn( TableName tableName, String nameAndAlias, ColumnRole role )
     {
         return new SimpleColumn(
                 tableName,
                 nameAndAlias,
                 nameAndAlias,
-                type,
+                EnumSet.of( role ),
                 SqlDataType.KEY_DATA_TYPE );
     }
 

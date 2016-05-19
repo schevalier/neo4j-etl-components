@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.EnumSet;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
@@ -40,7 +42,7 @@ class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
         SimpleColumn from = new SimpleColumn( join.keyOneSourceColumn().table(),
                 QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),
                 relationshipType,
-                ColumnRole.Literal,
+                EnumSet.of( ColumnRole.Literal ),
                 SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
         builder.add(
                 new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );

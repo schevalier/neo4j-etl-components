@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.EnumSet;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
@@ -48,7 +50,7 @@ class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
                 table.name(),
                 QuoteChar.DOUBLE_QUOTES.enquote( formatting.labelFormatter().format( table.name().simpleName() ) ),
                 table.name().simpleName(),
-                ColumnRole.Literal,
+                EnumSet.of(ColumnRole.Literal),
                 SqlDataType.LABEL_DATA_TYPE );
 
         builder.add( new ColumnToCsvFieldMapping( label, CsvField.label() ) );
