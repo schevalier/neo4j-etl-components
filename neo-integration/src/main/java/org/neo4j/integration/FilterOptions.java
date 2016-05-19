@@ -1,5 +1,7 @@
 package org.neo4j.integration;
 
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
+
 public class FilterOptions
 {
     public TinyIntAs tinyIntAs;
@@ -7,7 +9,19 @@ public class FilterOptions
 
     public enum TinyIntAs
     {
-        BYTE, BOOLEAN;
+        BYTE( Neo4jDataType.Byte ), BOOLEAN( Neo4jDataType.Boolean );
+
+        private Neo4jDataType tinyIntAsNeoDataType;
+
+        private TinyIntAs( Neo4jDataType tinyIntAs )
+        {
+            this.tinyIntAsNeoDataType = tinyIntAs;
+        }
+
+        public Neo4jDataType neoDataType()
+        {
+            return tinyIntAsNeoDataType;
+        }
     }
 
     public enum RelationshipNameFrom

@@ -21,6 +21,8 @@ import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
+import org.neo4j.integration.sql.metadata.SqlDataType;
+import org.neo4j.integration.util.SqlDataTypeUtils;
 
 public class CreateCsvResources implements Callable<CsvResources>
 {
@@ -89,6 +91,8 @@ public class CreateCsvResources implements Callable<CsvResources>
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
         this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.getRelationshipNameFrom() );
+
+        SqlDataTypeUtils.setDataTypeConversion( SqlDataType.TINYINT, filterOptions.getTinyIntAs().neoDataType() );
     }
 
     @Override

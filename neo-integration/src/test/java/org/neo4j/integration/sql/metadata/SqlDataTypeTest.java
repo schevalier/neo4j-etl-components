@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.metadata;
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
+import org.neo4j.integration.util.SqlDataTypeUtils;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -16,7 +17,7 @@ public class SqlDataTypeTest
     public void parseShouldUpperCaseDataTypesToMapToMySqlDataType() throws Exception
     {
         // given
-        SqlDataType anInt = SqlDataType.parse( "int" );
+        SqlDataType anInt = SqlDataTypeUtils.parse( "int" );
 
         // then
         assertThat( anInt, is( SqlDataType.INT ) );

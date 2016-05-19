@@ -37,6 +37,7 @@ import static org.junit.Assert.assertThat;
 public class ExportFromMySqlIntegrationTest
 {
     private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
+    private static final String tinyIntAs = "byte";
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -141,7 +142,7 @@ public class ExportFromMySqlIntegrationTest
         assertThat( stringFields.get( 0 ).values(), hasItems(
                 "val-1", "mediumtext_field", "tinytext_field",
                 "char-field", "text_field", "varchar-field", "longtext_field" ) );
-        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.0, 1.232343445E7, 1 ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
     }
 
     @Test
@@ -160,7 +161,27 @@ public class ExportFromMySqlIntegrationTest
                 "1989-01-23 00:00:00.0",
                 "2038-01-19 03:14:07.0",
                 "1988-01-23" ) );
-        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.0, 1.232343445E7, 1 ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
+    }
+
+    @Test
+    public void shouldExportFromMySqlAndImportIntoGraphWithCorrectTinyIntConversion() throws Exception
+    {
+        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
+        String response = neo4j.get().executeHttp( NEO_TX_URI,
+                "MATCH (c:NumericTable) RETURN c" );
+
+        List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
+
+        if( tinyIntAs == "boolean" )
+        {
+            assertThat( numericFields.get( 0 ).values(), hasItems( true, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
+        }
+        else
+        {
+            assertThat( numericFields.get( 0 ).values(), hasItems( 1, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
+        }
     }
 
     @Test
@@ -233,6 +254,8 @@ public class ExportFromMySqlIntegrationTest
                         "--options-file", importToolOptions.toString(),
                         "--csv-directory", tempDirectory.get().toString(),
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
+                        "--tiny-int", tinyIntAs,
+                        "--relationship-name", "table",
                         "--force"} );
     }
 }

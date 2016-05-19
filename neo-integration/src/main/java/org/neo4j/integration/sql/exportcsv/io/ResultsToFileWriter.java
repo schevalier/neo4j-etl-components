@@ -9,10 +9,12 @@ import java.nio.file.Path;
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.metadata.Column;
+import org.neo4j.integration.sql.metadata.SqlDataType;
 
 public class ResultsToFileWriter
 {
@@ -40,14 +42,35 @@ public class ResultsToFileWriter
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {
-                        writeFieldValueAndDelimiter( columns[i].selectFrom( results ), writer, columns[i].useQuotes() );
+                        String result = applyFilterStrategies( columns[i].selectFrom( results ), columns[i]
+                                .sqlDataType() );
+                        writeFieldValueAndDelimiter( result, writer, columns[i].useQuotes() );
                     }
 
-                    writeFieldValueAndNewLine( columns[maxIndex].selectFrom( results ),
-                            writer, columns[maxIndex].useQuotes() );
+                    String result = applyFilterStrategies( columns[maxIndex].selectFrom( results ), columns[maxIndex]
+                            .sqlDataType() );
+                    writeFieldValueAndNewLine( result, writer, columns[maxIndex].useQuotes() );
                 }
             }
         }
+    }
+
+    public String applyFilterStrategies( String value, SqlDataType sqlDataType )
+    {
+        if ( sqlDataType.equals( SqlDataType.TINYINT ) && SqlDataType.TINYINT.toNeo4jDataType().equals( Neo4jDataType
+                .Boolean ) )
+        {
+            if ( Integer.parseInt( value ) == 0 )
+            {
+                value = "false";
+            }
+            else
+            {
+                value = "true";
+            }
+        }
+
+        return value;
     }
 
     private void writeFieldValueAndDelimiter( String value,

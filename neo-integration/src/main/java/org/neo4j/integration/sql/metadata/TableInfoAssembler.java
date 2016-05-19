@@ -5,14 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.MySqlDatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.util.Loggers;
+import org.neo4j.integration.util.SqlDataTypeUtils;
 
 public class TableInfoAssembler
 {
@@ -50,7 +49,7 @@ public class TableInfoAssembler
                             table,
                             pk.get( "COLUMN_NAME" ),
                             ColumnRole.PrimaryKey,
-                            SqlDataType.parse( columnTypes.get( pk.get( "COLUMN_NAME" ) ) ) ) )
+                            SqlDataTypeUtils.parse( columnTypes.get( pk.get( "COLUMN_NAME" ) ) ) ) )
                     .collect( Collectors.toList() );
 
             if ( columns.isEmpty() )
@@ -87,7 +86,7 @@ public class TableInfoAssembler
                             table,
                             fk.get( "FKCOLUMN_NAME" ),
                             ColumnRole.ForeignKey,
-                            SqlDataType.parse( columnTypes.get( fk.get( "FKCOLUMN_NAME" ) ) ) ) );
+                            SqlDataTypeUtils.parse( columnTypes.get( fk.get( "FKCOLUMN_NAME" ) ) ) ) );
                     TableName targetTableName = new TableName(
                             firstNonNullOrEmpty( fk.get( "PKTABLE_CAT" ), fk.get( "PKTABLE_SCHEM" ) ),
                             fk.get( "PKTABLE_NAME" ) );
@@ -95,7 +94,7 @@ public class TableInfoAssembler
                             targetTableName,
                             fk.get( "PKCOLUMN_NAME" ),
                             ColumnRole.PrimaryKey,
-                            SqlDataType.parse( columnTypes.get( fk.get( "FKCOLUMN_NAME" ) ) ) ) );
+                            SqlDataTypeUtils.parse( columnTypes.get( fk.get( "FKCOLUMN_NAME" ) ) ) ) );
                 } );
 
                 if ( sourceColumns.size() == 1 )
@@ -117,7 +116,7 @@ public class TableInfoAssembler
     private Collection<Column> createColumns( TableName table, Map<String, String> columnTypes )
     {
         return columnTypes.entrySet().stream()
-                .map( e -> new SimpleColumn( table, e.getKey(), ColumnRole.Data, SqlDataType.parse( e.getValue() ) ) )
+                .map( e -> new SimpleColumn( table, e.getKey(), ColumnRole.Data, SqlDataTypeUtils.parse( e.getValue() ) ) )
                 .filter( c -> !c.sqlDataType().skipImport() )
                 .collect( Collectors.toList() );
     }

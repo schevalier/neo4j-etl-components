@@ -35,24 +35,12 @@ public enum SqlDataType
     MEDIUMBLOB( null ),
     LONGBLOB( null );
 
-    public static SqlDataType parse( String value )
-    {
-        try
-        {
-            return valueOf( value.toUpperCase() );
-        }
-        catch ( NullPointerException e )
-        {
-            throw new IllegalArgumentException( format( "Unrecognized SQL data type: %s", value ) );
-        }
-    }
-
     public static final SqlDataType COMPOSITE_KEY_TYPE = TEXT;
     public static final SqlDataType LABEL_DATA_TYPE = TEXT;
     public static final SqlDataType RELATIONSHIP_TYPE_DATA_TYPE = TEXT;
     public static final SqlDataType KEY_DATA_TYPE = TEXT;
 
-    private final Neo4jDataType neo4jDataType;
+    private Neo4jDataType neo4jDataType;
 
     SqlDataType( Neo4jDataType neo4jDataType )
     {
@@ -62,6 +50,11 @@ public enum SqlDataType
     public Neo4jDataType toNeo4jDataType()
     {
         return neo4jDataType;
+    }
+
+    public void setNeoDataType( Neo4jDataType neoDataType )
+    {
+        this.neo4jDataType = neoDataType;
     }
 
     public boolean skipImport()

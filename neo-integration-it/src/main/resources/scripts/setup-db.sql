@@ -32,7 +32,7 @@ CREATE TABLE javabase.Numeric_Table
   bigint_field    BIGINT,
   float_field     FLOAT,
   double_field    DOUBLE,
-  decimal_field   DECIMAL
+  decimal_field   DECIMAL(8,2)
 );
 GRANT ALL ON javabase.Numeric_Table TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';

@@ -133,7 +133,7 @@ public class ExportFromMySqlCli implements Runnable
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
-            name = {"--tiny-int"},
+            name = {"--tiny-int", "--tiny"},
             description = "Specifies whether to get the convert TinyInts to byte (byte) or boolean (boolean). Byte is default.",
             title = "tinyIntAs")
     private String tinyIntAs = "byte";
