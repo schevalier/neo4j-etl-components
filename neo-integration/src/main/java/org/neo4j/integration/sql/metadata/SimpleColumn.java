@@ -1,5 +1,8 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -70,9 +73,9 @@ public class SimpleColumn implements Column
     }
 
     @Override
-    public ColumnRole role()
+    public Set<ColumnRole> roles()
     {
-        return columnRole;
+        return EnumSet.of( columnRole );
     }
 
     @Override

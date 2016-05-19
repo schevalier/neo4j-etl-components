@@ -26,24 +26,21 @@ class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
 
         for ( Column column : table.columns() )
         {
-            switch ( column.role() )
+            if ( column.roles().contains( ColumnRole.PrimaryKey ) )
             {
-                case PrimaryKey:
-                    CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
-                    builder.add( new ColumnToCsvFieldMapping( column, id ) );
-                    column.addData( builder );
-                    break;
-                case CompositeKey:
-                    CsvField id1 = CsvField.id( new IdSpace( table.name().fullName() ) );
-                    builder.add( new ColumnToCsvFieldMapping( column, id1 ) );
-                    column.addData( builder );
-                    break;
-                case Data:
-                    column.addData( builder );
-                    break;
-                default:
-                    // Do nothing
-                    break;
+                CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
+                builder.add( new ColumnToCsvFieldMapping( column, id ) );
+                column.addData( builder );
+            }
+            else if ( column.roles().contains( ColumnRole.CompositeKey ) )
+            {
+                CsvField id1 = CsvField.id( new IdSpace( table.name().fullName() ) );
+                builder.add( new ColumnToCsvFieldMapping( column, id1 ) );
+                column.addData( builder );
+            }
+            else if ( column.roles().contains( ColumnRole.Data ) )
+            {
+                column.addData( builder );
             }
         }
 

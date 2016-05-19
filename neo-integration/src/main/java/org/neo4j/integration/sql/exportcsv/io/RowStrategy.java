@@ -1,6 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.io;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.BiPredicate;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +11,7 @@ import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 
-public enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
+enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
 {
     WriteRowWithNullKey
             {
@@ -28,7 +29,7 @@ public enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
                     boolean allowWriteLine = true;
                     for ( Column column : columns )
                     {
-                        if ( isKeyColumn( column.role() ) )
+                        if ( isKeyColumn( column.roles() ) )
                         {
                             if ( StringUtils.isEmpty( column.selectFrom( row ) ) )
                             {
@@ -53,8 +54,10 @@ public enum RowStrategy implements BiPredicate<RowAccessor, Collection<Column>>
         }
     }
 
-    private static boolean isKeyColumn( ColumnRole type )
+    private static boolean isKeyColumn( Set<ColumnRole> roles )
     {
-        return ColumnRole.ForeignKey == type || ColumnRole.PrimaryKey == type || ColumnRole.CompositeKey == type;
+        return roles.contains( ColumnRole.ForeignKey ) ||
+                roles.contains( ColumnRole.PrimaryKey ) ||
+                roles.contains( ColumnRole.CompositeKey );
     }
 }
