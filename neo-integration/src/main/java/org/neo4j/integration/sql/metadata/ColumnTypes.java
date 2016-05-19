@@ -25,7 +25,7 @@ class ColumnTypes
                 .map( e -> new SimpleColumn(
                         table,
                         e.getKey(),
-                        EnumSet.of(ColumnRole.Data),
+                        EnumSet.of( ColumnRole.Data ),
                         SqlDataType.parse( e.getValue() ) ) )
                 .filter( c -> !c.sqlDataType().skipImport() )
                 .collect( Collectors.toList() );

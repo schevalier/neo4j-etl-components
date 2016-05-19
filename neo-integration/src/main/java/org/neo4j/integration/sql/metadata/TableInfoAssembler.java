@@ -46,18 +46,10 @@ public class TableInfoAssembler
                     .map( pk -> createPrimaryKeyColumn( table, columnTypes, pk ) )
                     .collect( Collectors.toList() );
 
-            if ( columns.isEmpty() )
-            {
-                return Optional.empty();
-            }
-            else if ( columns.size() == 1 )
-            {
-                return Optional.of( columns.get( 0 ) );
-            }
-            else
-            {
-                return Optional.of( new CompositeColumn( table, columns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
-            }
+            return columns.isEmpty() ?
+                    Optional.empty() :
+                    Optional.of( new CompositeColumn( table, columns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
+
         }
     }
 
@@ -81,17 +73,10 @@ public class TableInfoAssembler
                     targetColumns.add( createForeignKeyTargetColumn( columnTypes, fk ) );
                 } );
 
-                if ( sourceColumns.size() == 1 )
-                {
-                    keys.add( new JoinKey( sourceColumns.get( 0 ), targetColumns.get( 0 ) ) );
-                }
-                else
-                {
-                    TableName targetTable = targetColumns.get( 0 ).table();
-                    keys.add( new JoinKey(
-                            new CompositeColumn( table, sourceColumns, EnumSet.of( ColumnRole.ForeignKey ) ),
-                            new CompositeColumn( targetTable, targetColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) ) );
-                }
+                TableName targetTable = targetColumns.get( 0 ).table();
+                keys.add( new JoinKey(
+                        new CompositeColumn( table, sourceColumns, EnumSet.of( ColumnRole.ForeignKey ) ),
+                        new CompositeColumn( targetTable, targetColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) ) );
             }
 
             return keys;
@@ -103,7 +88,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 table,
                 pk.get( "COLUMN_NAME" ),
-                EnumSet.of( ColumnRole.PrimaryKey ),
+                EnumSet.of( ColumnRole.Data ),
                 columnTypes.getSqlDataType( pk.get( "COLUMN_NAME" ) ) );
     }
 
@@ -112,7 +97,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 table,
                 fk.get( "FKCOLUMN_NAME" ),
-                EnumSet.of( ColumnRole.ForeignKey ),
+                EnumSet.of( ColumnRole.Data ),
                 columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
     }
 
@@ -125,7 +110,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 targetTableName,
                 fk.get( "PKCOLUMN_NAME" ),
-                EnumSet.of( ColumnRole.PrimaryKey ),
+                EnumSet.of( ColumnRole.Data ),
                 columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
     }
 
