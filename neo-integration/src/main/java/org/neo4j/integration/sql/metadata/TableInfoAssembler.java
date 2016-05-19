@@ -56,7 +56,7 @@ public class TableInfoAssembler
             }
             else
             {
-                return Optional.of( new CompositeColumn( table, columns ) );
+                return Optional.of( new CompositeColumn( table, columns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
             }
         }
     }
@@ -87,9 +87,10 @@ public class TableInfoAssembler
                 }
                 else
                 {
+                    TableName targetTable = targetColumns.get( 0 ).table();
                     keys.add( new JoinKey(
-                            new CompositeColumn( table, sourceColumns ),
-                            new CompositeColumn( targetColumns.get( 0 ).table(), targetColumns ) ) );
+                            new CompositeColumn( table, sourceColumns, EnumSet.of( ColumnRole.ForeignKey ) ),
+                            new CompositeColumn( targetTable, targetColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) ) );
                 }
             }
 

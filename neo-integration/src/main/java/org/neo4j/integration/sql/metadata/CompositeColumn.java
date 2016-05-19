@@ -2,7 +2,7 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,24 +28,30 @@ public class CompositeColumn implements Column
         TableName table = new TableName( root.path( "table" ).textValue() );
         Collection<Column> columns = new ArrayList<>();
 
+        ArrayNode rolesNode = (ArrayNode) root.path( "roles" );
+        Set<ColumnRole> roles = new HashSet<>();
+        rolesNode.forEach( r -> roles.add( ColumnRole.valueOf( r.textValue() ) ) );
+
         ArrayNode columnArray = (ArrayNode) root.path( "columns" );
         for ( JsonNode jsonNode : columnArray )
         {
             columns.add( Column.fromJson( jsonNode ) );
         }
 
-        return new CompositeColumn( table, columns );
+        return new CompositeColumn( table, columns, roles );
     }
 
     static final String SEPARATOR = "\0";
 
     private final TableName table;
     private final Collection<Column> columns;
+    private final Set<ColumnRole> roles;
 
-    public CompositeColumn( TableName table, Collection<Column> columns )
+    public CompositeColumn( TableName table, Collection<Column> columns, Set<ColumnRole> roles )
     {
         this.table = table;
         this.columns = columns;
+        this.roles = roles;
 
         for ( Column column : columns )
         {
@@ -83,7 +89,7 @@ public class CompositeColumn implements Column
     @Override
     public Set<ColumnRole> roles()
     {
-        return EnumSet.of( ColumnRole.CompositeKey );
+        return roles;
     }
 
     @Override
@@ -149,6 +155,10 @@ public class CompositeColumn implements Column
 
         root.put( "type", getClass().getSimpleName() );
         root.put( "table", table.fullName() );
+
+        ArrayNode rolesArray = JsonNodeFactory.instance.arrayNode();
+        roles.forEach( r -> rolesArray.add( r.name() ) );
+        root.set( "roles", rolesArray );
 
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
 

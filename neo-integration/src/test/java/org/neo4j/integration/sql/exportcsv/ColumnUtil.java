@@ -38,6 +38,7 @@ public class ColumnUtil
         return new CompositeColumn( tableName,
                 columnNames.stream()
                         .map( name -> keyColumn( tableName, name, keyType ) )
-                        .collect( Collectors.toList() ) );
+                        .collect( Collectors.toList() ) ,
+                EnumSet.of( keyType ));
     }
 }

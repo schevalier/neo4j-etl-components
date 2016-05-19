@@ -58,12 +58,7 @@ class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTa
     {
         for ( Column column : joinTable.columns() )
         {
-            if ( column.roles().contains( ColumnRole.PrimaryKey ) )
-            {
-                CsvField id = CsvField.id( new IdSpace( joinTable.joinTableName().fullName() ) );
-                builder.add( new ColumnToCsvFieldMapping( column, id ) );
-            }
-            else if ( column.roles().contains( ColumnRole.Data ) )
+            if ( column.roles().contains( ColumnRole.PrimaryKey ) || column.roles().contains( ColumnRole.Data ) )
             {
                 column.addData( builder );
             }
