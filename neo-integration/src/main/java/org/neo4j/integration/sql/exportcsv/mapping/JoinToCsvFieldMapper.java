@@ -6,6 +6,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
@@ -27,11 +28,11 @@ class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
     {
         ColumnToCsvFieldMappings.Builder builder = ColumnToCsvFieldMappings.builder();
 
-        final CsvField to = CsvField.startId( new IdSpace( join.keyOneSourceColumn().table().fullName() ) );
-        builder.add( new ColumnToCsvFieldMapping( join.keyOneSourceColumn(), to ) );
+        CsvField from = CsvField.startId( new IdSpace( join.keyOneSourceColumn().table().fullName() ) );
+        builder.add( new ColumnToCsvFieldMapping( join.keyOneSourceColumn(), from ) );
 
-        final CsvField to1 = CsvField.endId( new IdSpace( join.keyTwoTargetColumn().table().fullName() ) );
-        builder.add( new ColumnToCsvFieldMapping( join.keyTwoSourceColumn(), to1 ) );
+        CsvField to = CsvField.endId( new IdSpace( join.keyTwoTargetColumn().table().fullName() ) );
+        builder.add( new ColumnToCsvFieldMapping( join.keyTwoSourceColumn(), to ) );
 
         String tableName = join.keyTwoTargetColumn().table().simpleName();
         String columnName = join.keyTwoSourceColumn().alias();
@@ -39,13 +40,12 @@ class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
         String relationshipType =
                 formatting.relationshipFormatter().format( relationshipNameResolver.resolve( tableName, columnName ) );
 
-        SimpleColumn from = new SimpleColumn( join.keyOneSourceColumn().table(),
+        Column relationshipTypeColumn = new SimpleColumn( join.keyOneSourceColumn().table(),
                 QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),
                 relationshipType,
                 EnumSet.of( ColumnRole.Literal ),
                 SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
-        builder.add(
-                new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
+        builder.add( new ColumnToCsvFieldMapping( relationshipTypeColumn, CsvField.relationshipType() ) );
 
         return builder.build();
     }
