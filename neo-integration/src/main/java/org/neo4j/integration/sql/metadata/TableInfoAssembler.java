@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.metadata;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
+
+import static java.lang.String.format;
 
 public class TableInfoAssembler
 {
@@ -24,36 +27,63 @@ public class TableInfoAssembler
 
     public TableInfo createTableInfo( TableName tableName ) throws Exception
     {
+        Collection<Column> keyColumns = new HashSet<>();
+
+        Map<String, Column> allColumns = createColumnsMap( tableName );
+        Optional<Column> primaryKey = createPrimaryKey( tableName, allColumns, keyColumns );
+        Collection<JoinKey> foreignKeys = createForeignKeys( tableName, allColumns, keyColumns );
+
+        return new TableInfo(
+                tableName,
+                primaryKey,
+                foreignKeys,
+                columnsLessKeyColumns( allColumns, keyColumns ) );
+    }
+
+    private List<Column> columnsLessKeyColumns( Map<String, Column> allColumns, Collection<Column> keyColumns )
+    {
+        return allColumns.values().stream().filter( c -> !keyColumns.contains( c ) ).collect( Collectors.toList() );
+    }
+
+    private Map<String, Column> createColumnsMap( TableName tableName ) throws Exception
+    {
         try ( QueryResults columnsResults = databaseClient.columns( tableName ) )
         {
-            ColumnTypes columnTypes = new ColumnTypes( columnsResults.stream()
+            return columnsResults.stream()
                     .map( m -> new String[]{m.get( "COLUMN_NAME" ), m.get( "TYPE_NAME" )} )
-                    .collect( Collectors.toMap( v -> v[0], v -> v[1] ) ) );
-
-            return new TableInfo(
-                    tableName,
-                    createPrimaryKey( tableName, columnTypes ),
-                    createForeignKeys( tableName, columnTypes ),
-                    columnTypes.toColumns( tableName ) );
+                    .collect( Collectors.toMap( v -> v[0], v -> v[1] ) )
+                    .entrySet().stream()
+                    .map( e -> new SimpleColumn(
+                            tableName,
+                            e.getKey(),
+                            EnumSet.of( ColumnRole.Data ),
+                            SqlDataType.parse( e.getValue() ) ) )
+                    .filter( c -> !c.sqlDataType().skipImport() )
+                    .collect( Collectors.toMap( Column::name, c -> c ) );
         }
     }
 
-    private Optional<Column> createPrimaryKey( TableName table, ColumnTypes columnTypes ) throws Exception
+    private Optional<Column> createPrimaryKey( TableName table,
+                                               Map<String, Column> columns,
+                                               Collection<Column> keyColumns ) throws Exception
     {
         try ( QueryResults primaryKeyResults = databaseClient.primaryKeys( table ) )
         {
-            List<Column> columns = primaryKeyResults.stream()
-                    .map( pk -> createPrimaryKeyColumn( table, columnTypes, pk ) )
+            List<Column> primaryKeyColumns = primaryKeyResults.stream()
+                    .map( pk -> columns.get( table.fullyQualifiedColumnName( pk.get( "COLUMN_NAME" ) ) ) )
                     .collect( Collectors.toList() );
 
-            return columns.isEmpty() ?
-                    Optional.empty() :
-                    Optional.of( new CompositeColumn( table, columns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
+            keyColumns.addAll( primaryKeyColumns );
 
+            return primaryKeyColumns.isEmpty() ?
+                    Optional.empty() :
+                    Optional.of( new CompositeColumn( table, primaryKeyColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
         }
     }
 
-    private Collection<JoinKey> createForeignKeys( TableName table, ColumnTypes columnTypes ) throws Exception
+    private Collection<JoinKey> createForeignKeys( TableName table,
+                                                   Map<String, Column> columns,
+                                                   Collection<Column> keyColumns ) throws Exception
     {
         try ( QueryResults foreignKeysResults = databaseClient.foreignKeys( table ) )
         {
@@ -69,9 +99,23 @@ public class TableInfoAssembler
 
                 foreignKeyGroup.forEach( fk ->
                 {
-                    sourceColumns.add( createForeignKeySourceColumn( table, columnTypes, fk ) );
-                    targetColumns.add( createForeignKeyTargetColumn( columnTypes, fk ) );
+                    Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fk.get( "FKCOLUMN_NAME" ) ) );
+                    // We assume the key's target column data type is the same as the source column's data type
+                    SqlDataType sqlDataType = sourceColumn.sqlDataType();
+
+                    sourceColumns.add( sourceColumn );
+                    targetColumns.add( createForeignKeyTargetColumn( fk, sqlDataType ) );
                 } );
+
+                keyColumns.addAll( sourceColumns );
+
+                // We assume that for a composite foreign key, all parts of the key refer to the same target table
+                if ( targetColumns.stream().map( Column::table ).collect( Collectors.toSet() ).size() > 1 )
+                {
+                    throw new IllegalStateException(
+                            format( "Composite foreign key refers to more than one target table: %s",
+                                    foreignKeyGroup ) );
+                }
 
                 TableName targetTable = targetColumns.get( 0 ).table();
                 keys.add( new JoinKey(
@@ -83,25 +127,7 @@ public class TableInfoAssembler
         }
     }
 
-    private Column createPrimaryKeyColumn( TableName table, ColumnTypes columnTypes, Map<String, String> pk )
-    {
-        return new SimpleColumn(
-                table,
-                pk.get( "COLUMN_NAME" ),
-                EnumSet.of( ColumnRole.Data ),
-                columnTypes.getSqlDataType( pk.get( "COLUMN_NAME" ) ) );
-    }
-
-    private Column createForeignKeySourceColumn( TableName table, ColumnTypes columnTypes, Map<String, String> fk )
-    {
-        return new SimpleColumn(
-                table,
-                fk.get( "FKCOLUMN_NAME" ),
-                EnumSet.of( ColumnRole.Data ),
-                columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
-    }
-
-    private Column createForeignKeyTargetColumn( ColumnTypes columnTypes, Map<String, String> fk )
+    private Column createForeignKeyTargetColumn( Map<String, String> fk, SqlDataType sqlDataType )
     {
         TableName targetTableName = new TableName(
                 firstNonNullOrEmpty( fk.get( "PKTABLE_CAT" ), fk.get( "PKTABLE_SCHEM" ) ),
@@ -111,7 +137,7 @@ public class TableInfoAssembler
                 targetTableName,
                 fk.get( "PKCOLUMN_NAME" ),
                 EnumSet.of( ColumnRole.Data ),
-                columnTypes.getSqlDataType( fk.get( "FKCOLUMN_NAME" ) ) );
+                sqlDataType );
     }
 
     private String firstNonNullOrEmpty( String a, String b )
