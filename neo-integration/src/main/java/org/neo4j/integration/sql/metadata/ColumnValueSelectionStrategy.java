@@ -4,7 +4,7 @@ import org.neo4j.integration.sql.RowAccessor;
 
 public enum ColumnValueSelectionStrategy
 {
-    SelectColumnValue
+    SelectColumnValue( true )
             {
                 @Override
                 String selectFrom( RowAccessor row, int rowIndex, String key )
@@ -12,7 +12,7 @@ public enum ColumnValueSelectionStrategy
                     return row.getString( key );
                 }
             },
-    SelectRowIndex
+    SelectRowIndex( false )
             {
                 @Override
                 String selectFrom( RowAccessor row, int rowIndex, String key )
@@ -21,5 +21,17 @@ public enum ColumnValueSelectionStrategy
                 }
             };
 
+    private final boolean allowAddToSelectStatement;
+
+    ColumnValueSelectionStrategy( boolean allowAddToSelectStatement )
+    {
+        this.allowAddToSelectStatement = allowAddToSelectStatement;
+    }
+
     abstract String selectFrom( RowAccessor row, int rowIndex, String key );
+
+    public boolean allowAddToSelectStatement()
+    {
+        return allowAddToSelectStatement;
+    }
 }

@@ -55,6 +55,7 @@ public class ColumnToCsvFieldMappings
     public Collection<String> aliasedColumns()
     {
         return columns().stream()
+                .filter( Column::allowAddToSelectStatement )
                 .map( Column::aliasedColumn )
                 .collect( Collectors.toList() );
     }

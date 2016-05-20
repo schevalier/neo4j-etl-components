@@ -325,6 +325,12 @@ public class TableInfoTest
         }
 
         @Override
+        public boolean allowAddToSelectStatement()
+        {
+            return true;
+        }
+
+        @Override
         public String selectFrom( RowAccessor row, int rowIndex )
         {
             return null;

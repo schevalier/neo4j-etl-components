@@ -29,7 +29,7 @@ public class HeaderFileWriter
                                  String filenamePrefix ) throws IOException
     {
         Loggers.Default.log( Level.INFO,
-                format( "Writing %s headers for %s", description.toLowerCase(), filenamePrefix ) );
+                format( "Writing CSV headers for %s %s", description.toLowerCase(), filenamePrefix ) );
         String headers = fields.stream()
                 .map( f -> f.value( formatting.propertyFormatter() ) )
                 .collect( Collectors.joining( formatting.delimiter().value() ) );

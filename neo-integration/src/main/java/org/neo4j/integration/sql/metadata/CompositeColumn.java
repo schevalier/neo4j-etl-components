@@ -99,6 +99,12 @@ public class CompositeColumn implements Column
     }
 
     @Override
+    public boolean allowAddToSelectStatement()
+    {
+        return columns.stream().allMatch( Column::allowAddToSelectStatement );
+    }
+
+    @Override
     public String selectFrom( RowAccessor row, int rowIndex )
     {
         List<String> values = columns.stream()

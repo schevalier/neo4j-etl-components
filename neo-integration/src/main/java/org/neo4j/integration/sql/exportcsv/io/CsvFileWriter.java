@@ -29,7 +29,7 @@ public class CsvFileWriter
     public Path writeExportFile( CsvResource resource ) throws Exception
     {
         Loggers.Default.log( Level.INFO,
-                format( "Writing %s data for %s", resource.graphObjectType().name().toLowerCase(), resource.name() ) );
+                format( "Writing CSV data for %s %s", resource.graphObjectType().name().toLowerCase(), resource.name() ) );
 
         Path exportFile = createExportFile( resource.name() );
 

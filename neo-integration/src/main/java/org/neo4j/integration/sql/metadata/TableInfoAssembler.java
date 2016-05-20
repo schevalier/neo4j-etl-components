@@ -31,8 +31,8 @@ public class TableInfoAssembler
         Collection<Column> keyColumns = new HashSet<>();
 
         Map<String, Column> allColumns = createColumnsMap( tableName );
-        Optional<Column> primaryKey = createPrimaryKey( tableName, allColumns, keyColumns );
         Collection<JoinKey> foreignKeys = createForeignKeys( tableName, allColumns, keyColumns );
+        Optional<Column> primaryKey = createPrimaryKey( tableName, allColumns, keyColumns, foreignKeys );
 
         return new TableInfo(
                 tableName,
@@ -67,7 +67,8 @@ public class TableInfoAssembler
 
     private Optional<Column> createPrimaryKey( TableName table,
                                                Map<String, Column> columns,
-                                               Collection<Column> keyColumns ) throws Exception
+                                               Collection<Column> keyColumns,
+                                               Collection<JoinKey> foreignKeys ) throws Exception
     {
         try ( QueryResults primaryKeyResults = databaseClient.primaryKeys( table ) )
         {
@@ -77,9 +78,27 @@ public class TableInfoAssembler
 
             keyColumns.addAll( primaryKeyColumns );
 
-            return primaryKeyColumns.isEmpty() ?
-                    Optional.empty() :
-                    Optional.of( new CompositeColumn( table, primaryKeyColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
+            if ( primaryKeyColumns.isEmpty() )
+            {
+                if ( foreignKeys.size() != 2 )
+                {
+                    return Optional.of( new SimpleColumn(
+                            table,
+                            "_ROW_INDEX_",
+                            EnumSet.of( ColumnRole.PrimaryKey ),
+                            SqlDataType.INT,
+                            ColumnValueSelectionStrategy.SelectRowIndex ) );
+                }
+                else
+                {
+                    return Optional.empty();
+                }
+            }
+            else
+            {
+                return Optional.of(
+                        new CompositeColumn( table, primaryKeyColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
+            }
         }
     }
 

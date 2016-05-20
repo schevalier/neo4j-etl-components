@@ -102,6 +102,12 @@ public class SimpleColumn implements Column
     }
 
     @Override
+    public boolean allowAddToSelectStatement()
+    {
+        return columnValueSelectionStrategy.allowAddToSelectStatement();
+    }
+
+    @Override
     public String selectFrom( RowAccessor row, int rowIndex )
     {
         return columnValueSelectionStrategy.selectFrom( row, rowIndex, alias );
