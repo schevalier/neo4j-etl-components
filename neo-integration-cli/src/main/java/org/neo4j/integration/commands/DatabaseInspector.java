@@ -2,14 +2,9 @@ package org.neo4j.integration.commands;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.Join;
-import org.neo4j.integration.sql.metadata.JoinKey;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
 import org.neo4j.integration.sql.metadata.TableInfo;
@@ -48,29 +43,12 @@ public class DatabaseInspector
 
         if ( tableInfo.representsJoinTable() )
         {
-            List<JoinKey> joinKeys = tableInfo.foreignKeys().stream()
-                    .sorted( ( o1, o2 ) -> o1.sourceColumn().name().compareTo( o2.sourceColumn().name() ) )
-                    .collect( Collectors.toList() );
-            joinTables.add(
-                    new JoinTable( new Join( joinKeys.get( 0 ), joinKeys.get( 1 ) ), tableInfo.createTable() ) );
+            joinTables.add( tableInfo.createJoinTable() );
         }
         else
         {
             tables.add( tableInfo.createTable() );
-
-            for ( JoinKey joinKey : tableInfo.foreignKeys() )
-            {
-                Optional<Column> primaryKeyColumn = tableInfo.primaryKey();
-                if ( primaryKeyColumn.isPresent() )
-                {
-                    joins.add( new Join( new JoinKey( primaryKeyColumn.get(), primaryKeyColumn.get() ), joinKey ) );
-                }
-                else
-                {
-                    throw new IllegalStateException( "Unsupported: foreign key in a table that has no primary key, " +
-                            "and which is not a join table." );
-                }
-            }
+            joins.addAll( tableInfo.createJoins() );
         }
     }
 }

@@ -13,14 +13,19 @@ public class JoinKey
         this.targetColumn = targetColumn;
     }
 
-    public Column sourceColumn()
+    Column sourceColumn()
     {
         return sourceColumn;
     }
 
-    public Column targetColumn()
+    Column targetColumn()
     {
         return targetColumn;
+    }
+
+    Join createJoinForCollocatedPrimaryKey( Column primaryKey )
+    {
+        return new Join( new JoinKey( primaryKey, primaryKey ), this );
     }
 
     @Override

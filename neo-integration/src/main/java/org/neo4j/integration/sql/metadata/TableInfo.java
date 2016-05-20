@@ -28,16 +28,6 @@ public class TableInfo
         this.columns = columns;
     }
 
-    public Optional<Column> primaryKey()
-    {
-        return primaryKey;
-    }
-
-    public Collection<JoinKey> foreignKeys()
-    {
-        return foreignKeys;
-    }
-
     public boolean representsJoinTable()
     {
         if ( foreignKeys.size() == 2 )
@@ -62,6 +52,49 @@ public class TableInfo
         columns().forEach( tableBuilder::addColumn );
 
         return tableBuilder.build();
+    }
+
+    public JoinTable createJoinTable()
+    {
+        if ( !representsJoinTable() )
+        {
+            throw new IllegalStateException( "TableInfo does not represent a join table" );
+        }
+
+        List<JoinKey> joinKeys = foreignKeys().stream()
+                .sorted( ( o1, o2 ) -> o1.sourceColumn().name().compareTo( o2.sourceColumn().name() ) )
+                .collect( Collectors.toList() );
+        return new JoinTable( new Join( joinKeys.get( 0 ), joinKeys.get( 1 ) ), createTable() );
+    }
+
+    public Collection<Join> createJoins()
+    {
+        if ( representsJoinTable() )
+        {
+            throw new IllegalStateException( "TableInfo represents a join table" );
+        }
+
+        if ( !primaryKey.isPresent() && !foreignKeys.isEmpty() )
+        {
+            throw new IllegalStateException( "Unsupported: foreign key in a table that has no primary key, " +
+                    "and which is not a join table." );
+        }
+
+        Column primaryKeyColumn = primaryKey.get();
+
+        return foreignKeys.stream()
+                .map( fk -> fk.createJoinForCollocatedPrimaryKey( primaryKeyColumn ) )
+                .collect( Collectors.toList() );
+    }
+
+    Optional<Column> primaryKey()
+    {
+        return primaryKey;
+    }
+
+    Collection<JoinKey> foreignKeys()
+    {
+        return foreignKeys;
     }
 
     Collection<Column> columns()
