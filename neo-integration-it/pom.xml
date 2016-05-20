@@ -70,6 +70,9 @@
     </dependency>
 
   </dependencies>
+  <properties>
+    <performanceSuite>**/BigPerformanceTest.class</performanceSuite>
+  </properties>
 
   <build>
     <plugins>
@@ -88,6 +91,9 @@
               <goal>test</goal>
             </goals>
             <configuration>
+              <excludes>
+                <exclude>${performanceSuite}</exclude>
+              </excludes>
               <skip>false</skip>
             </configuration>
           </execution>
