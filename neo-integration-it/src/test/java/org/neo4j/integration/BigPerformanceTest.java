@@ -5,7 +5,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.LogManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -27,13 +26,7 @@ import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
-import static java.util.Arrays.asList;
-
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 public class BigPerformanceTest
 {
@@ -50,6 +43,7 @@ public class BigPerformanceTest
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
                     tempDirectory.get() ) );
+
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
             Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
@@ -60,10 +54,8 @@ public class BigPerformanceTest
     {
         try
         {
-            LogManager.getLogManager().readConfiguration(
-                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
             MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-            client.execute( MySqlScripts.northwindScript().value() );
+            client.execute( MySqlScripts.performanceScript().value() );
             exportFromMySqlToNeo4j( "northwind" );
             neo4j.get().start();
         }
@@ -72,7 +64,6 @@ public class BigPerformanceTest
             System.err.println( "Error in loading configuration" );
             e.printStackTrace( System.err );
         }
-
     }
 
     @AfterClass
