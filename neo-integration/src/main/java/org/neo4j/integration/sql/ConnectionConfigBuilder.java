@@ -15,7 +15,7 @@ class ConnectionConfigBuilder implements ConnectionConfig.Builder.SetHost,
     String username;
     String password;
 
-    public ConnectionConfigBuilder( DatabaseType databaseType )
+    ConnectionConfigBuilder( DatabaseType databaseType )
     {
         this.databaseType = databaseType;
     }

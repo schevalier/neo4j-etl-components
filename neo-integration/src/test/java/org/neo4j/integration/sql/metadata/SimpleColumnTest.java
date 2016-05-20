@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.metadata;
 
+import java.util.EnumSet;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 
@@ -20,12 +22,21 @@ public class SimpleColumnTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column1 = new SimpleColumn( personTable, "id", "id-alias", ColumnRole.PrimaryKey, SqlDataType.INT );
-        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT );
+        Column column1 = new SimpleColumn(
+                personTable,
+                "id",
+                "id-alias",
+                EnumSet.of( ColumnRole.PrimaryKey ),
+                SqlDataType.INT );
+        Column column2 = new SimpleColumn(
+                personTable,
+                "username",
+                EnumSet.of( ColumnRole.Data ),
+                SqlDataType.TEXT );
         Column column3 = new SimpleColumn( personTable,
                 QuoteChar.DOUBLE_QUOTES.enquote( "PERSON" ),
                 "PERSON",
-                ColumnRole.Literal,
+                EnumSet.of( ColumnRole.Literal ),
                 SqlDataType.TEXT );
 
         // then
@@ -44,8 +55,8 @@ public class SimpleColumnTest
                 .addRow( "1", "user-1" )
                 .build();
 
-        Column column1 = new SimpleColumn( personTable, "id", ColumnRole.Data, SqlDataType.INT );
-        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT );
+        Column column1 = new SimpleColumn( personTable, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT );
+        Column column2 = new SimpleColumn( personTable, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.TEXT );
 
         // then
         results.next();
@@ -63,8 +74,8 @@ public class SimpleColumnTest
                 .addRow( null, null )
                 .build();
 
-        Column column1 = new SimpleColumn( personTable, "id", ColumnRole.Data, SqlDataType.INT );
-        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT );
+        Column column1 = new SimpleColumn( personTable, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT );
+        Column column2 = new SimpleColumn( personTable, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.TEXT );
 
         // then
         results.next();
@@ -81,7 +92,7 @@ public class SimpleColumnTest
                 personTable,
                 "\"Person\"",
                 "Person",
-                ColumnRole.Literal,
+                EnumSet.of( ColumnRole.Literal ),
                 SqlDataType.LABEL_DATA_TYPE );
         // then
         assertThat( labelColumn.aliasedColumn(), is( "\"Person\" AS `Person`" ) );
@@ -92,7 +103,12 @@ public class SimpleColumnTest
     {
         // given
         TableName personTable = new TableName( "test.Person" );
-        Column column = new SimpleColumn( personTable, "id", "id-alias", ColumnRole.PrimaryKey, SqlDataType.INT );
+        Column column = new SimpleColumn(
+                personTable,
+                "id",
+                "id-alias",
+                EnumSet.of( ColumnRole.PrimaryKey ),
+                SqlDataType.INT );
 
         JsonNode json = column.toJson();
 

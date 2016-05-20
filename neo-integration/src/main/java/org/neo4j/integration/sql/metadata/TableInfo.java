@@ -12,12 +12,17 @@ import static java.util.Arrays.asList;
 
 public class TableInfo
 {
+    private final TableName tableName;
     private final Optional<Column> primaryKey;
     private final Collection<JoinKey> foreignKeys;
     private final Collection<Column> columns;
 
-    TableInfo( Optional<Column> primaryKey, Collection<JoinKey> foreignKeys, Collection<Column> columns )
+    TableInfo( TableName tableName,
+               Optional<Column> primaryKey,
+               Collection<JoinKey> foreignKeys,
+               Collection<Column> columns )
     {
+        this.tableName = tableName;
         this.primaryKey = primaryKey;
         this.foreignKeys = foreignKeys;
         this.columns = columns;
@@ -33,36 +38,48 @@ public class TableInfo
         return foreignKeys;
     }
 
-    public Collection<Column> columns()
-    {
-        return columns;
-    }
-
-    public Collection<Column> columnsLessKeys()
-    {
-        List<String> primaryKeyNames = primaryKeyNames();
-        List<String> foreignKeyNames = foreignKeyNames();
-
-        return columns.stream()
-                .filter( c -> !primaryKeyNames.contains( c.name() ) )
-                .filter( c -> !foreignKeyNames.contains( c.name() ) )
-                .collect( Collectors.toList() );
-    }
-
     public boolean representsJoinTable()
     {
         if ( foreignKeys.size() == 2 )
         {
-            List<String> primaryKeyNames = primaryKeyNames();
             List<String> foreignKeyNames = foreignKeyNames();
 
-            primaryKeyNames.removeAll( foreignKeyNames );
-
-            return primaryKeyNames.isEmpty();
+            return primaryKeyNames().stream()
+                    .filter( n -> !foreignKeyNames.contains( n ) )
+                    .collect( Collectors.toList() )
+                    .isEmpty();
         }
         else
         {
             return false;
+        }
+    }
+
+    public Table createTable()
+    {
+        Table.Builder tableBuilder = Table.builder().name( tableName );
+
+        columns().forEach( tableBuilder::addColumn );
+
+        return tableBuilder.build();
+    }
+
+    Collection<Column> columns()
+    {
+        List<String> primaryKeyNames = primaryKeyNames();
+        List<String> foreignKeyNames = foreignKeyNames();
+
+        Stream<Column> columnStream = columns.stream()
+                .filter( c -> !primaryKeyNames.contains( c.name() ) )
+                .filter( c -> !foreignKeyNames.contains( c.name() ) );
+
+        if ( primaryKey.isPresent() )
+        {
+            return Stream.concat( Stream.of( primaryKey.get() ), columnStream ).collect( Collectors.toList() );
+        }
+        else
+        {
+            return columnStream.collect( Collectors.toList() );
         }
     }
 

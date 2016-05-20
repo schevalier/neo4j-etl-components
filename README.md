@@ -20,6 +20,8 @@ To run the tests using Vagrant:
 
 To run the tests using AWS:
 
+Note: You need to create AWS Keypair and have the credentials file created to do this
+
 `mvn -DPLATFORM=aws -DEC2_SSH_KEY=<name of your EC2 SSH key> clean integration-test`
 
 If you don't supply a `PLATFORM` parameter, the tests will attempt to use Vagrant.

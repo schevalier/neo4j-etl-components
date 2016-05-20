@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.EnumSet;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
@@ -11,12 +13,12 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
 
-public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTable>
+class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTable>
 {
     private final Formatting formatting;
     private final RelationshipNameResolver relationshipNameResolver;
 
-    public JoinTableToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
+    JoinTableToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
     {
         this.formatting = formatting;
         this.relationshipNameResolver = relationshipNameResolver;
@@ -42,7 +44,7 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
         SimpleColumn from = new SimpleColumn( table,
                 QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),
                 relationshipType,
-                ColumnRole.Literal,
+                EnumSet.of( ColumnRole.Literal ),
                 SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
 
         builder.add( new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
@@ -56,18 +58,9 @@ public class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper
     {
         for ( Column column : joinTable.columns() )
         {
-            switch ( column.role() )
+            if ( column.roles().contains( ColumnRole.PrimaryKey ) || column.roles().contains( ColumnRole.Data ) )
             {
-                case PrimaryKey:
-                    CsvField id = CsvField.id( new IdSpace( joinTable.joinTableName().fullName() ) );
-                    builder.add( new ColumnToCsvFieldMapping( column, id ) );
-                    break;
-                case Data:
-                    column.addData( builder );
-                    break;
-                default:
-                    // Do nothing
-                    break;
+                column.addData( builder );
             }
         }
     }

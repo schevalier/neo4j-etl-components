@@ -1,6 +1,8 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 
 import org.junit.Test;
 
@@ -10,6 +12,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.ColumnRole;
+import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
@@ -33,9 +36,12 @@ public class TableToCsvFieldMapperTest
 
         Table table = Table.builder()
                 .name( personTable )
-                .addColumn( columnUtil.column( personTable, "id", ColumnRole.PrimaryKey ) )
+                .addColumn( new CompositeColumn(
+                        personTable,
+                        Collections.singletonList( columnUtil.column(personTable, "id", ColumnRole.Data ) ),
+                        EnumSet.of(   ColumnRole.PrimaryKey )))
                 .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
-                .addColumn( new SimpleColumn( personTable, "age", ColumnRole.Data, SqlDataType.INT ) )
+                .addColumn( new SimpleColumn( personTable, "age", EnumSet.of( ColumnRole.Data ), SqlDataType.INT ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
@@ -89,9 +95,15 @@ public class TableToCsvFieldMapperTest
 
         Table table = Table.builder()
                 .name( personTable )
-                .addColumn( columnUtil.column( personTable, "id", ColumnRole.PrimaryKey ) )
+                .addColumn( new CompositeColumn(
+                        personTable,
+                        Collections.singletonList( columnUtil.column(personTable, "id", ColumnRole.Data ) ),
+                        EnumSet.of(   ColumnRole.PrimaryKey )))
                 .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
-                .addColumn( columnUtil.column( personTable, "addressId", ColumnRole.ForeignKey ) )
+                .addColumn( new CompositeColumn(
+                        personTable,
+                        Collections.singletonList( columnUtil.column(personTable, "addressId", ColumnRole.Data ) ),
+                        EnumSet.of(   ColumnRole.ForeignKey )))
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

@@ -17,7 +17,7 @@ import org.neo4j.integration.commands.DatabaseInspector;
 import org.neo4j.integration.commands.SchemaExport;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
@@ -101,7 +101,7 @@ public class CreateCsvResources implements Callable<CsvResources>
         events.onCreatingCsvResourcesFile();
 
         SchemaExport schemaExport =
-                new DatabaseInspector( new MySqlDatabaseClient( connectionConfig ) ).buildSchemaExport();
+                new DatabaseInspector( new DatabaseClient( connectionConfig ) ).buildSchemaExport();
         CsvResources csvResources =
                 schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
 

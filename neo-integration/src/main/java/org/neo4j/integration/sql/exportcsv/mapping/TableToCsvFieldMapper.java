@@ -1,5 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import java.util.EnumSet;
+
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
@@ -10,11 +12,11 @@ import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
 
-public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
+class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
 {
     private final Formatting formatting;
 
-    public TableToCsvFieldMapper( Formatting formatting )
+    TableToCsvFieldMapper( Formatting formatting )
     {
         this.formatting = formatting;
     }
@@ -26,24 +28,15 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
 
         for ( Column column : table.columns() )
         {
-            switch ( column.role() )
+            if ( column.roles().contains( ColumnRole.PrimaryKey ) )
             {
-                case PrimaryKey:
-                    CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
-                    builder.add( new ColumnToCsvFieldMapping( column, id ) );
-                    column.addData( builder );
-                    break;
-                case CompositeKey:
-                    CsvField id1 = CsvField.id( new IdSpace( table.name().fullName() ) );
-                    builder.add( new ColumnToCsvFieldMapping( column, id1 ) );
-                    column.addData( builder );
-                    break;
-                case Data:
-                    column.addData( builder );
-                    break;
-                default:
-                    // Do nothing
-                    break;
+                CsvField id = CsvField.id( new IdSpace( table.name().fullName() ) );
+                builder.add( new ColumnToCsvFieldMapping( column, id ) );
+                column.addData( builder );
+            }
+            else if ( column.roles().contains( ColumnRole.Data ) )
+            {
+                column.addData( builder );
             }
         }
 
@@ -51,7 +44,7 @@ public class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Tab
                 table.name(),
                 QuoteChar.DOUBLE_QUOTES.enquote( formatting.labelFormatter().format( table.name().simpleName() ) ),
                 table.name().simpleName(),
-                ColumnRole.Literal,
+                EnumSet.of(ColumnRole.Literal),
                 SqlDataType.LABEL_DATA_TYPE );
 
         builder.add( new ColumnToCsvFieldMapping( label, CsvField.label() ) );

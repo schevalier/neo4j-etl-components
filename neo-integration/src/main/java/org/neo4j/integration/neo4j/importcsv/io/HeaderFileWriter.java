@@ -24,9 +24,12 @@ public class HeaderFileWriter
         this.formatting = formatting;
     }
 
-    public Path writeHeaderFile( Collection<CsvField> fields, String filenamePrefix ) throws IOException
+    public Path writeHeaderFile( String description,
+                                 Collection<CsvField> fields,
+                                 String filenamePrefix ) throws IOException
     {
-        Loggers.Default.log( Level.INFO, format( "Writing headers for %s", filenamePrefix ) );
+        Loggers.Default.log( Level.INFO,
+                format( "Writing %s headers for %s", description.toLowerCase(), filenamePrefix ) );
         String headers = fields.stream()
                 .map( f -> f.value( formatting.propertyFormatter() ) )
                 .collect( Collectors.joining( formatting.delimiter().value() ) );

@@ -11,7 +11,7 @@ import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 import org.neo4j.integration.sql.ConnectionConfig;
-import org.neo4j.integration.sql.MySqlDatabaseClient;
+import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
@@ -48,7 +48,7 @@ public class CsvFileWriterTest
                 .addRow( "2", "user-2" )
                 .build();
 
-        MySqlDatabaseClient databaseClient = mock( MySqlDatabaseClient.class );
+        DatabaseClient databaseClient = mock( DatabaseClient.class );
         when( databaseClient.executeQuery( any() ) ).thenReturn( AwaitHandle.forReturnValue( results ) );
 
         // setup config

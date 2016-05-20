@@ -68,7 +68,8 @@ public class Join implements DatabaseObject
     @Override
     public String descriptor()
     {
-        return format( "%s_%s", keyOne.sourceColumn().table().fullName(), keyTwoTargetColumn().table().fullName() );
+        return format( "%s_%s", keyOne.sourceColumn().name(), keyTwoSourceColumn().name() )
+                .replace( CompositeColumn.SEPARATOR, "_" );
     }
 
     @Override

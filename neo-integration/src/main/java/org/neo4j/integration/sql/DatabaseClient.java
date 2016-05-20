@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.neo4j.integration.SqlDatabaseClient;
 import org.neo4j.integration.io.AwaitHandle;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.FutureUtils;
@@ -26,12 +25,18 @@ import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
 
-public class MySqlDatabaseClient extends SqlDatabaseClient
+public class DatabaseClient implements AutoCloseable
 {
+    interface StatementFactory
+    {
+        Statement createStatement( Connection connection) throws SQLException;
+    }
+
     private final Connection connection;
     private final DatabaseMetaData metaData;
+    private final StatementFactory statementFactory;
 
-    public MySqlDatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
+    public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
         Loggers.Sql.log().fine( "Connecting to database..." );
 
@@ -43,6 +48,8 @@ public class MySqlDatabaseClient extends SqlDatabaseClient
                 connectionConfig.credentials().password() );
 
         metaData = connection.getMetaData();
+
+        statementFactory = connectionConfig.statementFactory();
 
         Loggers.Sql.log().fine( "Connected to database" );
     }
@@ -69,10 +76,7 @@ public class MySqlDatabaseClient extends SqlDatabaseClient
                 {
                     Loggers.Sql.log().finest( sql );
                     connection.setAutoCommit( false );
-                    Statement statement =
-                            connection.createStatement( ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY );
-                    statement.setFetchSize( Integer.MIN_VALUE );
-                    return new SqlQueryResults( statement.executeQuery( sql ) );
+                    return new SqlQueryResults( statementFactory.createStatement( connection ).executeQuery( sql ) );
 
                 }, r -> new Thread( r ).start() ) );
     }
