@@ -49,12 +49,12 @@ public class ExportFromMySqlIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(), "local" ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
             Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
-    public static final URI NEO_TX_URI = URI.create( "http://localhost:7474/db/data/transaction/commit" );
+    private static final URI NEO_TX_URI = URI.create( "http://localhost:7474/db/data/transaction/commit" );
 
     @BeforeClass
     public static void setUp() throws Exception
@@ -174,7 +174,7 @@ public class ExportFromMySqlIntegrationTest
 
         List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
 
-        if( tinyIntAs == "boolean" )
+        if ( tinyIntAs.equals( "boolean" ) )
         {
             assertThat( numericFields.get( 0 ).values(), hasItems( true, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
         }
@@ -231,6 +231,24 @@ public class ExportFromMySqlIntegrationTest
 
         assertThat( publishers.size(), is( 2 ) );
         assertThat( publishers, hasItems( "Pearson", "O'Reilly" ) );
+    }
+
+    @Test
+    public void shouldExportTableWithMoreThanTwoForeignKeysAndNoPrimaryKeyAsAnIntermediateNode() throws Exception
+    {
+        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
+        String response = neo4j.get().executeHttp(
+                NEO_TX_URI,
+                "MATCH (t:Team)-[:STUDENT]-(s:Student) RETURN t.name AS team, s.username AS student ORDER BY student" );
+
+        List<String> teams = JsonPath.read( response, "$.results[*].data[*].row[0]" );
+        List<String> students = JsonPath.read( response, "$.results[*].data[*].row[1]" );
+
+        assertThat( teams, hasItems( "Rassilon" ) );
+
+        assertThat( students.size(), is( 3 ) );
+        assertEquals( students, asList( "eve", "jim", "mark" ) );
     }
 
     private static void exportFromMySqlToNeo4j( String database ) throws IOException
