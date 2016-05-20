@@ -1,7 +1,6 @@
 package org.neo4j.integration.sql.exportcsv.io;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -34,11 +33,11 @@ public class RowStrategyTest
         rowOne.put( "age", null );
 
         TableName table = new TableName( "test.users" );
-        List<Column> columns = asList(
+        Column[] columns = new Column[]{
                 columnUtil.column( table, "id", ColumnRole.PrimaryKey ),
                 columnUtil.column( table, "username", ColumnRole.ForeignKey ),
                 columnUtil.column( table, "age", ColumnRole.Data ),
-                columnUtil.compositeKeyColumn( table, asList( "first_name", "last_name" ), ColumnRole.PrimaryKey ) );
+                columnUtil.compositeKeyColumn( table, asList( "first_name", "last_name" ), ColumnRole.PrimaryKey )};
 
         // when
         RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
@@ -58,10 +57,10 @@ public class RowStrategyTest
         rowOne.put( "age", "42" );
         TableName table = new TableName( "test.Users" );
 
-        List<Column> columns = asList(
+        Column[] columns = new Column[]{
                 columnUtil.column( table, "id", ColumnRole.PrimaryKey ),
                 columnUtil.column( table, "username", ColumnRole.ForeignKey ),
-                columnUtil.column( table, "age", ColumnRole.Data ) );
+                columnUtil.column( table, "age", ColumnRole.Data )};
 
         // when
         RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
@@ -82,9 +81,9 @@ public class RowStrategyTest
         Column compositeColumn = columnUtil.compositeKeyColumn( table, asList( "first_name", "last_name" ),
                 ColumnRole.PrimaryKey );
 
-        List<Column> columns = asList(
+        Column[] columns = new Column[]{
                 compositeColumn,
-                columnUtil.column( table, "age", ColumnRole.Data ) );
+                columnUtil.column( table, "age", ColumnRole.Data )};
 
         // when
         RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;
@@ -99,10 +98,10 @@ public class RowStrategyTest
     {
         // given
         TableName table = new TableName( "users" );
-        List<Column> columns = asList(
+        Column[] columns = new Column[]{
                 columnUtil.column( table, "id", ColumnRole.PrimaryKey ),
                 columnUtil.column( table, "username", ColumnRole.ForeignKey ),
-                columnUtil.column( table, "age", ColumnRole.Data ) );
+                columnUtil.column( table, "age", ColumnRole.Data )};
 
         // when
         RowStrategy strategy = RowStrategy.IgnoreRowWithNullKey;

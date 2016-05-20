@@ -16,11 +16,11 @@ import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 
-public class ResultsToFileWriter
+class ResultsToFileWriter
 {
     private Formatting formatting;
 
-    public ResultsToFileWriter( Formatting formatting )
+    ResultsToFileWriter( Formatting formatting )
     {
         this.formatting = formatting;
     }
@@ -38,7 +38,7 @@ public class ResultsToFileWriter
         {
             while ( results.next() )
             {
-                if ( rowStrategy.test( results, mappings.columns() ) )
+                if ( rowStrategy.test( results, columns ) )
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {
