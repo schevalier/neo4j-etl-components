@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
-import org.neo4j.integration.util.SqlDataTypeUtils;
 
 import static java.lang.String.format;
 
@@ -57,7 +56,7 @@ public class TableInfoAssembler
                             tableName,
                             e.getKey(),
                             ColumnRole.Data,
-                            SqlDataTypeUtils.parse( e.getValue() ),
+                            SqlDataType.parse( e.getValue() ),
                             ColumnValueSelectionStrategy.SelectColumnValue ) )
                     .filter( c -> !c.sqlDataType().skipImport() )
                     .collect( Collectors.toMap( Column::name, c -> c ) );

@@ -40,6 +40,18 @@ public enum SqlDataType
     public static final SqlDataType RELATIONSHIP_TYPE_DATA_TYPE = TEXT;
     public static final SqlDataType KEY_DATA_TYPE = TEXT;
 
+    public static SqlDataType parse( String dataType )
+    {
+        try
+        {
+            return SqlDataType.valueOf( dataType.toUpperCase() );
+        }
+        catch ( NullPointerException e )
+        {
+            throw new IllegalArgumentException( format( "Unrecognized SQL data type: %s", dataType ) );
+        }
+    }
+
     private Neo4jDataType neo4jDataType;
 
     SqlDataType( Neo4jDataType neo4jDataType )

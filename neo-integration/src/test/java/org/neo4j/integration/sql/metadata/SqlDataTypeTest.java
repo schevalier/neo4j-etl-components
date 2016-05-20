@@ -3,7 +3,6 @@ package org.neo4j.integration.sql.metadata;
 import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
-import org.neo4j.integration.util.SqlDataTypeUtils;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -17,7 +16,7 @@ public class SqlDataTypeTest
     public void parseShouldUpperCaseDataTypesToMapToMySqlDataType() throws Exception
     {
         // given
-        SqlDataType anInt = SqlDataTypeUtils.parse( "int" );
+        SqlDataType anInt = SqlDataType.parse( "int" );
 
         // then
         assertThat( anInt, is( SqlDataType.INT ) );
@@ -81,6 +80,23 @@ public class SqlDataTypeTest
     public void toNeo4jDataTypeMappingOfBit() throws Exception
     {
         assertThat( SqlDataType.BIT.toNeo4jDataType(), is( Neo4jDataType.Byte ) );
+    }
+
+    @Test
+    public void testParse() throws Exception
+    {
+        SqlDataType sqlDataType = SqlDataType.parse( "float" );
+        assertThat( sqlDataType, is( sqlDataType.FLOAT ) );
+    }
+
+    @Test
+    public void testSetDataTypeConversion() throws Exception
+    {
+        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Boolean );
+
+        assertThat( SqlDataType.TINYINT.toNeo4jDataType(), is( Neo4jDataType.Boolean ) );
+
+        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Byte );
     }
 
 }
