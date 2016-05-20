@@ -30,8 +30,6 @@ import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
 
-import static java.lang.String.format;
-
 @Command(name = "export", description = "Export from MySQL.")
 public class ExportFromMySqlCli implements Runnable
 {
@@ -127,14 +125,16 @@ public class ExportFromMySqlCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--relationship-name", "--rel-name"},
-            description = "Specifies whether to get the name for relationships from table names (table) or column names (column). Table is default.",
+            description = "Specifies whether to get the name for relationships from table names (table) or column " +
+                    "names (column). Table is default.",
             title = "relationshipNameFrom")
     private String relationshipNameFrom = "table";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--tiny-int", "--tiny"},
-            description = "Specifies whether to get the convert TinyInts to byte (byte) or boolean (boolean). Byte is default.",
+            description = "Specifies whether to get the convert TinyInts to byte (byte) or boolean (boolean). Byte is" +
+                    " default.",
             title = "tinyIntAs")
     private String tinyIntAs = "byte";
 
@@ -230,10 +230,8 @@ public class ExportFromMySqlCli implements Runnable
 
     private FilterOptions createFilterOptions()
     {
-        FilterOptions filterOptions = new FilterOptions(  );
-
-        filterOptions.setTinyIntAs( tinyIntAs );
-        filterOptions.setRelationshipNameFrom( relationshipNameFrom );
+        FilterOptions filterOptions = new FilterOptions( FilterOptions.TinyIntAs.parse( tinyIntAs ),
+                FilterOptions.RelationshipNameFrom.parse( relationshipNameFrom ) );
 
         return filterOptions;
     }
