@@ -5,9 +5,12 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -55,10 +58,21 @@ public class BigPerformanceTest
     @BeforeClass
     public static void setUp() throws Exception
     {
-        MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-        client.execute( MySqlScripts.setupDatabaseScript().value() );
-        exportFromMySqlToNeo4j( "javabase" );
-        neo4j.get().start();
+        try
+        {
+            LogManager.getLogManager().readConfiguration(
+                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
+            MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
+            client.execute( MySqlScripts.northwindScript().value() );
+            exportFromMySqlToNeo4j( "northwind" );
+            neo4j.get().start();
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error in loading configuration" );
+            e.printStackTrace( System.err );
+        }
+
     }
 
     @AfterClass
@@ -73,19 +87,15 @@ public class BigPerformanceTest
         // then
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
-        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p:Person)-[r]->(c:Address) RETURN p, type" +
-                "(r), c" );
-        List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
-        List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
-        List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[2].postcode" );
+        String customersJson = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:Customer) RETURN c" );
+        String customersWithOrdersJson = neo4j.get().executeHttp( NEO_TX_URI,
+                "MATCH (c)--(o) " +
+                        "WHERE (c:Customer)<-[:CUSTOMER]-(o:Order) RETURN DISTINCT c" );
+        List<String> customers = JsonPath.read( customersJson, "$.results[*].data[*].row[0]" );
+        List<String> customersWithOrders = JsonPath.read( customersWithOrdersJson, "$.results[*].data[*].row[0]" );
+        MatcherAssert.assertThat( customers.size(), CoreMatchers.is( 93 ) );
+        MatcherAssert.assertThat( customersWithOrders.size(), CoreMatchers.is( 89 ) );
 
-        assertThat( usernames.size(), is( 9 ) );
-
-        assertThat( usernames, hasItems(
-                "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
-        assertEquals( asList( "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS",
-                "ADDRESS", "ADDRESS", "ADDRESS" ), relationships );
-        assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
     }
 
     private static void exportFromMySqlToNeo4j( String database ) throws IOException
