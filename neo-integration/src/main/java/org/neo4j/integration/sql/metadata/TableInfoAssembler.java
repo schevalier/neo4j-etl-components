@@ -17,6 +17,8 @@ import static java.lang.String.format;
 
 public class TableInfoAssembler
 {
+    static final String SYNTHETIC_PRIMARY_KEY_NAME = "_ROW_INDEX_";
+
     private final DatabaseClient databaseClient;
 
     public TableInfoAssembler( DatabaseClient databaseClient )
@@ -39,17 +41,12 @@ public class TableInfoAssembler
                 columnsLessKeyColumns( allColumns, keyColumns ) );
     }
 
-    private List<Column> columnsLessKeyColumns( Map<String, Column> allColumns, Collection<Column> keyColumns )
-    {
-        return allColumns.values().stream().filter( c -> !keyColumns.contains( c ) ).collect( Collectors.toList() );
-    }
-
     private Map<String, Column> createColumnsMap( TableName tableName ) throws Exception
     {
         try ( QueryResults columnsResults = databaseClient.columns( tableName ) )
         {
             return columnsResults.stream()
-                    .map( m -> new String[]{m.get( "COLUMN_NAME" ), m.get( "TYPE_NAME" )} )
+                    .map( row -> new String[]{row.get( "COLUMN_NAME" ), row.get( "TYPE_NAME" )} )
                     .collect( Collectors.toMap( v -> v[0], v -> v[1] ) )
                     .entrySet().stream()
                     .map( e -> new SimpleColumn(
@@ -63,43 +60,6 @@ public class TableInfoAssembler
         }
     }
 
-    private Optional<Column> createPrimaryKey( TableName table,
-                                               Map<String, Column> columns,
-                                               Collection<Column> keyColumns,
-                                               Collection<JoinKey> foreignKeys ) throws Exception
-    {
-        try ( QueryResults primaryKeyResults = databaseClient.primaryKeys( table ) )
-        {
-            List<Column> primaryKeyColumns = primaryKeyResults.stream()
-                    .map( pk -> columns.get( table.fullyQualifiedColumnName( pk.get( "COLUMN_NAME" ) ) ) )
-                    .collect( Collectors.toList() );
-
-            keyColumns.addAll( primaryKeyColumns );
-
-            if ( primaryKeyColumns.isEmpty() )
-            {
-                if ( foreignKeys.size() != 2 )
-                {
-                    return Optional.of( new SimpleColumn(
-                            table,
-                            "_ROW_INDEX_",
-                            ColumnRole.PrimaryKey,
-                            SqlDataType.INT,
-                            ColumnValueSelectionStrategy.SelectRowIndex ) );
-                }
-                else
-                {
-                    return Optional.empty();
-                }
-            }
-            else
-            {
-                return Optional.of(
-                        new CompositeColumn( table, primaryKeyColumns, ColumnRole.PrimaryKey ) );
-            }
-        }
-    }
-
     private Collection<JoinKey> createForeignKeys( TableName table,
                                                    Map<String, Column> columns,
                                                    Collection<Column> keyColumns ) throws Exception
@@ -107,7 +67,7 @@ public class TableInfoAssembler
         try ( QueryResults foreignKeysResults = databaseClient.foreignKeys( table ) )
         {
             Map<String, List<Map<String, String>>> foreignKeyGroups = foreignKeysResults.stream()
-                    .collect( Collectors.groupingBy( r -> r.get( "FK_NAME" ) ) );
+                    .collect( Collectors.groupingBy( row -> row.get( "FK_NAME" ) ) );
 
             Collection<JoinKey> keys = new ArrayList<>();
 
@@ -116,14 +76,14 @@ public class TableInfoAssembler
                 List<Column> sourceColumns = new ArrayList<>();
                 List<Column> targetColumns = new ArrayList<>();
 
-                foreignKeyGroup.forEach( fk ->
+                foreignKeyGroup.forEach( fkRow ->
                 {
-                    Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fk.get( "FKCOLUMN_NAME" ) ) );
+                    Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fkRow.get( "FKCOLUMN_NAME" ) ) );
                     // We assume the key's target column data type is the same as the source column's data type
                     SqlDataType sqlDataType = sourceColumn.sqlDataType();
 
                     sourceColumns.add( sourceColumn );
-                    targetColumns.add( createForeignKeyTargetColumn( fk, sqlDataType ) );
+                    targetColumns.add( createForeignKeyTargetColumn( fkRow, sqlDataType ) );
                 } );
 
                 keyColumns.addAll( sourceColumns );
@@ -146,17 +106,68 @@ public class TableInfoAssembler
         }
     }
 
-    private Column createForeignKeyTargetColumn( Map<String, String> fk, SqlDataType sqlDataType )
+    private Optional<Column> createPrimaryKey( TableName table,
+                                               Map<String, Column> columns,
+                                               Collection<Column> keyColumns,
+                                               Collection<JoinKey> foreignKeys ) throws Exception
+    {
+        try ( QueryResults primaryKeyResults = databaseClient.primaryKeys( table ) )
+        {
+            List<Column> primaryKeyColumns = primaryKeyResults.stream()
+                    .map( pk -> columns.get( table.fullyQualifiedColumnName( pk.get( "COLUMN_NAME" ) ) ) )
+                    .collect( Collectors.toList() );
+
+            keyColumns.addAll( primaryKeyColumns );
+
+            if ( primaryKeyColumns.isEmpty() )
+            {
+                if ( notJoinTable( foreignKeys ) )
+                {
+                    return Optional.of( createRowIndexBasedPrimaryKey( table ) );
+                }
+                else
+                {
+                    return Optional.empty();
+                }
+            }
+            else
+            {
+                return Optional.of( new CompositeColumn( table, primaryKeyColumns, ColumnRole.PrimaryKey ) );
+            }
+        }
+    }
+
+    private boolean notJoinTable( Collection<JoinKey> foreignKeys )
+    {
+        return foreignKeys.size() != 2;
+    }
+
+    private SimpleColumn createRowIndexBasedPrimaryKey( TableName table )
+    {
+        return new SimpleColumn(
+                table,
+                SYNTHETIC_PRIMARY_KEY_NAME,
+                ColumnRole.PrimaryKey,
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectRowIndex );
+    }
+
+    private Column createForeignKeyTargetColumn( Map<String, String> fkRow, SqlDataType sqlDataType )
     {
         TableName targetTableName = new TableName(
-                firstNonNullOrEmpty( fk.get( "PKTABLE_CAT" ), fk.get( "PKTABLE_SCHEM" ) ),
-                fk.get( "PKTABLE_NAME" ) );
+                firstNonNullOrEmpty( fkRow.get( "PKTABLE_CAT" ), fkRow.get( "PKTABLE_SCHEM" ) ),
+                fkRow.get( "PKTABLE_NAME" ) );
 
         return new SimpleColumn(
                 targetTableName,
-                fk.get( "PKCOLUMN_NAME" ),
+                fkRow.get( "PKCOLUMN_NAME" ),
                 ColumnRole.Data,
                 sqlDataType, ColumnValueSelectionStrategy.SelectColumnValue );
+    }
+
+    private List<Column> columnsLessKeyColumns( Map<String, Column> allColumns, Collection<Column> keyColumns )
+    {
+        return allColumns.values().stream().filter( c -> !keyColumns.contains( c ) ).collect( Collectors.toList() );
     }
 
     private String firstNonNullOrEmpty( String a, String b )
