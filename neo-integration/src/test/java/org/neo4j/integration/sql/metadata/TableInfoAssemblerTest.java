@@ -114,6 +114,72 @@ public class TableInfoAssemblerTest
                         join( "javabase.Example.column_3", "javabase.Example.column_4" ) ) );
     }
 
+    @Test
+    public void shouldCreateSyntheticPrimaryKeyForTableWithLessThanTwoForeignKeysAndNoPrimaryKey() throws Exception
+    {
+        // given
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
+                .addForeignKey( "fk" )
+                .build();
+
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
+
+        // when
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
+
+        // then
+        assertTrue( tableInfo.primaryKey().isPresent() );
+        assertEquals( 1, tableInfo.foreignKeys().size() );
+        assertFalse( tableInfo.representsJoinTable() );
+
+        assertEquals( TableInfoAssembler.SYNTHETIC_PRIMARY_KEY_NAME, tableInfo.primaryKey().get().alias() );
+        assertFalse( tableInfo.primaryKey().get().allowAddToSelectStatement() );
+    }
+
+    @Test
+    public void shouldCreateSyntheticPrimaryKeyForTableWithMoreThanTwoForeignKeysAndNoPrimaryKey() throws Exception
+    {
+        // given
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
+                .addForeignKey( "fk_1" )
+                .addForeignKey( "fk_2" )
+                .addForeignKey( "fk_3" )
+                .build();
+
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
+
+        // when
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
+
+        // then
+        assertTrue( tableInfo.primaryKey().isPresent() );
+        assertEquals( 3, tableInfo.foreignKeys().size() );
+        assertFalse( tableInfo.representsJoinTable() );
+
+        assertEquals( TableInfoAssembler.SYNTHETIC_PRIMARY_KEY_NAME, tableInfo.primaryKey().get().alias() );
+        assertFalse( tableInfo.primaryKey().get().allowAddToSelectStatement() );
+    }
+
+    @Test
+    public void shouldNotCreateSyntheticPrimaryKeyForJoinTableWithTwoForeignKeysAndNoPrimaryKey() throws Exception
+    {
+        // given
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
+                .addForeignKey( "fk_1" )
+                .addForeignKey( "fk_2" )
+                .build();
+
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient );
+
+        // when
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
+
+        // then
+        assertFalse( tableInfo.primaryKey().isPresent() );
+        assertEquals( 2, tableInfo.foreignKeys().size() );
+        assertTrue( tableInfo.representsJoinTable() );
+    }
+
     private String join( String... columns )
     {
         return StringUtils.join( columns, CompositeColumn.SEPARATOR );

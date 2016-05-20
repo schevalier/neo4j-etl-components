@@ -143,6 +143,19 @@ CREATE TABLE javabase.Student_Course
 GRANT ALL ON javabase.Student_Course TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
+CREATE TABLE javabase.Team
+(
+  name VARCHAR(20) NOT NULL,
+  teamMember1Id       INT         NOT NULL,
+  teamMember2Id       INT         NOT NULL,
+  teamMember3Id       INT         NOT NULL,
+  FOREIGN KEY (teamMember1Id) REFERENCES javabase.Student (id),
+  FOREIGN KEY (teamMember2Id) REFERENCES javabase.Student (id),
+  FOREIGN KEY (teamMember3Id) REFERENCES javabase.Student (id)
+);
+GRANT ALL ON javabase.Team TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');
 INSERT INTO javabase.Address (postcode) VALUES ('ZZ1 0MN');
@@ -305,3 +318,12 @@ INSERT INTO javabase.Student_Course (studentId, courseId, credits)
     4
   FROM javabase.Student s, javabase.Course c
   WHERE s.username = 'mark' AND c.name = 'English';
+
+INSERT INTO javabase.Team (name, teamMember1Id, teamMember2Id, teamMember3Id)
+  SELECT
+    'Rassilon',
+    s1.id,
+    s2.id,
+    s3.id
+  FROM javabase.Student s1, javabase.Student s2, javabase.Student s3
+  WHERE s1.username = 'jim' AND s2.username = 'mark' AND s3.username = 'eve';

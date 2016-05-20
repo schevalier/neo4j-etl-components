@@ -5,12 +5,18 @@ import org.junit.Test;
 
 import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
 import org.neo4j.integration.sql.QueryResults;
+import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.StubQueryResults;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class SimpleColumnTest
 {
@@ -25,17 +31,20 @@ public class SimpleColumnTest
                 "id",
                 "id-alias",
                 ColumnRole.PrimaryKey,
-                SqlDataType.INT, ColumnValueSelectionStrategy.SelectColumnValue );
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
         Column column2 = new SimpleColumn(
                 personTable,
                 "username",
                 ColumnRole.Data,
-                SqlDataType.TEXT, ColumnValueSelectionStrategy.SelectColumnValue );
+                SqlDataType.TEXT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
         Column column3 = new SimpleColumn( personTable,
                 QuoteChar.DOUBLE_QUOTES.enquote( "PERSON" ),
                 "PERSON",
                 ColumnRole.Literal,
-                SqlDataType.TEXT, ColumnValueSelectionStrategy.SelectColumnValue );
+                SqlDataType.TEXT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
 
         // then
         assertThat( column1.aliasedColumn(), is( "`test`.`Person`.`id` AS `id-alias`" ) );
@@ -53,9 +62,17 @@ public class SimpleColumnTest
                 .addRow( "1", "user-1" )
                 .build();
 
-        Column column1 = new SimpleColumn( personTable, "id", ColumnRole.Data, SqlDataType.INT,
+        Column column1 = new SimpleColumn(
+                personTable,
+                "id",
+                ColumnRole.Data,
+                SqlDataType.INT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
-        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT,
+        Column column2 = new SimpleColumn(
+                personTable,
+                "username",
+                ColumnRole.Data,
+                SqlDataType.TEXT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
 
         // then
@@ -74,9 +91,17 @@ public class SimpleColumnTest
                 .addRow( null, null )
                 .build();
 
-        Column column1 = new SimpleColumn( personTable, "id", ColumnRole.Data, SqlDataType.INT,
+        Column column1 = new SimpleColumn(
+                personTable,
+                "id",
+                ColumnRole.Data,
+                SqlDataType.INT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
-        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT,
+        Column column2 = new SimpleColumn(
+                personTable,
+                "username",
+                ColumnRole.Data,
+                SqlDataType.TEXT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
 
         // then
@@ -95,7 +120,8 @@ public class SimpleColumnTest
                 "\"Person\"",
                 "Person",
                 ColumnRole.Literal,
-                SqlDataType.LABEL_DATA_TYPE, ColumnValueSelectionStrategy.SelectColumnValue );
+                SqlDataType.LABEL_DATA_TYPE,
+                ColumnValueSelectionStrategy.SelectColumnValue );
         // then
         assertThat( labelColumn.aliasedColumn(), is( "\"Person\" AS `Person`" ) );
     }
@@ -110,7 +136,8 @@ public class SimpleColumnTest
                 "id",
                 "id-alias",
                 ColumnRole.PrimaryKey,
-                SqlDataType.INT, ColumnValueSelectionStrategy.SelectColumnValue );
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
 
         JsonNode json = column.toJson();
 
@@ -119,5 +146,84 @@ public class SimpleColumnTest
 
         // then
         assertEquals( column, deserialized );
+    }
+
+    @Test
+    public void shouldAllowBeingBeAddedToSelectStatementIfSelectingColumnValue()
+    {
+        // given
+        TableName personTable = new TableName( "test.Person" );
+        Column column = new SimpleColumn(
+                personTable,
+                "id",
+                "id-alias",
+                ColumnRole.PrimaryKey,
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
+
+        // then
+        assertTrue( column.allowAddToSelectStatement() );
+    }
+
+    @Test
+    public void shouldSelectColumnValueIfUsingSelectColumnValueStrategy()
+    {
+        // given
+        TableName personTable = new TableName( "test.Person" );
+        Column column = new SimpleColumn(
+                personTable,
+                "id",
+                "id-alias",
+                ColumnRole.PrimaryKey,
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
+
+        RowAccessor row = mock(RowAccessor.class);
+
+        // when
+        column.selectFrom( row, 10 );
+
+        // then
+        verify(row).getString( "id-alias" );
+    }
+
+    @Test
+    public void shouldNotAllowBeingBeAddedToSelectStatementIfSelectingRowIndex()
+    {
+        // given
+        TableName personTable = new TableName( "test.Person" );
+        Column column = new SimpleColumn(
+                personTable,
+                "id",
+                "id-alias",
+                ColumnRole.PrimaryKey,
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectRowIndex );
+
+        // then
+        assertFalse( column.allowAddToSelectStatement() );
+    }
+
+    @Test
+    public void shouldSelectRowIndexIfUsingSelectRowIndexStrategy()
+    {
+        // given
+        TableName personTable = new TableName( "test.Person" );
+        Column column = new SimpleColumn(
+                personTable,
+                "id",
+                "id-alias",
+                ColumnRole.PrimaryKey,
+                SqlDataType.INT,
+                ColumnValueSelectionStrategy.SelectRowIndex );
+
+        RowAccessor row = mock(RowAccessor.class);
+
+        // when
+        String result = column.selectFrom( row, 10 );
+
+        // then
+        verifyZeroInteractions( row );
+        assertEquals( "10", result );
     }
 }
