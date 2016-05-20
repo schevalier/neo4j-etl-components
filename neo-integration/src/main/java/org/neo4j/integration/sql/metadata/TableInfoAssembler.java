@@ -58,7 +58,8 @@ public class TableInfoAssembler
                             tableName,
                             e.getKey(),
                             EnumSet.of( ColumnRole.Data ),
-                            SqlDataTypeUtils.parse( e.getValue() ) ) )
+                            SqlDataTypeUtils.parse( e.getValue() ),
+                            ColumnValueSelectionStrategy.SelectColumnValue ) )
                     .filter( c -> !c.sqlDataType().skipImport() )
                     .collect( Collectors.toMap( Column::name, c -> c ) );
         }
@@ -138,7 +139,7 @@ public class TableInfoAssembler
                 targetTableName,
                 fk.get( "PKCOLUMN_NAME" ),
                 EnumSet.of( ColumnRole.Data ),
-                sqlDataType );
+                sqlDataType, ColumnValueSelectionStrategy.SelectColumnValue );
     }
 
     private String firstNonNullOrEmpty( String a, String b )

@@ -48,7 +48,7 @@ public class CompositeColumnTest
                 singletonList( Collections.<String, String>emptyMap() ).get( 0 ).get( columnLabel );
 
         // when
-        String value = compositeColumn.selectFrom( stubRowAccessor );
+        String value = compositeColumn.selectFrom( stubRowAccessor, 1 );
 
         // then
         assertTrue( value.isEmpty() );
@@ -71,7 +71,7 @@ public class CompositeColumnTest
                 singletonList( rowOne ).get( 0 ).get( columnLabel );
 
         // when
-        String value = compositeColumn.selectFrom( stubRowAccessor );
+        String value = compositeColumn.selectFrom( stubRowAccessor, 1 );
 
         // then
         assertTrue( value.isEmpty() );
@@ -92,7 +92,7 @@ public class CompositeColumnTest
 
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
         // when
-        String value = compositeColumn.selectFrom( stubRowAccessor );
+        String value = compositeColumn.selectFrom( stubRowAccessor, 1 );
 
         // then
         assertThat( value, is( "Boaty\0Mc.Boatface" ) );

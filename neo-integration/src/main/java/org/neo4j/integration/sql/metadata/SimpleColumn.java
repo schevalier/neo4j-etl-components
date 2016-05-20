@@ -26,15 +26,15 @@ public class SimpleColumn implements Column
     {
         ArrayNode rolesNode = (ArrayNode) root.path( "roles" );
         Set<ColumnRole> roles = new HashSet<>();
-        rolesNode.forEach( r -> roles.add(  ColumnRole.valueOf( r.textValue() ) ));
+        rolesNode.forEach( r -> roles.add( ColumnRole.valueOf( r.textValue() ) ) );
 
         return new SimpleColumn(
                 new TableName( root.path( "table" ).textValue() ),
                 root.path( "name" ).textValue(),
                 root.path( "alias" ).textValue(),
                 roles,
-                SqlDataType.valueOf( root.path( "sql-data-type" ).textValue() )
-        );
+                SqlDataType.valueOf( root.path( "sql-data-type" ).textValue() ),
+                ColumnValueSelectionStrategy.valueOf( root.path( "column-value-selection-strategy" ).textValue() ) );
     }
 
     private final TableName table;
@@ -42,19 +42,31 @@ public class SimpleColumn implements Column
     private final String alias;
     private final Set<ColumnRole> columnRoles;
     private final SqlDataType dataType;
+    private final ColumnValueSelectionStrategy columnValueSelectionStrategy;
 
-    public SimpleColumn( TableName table, String name, Set<ColumnRole> columnRoles, SqlDataType dataType )
+    public SimpleColumn( TableName table,
+                         String name,
+                         Set<ColumnRole> columnRoles,
+                         SqlDataType dataType,
+                         ColumnValueSelectionStrategy columnValueSelectionStrategy )
     {
-        this( table, name, name, columnRoles, dataType );
+        this( table, name, name, columnRoles, dataType, columnValueSelectionStrategy );
     }
 
-    public SimpleColumn( TableName table, String name, String alias, Set<ColumnRole> columnRoles, SqlDataType dataType )
+    public SimpleColumn( TableName table,
+                         String name,
+                         String alias,
+                         Set<ColumnRole> columnRoles,
+                         SqlDataType dataType,
+                         ColumnValueSelectionStrategy columnValueSelectionStrategy )
     {
         this.table = Preconditions.requireNonNull( table, "Table" );
         this.name = Preconditions.requireNonNullString( name, "Name" );
         this.alias = Preconditions.requireNonNullString( alias, "Alias" );
         this.columnRoles = Preconditions.requireNonNull( columnRoles, "ColumnRole" );
         this.dataType = Preconditions.requireNonNull( dataType, "DataType" );
+        this.columnValueSelectionStrategy =
+                Preconditions.requireNonNull( columnValueSelectionStrategy, "ColumnValueSelectionStrategy" );
     }
 
     @Override
@@ -90,9 +102,9 @@ public class SimpleColumn implements Column
     }
 
     @Override
-    public String selectFrom( RowAccessor row )
+    public String selectFrom( RowAccessor row, int rowIndex )
     {
-        return row.getString( alias );
+        return columnValueSelectionStrategy.selectFrom( row, rowIndex, alias );
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
@@ -149,6 +161,7 @@ public class SimpleColumn implements Column
         root.put( "name", name );
         root.put( "alias", alias );
         root.put( "sql-data-type", dataType.name() );
+        root.put( "column-value-selection-strategy", columnValueSelectionStrategy.name() );
 
         return root;
     }

@@ -26,7 +26,7 @@ class ColumnTypes
                         table,
                         e.getKey(),
                         EnumSet.of( ColumnRole.Data ),
-                        SqlDataType.parse( e.getValue() ) ) )
+                        SqlDataType.parse( e.getValue() ), ColumnValueSelectionStrategy.SelectColumnValue ) )
                 .filter( c -> !c.sqlDataType().skipImport() )
                 .collect( Collectors.toList() );
     }

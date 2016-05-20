@@ -1,7 +1,6 @@
 package org.neo4j.integration.sql.exportcsv.io;
 
 import java.util.Set;
-import java.util.function.BiPredicate;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,12 +9,12 @@ import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 
-enum RowStrategy implements BiPredicate<RowAccessor, Column[]>
+enum RowStrategy
 {
     WriteRowWithNullKey
             {
                 @Override
-                public boolean test( RowAccessor rowAccessor, Column[] columns )
+                public boolean isWriteableRow( RowAccessor row, int rowIndex, Column[] columns )
                 {
                     return true;
                 }
@@ -23,14 +22,14 @@ enum RowStrategy implements BiPredicate<RowAccessor, Column[]>
     IgnoreRowWithNullKey
             {
                 @Override
-                public boolean test( RowAccessor row, Column[] columns )
+                public boolean isWriteableRow( RowAccessor row, int rowIndex, Column[] columns )
                 {
                     boolean allowWriteLine = true;
                     for ( Column column : columns )
                     {
                         if ( isKeyColumn( column.roles() ) )
                         {
-                            if ( StringUtils.isEmpty( column.selectFrom( row ) ) )
+                            if ( StringUtils.isEmpty( column.selectFrom( row, rowIndex ) ) )
                             {
                                 allowWriteLine = false;
                                 break;
@@ -58,4 +57,6 @@ enum RowStrategy implements BiPredicate<RowAccessor, Column[]>
         return roles.contains( ColumnRole.ForeignKey ) ||
                 roles.contains( ColumnRole.PrimaryKey );
     }
+
+    public abstract boolean isWriteableRow( RowAccessor row, int rowIndex, Column[] columns );
 }

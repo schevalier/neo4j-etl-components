@@ -99,7 +99,7 @@ public class CompositeColumn implements Column
     }
 
     @Override
-    public String selectFrom( RowAccessor row )
+    public String selectFrom( RowAccessor row, int rowIndex )
     {
         List<String> values = columns.stream()
                 .map( c -> row.getString( c.alias() ) )

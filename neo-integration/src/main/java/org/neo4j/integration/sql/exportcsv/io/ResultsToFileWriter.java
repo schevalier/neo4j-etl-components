@@ -33,23 +33,29 @@ class ResultsToFileWriter
         Column[] columns = mappings.columns().toArray( new Column[mappings.columns().size()] );
 
         int maxIndex = columns.length - 1;
+        int rowIndex = 0;
 
         try ( BufferedWriter writer = Files.newBufferedWriter( file, Charset.forName( "UTF8" ) ) )
         {
             while ( results.next() )
             {
-                if ( rowStrategy.test( results, columns ) )
+                rowIndex += 1;
+
+                if ( rowStrategy.isWriteableRow( results, rowIndex, columns ) )
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {
-                        String result = applyFilterStrategies( columns[i].selectFrom( results ), columns[i]
-                                .sqlDataType() );
-                        writeFieldValueAndDelimiter( result, writer, columns[i].useQuotes() );
+
+                        writeFieldValueAndDelimiter(
+                                columns[i].selectFrom( results, rowIndex ),
+                                writer,
+                                columns[i].useQuotes() );
                     }
 
-                    String result = applyFilterStrategies( columns[maxIndex].selectFrom( results ), columns[maxIndex]
-                            .sqlDataType() );
-                    writeFieldValueAndNewLine( result, writer, columns[maxIndex].useQuotes() );
+                    writeFieldValueAndNewLine(
+                            columns[maxIndex].selectFrom( results, rowIndex ),
+                            writer,
+                            columns[maxIndex].useQuotes() );
                 }
             }
         }

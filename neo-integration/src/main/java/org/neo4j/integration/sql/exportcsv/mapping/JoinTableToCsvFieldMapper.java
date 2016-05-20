@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
+import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
@@ -45,7 +46,7 @@ class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTa
                 QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),
                 relationshipType,
                 EnumSet.of( ColumnRole.Literal ),
-                SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE );
+                SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE, ColumnValueSelectionStrategy.SelectColumnValue );
 
         builder.add( new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
 

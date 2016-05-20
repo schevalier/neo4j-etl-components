@@ -12,6 +12,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.metadata.ColumnRole;
+import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
@@ -41,7 +42,8 @@ public class TableToCsvFieldMapperTest
                         Collections.singletonList( columnUtil.column(personTable, "id", ColumnRole.Data ) ),
                         EnumSet.of(   ColumnRole.PrimaryKey )))
                 .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
-                .addColumn( new SimpleColumn( personTable, "age", EnumSet.of( ColumnRole.Data ), SqlDataType.INT ) )
+                .addColumn( new SimpleColumn( personTable, "age", EnumSet.of( ColumnRole.Data ), SqlDataType.INT,
+                        ColumnValueSelectionStrategy.SelectColumnValue ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

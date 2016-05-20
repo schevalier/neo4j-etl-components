@@ -18,6 +18,7 @@ import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
 import org.neo4j.integration.sql.metadata.ColumnRole;
+import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.TableName;
@@ -103,8 +104,10 @@ public class ResultsToFileWriterTest
 
         when( mappings.columns() ).thenReturn(
                 asList(
-                        new SimpleColumn( table, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT ),
-                        new SimpleColumn( table, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.VARCHAR ) ) );
+                        new SimpleColumn( table, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT,
+                                ColumnValueSelectionStrategy.SelectColumnValue ),
+                        new SimpleColumn( table, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.VARCHAR,
+                                ColumnValueSelectionStrategy.SelectColumnValue ) ) );
 
         CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
 

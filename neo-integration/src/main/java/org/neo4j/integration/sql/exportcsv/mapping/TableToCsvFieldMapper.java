@@ -8,6 +8,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
+import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 import org.neo4j.integration.sql.metadata.Table;
@@ -45,7 +46,7 @@ class TableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Table>
                 QuoteChar.DOUBLE_QUOTES.enquote( formatting.labelFormatter().format( table.name().simpleName() ) ),
                 table.name().simpleName(),
                 EnumSet.of(ColumnRole.Literal),
-                SqlDataType.LABEL_DATA_TYPE );
+                SqlDataType.LABEL_DATA_TYPE, ColumnValueSelectionStrategy.SelectColumnValue );
 
         builder.add( new ColumnToCsvFieldMapping( label, CsvField.label() ) );
 

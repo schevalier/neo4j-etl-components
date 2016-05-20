@@ -325,7 +325,7 @@ public class TableInfoTest
         }
 
         @Override
-        public String selectFrom( RowAccessor row )
+        public String selectFrom( RowAccessor row, int rowIndex )
         {
             return null;
         }

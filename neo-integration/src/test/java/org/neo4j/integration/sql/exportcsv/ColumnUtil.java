@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
+import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
 import org.neo4j.integration.sql.metadata.SqlDataType;
@@ -20,7 +21,8 @@ public class ColumnUtil
 
     public Column column( TableName table, String name, String alias, ColumnRole role )
     {
-        return new SimpleColumn( table, name, alias, EnumSet.of( role ), SqlDataType.TEXT );
+        return new SimpleColumn( table, name, alias, EnumSet.of( role ), SqlDataType.TEXT,
+                ColumnValueSelectionStrategy.SelectColumnValue );
     }
 
     public SimpleColumn keyColumn( TableName tableName, String nameAndAlias, ColumnRole role )
@@ -30,7 +32,7 @@ public class ColumnUtil
                 nameAndAlias,
                 nameAndAlias,
                 EnumSet.of( role ),
-                SqlDataType.KEY_DATA_TYPE );
+                SqlDataType.KEY_DATA_TYPE, ColumnValueSelectionStrategy.SelectColumnValue );
     }
 
     public Column compositeKeyColumn( TableName tableName, List<String> columnNames, ColumnRole keyType )

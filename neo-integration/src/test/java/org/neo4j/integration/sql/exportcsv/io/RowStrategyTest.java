@@ -44,7 +44,7 @@ public class RowStrategyTest
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
-        assertTrue( strategy.test( stubRowAccessor, columns ) );
+        assertTrue( strategy.isWriteableRow( stubRowAccessor, 1, columns ) );
     }
 
     @Test
@@ -67,7 +67,7 @@ public class RowStrategyTest
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
-        assertFalse( strategy.test( stubRowAccessor, columns ) );
+        assertFalse( strategy.isWriteableRow( stubRowAccessor, 1, columns ) );
     }
 
     @Test
@@ -90,7 +90,7 @@ public class RowStrategyTest
 
         // then
         RowAccessor stubRowAccessor = columnLabel -> singletonList( rowOne ).get( 0 ).get( columnLabel );
-        assertFalse( strategy.test( stubRowAccessor, columns ) );
+        assertFalse( strategy.isWriteableRow( stubRowAccessor, 1, columns ) );
     }
 
     @Test(expected = IllegalStateException.class)
@@ -110,7 +110,7 @@ public class RowStrategyTest
         RowAccessor stubRowAccessor = columnLabel -> {
             throw new IllegalStateException();
         };
-        strategy.test( stubRowAccessor, columns );
+        strategy.isWriteableRow( stubRowAccessor, 1, columns );
         fail( "Should have bubbled up the exception" );
     }
 }
