@@ -2,7 +2,6 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
@@ -313,7 +312,7 @@ public class TableInfoTest
         }
 
         @Override
-        public Set<ColumnRole> roles()
+        public ColumnRole role()
         {
             return null;
         }

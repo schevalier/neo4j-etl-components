@@ -2,9 +2,7 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,32 +24,29 @@ public class CompositeColumn implements Column
     public static Column fromJson( JsonNode root )
     {
         TableName table = new TableName( root.path( "table" ).textValue() );
+        ColumnRole role = ColumnRole.valueOf( root.path( "role" ).textValue() );
+
         Collection<Column> columns = new ArrayList<>();
-
-        ArrayNode rolesNode = (ArrayNode) root.path( "roles" );
-        Set<ColumnRole> roles = new HashSet<>();
-        rolesNode.forEach( r -> roles.add( ColumnRole.valueOf( r.textValue() ) ) );
-
         ArrayNode columnArray = (ArrayNode) root.path( "columns" );
         for ( JsonNode jsonNode : columnArray )
         {
             columns.add( Column.fromJson( jsonNode ) );
         }
 
-        return new CompositeColumn( table, columns, roles );
+        return new CompositeColumn( table, columns, role );
     }
 
     static final String SEPARATOR = "\0";
 
     private final TableName table;
     private final Collection<Column> columns;
-    private final Set<ColumnRole> roles;
+    private final ColumnRole role;
 
-    public CompositeColumn( TableName table, Collection<Column> columns, Set<ColumnRole> roles )
+    public CompositeColumn( TableName table, Collection<Column> columns, ColumnRole role )
     {
         this.table = table;
         this.columns = columns;
-        this.roles = roles;
+        this.role = role;
 
         for ( Column column : columns )
         {
@@ -87,9 +82,9 @@ public class CompositeColumn implements Column
     }
 
     @Override
-    public Set<ColumnRole> roles()
+    public ColumnRole role()
     {
-        return roles;
+        return role;
     }
 
     @Override
@@ -161,10 +156,7 @@ public class CompositeColumn implements Column
 
         root.put( "type", getClass().getSimpleName() );
         root.put( "table", table.fullName() );
-
-        ArrayNode rolesArray = JsonNodeFactory.instance.arrayNode();
-        roles.forEach( r -> rolesArray.add( r.name() ) );
-        root.set( "roles", rolesArray );
+        root.put( "role", role.name() );
 
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
 

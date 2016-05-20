@@ -1,10 +1,6 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
@@ -24,15 +20,11 @@ public class SimpleColumn implements Column
 {
     public static Column fromJson( JsonNode root )
     {
-        ArrayNode rolesNode = (ArrayNode) root.path( "roles" );
-        Set<ColumnRole> roles = new HashSet<>();
-        rolesNode.forEach( r -> roles.add( ColumnRole.valueOf( r.textValue() ) ) );
-
         return new SimpleColumn(
                 new TableName( root.path( "table" ).textValue() ),
                 root.path( "name" ).textValue(),
                 root.path( "alias" ).textValue(),
-                roles,
+                ColumnRole.valueOf( root.path( "role" ).textValue() ),
                 SqlDataType.valueOf( root.path( "sql-data-type" ).textValue() ),
                 ColumnValueSelectionStrategy.valueOf( root.path( "column-value-selection-strategy" ).textValue() ) );
     }
@@ -40,30 +32,30 @@ public class SimpleColumn implements Column
     private final TableName table;
     private final String name;
     private final String alias;
-    private final Set<ColumnRole> columnRoles;
+    private final ColumnRole role;
     private final SqlDataType dataType;
     private final ColumnValueSelectionStrategy columnValueSelectionStrategy;
 
     public SimpleColumn( TableName table,
                          String name,
-                         Set<ColumnRole> columnRoles,
+                         ColumnRole role,
                          SqlDataType dataType,
                          ColumnValueSelectionStrategy columnValueSelectionStrategy )
     {
-        this( table, name, name, columnRoles, dataType, columnValueSelectionStrategy );
+        this( table, name, name, role, dataType, columnValueSelectionStrategy );
     }
 
     public SimpleColumn( TableName table,
                          String name,
                          String alias,
-                         Set<ColumnRole> columnRoles,
+                         ColumnRole role,
                          SqlDataType dataType,
                          ColumnValueSelectionStrategy columnValueSelectionStrategy )
     {
         this.table = Preconditions.requireNonNull( table, "Table" );
         this.name = Preconditions.requireNonNullString( name, "Name" );
         this.alias = Preconditions.requireNonNullString( alias, "Alias" );
-        this.columnRoles = Preconditions.requireNonNull( columnRoles, "ColumnRole" );
+        this.role = Preconditions.requireNonNull( role, "Role" );
         this.dataType = Preconditions.requireNonNull( dataType, "DataType" );
         this.columnValueSelectionStrategy =
                 Preconditions.requireNonNull( columnValueSelectionStrategy, "ColumnValueSelectionStrategy" );
@@ -79,7 +71,7 @@ public class SimpleColumn implements Column
     @Override
     public String name()
     {
-        return columnRoles.contains( ColumnRole.Literal ) ? name : table.fullyQualifiedColumnName( name );
+        return role == ColumnRole.Literal ? name : table.fullyQualifiedColumnName( name );
     }
 
     // Column alias
@@ -90,9 +82,9 @@ public class SimpleColumn implements Column
     }
 
     @Override
-    public Set<ColumnRole> roles()
+    public ColumnRole role()
     {
-        return columnRoles;
+        return role;
     }
 
     @Override
@@ -135,7 +127,7 @@ public class SimpleColumn implements Column
     @Override
     public String aliasedColumn()
     {
-        if ( columnRoles.contains( ColumnRole.Literal ) )
+        if ( role == ColumnRole.Literal )
         {
             return format( "%s AS `%s`", name(), alias );
         }
@@ -158,11 +150,7 @@ public class SimpleColumn implements Column
         ObjectNode root = JsonNodeFactory.instance.objectNode();
 
         root.put( "type", getClass().getSimpleName() );
-
-        ArrayNode roles = JsonNodeFactory.instance.arrayNode();
-        columnRoles.forEach( r -> roles.add( r.name() ) );
-        root.set( "roles", roles );
-
+        root.put( "role", role.name() );
         root.put( "table", table.fullName() );
         root.put( "name", name );
         root.put( "alias", alias );

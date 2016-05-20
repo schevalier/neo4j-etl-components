@@ -1,7 +1,5 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.util.EnumSet;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 
@@ -26,17 +24,17 @@ public class SimpleColumnTest
                 personTable,
                 "id",
                 "id-alias",
-                EnumSet.of( ColumnRole.PrimaryKey ),
+                ColumnRole.PrimaryKey,
                 SqlDataType.INT, ColumnValueSelectionStrategy.SelectColumnValue );
         Column column2 = new SimpleColumn(
                 personTable,
                 "username",
-                EnumSet.of( ColumnRole.Data ),
+                ColumnRole.Data,
                 SqlDataType.TEXT, ColumnValueSelectionStrategy.SelectColumnValue );
         Column column3 = new SimpleColumn( personTable,
                 QuoteChar.DOUBLE_QUOTES.enquote( "PERSON" ),
                 "PERSON",
-                EnumSet.of( ColumnRole.Literal ),
+                ColumnRole.Literal,
                 SqlDataType.TEXT, ColumnValueSelectionStrategy.SelectColumnValue );
 
         // then
@@ -55,9 +53,9 @@ public class SimpleColumnTest
                 .addRow( "1", "user-1" )
                 .build();
 
-        Column column1 = new SimpleColumn( personTable, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT,
+        Column column1 = new SimpleColumn( personTable, "id", ColumnRole.Data, SqlDataType.INT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
-        Column column2 = new SimpleColumn( personTable, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.TEXT,
+        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
 
         // then
@@ -76,9 +74,9 @@ public class SimpleColumnTest
                 .addRow( null, null )
                 .build();
 
-        Column column1 = new SimpleColumn( personTable, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT,
+        Column column1 = new SimpleColumn( personTable, "id", ColumnRole.Data, SqlDataType.INT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
-        Column column2 = new SimpleColumn( personTable, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.TEXT,
+        Column column2 = new SimpleColumn( personTable, "username", ColumnRole.Data, SqlDataType.TEXT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
 
         // then
@@ -96,7 +94,7 @@ public class SimpleColumnTest
                 personTable,
                 "\"Person\"",
                 "Person",
-                EnumSet.of( ColumnRole.Literal ),
+                ColumnRole.Literal,
                 SqlDataType.LABEL_DATA_TYPE, ColumnValueSelectionStrategy.SelectColumnValue );
         // then
         assertThat( labelColumn.aliasedColumn(), is( "\"Person\" AS `Person`" ) );
@@ -111,7 +109,7 @@ public class SimpleColumnTest
                 personTable,
                 "id",
                 "id-alias",
-                EnumSet.of( ColumnRole.PrimaryKey ),
+                ColumnRole.PrimaryKey,
                 SqlDataType.INT, ColumnValueSelectionStrategy.SelectColumnValue );
 
         JsonNode json = column.toJson();

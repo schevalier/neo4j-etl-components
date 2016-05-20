@@ -1,7 +1,6 @@
 package org.neo4j.integration.sql.exportcsv.mysql;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 
 import org.junit.Test;
 
@@ -65,7 +64,7 @@ public class MySqlExportSqlSupplierTest
         Column lastName = columnUtil.column( forTable, "last_name", ColumnRole.PrimaryKey );
 
         CompositeColumn from = new CompositeColumn(
-                forTable, Arrays.asList( firstName, lastName ), EnumSet.of( ColumnRole.PrimaryKey ) );
+                forTable, Arrays.asList( firstName, lastName ), ColumnRole.PrimaryKey );
         ColumnToCsvFieldMappings mappings = ColumnToCsvFieldMappings.builder()
                 .add(
                         new ColumnToCsvFieldMapping( from, CsvField.id() ) )

@@ -3,7 +3,6 @@ package org.neo4j.integration.sql.exportcsv.io;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.junit.Rule;
@@ -104,9 +103,9 @@ public class ResultsToFileWriterTest
 
         when( mappings.columns() ).thenReturn(
                 asList(
-                        new SimpleColumn( table, "id", EnumSet.of( ColumnRole.Data ), SqlDataType.INT,
+                        new SimpleColumn( table, "id", ColumnRole.Data, SqlDataType.INT,
                                 ColumnValueSelectionStrategy.SelectColumnValue ),
-                        new SimpleColumn( table, "username", EnumSet.of( ColumnRole.Data ), SqlDataType.VARCHAR,
+                        new SimpleColumn( table, "username", ColumnRole.Data, SqlDataType.VARCHAR,
                                 ColumnValueSelectionStrategy.SelectColumnValue ) ) );
 
         CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );

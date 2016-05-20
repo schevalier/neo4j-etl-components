@@ -1,6 +1,5 @@
 package org.neo4j.integration.sql.exportcsv;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ public class ColumnUtil
 
     public Column column( TableName table, String name, String alias, ColumnRole role )
     {
-        return new SimpleColumn( table, name, alias, EnumSet.of( role ), SqlDataType.TEXT,
+        return new SimpleColumn( table, name, alias, role, SqlDataType.TEXT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
     }
 
@@ -31,16 +30,16 @@ public class ColumnUtil
                 tableName,
                 nameAndAlias,
                 nameAndAlias,
-                EnumSet.of( role ),
+                role,
                 SqlDataType.KEY_DATA_TYPE, ColumnValueSelectionStrategy.SelectColumnValue );
     }
 
-    public Column compositeKeyColumn( TableName tableName, List<String> columnNames, ColumnRole keyType )
+    public Column compositeKeyColumn( TableName tableName, List<String> columnNames, ColumnRole role )
     {
         return new CompositeColumn( tableName,
                 columnNames.stream()
-                        .map( name -> keyColumn( tableName, name, keyType ) )
-                        .collect( Collectors.toList() ) ,
-                EnumSet.of( keyType ));
+                        .map( name -> keyColumn( tableName, name, role ) )
+                        .collect( Collectors.toList() ),
+                role );
     }
 }

@@ -1,7 +1,5 @@
 package org.neo4j.integration.sql.metadata;
 
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.neo4j.integration.sql.RowAccessor;
@@ -37,7 +35,7 @@ public interface Column
     // Column alias
     String alias();
 
-    Set<ColumnRole> roles();
+    ColumnRole role();
 
     SqlDataType sqlDataType();
 

@@ -2,7 +2,6 @@ package org.neo4j.integration.sql.exportcsv.mapping;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 
 import org.junit.Test;
 
@@ -39,10 +38,10 @@ public class TableToCsvFieldMapperTest
                 .name( personTable )
                 .addColumn( new CompositeColumn(
                         personTable,
-                        Collections.singletonList( columnUtil.column(personTable, "id", ColumnRole.Data ) ),
-                        EnumSet.of(   ColumnRole.PrimaryKey )))
+                        Collections.singletonList( columnUtil.column( personTable, "id", ColumnRole.Data ) ),
+                        ColumnRole.PrimaryKey ) )
                 .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
-                .addColumn( new SimpleColumn( personTable, "age", EnumSet.of( ColumnRole.Data ), SqlDataType.INT,
+                .addColumn( new SimpleColumn( personTable, "age", ColumnRole.Data, SqlDataType.INT,
                         ColumnValueSelectionStrategy.SelectColumnValue ) )
                 .build();
 
@@ -99,13 +98,13 @@ public class TableToCsvFieldMapperTest
                 .name( personTable )
                 .addColumn( new CompositeColumn(
                         personTable,
-                        Collections.singletonList( columnUtil.column(personTable, "id", ColumnRole.Data ) ),
-                        EnumSet.of(   ColumnRole.PrimaryKey )))
+                        Collections.singletonList( columnUtil.column( personTable, "id", ColumnRole.Data ) ),
+                        ColumnRole.PrimaryKey ) )
                 .addColumn( columnUtil.column( personTable, "username", ColumnRole.Data ) )
                 .addColumn( new CompositeColumn(
                         personTable,
-                        Collections.singletonList( columnUtil.column(personTable, "addressId", ColumnRole.Data ) ),
-                        EnumSet.of(   ColumnRole.ForeignKey )))
+                        Collections.singletonList( columnUtil.column( personTable, "addressId", ColumnRole.Data ) ),
+                        ColumnRole.ForeignKey ) )
                 .build();
 
         TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );

@@ -2,7 +2,6 @@ package org.neo4j.integration.sql.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class TableInfoAssembler
                     .map( e -> new SimpleColumn(
                             tableName,
                             e.getKey(),
-                            EnumSet.of( ColumnRole.Data ),
+                            ColumnRole.Data,
                             SqlDataTypeUtils.parse( e.getValue() ),
                             ColumnValueSelectionStrategy.SelectColumnValue ) )
                     .filter( c -> !c.sqlDataType().skipImport() )
@@ -85,7 +84,7 @@ public class TableInfoAssembler
                     return Optional.of( new SimpleColumn(
                             table,
                             "_ROW_INDEX_",
-                            EnumSet.of( ColumnRole.PrimaryKey ),
+                            ColumnRole.PrimaryKey,
                             SqlDataType.INT,
                             ColumnValueSelectionStrategy.SelectRowIndex ) );
                 }
@@ -97,7 +96,7 @@ public class TableInfoAssembler
             else
             {
                 return Optional.of(
-                        new CompositeColumn( table, primaryKeyColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) );
+                        new CompositeColumn( table, primaryKeyColumns, ColumnRole.PrimaryKey ) );
             }
         }
     }
@@ -140,8 +139,8 @@ public class TableInfoAssembler
 
                 TableName targetTable = targetColumns.get( 0 ).table();
                 keys.add( new JoinKey(
-                        new CompositeColumn( table, sourceColumns, EnumSet.of( ColumnRole.ForeignKey ) ),
-                        new CompositeColumn( targetTable, targetColumns, EnumSet.of( ColumnRole.PrimaryKey ) ) ) );
+                        new CompositeColumn( table, sourceColumns, ColumnRole.ForeignKey ),
+                        new CompositeColumn( targetTable, targetColumns, ColumnRole.PrimaryKey ) ) );
             }
 
             return keys;
@@ -157,7 +156,7 @@ public class TableInfoAssembler
         return new SimpleColumn(
                 targetTableName,
                 fk.get( "PKCOLUMN_NAME" ),
-                EnumSet.of( ColumnRole.Data ),
+                ColumnRole.Data,
                 sqlDataType, ColumnValueSelectionStrategy.SelectColumnValue );
     }
 
