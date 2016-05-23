@@ -15,6 +15,7 @@ import java.util.Spliterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -42,10 +43,18 @@ public class DatabaseClient implements AutoCloseable
 
         Class.forName( connectionConfig.driverClassName() );
 
-        connection = DriverManager.getConnection(
-                connectionConfig.uri().toString(),
-                connectionConfig.credentials().username(),
-                connectionConfig.credentials().password() );
+        try
+        {
+            connection = DriverManager.getConnection(
+                    connectionConfig.uri().toString(),
+                    connectionConfig.credentials().username(),
+                    connectionConfig.credentials().password() );
+        }
+        catch ( SQLException e )
+        {
+            Loggers.Sql.log( Level.SEVERE, "Could not connect to the host database. Please check your credentials ", e);
+            throw e;
+        }
 
         metaData = connection.getMetaData();
 
