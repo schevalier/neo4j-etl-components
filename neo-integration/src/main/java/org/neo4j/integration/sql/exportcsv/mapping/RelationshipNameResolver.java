@@ -11,18 +11,12 @@ public class RelationshipNameResolver
         this.relationshipNameFrom = relationshipNameFrom;
     }
 
-    String resolve( String tableName, String columnName )
+    public String resolve( String tableName, String columnName )
     {
-        switch ( relationshipNameFrom )
+        if ( RelationshipNameFrom.COLUMN_NAME == relationshipNameFrom )
         {
-            case TABLE_NAME:
-                return tableName;
-
-            case COLUMN_NAME:
-                return columnName;
-
-            default:
-                return tableName;
+            return columnName;
         }
+        return tableName;
     }
 }

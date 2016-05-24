@@ -6,16 +6,10 @@ public enum RelationshipNameFrom
 
     public static RelationshipNameFrom parse( String relationshipNameFrom )
     {
-        switch ( relationshipNameFrom )
+        if ( "column".equalsIgnoreCase( relationshipNameFrom ) )
         {
-            case "table":
-                return TABLE_NAME;
-
-            case "column":
-                return COLUMN_NAME;
-
-            default:
-                return TABLE_NAME;
+            return COLUMN_NAME;
         }
+        return TABLE_NAME;
     }
 }

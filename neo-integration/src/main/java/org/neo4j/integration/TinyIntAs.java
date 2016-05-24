@@ -20,16 +20,10 @@ public enum TinyIntAs
 
     public static TinyIntAs parse( String tinyIntAs )
     {
-        switch ( tinyIntAs )
+        if ( "boolean".equalsIgnoreCase( tinyIntAs ) )
         {
-            case "byte":
-                return TinyIntAs.BYTE;
-
-            case "boolean":
-                return TinyIntAs.BOOLEAN;
-
-            default:
-                return TinyIntAs.BYTE;
+            return TinyIntAs.BOOLEAN;
         }
+        return TinyIntAs.BYTE;
     }
 }
