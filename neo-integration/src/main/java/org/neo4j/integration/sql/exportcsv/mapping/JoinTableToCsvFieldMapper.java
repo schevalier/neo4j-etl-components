@@ -42,7 +42,7 @@ class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTa
 
         SimpleColumn from = new SimpleColumn( table,
                 QuoteChar.DOUBLE_QUOTES.enquote( relationshipType ),
-                relationshipType,
+                "_RELATIONSHIP_TYPE_",
                 ColumnRole.Literal,
                 SqlDataType.RELATIONSHIP_TYPE_DATA_TYPE,
                 ColumnValueSelectionStrategy.SelectColumnValue );
