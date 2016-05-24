@@ -1,12 +1,12 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import org.neo4j.integration.FilterOptions;
+import org.neo4j.integration.RelationshipNameFrom;
 
 public class RelationshipNameResolver
 {
-    private FilterOptions.RelationshipNameFrom relationshipNameFrom;
+    private RelationshipNameFrom relationshipNameFrom;
 
-    public RelationshipNameResolver( FilterOptions.RelationshipNameFrom relationshipNameFrom )
+    public RelationshipNameResolver( RelationshipNameFrom relationshipNameFrom )
     {
         this.relationshipNameFrom = relationshipNameFrom;
     }

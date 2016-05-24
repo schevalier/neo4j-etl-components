@@ -124,20 +124,12 @@ public class CreateCsvResourcesCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    createFilterOptions() ).call();
+                    new FilterOptions( tinyIntAs, relationshipNameFrom ) ).call();
         }
         catch ( Exception e )
         {
             CliRunner.handleException( e, debug );
         }
-    }
-
-    private FilterOptions createFilterOptions()
-    {
-        FilterOptions filterOptions = new FilterOptions( FilterOptions.TinyIntAs.parse( tinyIntAs ),
-                FilterOptions.RelationshipNameFrom.parse( relationshipNameFrom ) );
-
-        return filterOptions;
     }
 
     private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events

@@ -74,7 +74,7 @@ public class CreateCsvResources implements Callable<CsvResources>
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier )
     {
-        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier, new FilterOptions(  ) );
+        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier, FilterOptions.DEFAULT );
     }
 
     public CreateCsvResources( Events events,
@@ -89,9 +89,9 @@ public class CreateCsvResources implements Callable<CsvResources>
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
-        this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.getRelationshipNameFrom() );
+        this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.relationshipNameFrom() );
 
-        SqlDataType.TINYINT.setNeoDataType( filterOptions.getTinyIntAs().neoDataType() );
+        SqlDataType.TINYINT.setNeoDataType( filterOptions.tinyIntAs().neoDataType() );
     }
 
     @Override

@@ -210,6 +210,7 @@ public class ExportFromMySqlCli implements Runnable
         }
         else
         {
+
             createCsvResources = new CreateCsvResources(
                     new CreateCsvResourcesEventHandler(),
                     new OutputStream()
@@ -222,18 +223,11 @@ public class ExportFromMySqlCli implements Runnable
                     },
                     connectionConfig,
                     formatting,
-                    new MySqlExportSqlSupplier(), createFilterOptions() );
+                    new MySqlExportSqlSupplier(),
+                    new FilterOptions( tinyIntAs, relationshipNameFrom ) );
         }
 
         return createCsvResources.call();
-    }
-
-    private FilterOptions createFilterOptions()
-    {
-        FilterOptions filterOptions = new FilterOptions( FilterOptions.TinyIntAs.parse( tinyIntAs ),
-                FilterOptions.RelationshipNameFrom.parse( relationshipNameFrom ) );
-
-        return filterOptions;
     }
 
     private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events

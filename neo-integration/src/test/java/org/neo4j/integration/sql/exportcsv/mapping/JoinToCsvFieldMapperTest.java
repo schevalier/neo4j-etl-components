@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import org.neo4j.integration.FilterOptions;
+import org.neo4j.integration.RelationshipNameFrom;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
@@ -25,7 +25,7 @@ public class JoinToCsvFieldMapperTest
 {
 
     private JoinToCsvFieldMapper mapper = new JoinToCsvFieldMapper( Formatting.DEFAULT,
-            new RelationshipNameResolver( FilterOptions.RelationshipNameFrom.TABLE_NAME ) );
+            new RelationshipNameResolver( RelationshipNameFrom.TABLE_NAME ) );
     private ColumnUtil columnUtil = new ColumnUtil();
 
     @Test
@@ -73,7 +73,7 @@ public class JoinToCsvFieldMapperTest
         );
         // when
         ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( Formatting.DEFAULT,
-                new RelationshipNameResolver( FilterOptions.RelationshipNameFrom.COLUMN_NAME ) ).createMappings( join );
+                new RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ) ).createMappings( join );
 
         // then
         Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
@@ -85,5 +85,41 @@ public class JoinToCsvFieldMapperTest
                 CsvField.relationshipType() ) );
 
         assertEquals( asList( "test.Person.id", "test.Person.addressId", "\"ADDRESS_ID\"" ), columns );
+    }
+
+    @Test
+    public void shouldCreateMappingsForJoinTableUsingColumnNameAsRelationshipNameForCompositeColumns()
+    {
+        // given
+        TableName leftTable = new TableName( "test.Book" );
+        TableName authorTable = new TableName( "test.Author" );
+
+        Join join = new Join(
+                new JoinKey(
+                        columnUtil.column( leftTable, "id", ColumnRole.PrimaryKey ),
+                        columnUtil.column( leftTable, "id", ColumnRole.PrimaryKey ) ),
+                new JoinKey(
+                        columnUtil.compositeKeyColumn( leftTable,
+                                asList( "author_first_name", "author_last_name" ),
+                                ColumnRole.ForeignKey ),
+                        new ColumnUtil().compositeKeyColumn( authorTable, asList( "first_name", "last_name" ),
+                                ColumnRole.PrimaryKey ) )
+        );
+        // when
+        ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( Formatting.DEFAULT,
+                new RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ) ).createMappings( join );
+
+        // then
+        Collection<CsvField> fields = new ArrayList<>( mappings.fields() );
+        Collection<String> columns = mappings.columns().stream().map( Column::name ).collect( Collectors.toList() );
+
+        assertEquals( fields, asList(
+                CsvField.startId( new IdSpace( "test.Book" ) ),
+                CsvField.endId( new IdSpace( "test.Author" ) ),
+                CsvField.relationshipType() ) );
+
+        assertEquals( asList( "test.Book.id",
+                "test.Book.author_first_name\0test.Book.author_last_name",
+                "\"AUTHOR_FIRST_NAME_AUTHOR_LAST_NAME\"" ), columns );
     }
 }
