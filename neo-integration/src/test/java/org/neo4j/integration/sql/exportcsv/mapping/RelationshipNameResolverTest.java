@@ -2,8 +2,6 @@ package org.neo4j.integration.sql.exportcsv.mapping;
 
 import org.junit.Test;
 
-import org.neo4j.integration.RelationshipNameFrom;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

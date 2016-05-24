@@ -1,4 +1,4 @@
-package org.neo4j.integration;
+package org.neo4j.integration.sql.exportcsv.mapping;
 
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 

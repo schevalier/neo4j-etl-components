@@ -1,7 +1,5 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import org.neo4j.integration.RelationshipNameFrom;
-
 public class RelationshipNameResolver
 {
     private RelationshipNameFrom relationshipNameFrom;

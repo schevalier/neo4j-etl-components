@@ -5,10 +5,10 @@ import java.util.Collections;
 
 import org.junit.Test;
 
-import org.neo4j.integration.RelationshipNameFrom;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameFrom;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;

@@ -15,7 +15,6 @@ import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.FilterOptions;
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
 import org.neo4j.integration.commands.mysql.ExportFromMySql;
 import org.neo4j.integration.environment.CsvDirectorySupplier;
@@ -27,6 +26,7 @@ import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
 

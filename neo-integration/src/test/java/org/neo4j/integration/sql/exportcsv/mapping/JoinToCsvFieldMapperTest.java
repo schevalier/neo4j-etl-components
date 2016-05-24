@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import org.neo4j.integration.RelationshipNameFrom;
 import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
