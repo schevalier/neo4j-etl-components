@@ -17,6 +17,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.ProcessHandle;
+import org.neo4j.integration.process.ProcessLatch;
 import org.neo4j.integration.process.Result;
 
 import static org.neo4j.integration.util.OperatingSystem.isWindows;
@@ -76,13 +77,23 @@ public class Neo4j implements AutoCloseable
 
         if ( isWindows() )
         {
-            processHandle.set( Commands.builder( "bin/neo4j.bat", "console" )
+            ProcessLatch latch = new ProcessLatch( l -> l.contains( "Remote interface available at" ) );
+
+            processHandle.set( Commands.builder( neo4jBatFile(), "console" )
                     .workingDirectory( directory )
                     .commandResultEvaluator( resultEvaluator )
-                    .timeout( 10, TimeUnit.SECONDS )
+                    .noTimeout()
                     .inheritEnvironment()
+                    .redirectStdOutTo( latch )
                     .build()
                     .execute() );
+
+            ProcessLatch.ProcessLatchResult result = latch.awaitContents( 20, TimeUnit.SECONDS );
+
+            if ( !result.ok() )
+            {
+                throw new RuntimeException( "Unable to start Neo4j: " + result.streamContents() );
+            }
         }
         else
         {
@@ -94,9 +105,8 @@ public class Neo4j implements AutoCloseable
                     .build()
                     .execute()
                     .await();
+            Thread.sleep( 15000 );
         }
-
-        Thread.sleep( 15000 );
     }
 
     public void stop() throws Exception
@@ -162,4 +172,8 @@ public class Neo4j implements AutoCloseable
         return new ObjectMapper().writeValueAsString( statements );
     }
 
+    private String neo4jBatFile()
+    {
+        return binDirectory().resolve( "neo4j.bat" ).toAbsolutePath().toString();
+    }
 }

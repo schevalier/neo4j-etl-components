@@ -13,7 +13,7 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 public class Neo4jOnWindowsTest
 {
-    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
+    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_1;
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -24,9 +24,11 @@ public class Neo4jOnWindowsTest
             Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
 
     @Test
-    public void InstallNeo4j()
+    public void InstallNeo4j() throws Exception
     {
+        neo4j.get().start();
         System.out.println(neo4j.get().binDirectory());
+        neo4j.get().stop();
     }
 
 
