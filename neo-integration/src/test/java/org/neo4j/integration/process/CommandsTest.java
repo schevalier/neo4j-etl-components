@@ -126,10 +126,10 @@ public class CommandsTest
     public void shouldReturnNullIfCommandDurationExceedsAwaitTimeout() throws Exception
     {
         // given
-        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 5 ).commands() )
+        Commands commands = Commands.builder( commandFactory.get().sleepSeconds( 10 ).commands() )
                 .inheritWorkingDirectory()
                 .failOnNonZeroExitValue()
-                .timeout( 10, TimeUnit.MILLISECONDS )
+                .timeout( 20, TimeUnit.MILLISECONDS )
                 .inheritEnvironment()
                 .build();
 
