@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.neo4j.Neo4j;
-import org.neo4j.integration.neo4j.Neo4jVersion;
 import org.neo4j.integration.provisioning.Neo4jFixture;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFixture;
@@ -34,9 +33,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
+import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
+
 public class ExportFromMySqlIntegrationTest
 {
-    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
     private static final String tinyIntAs = "byte";
 
     @ClassRule

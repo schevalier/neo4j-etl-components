@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.neo4j.Neo4j;
-import org.neo4j.integration.neo4j.Neo4jVersion;
 import org.neo4j.integration.provisioning.Neo4jFixture;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFixture;
@@ -23,10 +22,10 @@ import org.neo4j.integration.util.TemporaryDirectory;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
+import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
+
 public class CreateCsvResourceslIntegrationTest
 {
-    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
-
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
             new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );

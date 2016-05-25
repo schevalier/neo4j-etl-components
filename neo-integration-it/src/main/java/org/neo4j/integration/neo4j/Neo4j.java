@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,11 +16,20 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
 import org.neo4j.integration.process.Commands;
+import org.neo4j.integration.process.ProcessHandle;
 import org.neo4j.integration.process.Result;
+
+import static org.neo4j.integration.util.OperatingSystem.isWindows;
 
 public class Neo4j implements AutoCloseable
 {
+    public static final URI NEO_TX_URI = URI.create( "http://localhost:7474/db/data/transaction/commit" );
+
+    public static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_1;
+
     public static final String DEFAULT_DATABASE = "graph.db";
+
+    private final AtomicReference<ProcessHandle> processHandle = new AtomicReference<>();
 
     private final Path directory;
 
@@ -64,28 +74,53 @@ public class Neo4j implements AutoCloseable
                 (r.exitValue() == 0) ||
                         (r.exitValue() == 1 && r.stdout().startsWith( "Service is already running" ));
 
-        Commands.builder( "bin/neo4j", "start" )
-                .workingDirectory( directory )
-                .commandResultEvaluator( resultEvaluator )
-                .timeout( 10, TimeUnit.SECONDS )
-                .inheritEnvironment()
-                .build()
-                .execute()
-                .await();
+        if ( isWindows() )
+        {
+            processHandle.set( Commands.builder( "bin/neo4j.bat", "console" )
+                    .workingDirectory( directory )
+                    .commandResultEvaluator( resultEvaluator )
+                    .timeout( 10, TimeUnit.SECONDS )
+                    .inheritEnvironment()
+                    .build()
+                    .execute() );
+        }
+        else
+        {
+            Commands.builder( "bin/neo4j", "start" )
+                    .workingDirectory( directory )
+                    .commandResultEvaluator( resultEvaluator )
+                    .timeout( 10, TimeUnit.SECONDS )
+                    .inheritEnvironment()
+                    .build()
+                    .execute()
+                    .await();
+        }
 
         Thread.sleep( 15000 );
     }
 
     public void stop() throws Exception
     {
-        Commands.builder( "bin/neo4j", "stop" )
-                .workingDirectory( directory )
-                .failOnNonZeroExitValue()
-                .timeout( 10, TimeUnit.SECONDS )
-                .inheritEnvironment()
-                .build()
-                .execute()
-                .await();
+        if ( isWindows() )
+        {
+            ProcessHandle handle = this.processHandle.get();
+            if ( handle != null )
+            {
+                handle.terminate();
+                processHandle.set( null );
+            }
+        }
+        else
+        {
+            Commands.builder( "bin/neo4j", "stop" )
+                    .workingDirectory( directory )
+                    .failOnNonZeroExitValue()
+                    .timeout( 10, TimeUnit.SECONDS )
+                    .inheritEnvironment()
+                    .build()
+                    .execute()
+                    .await();
+        }
     }
 
     public String executeShell( String command ) throws Exception

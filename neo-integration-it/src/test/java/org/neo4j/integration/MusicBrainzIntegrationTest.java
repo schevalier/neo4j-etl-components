@@ -1,7 +1,6 @@
 package org.neo4j.integration;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.logging.LogManager;
@@ -16,7 +15,6 @@ import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
 import org.neo4j.integration.neo4j.Neo4j;
-import org.neo4j.integration.neo4j.Neo4jVersion;
 import org.neo4j.integration.provisioning.Neo4jFixture;
 import org.neo4j.integration.provisioning.Server;
 import org.neo4j.integration.provisioning.ServerFixture;
@@ -27,11 +25,11 @@ import org.neo4j.integration.util.TemporaryDirectory;
 
 import static org.junit.Assert.assertFalse;
 
+import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
+
 @Ignore
 public class MusicBrainzIntegrationTest
 {
-    private static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_0_M04;
-
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
             new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
@@ -48,7 +46,6 @@ public class MusicBrainzIntegrationTest
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
             Neo4jFixture.neo4j( NEO4J_VERSION, tempDirectory.get() ) );
-    public static final URI NEO_TX_URI = URI.create( "http://localhost:7474/db/data/transaction/commit" );
 
     @BeforeClass
     public static void setUp() throws Exception
