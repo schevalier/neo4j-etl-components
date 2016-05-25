@@ -11,6 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
 import static org.neo4j.integration.neo4j.Neo4j.NEO_TX_URI;
 
+@Ignore
 public class MusicBrainzPerformanceTest
 {
     @ClassRule
