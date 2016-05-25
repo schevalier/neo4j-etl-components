@@ -30,6 +30,17 @@ public class MySqlScripts
 
     public static Script performanceScript()
     {
+        return awsScript( "https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/northwind.sql" );
+    }
+
+    public static Script ngsdbScript()
+    {
+        return awsScript( "https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/ngsdb.sql" );
+    }
+
+
+    private static Script awsScript( final String url )
+    {
         return new Script()
         {
             @Override
@@ -43,7 +54,7 @@ public class MySqlScripts
                 try
                 {
                     response = client
-                            .resource( "https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/northwind.sql" )
+                            .resource( url )
                             .get( ClientResponse.class );
 
                     return response.getEntity( String.class );
@@ -58,9 +69,7 @@ public class MySqlScripts
                 }
             }
         };
-
     }
-
 
     private static Script createScript( String path )
     {

@@ -71,7 +71,7 @@
 
   </dependencies>
   <properties>
-    <performanceSuite>**/BigPerformanceTest.class</performanceSuite>
+    <performanceSuite>**/*PerformanceTest.class</performanceSuite>
   </properties>
 
   <build>

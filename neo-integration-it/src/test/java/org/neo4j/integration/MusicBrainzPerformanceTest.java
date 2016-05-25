@@ -3,14 +3,14 @@ package org.neo4j.integration;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.LogManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -23,12 +23,14 @@ import org.neo4j.integration.sql.DatabaseType;
 import org.neo4j.integration.util.ResourceRule;
 import org.neo4j.integration.util.TemporaryDirectory;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
+import static org.neo4j.integration.neo4j.Neo4j.NEO_TX_URI;
 
-@Ignore
-public class MusicBrainzIntegrationTest
+public class MusicBrainzPerformanceTest
 {
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -40,8 +42,7 @@ public class MusicBrainzIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get(),
-                    "local" ) );
+                    tempDirectory.get()) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -50,10 +51,20 @@ public class MusicBrainzIntegrationTest
     @BeforeClass
     public static void setUp() throws Exception
     {
-        LogManager.getLogManager().readConfiguration(
-                NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-        exportFromMySqlToNeo4j( "ngsdb" );
-        neo4j.get().start();
+        try
+        {
+            LogManager.getLogManager().readConfiguration(
+                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
+            MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
+            client.execute( MySqlScripts.ngsdbScript().value() );
+            exportFromMySqlToNeo4j( "ngsdb" );
+            neo4j.get().start();
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error in loading configuration" );
+            e.printStackTrace( System.err );
+        }
     }
 
     @AfterClass
@@ -67,20 +78,12 @@ public class MusicBrainzIntegrationTest
     {
         // then
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
-
-//        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (p:Person)-[r]->(c:Address) RETURN p, type" +
-//                "(r), c" );
-//        List<String> usernames = JsonPath.read( response, "$.results[*].data[*].row[0].username" );
-//        List<String> relationships = JsonPath.read( response, "$.results[*].data[*].row[1]" );
-//        List<String> postcodes = JsonPath.read( response, "$.results[*].data[*].row[2].postcode" );
-//
-//        assertThat( usernames.size(), is( 9 ) );
-//
-//        assertThat( usernames, hasItems(
-//                "user-1", "user-2", "user-3", "user-4", "user-5", "user-6", "user-7", "user-8", "user-9" ) );
-//        assertEquals( asList( "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS", "ADDRESS",
-//                "ADDRESS", "ADDRESS", "ADDRESS" ), relationships );
-//        assertThat( postcodes, hasItems( "AB12 1XY", "XY98 9BA", "ZZ1 0MN" ) );
+        String response = neo4j.get().executeHttp( NEO_TX_URI,
+                "MATCH (label:Label{name : \"EMI Group\"})--(labelType:LabelType) RETURN label, labelType" );
+        List<String> label = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
+        List<String> labelType = JsonPath.read( response, "$.results[*].data[*].row[1].name" );
+        assertThat( label.get( 0 ), is( "EMI Group" ) );
+        assertThat( labelType.get( 0 ), is( "Holding" ) );
     }
 
     private static void exportFromMySqlToNeo4j( String database ) throws IOException
@@ -93,7 +96,7 @@ public class MusicBrainzIntegrationTest
         options.put( "multiline-fields", "true" );
         objectMapper.writeValue( importToolOptions.toFile(), options );
 
-        String[] args = {"mysql",
+        NeoIntegrationCli.executeMainReturnSysOut( new String[]{"mysql",
                 "export",
                 "--host", mySqlServer.get().ipAddress(),
                 "--user", MySqlClient.Parameters.DBUser.value(),
@@ -104,9 +107,6 @@ public class MusicBrainzIntegrationTest
                 "--csv-directory", tempDirectory.get().toString(),
                 "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                 "--force",
-                "--debug"};
-        System.out.println( ToStringBuilder.reflectionToString( args ) );
-        NeoIntegrationCli.executeMainReturnSysOut(
-                args );
+                "--debug"} );
     }
 }
