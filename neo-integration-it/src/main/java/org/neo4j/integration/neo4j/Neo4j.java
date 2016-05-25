@@ -49,6 +49,11 @@ public class Neo4j implements AutoCloseable
         return directory.resolve( "data/databases" );
     }
 
+    public Path debugLog()
+    {
+        return directory.resolve( "logs/debug.log" );
+    }
+
     public void disableAuth() throws IOException
     {
         Path confFile = directory.resolve( "conf/neo4j.conf" );
@@ -116,7 +121,11 @@ public class Neo4j implements AutoCloseable
             ProcessHandle handle = this.processHandle.get();
             if ( handle != null )
             {
+                Neo4jWindowsProcess neo4jWindowsProcess = new Neo4jWindowsProcess( this );
+
+                neo4jWindowsProcess.kill();
                 handle.terminate();
+
                 processHandle.set( null );
             }
         }
