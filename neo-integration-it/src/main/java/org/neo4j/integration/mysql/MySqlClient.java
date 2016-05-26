@@ -8,7 +8,7 @@ public class MySqlClient
 {
     public MySqlClient( String host )
     {
-        this( host, Parameters.DBRootUser.value(), Parameters.DBRootPassword.value() );
+        this( host, Parameters.DBUser.value(), Parameters.DBPassword.value() );
     }
 
     public MySqlClient( String host, String user, String password )
