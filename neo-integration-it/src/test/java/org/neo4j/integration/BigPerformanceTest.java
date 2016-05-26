@@ -52,8 +52,7 @@ public class BigPerformanceTest
     {
         try
         {
-            MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
-            client.execute( MySqlScripts.performanceScript().value() );
+            MySqlScripts.executeImportOfDatabase( tempDirectory.get(), "northwind.sql" );
             exportFromMySqlToNeo4j( "northwind" );
             neo4j.get().start();
         }
