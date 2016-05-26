@@ -8,12 +8,19 @@ public class MySqlClient
 {
     public MySqlClient( String host )
     {
+        this( host, Parameters.DBRootUser.value(), Parameters.DBRootPassword.value() );
+    }
+
+    public MySqlClient( String host, String user, String password )
+    {
         this.host = host;
+        this.user = user;
+        this.password = password;
     }
 
     public enum Parameters
     {
-        DBRootPassword( "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" );
+        DBRootUser( "root" ), DBRootPassword( "xsjhdcfhsd" ), DBUser( "neo" ), DBPassword( "neo" );
 
         private final String value;
 
@@ -29,6 +36,8 @@ public class MySqlClient
     }
 
     private final String host;
+    private final String user;
+    private final String password;
 
     public void execute( String sql ) throws Exception
     {
@@ -36,8 +45,8 @@ public class MySqlClient
                 ConnectionConfig.forDatabase( DatabaseType.MySQL )
                         .host( host )
                         .port( DatabaseType.MySQL.defaultPort() )
-                        .username( Parameters.DBUser.value() )
-                        .password( Parameters.DBPassword.value() )
+                        .username( user )
+                        .password( password )
                         .build() );
 
         for ( String line : sql.split( ";" ) )
