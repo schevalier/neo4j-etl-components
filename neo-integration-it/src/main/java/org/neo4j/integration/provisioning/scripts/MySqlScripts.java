@@ -57,7 +57,9 @@ public class MySqlScripts
     }
 
     public static void executeImportOfDatabase( Path tempDirectoryPath,
-                                                final String databaseSqlFileName ) throws Exception
+                                                final String databaseSqlFileName,
+                                                String username,
+                                                String password ) throws Exception
     {
         Client httpClient = Client.create();
 
@@ -74,7 +76,7 @@ public class MySqlScripts
 
                 Commands commands = Commands.builder(
                         new String[]{"mysql",
-                                "-u", "neo", "-pneo"} )
+                                "-u", username, "-p"+ password} )
                         .inheritWorkingDirectory()
                         .failOnNonZeroExitValue()
                         .noTimeout()

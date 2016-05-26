@@ -58,7 +58,7 @@ public class MusicBrainzPerformanceTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-            MySqlScripts.executeImportOfDatabase( tempDirectory.get(), "ngsdb.sql" );
+            MySqlScripts.executeImportOfDatabase( tempDirectory.get(), "ngsdb.sql", "neo", "neo" );
             exportFromMySqlToNeo4j( "ngsdb" );
             neo4j.get().start();
         }

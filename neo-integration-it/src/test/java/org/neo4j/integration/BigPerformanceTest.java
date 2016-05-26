@@ -52,7 +52,11 @@ public class BigPerformanceTest
     {
         try
         {
-            MySqlScripts.executeImportOfDatabase( tempDirectory.get(), "northwind.sql" );
+            MySqlScripts.executeImportOfDatabase( tempDirectory.get(),
+                    "northwind.sql",
+                    MySqlClient.Parameters.DBUser.value(),
+                    MySqlClient.Parameters.DBPassword.value() );
+
             exportFromMySqlToNeo4j( "northwind" );
             neo4j.get().start();
         }
