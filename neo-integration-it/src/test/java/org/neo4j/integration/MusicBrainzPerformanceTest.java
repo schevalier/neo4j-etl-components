@@ -44,8 +44,7 @@ public class MusicBrainzPerformanceTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get(),
-                    "local") );
+                    tempDirectory.get() ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(
@@ -58,7 +57,11 @@ public class MusicBrainzPerformanceTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-            MySqlScripts.executeImportOfDatabase( tempDirectory.get(), "ngsdb.sql", "neo", "neo" );
+            MySqlScripts.executeImportOfDatabase( tempDirectory.get(),
+                    "ngsdb.sql",
+                    MySqlClient.Parameters.DBUser.value(),
+                    MySqlClient.Parameters.DBPassword.value(),
+                    mySqlServer.get().ipAddress() );
             exportFromMySqlToNeo4j( "ngsdb" );
             neo4j.get().start();
         }

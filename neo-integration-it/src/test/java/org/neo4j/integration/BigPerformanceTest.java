@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -52,10 +53,13 @@ public class BigPerformanceTest
     {
         try
         {
+            LogManager.getLogManager().readConfiguration(
+                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
             MySqlScripts.executeImportOfDatabase( tempDirectory.get(),
                     "northwind.sql",
                     MySqlClient.Parameters.DBUser.value(),
-                    MySqlClient.Parameters.DBPassword.value() );
+                    MySqlClient.Parameters.DBPassword.value(),
+                    mySqlServer.get().ipAddress() );
 
             exportFromMySqlToNeo4j( "northwind" );
             neo4j.get().start();
