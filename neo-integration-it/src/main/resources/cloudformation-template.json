@@ -90,7 +90,7 @@
       },
       "CreationPolicy": {
         "ResourceSignal": {
-          "Timeout": "PT2H"
+          "Timeout": "PT5H"
         }
       }
     },
