@@ -11,7 +11,6 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.neo4j.integration.mysql.MySqlClient;
@@ -31,7 +30,6 @@ import static org.junit.Assert.assertThat;
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
 import static org.neo4j.integration.neo4j.Neo4j.NEO_TX_URI;
 
-@Ignore
 public class MusicBrainzPerformanceTest
 {
     @ClassRule
@@ -43,7 +41,7 @@ public class MusicBrainzPerformanceTest
             ServerFixture.server(
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
-                    MySqlScripts.startupScript(),
+                    MySqlScripts.performanceStartupScript(),
                     tempDirectory.get() ) );
 
     @ClassRule
@@ -57,11 +55,11 @@ public class MusicBrainzPerformanceTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-            ServerFixture.executeImportOfDatabase( tempDirectory.get(),
-                    "ngsdb.sql",
-                    MySqlClient.Parameters.DBUser.value(),
-                    MySqlClient.Parameters.DBPassword.value(),
-                    mySqlServer.get().ipAddress() );
+//            ServerFixture.executeImportOfDatabase( tempDirectory.get(),
+//                    "ngsdb.sql",
+//                    MySqlClient.Parameters.DBUser.value(),
+//                    MySqlClient.Parameters.DBPassword.value(),
+//                    mySqlServer.get().ipAddress() );
             exportFromMySqlToNeo4j( "ngsdb" );
             neo4j.get().start();
         }
