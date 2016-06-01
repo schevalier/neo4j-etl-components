@@ -16,9 +16,14 @@ public class MySqlScripts
         return createScript( "/scripts/mysql-startup.sh" );
     }
 
-    public static Script performanceStartupScript()
+    public static Script bigPerformanceStartupScript()
     {
-        return createScript( "/scripts/performance-startup.sh" );
+        return createScript( "/scripts/bigperformance-startup.sh" );
+    }
+
+    public static Script musicBrainzPerformanceStartupScript()
+    {
+        return createScript( "/scripts/musicbrainzperformance-startup.sh" );
     }
 
     public static Script setupDatabaseScript()

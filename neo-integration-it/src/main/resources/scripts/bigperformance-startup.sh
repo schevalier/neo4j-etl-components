@@ -16,9 +16,7 @@ FLUSH PRIVILEGES;
 EOF
 mysql -u root --password='<DBRootPassword>' \< /tmp/setup.mysql
 wget https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/northwind.sql -P /tmp
-wget https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/ngsdb.sql -P /tmp
 mysql -u root --password='<DBRootPassword>' \< /tmp/northwind.sql
-mysql -u root --password='<DBRootPassword>' \< /tmp/ngsdb.sql
 
 # Update MySQL config
 echo [server] >> /etc/mysql/my.cnf

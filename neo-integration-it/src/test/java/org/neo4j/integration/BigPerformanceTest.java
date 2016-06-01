@@ -41,7 +41,7 @@ public class BigPerformanceTest
             ServerFixture.server(
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
-                    MySqlScripts.performanceStartupScript(),
+                    MySqlScripts.bigPerformanceStartupScript(),
                     tempDirectory.get() ) );
 
     @ClassRule

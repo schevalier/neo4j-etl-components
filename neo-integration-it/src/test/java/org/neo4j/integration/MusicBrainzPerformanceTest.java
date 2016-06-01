@@ -41,7 +41,7 @@ public class MusicBrainzPerformanceTest
             ServerFixture.server(
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
-                    MySqlScripts.performanceStartupScript(),
+                    MySqlScripts.musicBrainzPerformanceStartupScript(),
                     tempDirectory.get() ) );
 
     @ClassRule
