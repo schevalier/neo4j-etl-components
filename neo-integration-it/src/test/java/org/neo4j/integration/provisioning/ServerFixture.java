@@ -1,9 +1,16 @@
 package org.neo4j.integration.provisioning;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+
+import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.provisioning.platforms.Aws;
 import org.neo4j.integration.provisioning.platforms.Local;
 import org.neo4j.integration.provisioning.platforms.Vagrant;
@@ -14,6 +21,8 @@ import org.neo4j.integration.util.SystemProperties;
 
 public class ServerFixture
 {
+    public static final String AWS_SQL_FILE_BUCKET = "https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/";
+
     public static Resource<Server> server( String description, int port, Script script, Path directory )
     {
         return server( description, port, script, directory, Optional.empty() );
@@ -74,5 +83,45 @@ public class ServerFixture
     {
         Optional<String> value = SystemProperties.asOptionalString( key );
         return value.isPresent() ? value : EnvironmentVariables.asOptionalString( key );
+    }
+
+    public static void executeImportOfDatabase( Path tempDirectoryPath,
+                                                final String databaseSqlFileName,
+                                                String username,
+                                                String password,
+                                                String hostname ) throws Exception
+    {
+        Client httpClient = Client.create();
+
+        ClientResponse response = null;
+
+        try
+        {
+            response = httpClient.resource( AWS_SQL_FILE_BUCKET + databaseSqlFileName ).get( ClientResponse.class );
+            Path fileOnDisk = tempDirectoryPath.resolve( databaseSqlFileName );
+
+            try ( InputStream entityInputStream = response.getEntityInputStream() )
+            {
+                Files.copy( entityInputStream, fileOnDisk );
+
+                Commands commands = Commands.builder(
+                        new String[]{"mysql", "-u", username, "-p" + password, "-h", hostname} )
+                        .inheritWorkingDirectory()
+                        .failOnNonZeroExitValue()
+                        .noTimeout()
+                        .inheritEnvironment()
+                        .redirectStdInFrom( fileOnDisk )
+                        .build();
+                commands.execute().await( 20, TimeUnit.MINUTES );
+            }
+        }
+        catch ( Exception e )
+        {
+            if ( response != null )
+            {
+                response.close();
+            }
+            throw e;
+        }
     }
 }

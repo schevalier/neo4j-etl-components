@@ -41,7 +41,7 @@ public class BigPerformanceTest
             ServerFixture.server(
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
-                    MySqlScripts.startupScript(),
+                    MySqlScripts.performanceStartupScript(),
                     tempDirectory.get() ) );
 
     @ClassRule
@@ -55,11 +55,11 @@ public class BigPerformanceTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-            MySqlScripts.executeImportOfDatabase( tempDirectory.get(),
-                    "northwind.sql",
-                    MySqlClient.Parameters.DBUser.value(),
-                    MySqlClient.Parameters.DBPassword.value(),
-                    mySqlServer.get().ipAddress() );
+//            ServerFixture.executeImportOfDatabase( tempDirectory.get(),
+//                    "northwind.sql",
+//                    MySqlClient.Parameters.DBUser.value(),
+//                    MySqlClient.Parameters.DBPassword.value(),
+//                    mySqlServer.get().ipAddress() );
 
             exportFromMySqlToNeo4j( "northwind" );
             neo4j.get().start();

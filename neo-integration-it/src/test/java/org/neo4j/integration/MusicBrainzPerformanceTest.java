@@ -57,7 +57,7 @@ public class MusicBrainzPerformanceTest
         {
             LogManager.getLogManager().readConfiguration(
                     NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
-            MySqlScripts.executeImportOfDatabase( tempDirectory.get(),
+            ServerFixture.executeImportOfDatabase( tempDirectory.get(),
                     "ngsdb.sql",
                     MySqlClient.Parameters.DBUser.value(),
                     MySqlClient.Parameters.DBPassword.value(),
