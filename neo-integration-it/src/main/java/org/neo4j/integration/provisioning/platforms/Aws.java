@@ -10,7 +10,6 @@ import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient;
 import com.amazonaws.services.cloudformation.model.Capability;
 import com.amazonaws.services.cloudformation.model.CreateStackRequest;
-import com.amazonaws.services.cloudformation.model.DeleteStackRequest;
 import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
 import com.amazonaws.services.cloudformation.model.DescribeStacksResult;
 import com.amazonaws.services.cloudformation.model.OnFailure;
@@ -27,6 +26,8 @@ import static java.lang.String.format;
 
 public class Aws implements ServerFactory
 {
+    public static final int FIVE_MINUTES = 300000;
+
     private enum Parameters
     {
         KeyName, AMI, InstanceDescription, UserData, Port
@@ -89,7 +90,7 @@ public class Aws implements ServerFactory
                         throw new IOException(
                                 format( "Stack creation failed: %s", stack.get().getStackStatusReason() ) );
                     default:
-                        Thread.sleep( 5000 );
+                        Thread.sleep( FIVE_MINUTES );
                 }
             }
         }
@@ -116,29 +117,4 @@ public class Aws implements ServerFactory
         return new Parameter().withParameterKey( key.name() ).withParameterValue( value );
     }
 
-    private static class StackHandle implements Server
-    {
-        private final String ipAddress;
-        private final AmazonCloudFormation cloudFormation;
-        private final String stackName;
-
-        private StackHandle( String ipAddress, AmazonCloudFormation cloudFormation, String stackName )
-        {
-            this.ipAddress = ipAddress;
-            this.cloudFormation = cloudFormation;
-            this.stackName = stackName;
-        }
-
-        @Override
-        public String ipAddress()
-        {
-            return ipAddress;
-        }
-
-        @Override
-        public void close() throws Exception
-        {
-            cloudFormation.deleteStack( new DeleteStackRequest().withStackName( stackName ) );
-        }
-    }
 }
