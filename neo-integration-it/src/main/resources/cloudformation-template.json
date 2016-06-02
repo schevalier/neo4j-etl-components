@@ -40,6 +40,15 @@
     "ServerInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": "20",
+              "VolumeType": "gp2"
+            }
+          }
+        ],
         "ImageId": {
           "Ref": "AMI"
         },
