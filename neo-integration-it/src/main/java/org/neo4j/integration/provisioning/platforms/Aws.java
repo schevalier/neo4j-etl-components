@@ -27,6 +27,7 @@ import static java.lang.String.format;
 public class Aws implements ServerFactory
 {
     public static final int FIVE_MINUTES = 300000;
+    public static final int TWENTY_MINUTES = 1200000;
 
     private enum Parameters
     {
@@ -47,7 +48,7 @@ public class Aws implements ServerFactory
     }
 
     @Override
-    public Server createServer( Script script ) throws Exception
+    public Server createServer( Script script, TestType testType ) throws Exception
     {
         String template = IOUtils.toString( getClass().getResourceAsStream( "/cloudformation-template.json" ) );
 
@@ -84,13 +85,20 @@ public class Aws implements ServerFactory
                 switch ( status )
                 {
                     case "CREATE_COMPLETE":
-                        return new StackHandle( publicIpAddress( stack ), cloudFormation, stackName );
+                        return new StackHandle( publicIpAddress( stack ), cloudFormation, stackName, testType );
                     case "FAILED":
                     case "ROLLBACK":
                         throw new IOException(
                                 format( "Stack creation failed: %s", stack.get().getStackStatusReason() ) );
                     default:
-                        Thread.sleep( FIVE_MINUTES );
+                        if ( TestType.PERFORMANCE == testType )
+                        {
+                            Thread.sleep( TWENTY_MINUTES );
+                        }
+                        else
+                        {
+                            Thread.sleep( FIVE_MINUTES );
+                        }
                 }
             }
         }

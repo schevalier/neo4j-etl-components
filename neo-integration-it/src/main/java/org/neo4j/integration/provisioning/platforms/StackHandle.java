@@ -13,12 +13,14 @@ class StackHandle implements Server
     private final String ipAddress;
     private final AmazonCloudFormation cloudFormation;
     private final String stackName;
+    private TestType testType;
 
-    StackHandle( String ipAddress, AmazonCloudFormation cloudFormation, String stackName )
+    StackHandle( String ipAddress, AmazonCloudFormation cloudFormation, String stackName, TestType testType )
     {
         this.ipAddress = ipAddress;
         this.cloudFormation = cloudFormation;
         this.stackName = stackName;
+        this.testType = testType;
     }
 
     @Override
@@ -30,7 +32,13 @@ class StackHandle implements Server
     @Override
     public void close() throws Exception
     {
-        Loggers.Default.log( Level.SEVERE, "Not deleting until the stack problem is fixed" );
-//        cloudFormation.deleteStack( new DeleteStackRequest().withStackName( stackName ) );
+        if ( TestType.PERFORMANCE == testType )
+        {
+            Loggers.Default.log( Level.SEVERE, "Not deleting until the stack problem is fixed" );
+        }
+        else
+        {
+            cloudFormation.deleteStack( new DeleteStackRequest().withStackName( stackName ) );
+        }
     }
 }

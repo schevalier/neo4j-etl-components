@@ -29,6 +29,7 @@ import static org.junit.Assert.assertFalse;
 
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
 import static org.neo4j.integration.neo4j.Neo4j.NEO_TX_URI;
+import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 
 public class BigPerformanceTest
 {
@@ -42,7 +43,8 @@ public class BigPerformanceTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.bigPerformanceStartupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(),
+                    INTEGRATION ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(

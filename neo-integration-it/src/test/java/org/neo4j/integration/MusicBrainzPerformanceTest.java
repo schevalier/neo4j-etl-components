@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
 import static org.neo4j.integration.neo4j.Neo4j.NEO_TX_URI;
+import static org.neo4j.integration.provisioning.platforms.TestType.PERFORMANCE;
 
 public class MusicBrainzPerformanceTest
 {
@@ -42,7 +43,8 @@ public class MusicBrainzPerformanceTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.musicBrainzPerformanceStartupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(),
+                    PERFORMANCE ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j = new ResourceRule<>(

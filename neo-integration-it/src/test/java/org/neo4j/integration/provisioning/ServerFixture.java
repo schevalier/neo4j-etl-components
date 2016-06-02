@@ -13,6 +13,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.provisioning.platforms.Aws;
 import org.neo4j.integration.provisioning.platforms.Local;
+import org.neo4j.integration.provisioning.platforms.TestType;
 import org.neo4j.integration.provisioning.platforms.Vagrant;
 import org.neo4j.integration.util.EnvironmentVariables;
 import org.neo4j.integration.util.LazyResource;
@@ -21,26 +22,33 @@ import org.neo4j.integration.util.SystemProperties;
 
 public class ServerFixture
 {
+
     public static final String AWS_SQL_FILE_BUCKET = "https://s3-eu-west-1.amazonaws.com/integration.neo4j.com/";
 
-    public static Resource<Server> server( String description, int port, Script script, Path directory )
+    public static Resource<Server> server( String description,
+                                           int port,
+                                           Script script,
+                                           Path directory,
+                                           TestType testType )
     {
-        return server( description, port, script, directory, Optional.empty() );
+        return server( description, port, script, directory, testType, Optional.empty() );
     }
 
     public static Resource<Server> server( String description,
                                            int port,
                                            Script script,
                                            Path directory,
+                                           TestType testType,
                                            String platform )
     {
-        return server( description, port, script, directory, Optional.of( platform ) );
+        return server( description, port, script, directory, testType, Optional.of( platform ) );
     }
 
     private static Resource<Server> server( String description,
                                             int port,
                                             Script script,
                                             Path directory,
+                                            final TestType testType,
                                             Optional<String> _platform )
     {
         return new LazyResource<>( new LazyResource.Lifecycle<Server>()
@@ -55,19 +63,20 @@ public class ServerFixture
 
                 if ( platform.equalsIgnoreCase( "local" ) )
                 {
-                    return new Local().createServer( script );
+                    return new Local().createServer( script, testType );
                 }
                 else if ( platform.equalsIgnoreCase( "aws" ) && ec2Key.isPresent() )
                 {
-                    return new Aws( description, ec2Key.get(), port ).createServer( script );
+                    return new Aws( description, ec2Key.get(), port ).createServer( script, testType );
                 }
                 else if ( vagrantBoxUri.isPresent() && !vagrantBoxUri.get().isEmpty() )
                 {
-                    return new Vagrant( URI.create( vagrantBoxUri.get() ), directory ).createServer( script );
+                    return new Vagrant(
+                            URI.create( vagrantBoxUri.get() ), directory ).createServer( script, testType );
                 }
                 else
                 {
-                    return new Vagrant( directory ).createServer( script );
+                    return new Vagrant( directory ).createServer( script, testType );
                 }
             }
 
