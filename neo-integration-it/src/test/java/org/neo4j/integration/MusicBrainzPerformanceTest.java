@@ -83,6 +83,7 @@ public class MusicBrainzPerformanceTest
     {
         // then
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+        Thread.sleep( 15000 );
         String response = neo4j.get().executeHttp( NEO_TX_URI,
                 "MATCH (label:Label{name : \"EMI Group\"})--(labelType:LabelType) RETURN label, labelType" );
         List<String> label = JsonPath.read( response, "$.results[*].data[*].row[0].name" );
