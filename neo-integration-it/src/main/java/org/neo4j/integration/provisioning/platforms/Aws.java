@@ -26,7 +26,7 @@ import static java.lang.String.format;
 
 public class Aws implements ServerFactory
 {
-    public static final int FIVE_MINUTES = 300000;
+    public static final int FIVE_SECONDS = 5000;
     public static final int TWENTY_MINUTES = 1200000;
 
     private enum Parameters
@@ -91,14 +91,7 @@ public class Aws implements ServerFactory
                         throw new IOException(
                                 format( "Stack creation failed: %s", stack.get().getStackStatusReason() ) );
                     default:
-                        if ( TestType.PERFORMANCE == testType )
-                        {
-                            Thread.sleep( TWENTY_MINUTES );
-                        }
-                        else
-                        {
-                            Thread.sleep( FIVE_MINUTES );
-                        }
+                        Thread.sleep( resolveSleepTime( testType ) );
                 }
             }
         }
@@ -118,6 +111,11 @@ public class Aws implements ServerFactory
                 .findFirst()
                 .orElseThrow( () -> new IllegalStateException( "Public IP address not available for EC2 instance" ) )
                 .getOutputValue();
+    }
+
+    private int resolveSleepTime( TestType testType )
+    {
+        return TestType.PERFORMANCE == testType ? TWENTY_MINUTES : FIVE_SECONDS;
     }
 
     private String resolveTimeout( TestType testType )
