@@ -1,12 +1,9 @@
 package org.neo4j.integration.provisioning.platforms;
 
-import java.util.logging.Level;
-
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.model.DeleteStackRequest;
 
 import org.neo4j.integration.provisioning.Server;
-import org.neo4j.integration.util.Loggers;
 
 class StackHandle implements Server
 {
@@ -32,13 +29,6 @@ class StackHandle implements Server
     @Override
     public void close() throws Exception
     {
-        if ( TestType.PERFORMANCE == testType )
-        {
-            Loggers.Default.log( Level.SEVERE, "Not deleting until the stack problem is fixed" );
-        }
-        else
-        {
-            cloudFormation.deleteStack( new DeleteStackRequest().withStackName( stackName ) );
-        }
+        cloudFormation.deleteStack( new DeleteStackRequest().withStackName( stackName ) );
     }
 }
