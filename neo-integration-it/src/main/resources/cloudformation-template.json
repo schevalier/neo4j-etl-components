@@ -78,12 +78,8 @@
             "Fn::Join": [
               "",
               [
-                {
-                  "Ref": "UserData"
-                },
-                "\n",
-                "apt-get -y install python-setuptools\n",
-                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "#!/bin/bash -eux\n",
+                "signal_cfn_init() {\n",
                 "# Signal the status from cfn-init\n",
                 "/usr/local/bin/cfn-signal -e $? ",
                 "         --stack ",
@@ -94,6 +90,15 @@
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
+                },
+                "\n",
+                "}\n",
+                "trap signal_cfn_init EXIT\n",
+                "\n",
+                "apt-get -y install python-setuptools\n",
+                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                {
+                  "Ref": "UserData"
                 },
                 "\n"
               ]
