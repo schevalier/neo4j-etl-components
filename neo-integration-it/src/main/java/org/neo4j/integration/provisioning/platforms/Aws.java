@@ -31,7 +31,7 @@ public class Aws implements ServerFactory
 
     private enum Parameters
     {
-        KeyName, AMI, InstanceDescription, UserData, Port
+        KeyName, AMI, InstanceDescription, UserData, Port, Timeout
     }
 
     private static final String IMAGE_ID = "ami-bdfbccca";
@@ -67,8 +67,8 @@ public class Aws implements ServerFactory
                         parameter( Parameters.AMI, IMAGE_ID ),
                         parameter( Parameters.InstanceDescription, instanceDescription ),
                         parameter( Parameters.UserData, script.value() ),
-                        parameter( Parameters.Port, String.valueOf( port ) )
-                ) );
+                        parameter( Parameters.Port, String.valueOf( port ) ),
+                        parameter( Parameters.Timeout, resolveTimeout( testType ) )) );
 
         while ( true )
         {
@@ -118,6 +118,11 @@ public class Aws implements ServerFactory
                 .findFirst()
                 .orElseThrow( () -> new IllegalStateException( "Public IP address not available for EC2 instance" ) )
                 .getOutputValue();
+    }
+
+    private String resolveTimeout( TestType testType )
+    {
+        return TestType.PERFORMANCE == testType ? "PT5H" : "PT10M";
     }
 
     private Parameter parameter( Parameters key, String value )
