@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
+import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 
 public class CreateCsvResourceslIntegrationTest
 {
@@ -36,7 +37,7 @@ public class CreateCsvResourceslIntegrationTest
                     "mysql-integration-test",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get() ) );
+                    tempDirectory.get(), INTEGRATION ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j =

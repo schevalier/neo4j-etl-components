@@ -7,7 +7,7 @@ import org.neo4j.integration.provisioning.ServerFactory;
 public class Local implements ServerFactory
 {
     @Override
-    public Server createServer( Script script ) throws Exception
+    public Server createServer( Script script, TestType testType ) throws Exception
     {
         return new Server()
         {

@@ -10,7 +10,6 @@ import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient;
 import com.amazonaws.services.cloudformation.model.Capability;
 import com.amazonaws.services.cloudformation.model.CreateStackRequest;
-import com.amazonaws.services.cloudformation.model.DeleteStackRequest;
 import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
 import com.amazonaws.services.cloudformation.model.DescribeStacksResult;
 import com.amazonaws.services.cloudformation.model.OnFailure;
@@ -27,9 +26,12 @@ import static java.lang.String.format;
 
 public class Aws implements ServerFactory
 {
+    public static final int FIVE_SECONDS = 5000;
+    public static final int TWENTY_MINUTES = 1200000;
+
     private enum Parameters
     {
-        KeyName, AMI, InstanceDescription, UserData, Port
+        KeyName, AMI, InstanceDescription, UserData, Port, Timeout
     }
 
     private static final String IMAGE_ID = "ami-bdfbccca";
@@ -46,7 +48,7 @@ public class Aws implements ServerFactory
     }
 
     @Override
-    public Server createServer( Script script ) throws Exception
+    public Server createServer( Script script, TestType testType ) throws Exception
     {
         String template = IOUtils.toString( getClass().getResourceAsStream( "/cloudformation-template.json" ) );
 
@@ -65,8 +67,8 @@ public class Aws implements ServerFactory
                         parameter( Parameters.AMI, IMAGE_ID ),
                         parameter( Parameters.InstanceDescription, instanceDescription ),
                         parameter( Parameters.UserData, script.value() ),
-                        parameter( Parameters.Port, String.valueOf( port ) )
-                ) );
+                        parameter( Parameters.Port, String.valueOf( port ) ),
+                        parameter( Parameters.Timeout, resolveTimeout( testType ) )) );
 
         while ( true )
         {
@@ -83,13 +85,13 @@ public class Aws implements ServerFactory
                 switch ( status )
                 {
                     case "CREATE_COMPLETE":
-                        return new StackHandle( publicIpAddress( stack ), cloudFormation, stackName );
+                        return new StackHandle( publicIpAddress( stack ), cloudFormation, stackName, testType );
                     case "FAILED":
                     case "ROLLBACK":
                         throw new IOException(
                                 format( "Stack creation failed: %s", stack.get().getStackStatusReason() ) );
                     default:
-                        Thread.sleep( 5000 );
+                        Thread.sleep( resolveSleepTime( testType ) );
                 }
             }
         }
@@ -111,34 +113,19 @@ public class Aws implements ServerFactory
                 .getOutputValue();
     }
 
+    private int resolveSleepTime( TestType testType )
+    {
+        return TestType.PERFORMANCE == testType ? TWENTY_MINUTES : FIVE_SECONDS;
+    }
+
+    private String resolveTimeout( TestType testType )
+    {
+        return TestType.PERFORMANCE == testType ? "PT5H" : "PT10M";
+    }
+
     private Parameter parameter( Parameters key, String value )
     {
         return new Parameter().withParameterKey( key.name() ).withParameterValue( value );
     }
 
-    private static class StackHandle implements Server
-    {
-        private final String ipAddress;
-        private final AmazonCloudFormation cloudFormation;
-        private final String stackName;
-
-        private StackHandle( String ipAddress, AmazonCloudFormation cloudFormation, String stackName )
-        {
-            this.ipAddress = ipAddress;
-            this.cloudFormation = cloudFormation;
-            this.stackName = stackName;
-        }
-
-        @Override
-        public String ipAddress()
-        {
-            return ipAddress;
-        }
-
-        @Override
-        public void close() throws Exception
-        {
-            cloudFormation.deleteStack( new DeleteStackRequest().withStackName( stackName ) );
-        }
-    }
 }

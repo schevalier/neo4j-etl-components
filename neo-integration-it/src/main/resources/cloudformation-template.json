@@ -26,6 +26,10 @@
       "Description": "Port to be opened",
       "Type": "Number"
     },
+    "Timeout": {
+      "Description": "Timeout for the creation policy",
+      "Type": "String"
+    },
     "ClientLocation": {
       "Description": "The IP address range that can be used to connect to the EC2 instances",
       "Type": "String",
@@ -40,6 +44,15 @@
     "ServerInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": "20",
+              "VolumeType": "gp2"
+            }
+          }
+        ],
         "ImageId": {
           "Ref": "AMI"
         },
@@ -65,12 +78,8 @@
             "Fn::Join": [
               "",
               [
-                {
-                  "Ref": "UserData"
-                },
-                "\n",
-                "apt-get -y install python-setuptools\n",
-                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "#!/bin/bash -eux\n",
+                "signal_cfn_init() {\n",
                 "# Signal the status from cfn-init\n",
                 "/usr/local/bin/cfn-signal -e $? ",
                 "         --stack ",
@@ -82,6 +91,15 @@
                 {
                   "Ref": "AWS::Region"
                 },
+                "\n",
+                "}\n",
+                "trap signal_cfn_init EXIT\n",
+                "\n",
+                "apt-get -y install python-setuptools\n",
+                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                {
+                  "Ref": "UserData"
+                },
                 "\n"
               ]
             ]
@@ -90,7 +108,9 @@
       },
       "CreationPolicy": {
         "ResourceSignal": {
-          "Timeout": "PT10M"
+          "Timeout": {
+            "Ref": "Timeout"
+          }
         }
       }
     },
