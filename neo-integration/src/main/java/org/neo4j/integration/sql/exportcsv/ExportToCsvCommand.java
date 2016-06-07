@@ -38,7 +38,7 @@ public class ExportToCsvCommand
 
         Manifest manifest = new Manifest();
 
-        try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
+        try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig(), "" ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
             CsvFileWriter csvFileWriter = new CsvFileWriter( config, databaseClient );

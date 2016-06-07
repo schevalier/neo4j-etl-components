@@ -67,7 +67,8 @@ public class CreateCsvResources implements Callable<CsvResources>
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
-    private RelationshipNameResolver relationshipNameResolver;
+    private final RelationshipNameResolver relationshipNameResolver;
+    private final String tablesToExclude;
 
     public CreateCsvResources( OutputStream output,
                                ConnectionConfig connectionConfig,
@@ -89,9 +90,12 @@ public class CreateCsvResources implements Callable<CsvResources>
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
+        this.tablesToExclude = filterOptions.tablesToExclude();
         this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.relationshipNameFrom() );
 
         SqlDataType.TINYINT.setNeoDataType( filterOptions.tinyIntAs().neoDataType() );
+
+        System.out.println( filterOptions.tablesToExclude() );
     }
 
     @Override
@@ -100,7 +104,7 @@ public class CreateCsvResources implements Callable<CsvResources>
         events.onCreatingCsvResourcesFile();
 
         SchemaExport schemaExport =
-                new DatabaseInspector( new DatabaseClient( connectionConfig ) ).buildSchemaExport();
+                new DatabaseInspector( new DatabaseClient( connectionConfig, tablesToExclude ) ).buildSchemaExport();
         CsvResources csvResources =
                 schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
 

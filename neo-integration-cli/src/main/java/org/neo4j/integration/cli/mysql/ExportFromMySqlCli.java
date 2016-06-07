@@ -6,12 +6,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.annotations.restrictions.MutuallyExclusiveWith;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
@@ -138,6 +142,14 @@ public class ExportFromMySqlCli implements Runnable
             title = "tinyIntAs")
     private String tinyIntAs = "byte";
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--exclude", "--exc"},
+            description = "Specifies tables to exclude from the process.",
+            title = "tinyIntAs")
+    @MutuallyExclusiveWith(tag = "exc/inc")
+    private String tablesToExclude = "";
+
     @Option(type = OptionType.COMMAND,
             name = {"--csv-resources"},
             description = "Path to an existing CSV resources definitions file. " +
@@ -224,7 +236,7 @@ public class ExportFromMySqlCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom ) );
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude ) );
         }
 
         return createCsvResources.call();

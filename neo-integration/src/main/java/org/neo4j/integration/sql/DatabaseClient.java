@@ -1,5 +1,9 @@
 package org.neo4j.integration.sql;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -34,10 +38,11 @@ public class DatabaseClient implements AutoCloseable
     }
 
     private final Connection connection;
+    private final String tablesToExclude;
     private final DatabaseMetaData metaData;
     private final StatementFactory statementFactory;
 
-    public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
+    public DatabaseClient( ConnectionConfig connectionConfig, String tablesToExclude ) throws SQLException, ClassNotFoundException
     {
         Loggers.Sql.log().fine( "Connecting to database..." );
 
@@ -57,7 +62,7 @@ public class DatabaseClient implements AutoCloseable
         }
 
         metaData = connection.getMetaData();
-
+        this.tablesToExclude = tablesToExclude;
         statementFactory = connectionConfig.statementFactory();
 
         Loggers.Sql.log().fine( "Connected to database" );
@@ -106,12 +111,16 @@ public class DatabaseClient implements AutoCloseable
     {
         Collection<TableName> tableNames = new ArrayList<>();
 
-        try ( ResultSet results =
-                      connection.getMetaData().getTables( null, null, null, new String[]{"TABLE"} ) )
+        try ( ResultSet results = connection.getMetaData().getTables( null, null, null, new String[]{"TABLE"} ) )
         {
             while ( results.next() )
             {
-                tableNames.add( new TableName( connection.getCatalog(), results.getString( "TABLE_NAME" ) ) );
+                String tableName = results.getString( "TABLE_NAME" );
+
+                if( !tableName.equalsIgnoreCase( tablesToExclude ) )
+                {
+                    tableNames.add( new TableName( connection.getCatalog(), tableName ) );
+                }
             }
         }
 

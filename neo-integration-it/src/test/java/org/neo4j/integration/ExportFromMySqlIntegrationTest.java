@@ -38,6 +38,7 @@ import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
 public class ExportFromMySqlIntegrationTest
 {
     private static final String tinyIntAs = "byte";
+    private static final String tablesToExclude = "Leaf_Table";
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -251,6 +252,20 @@ public class ExportFromMySqlIntegrationTest
         assertEquals( students, asList( "eve", "jim", "mark" ) );
     }
 
+    @Test
+    public void shouldExcludeLeafTable() throws Exception
+    {
+        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
+        String response = neo4j.get().executeHttp(
+                NEO_TX_URI,
+                "MATCH (lt:Leaf_Table) RETURN lt" );
+
+        List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
+        
+        assertThat( leaves.size(), is( tablesToExclude.isEmpty() ? 1 : 0 ) );
+    }
+
     private static void exportFromMySqlToNeo4j( String database ) throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
@@ -274,6 +289,7 @@ public class ExportFromMySqlIntegrationTest
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--tiny-int", tinyIntAs,
                         "--relationship-name", "table",
-                        "--force"} );
+                        "--exclude", tablesToExclude,
+                        "--force", "--debug"} );
     }
 }

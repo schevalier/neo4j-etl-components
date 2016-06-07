@@ -1,10 +1,14 @@
 package org.neo4j.integration.cli.mysql;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.annotations.restrictions.MutuallyExclusiveWith;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
 import org.neo4j.integration.commands.mysql.CreateCsvResources;
@@ -92,10 +96,17 @@ public class CreateCsvResourcesCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--tiny-int"},
-            description = "Specifies whether to get the convert TinyInts to byte (byte) or boolean (boolean). Byte is" +
-                    " default.",
+            description = "Specifies whether to convert TinyInts to byte (byte) or boolean (boolean). Byte is default.",
             title = "tinyIntAs")
     private String tinyIntAs = "byte";
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--exclude", "--exc"},
+            description = "Specifies tables to exclude from the process.",
+            title = "tinyIntAs")
+    @MutuallyExclusiveWith(tag = "exc/inc")
+    private String tablesToExclude = "";
 
     @Override
     public void run()
@@ -124,7 +135,7 @@ public class CreateCsvResourcesCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom ) ).call();
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude ) ).call();
         }
         catch ( Exception e )
         {
