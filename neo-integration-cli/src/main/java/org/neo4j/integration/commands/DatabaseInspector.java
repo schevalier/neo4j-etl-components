@@ -13,11 +13,13 @@ import org.neo4j.integration.sql.metadata.TableName;
 
 public class DatabaseInspector
 {
+    private final String tablesToExclude;
     private final DatabaseClient databaseClient;
 
-    public DatabaseInspector( DatabaseClient databaseClient )
+    public DatabaseInspector( DatabaseClient databaseClient, String tablesToExclude )
     {
         this.databaseClient = databaseClient;
+        this.tablesToExclude = tablesToExclude;
     }
 
     public SchemaExport buildSchemaExport() throws Exception
@@ -28,7 +30,10 @@ public class DatabaseInspector
 
         for ( TableName tableName : databaseClient.tableNames() )
         {
-            buildSchema( tableName, tables, joins, joinTables );
+            if( ! tableName.simpleName().equalsIgnoreCase( tablesToExclude ) )
+            {
+                buildSchema( tableName, tables, joins, joinTables );
+            }
         }
 
         return new SchemaExport( tables, joins, joinTables );

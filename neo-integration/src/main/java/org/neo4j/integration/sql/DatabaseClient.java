@@ -38,11 +38,10 @@ public class DatabaseClient implements AutoCloseable
     }
 
     private final Connection connection;
-    private final String tablesToExclude;
     private final DatabaseMetaData metaData;
     private final StatementFactory statementFactory;
 
-    public DatabaseClient( ConnectionConfig connectionConfig, String tablesToExclude ) throws SQLException, ClassNotFoundException
+    public DatabaseClient( ConnectionConfig connectionConfig ) throws SQLException, ClassNotFoundException
     {
         Loggers.Sql.log().fine( "Connecting to database..." );
 
@@ -62,7 +61,6 @@ public class DatabaseClient implements AutoCloseable
         }
 
         metaData = connection.getMetaData();
-        this.tablesToExclude = tablesToExclude;
         statementFactory = connectionConfig.statementFactory();
 
         Loggers.Sql.log().fine( "Connected to database" );
@@ -115,12 +113,7 @@ public class DatabaseClient implements AutoCloseable
         {
             while ( results.next() )
             {
-                String tableName = results.getString( "TABLE_NAME" );
-
-                if( !tableName.equalsIgnoreCase( tablesToExclude ) )
-                {
-                    tableNames.add( new TableName( connection.getCatalog(), tableName ) );
-                }
+                tableNames.add( new TableName( connection.getCatalog(), results.getString( "TABLE_NAME" ) ) );
             }
         }
 

@@ -5,12 +5,12 @@ CREATE DATABASE javabase
 GRANT ALL ON javabase.* TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
-CREATE TABLE javabase.Leaf_Table
+CREATE TABLE javabase.Orphan_Table
 (
   id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
   number   INT  NOT NULL
 );
-GRANT ALL ON javabase.Leaf_Table TO '<DBUser>'@'localhost'
+GRANT ALL ON javabase.Orphan_Table TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
 CREATE TABLE javabase.Address
@@ -164,7 +164,7 @@ CREATE TABLE javabase.Team
 GRANT ALL ON javabase.Team TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
-INSERT INTO javabase.Leaf_Table ( number ) VALUES(321);
+INSERT INTO javabase.Orphan_Table ( number ) VALUES(321);
 
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');

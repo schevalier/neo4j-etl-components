@@ -27,24 +27,24 @@ public class TemporaryDirectory
             @Override
             public void destroy( Path directory ) throws IOException
             {
-//                Loggers.Default.log( Level.FINE, "Deleting temporary directory {0}...", directory );
-//
-//                try
-//                {
-//                    FileUtils.deleteDirectory( directory.toFile() );
-//                }
-//                catch ( IOException e )
-//                {
-//                    // Retry
-//                    try
-//                    {
-//                        FileUtils.deleteDirectory( directory.toFile() );
-//                    }
-//                    catch ( Exception ex )
-//                    {
-//                        ex.printStackTrace();
-//                    }
-//                }
+                Loggers.Default.log( Level.FINE, "Deleting temporary directory {0}...", directory );
+
+                try
+                {
+                    FileUtils.deleteDirectory( directory.toFile() );
+                }
+                catch ( IOException e )
+                {
+                    // Retry
+                    try
+                    {
+                        FileUtils.deleteDirectory( directory.toFile() );
+                    }
+                    catch ( Exception ex )
+                    {
+                        ex.printStackTrace();
+                    }
+                }
             }
         } );
     }

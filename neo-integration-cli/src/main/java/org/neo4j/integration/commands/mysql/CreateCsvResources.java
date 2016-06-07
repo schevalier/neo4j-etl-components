@@ -104,7 +104,7 @@ public class CreateCsvResources implements Callable<CsvResources>
         events.onCreatingCsvResourcesFile();
 
         SchemaExport schemaExport =
-                new DatabaseInspector( new DatabaseClient( connectionConfig, tablesToExclude ) ).buildSchemaExport();
+                new DatabaseInspector( new DatabaseClient( connectionConfig ), tablesToExclude ).buildSchemaExport();
         CsvResources csvResources =
                 schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
 

@@ -39,7 +39,9 @@ import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 public class ExportFromMySqlIntegrationTest
 {
     private static final String tinyIntAs = "byte";
-    private static final String tablesToExclude = "Leaf_Table";
+
+    private static final boolean exclude = true;
+    private static final String tablesToExclude = "Orphan_Table";
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -254,17 +256,17 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    public void shouldExcludeLeafTable() throws Exception
+    public void shouldExcludeOrphanTable() throws Exception
     {
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
         String response = neo4j.get().executeHttp(
                 NEO_TX_URI,
-                "MATCH (lt:Leaf_Table) RETURN lt" );
+                "MATCH (lt:" + tablesToExclude + ") RETURN lt" );
 
         List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
         
-        assertThat( leaves.size(), is( tablesToExclude.isEmpty() ? 1 : 0 ) );
+        assertThat( leaves.size(), is( exclude ? 0 : 1 ) );
     }
 
     private static void exportFromMySqlToNeo4j( String database ) throws IOException
@@ -290,7 +292,7 @@ public class ExportFromMySqlIntegrationTest
                         "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
                         "--tiny-int", tinyIntAs,
                         "--relationship-name", "table",
-                        "--exclude", tablesToExclude,
-                        "--force", "--debug"} );
+                        "--force",
+                        exclude ? "--exclude" : "", exclude ? tablesToExclude : "" } );
     }
 }

@@ -47,7 +47,7 @@ public class MySqlClient
                         .port( DatabaseType.MySQL.defaultPort() )
                         .username( user )
                         .password( password )
-                        .build(), "" );
+                        .build() );
 
         for ( String line : sql.split( ";" ) )
         {
