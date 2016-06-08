@@ -13,6 +13,23 @@ CREATE TABLE javabase.Orphan_Table
 GRANT ALL ON javabase.Orphan_Table TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
+CREATE TABLE javabase.Leaf_Table
+(
+  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  number   INT  NOT NULL
+);
+GRANT ALL ON javabase.Leaf_Table TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
+CREATE TABLE javabase.Points_To_Leaf_Table
+(
+  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  leafId   INT  NOT NULL,
+  FOREIGN KEY (leafId) REFERENCES javabase.Leaf_Table (id)
+);
+GRANT ALL ON javabase.Points_To_Leaf_Table TO '<DBUser>'@'localhost'
+IDENTIFIED BY '<DBPassword>';
+
 CREATE TABLE javabase.Address
 (
   id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -165,6 +182,10 @@ GRANT ALL ON javabase.Team TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
 INSERT INTO javabase.Orphan_Table ( number ) VALUES(321);
+INSERT INTO javabase.Leaf_Table ( number ) VALUES(321);
+INSERT INTO javabase.Leaf_Table ( number ) VALUES(432);
+INSERT INTO javabase.Points_To_Leaf_Table (leafId) SELECT id FROM javabase.Leaf_Table WHERE javabase.Leaf_Table.number = 321;
+INSERT INTO javabase.Points_To_Leaf_Table (leafId) SELECT id FROM javabase.Leaf_Table WHERE javabase.Leaf_Table.number = 432;
 
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');

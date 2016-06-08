@@ -15,11 +15,13 @@ public class DatabaseInspector
 {
     private final String tablesToExclude;
     private final DatabaseClient databaseClient;
+    private final TableInfoAssembler tableInfoAssembler;
 
     public DatabaseInspector( DatabaseClient databaseClient, String tablesToExclude )
     {
         this.databaseClient = databaseClient;
         this.tablesToExclude = tablesToExclude;
+        this.tableInfoAssembler = new TableInfoAssembler( databaseClient, tablesToExclude );
     }
 
     public SchemaExport buildSchemaExport() throws Exception
@@ -44,7 +46,7 @@ public class DatabaseInspector
                               Collection<Join> joins,
                               Collection<JoinTable> joinTables ) throws Exception
     {
-        TableInfo tableInfo = new TableInfoAssembler( databaseClient ).createTableInfo( tableName );
+        TableInfo tableInfo = tableInfoAssembler.createTableInfo( tableName );
 
         if ( tableInfo.representsJoinTable() )
         {

@@ -19,11 +19,13 @@ public class TableInfoAssembler
 {
     static final String SYNTHETIC_PRIMARY_KEY_NAME = "_ROW_INDEX_";
 
+    private final String tablesToExclude;
     private final DatabaseClient databaseClient;
 
-    public TableInfoAssembler( DatabaseClient databaseClient )
+    public TableInfoAssembler( DatabaseClient databaseClient, String tablesToExclude )
     {
         this.databaseClient = databaseClient;
+        this.tablesToExclude = tablesToExclude;
     }
 
     public TableInfo createTableInfo( TableName tableName ) throws Exception
@@ -78,12 +80,16 @@ public class TableInfoAssembler
 
                 foreignKeyGroup.forEach( fkRow ->
                 {
-                    Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fkRow.get( "FKCOLUMN_NAME" ) ) );
-                    // We assume the key's target column data type is the same as the source column's data type
-                    SqlDataType sqlDataType = sourceColumn.sqlDataType();
+                    if( !fkRow.get( "FKCOLUMN_NAME" ).equalsIgnoreCase( tablesToExclude )  )
+                    {
+                        Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fkRow.get( "FKCOLUMN_NAME" ) ) );
 
-                    sourceColumns.add( sourceColumn );
-                    targetColumns.add( createForeignKeyTargetColumn( fkRow, sqlDataType ) );
+                        // We assume the key's target column data type is the same as the source column's data type
+                        SqlDataType sqlDataType = sourceColumn.sqlDataType();
+
+                        sourceColumns.add( sourceColumn );
+                        targetColumns.add( createForeignKeyTargetColumn( fkRow, sqlDataType ) );
+                    }
                 } );
 
                 keyColumns.addAll( sourceColumns );
