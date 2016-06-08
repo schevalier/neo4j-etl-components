@@ -17,7 +17,6 @@ public class CsvResource
                 ColumnToCsvFieldMappings.fromJson( root.path( "mappings" ) ) );
     }
 
-
     private final String name;
     private final GraphObjectType graphObjectType;
     private final String sql;

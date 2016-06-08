@@ -94,8 +94,6 @@ public class CreateCsvResources implements Callable<CsvResources>
         this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.relationshipNameFrom() );
 
         SqlDataType.TINYINT.setNeoDataType( filterOptions.tinyIntAs().neoDataType() );
-
-        System.out.println( filterOptions.tablesToExclude() );
     }
 
     @Override

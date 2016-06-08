@@ -54,7 +54,8 @@ public class ImportToolOptions
         else
         {
             Loggers.Default.log( Level.INFO,
-                    format( "Skipping reading import options from file because file %s doesn't exist.", optionsFile ) );
+                    format( "Skipping reading import options from file because file [%s] doesn't exist.",
+                            optionsFile ) );
             return new ImportToolOptions( Collections.emptyMap() );
         }
     }

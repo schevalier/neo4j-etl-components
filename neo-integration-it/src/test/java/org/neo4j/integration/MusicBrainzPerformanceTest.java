@@ -62,8 +62,6 @@ public class MusicBrainzPerformanceTest
 //                    MySqlClient.Parameters.DBUser.value(),
 //                    MySqlClient.Parameters.DBPassword.value(),
 //                    mySqlServer.get().ipAddress() );
-            exportFromMySqlToNeo4j( "ngsdb" );
-            neo4j.get().start();
         }
         catch ( IOException e )
         {
@@ -81,6 +79,9 @@ public class MusicBrainzPerformanceTest
     @Test
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
+        //given
+        exportFromMySqlToNeo4j( "ngsdb" );
+        neo4j.get().start();
         // then
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
         Thread.sleep( 15000 );
