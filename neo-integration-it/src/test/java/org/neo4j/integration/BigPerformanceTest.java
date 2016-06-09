@@ -63,8 +63,6 @@ public class BigPerformanceTest
 //                    MySqlClient.Parameters.DBPassword.value(),
 //                    mySqlServer.get().ipAddress() );
 
-            exportFromMySqlToNeo4j( "northwind" );
-            neo4j.get().start();
         }
         catch ( IOException e )
         {
@@ -82,6 +80,9 @@ public class BigPerformanceTest
     @Test
     public void shouldExportFromMySqlAndImportIntoGraph() throws Exception
     {
+        exportFromMySqlToNeo4j( "northwind" );
+        neo4j.get().start();
+
         // then
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 

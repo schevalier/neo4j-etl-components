@@ -28,7 +28,7 @@ public class ConnectionConfig
         this.database = Preconditions.requireNonNull( builder.database, "Database" );
         this.credentials = new Credentials(
                 Preconditions.requireNonNullString( builder.username, "Username" ),
-                Preconditions.requireNonNullString( builder.password, "Password" ) );
+                builder.password );
     }
 
     String driverClassName()

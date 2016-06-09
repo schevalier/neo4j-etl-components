@@ -58,7 +58,6 @@ public class ExportFromMySqlCli implements Runnable
             title = "name")
     private String user;
 
-    @Required
     @Option(type = OptionType.COMMAND,
             name = {"--password"},
             description = "Password for login to MySQL.",
