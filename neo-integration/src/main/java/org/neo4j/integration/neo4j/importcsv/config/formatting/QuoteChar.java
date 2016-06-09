@@ -37,7 +37,7 @@ public class QuoteChar
     private final Pattern pattern;
     private final String escaped;
 
-    public QuoteChar( String quote, String argValue )
+    QuoteChar( String quote, String argValue )
     {
         this.quote = quote;
         this.argValue = argValue;

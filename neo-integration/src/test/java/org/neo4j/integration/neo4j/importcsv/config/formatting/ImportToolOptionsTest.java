@@ -1,4 +1,4 @@
-package org.neo4j.integration.neo4j.importcsv.config;
+package org.neo4j.integration.neo4j.importcsv.config.formatting;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.util.ResourceRule;
 

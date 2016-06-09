@@ -2,7 +2,7 @@ package org.neo4j.integration.environment;
 
 import java.nio.file.Path;
 
-import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 
 public class Environment
 {

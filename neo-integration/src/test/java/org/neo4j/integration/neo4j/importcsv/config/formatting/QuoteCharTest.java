@@ -1,10 +1,8 @@
-package org.neo4j.integration.neo4j.importcsv.config;
+package org.neo4j.integration.neo4j.importcsv.config.formatting;
 
 import java.io.IOException;
 
 import org.junit.Test;
-
-import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
 
 import static org.junit.Assert.assertEquals;
 

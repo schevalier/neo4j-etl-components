@@ -1,4 +1,4 @@
-package org.neo4j.integration.neo4j.importcsv.config;
+package org.neo4j.integration.neo4j.importcsv.config.formatting;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +12,6 @@ import java.util.logging.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.neo4j.importcsv.config.formatting.Delimiter;
-import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.util.Loggers;
 
