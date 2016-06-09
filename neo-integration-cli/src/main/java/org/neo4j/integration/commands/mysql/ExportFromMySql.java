@@ -1,6 +1,5 @@
 package org.neo4j.integration.commands.mysql;
 
-import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import org.neo4j.integration.environment.Environment;
@@ -16,37 +15,8 @@ import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 
 public class ExportFromMySql implements Callable<Void>
 {
-    public interface Events
-    {
-        Events EMPTY = new Events()
-        {
-            @Override
-            public void onExportingToCsv( Path csvDirectory )
-            {
-                // Do nothing
-            }
 
-            @Override
-            public void onCreatingNeo4jStore()
-            {
-                // Do nothing
-            }
-
-            @Override
-            public void onExportComplete( Path destinationDirectory )
-            {
-                // Do nothing
-            }
-        };
-
-        void onExportingToCsv( Path csvDirectory );
-
-        void onCreatingNeo4jStore();
-
-        void onExportComplete( Path destinationDirectory );
-    }
-
-    private final Events events;
+    private final ExportFromMySqlEvents events;
     private final CsvResources csvResources;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
@@ -57,10 +27,10 @@ public class ExportFromMySql implements Callable<Void>
                             Formatting formatting,
                             Environment environment )
     {
-        this( Events.EMPTY, csvResources, connectionConfig, formatting, environment );
+        this( ExportFromMySqlEvents.EMPTY, csvResources, connectionConfig, formatting, environment );
     }
 
-    public ExportFromMySql( Events events,
+    public ExportFromMySql( ExportFromMySqlEvents events,
                             CsvResources csvResources,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,

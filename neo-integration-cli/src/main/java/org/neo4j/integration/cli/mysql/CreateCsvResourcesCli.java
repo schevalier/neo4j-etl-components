@@ -1,10 +1,12 @@
 package org.neo4j.integration.cli.mysql;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Callable;
 
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
@@ -16,6 +18,7 @@ import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
+import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
@@ -142,18 +145,22 @@ public class CreateCsvResourcesCli implements Runnable
         }
     }
 
-    private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events
+    public static Callable<CsvResources> csvResourcesFromFile( String csvResourcesFile ) throws IOException
     {
-        @Override
-        public void onCreatingCsvResourcesFile()
+        Callable<CsvResources> createCsvResources;
+        if ( csvResourcesFile.equalsIgnoreCase( "stdin" ) )
         {
-            CliRunner.print( "Creating MySQL to CSV mappings..." );
+            try ( Reader reader = new InputStreamReader( System.in );
+                  BufferedReader buffer = new BufferedReader( reader ) )
+            {
+                createCsvResources = CreateCsvResources.load( buffer );
+            }
         }
-
-        @Override
-        public void onCsvResourcesCreated()
+        else
         {
-            // Do nothing
+            createCsvResources = CreateCsvResources.load( csvResourcesFile );
         }
+        return createCsvResources;
     }
+
 }

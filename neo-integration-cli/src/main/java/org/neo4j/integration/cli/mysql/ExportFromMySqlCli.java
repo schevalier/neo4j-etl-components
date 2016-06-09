@@ -1,14 +1,8 @@
 package org.neo4j.integration.cli.mysql;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.github.rvesse.airline.annotations.Arguments;
@@ -206,32 +200,13 @@ public class ExportFromMySqlCli implements Runnable
 
         if ( StringUtils.isNotEmpty( csvResourcesFile ) )
         {
-            if ( csvResourcesFile.equalsIgnoreCase( "stdin" ) )
-            {
-                try ( Reader reader = new InputStreamReader( System.in );
-                      BufferedReader buffer = new BufferedReader( reader ) )
-                {
-                    createCsvResources = CreateCsvResources.load( buffer );
-                }
-            }
-            else
-            {
-                createCsvResources = CreateCsvResources.load( csvResourcesFile );
-            }
+            createCsvResources = CreateCsvResourcesCli.csvResourcesFromFile( csvResourcesFile );
         }
         else
         {
-
             createCsvResources = new CreateCsvResources(
                     new CreateCsvResourcesEventHandler(),
-                    new OutputStream()
-                    {
-                        @Override
-                        public void write( int b ) throws IOException
-                        {
-                            // Do nothing
-                        }
-                    },
+                    emptyOutputStream(),
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
@@ -241,18 +216,16 @@ public class ExportFromMySqlCli implements Runnable
         return createCsvResources.call();
     }
 
-    private static class CreateCsvResourcesEventHandler implements CreateCsvResources.Events
+    private OutputStream emptyOutputStream()
     {
-        @Override
-        public void onCreatingCsvResourcesFile()
+        return new OutputStream()
         {
-            CliRunner.print( "Creating MySQL to CSV mappings..." );
-        }
-
-        @Override
-        public void onCsvResourcesCreated()
-        {
-            // Do nothing
-        }
+            @Override
+            public void write( int b ) throws IOException
+            {
+                // Do nothing
+            }
+        };
     }
+
 }

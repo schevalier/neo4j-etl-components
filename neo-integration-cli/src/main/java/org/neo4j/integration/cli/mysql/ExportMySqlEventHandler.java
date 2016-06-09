@@ -3,12 +3,12 @@ package org.neo4j.integration.cli.mysql;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.neo4j.integration.commands.mysql.ExportFromMySql;
+import org.neo4j.integration.commands.mysql.ExportFromMySqlEvents;
 import org.neo4j.integration.util.CliRunner;
 
 import static java.lang.String.format;
 
-public class ExportMySqlEventHandler implements ExportFromMySql.Events
+public class ExportMySqlEventHandler implements ExportFromMySqlEvents
 {
     @Override
     public void onExportingToCsv( Path csvDirectory )

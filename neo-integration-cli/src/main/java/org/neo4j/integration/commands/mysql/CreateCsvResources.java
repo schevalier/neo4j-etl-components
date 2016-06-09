@@ -40,29 +40,7 @@ public class CreateCsvResources implements Callable<CsvResources>
         return () -> CsvResources.fromJson( root );
     }
 
-    public interface Events
-    {
-        Events EMPTY = new Events()
-        {
-            @Override
-            public void onCreatingCsvResourcesFile()
-            {
-                // Do nothing
-            }
-
-            @Override
-            public void onCsvResourcesCreated()
-            {
-                // Do nothing
-            }
-        };
-
-        void onCreatingCsvResourcesFile();
-
-        void onCsvResourcesCreated();
-    }
-
-    private final Events events;
+    private final CreateCsvResourcesEvents events;
     private final OutputStream output;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
@@ -75,10 +53,15 @@ public class CreateCsvResources implements Callable<CsvResources>
                                Formatting formatting,
                                DatabaseExportSqlSupplier sqlSupplier )
     {
-        this( Events.EMPTY, output, connectionConfig, formatting, sqlSupplier, FilterOptions.DEFAULT );
+        this( CreateCsvResourcesEvents.EMPTY,
+                output,
+                connectionConfig,
+                formatting,
+                sqlSupplier,
+                FilterOptions.DEFAULT );
     }
 
-    public CreateCsvResources( Events events,
+    public CreateCsvResources( CreateCsvResourcesEvents events,
                                OutputStream output,
                                ConnectionConfig connectionConfig,
                                Formatting formatting,
