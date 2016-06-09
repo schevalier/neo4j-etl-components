@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatter;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatter;
 
 import static java.lang.String.format;
 

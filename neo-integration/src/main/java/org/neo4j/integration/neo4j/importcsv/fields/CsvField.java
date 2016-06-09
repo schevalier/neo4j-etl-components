@@ -2,7 +2,7 @@ package org.neo4j.integration.neo4j.importcsv.fields;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatter;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatter;
 
 import static java.lang.String.format;
 

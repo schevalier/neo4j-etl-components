@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;

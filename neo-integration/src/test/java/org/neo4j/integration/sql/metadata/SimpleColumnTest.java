@@ -3,7 +3,7 @@ package org.neo4j.integration.sql.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.RowAccessor;
 import org.neo4j.integration.sql.StubQueryResults;
@@ -178,13 +178,13 @@ public class SimpleColumnTest
                 SqlDataType.INT,
                 ColumnValueSelectionStrategy.SelectColumnValue );
 
-        RowAccessor row = mock(RowAccessor.class);
+        RowAccessor row = mock( RowAccessor.class );
 
         // when
         column.selectFrom( row, 10 );
 
         // then
-        verify(row).getString( "id-alias" );
+        verify( row ).getString( "id-alias" );
     }
 
     @Test
@@ -217,7 +217,7 @@ public class SimpleColumnTest
                 SqlDataType.INT,
                 ColumnValueSelectionStrategy.SelectRowIndex );
 
-        RowAccessor row = mock(RowAccessor.class);
+        RowAccessor row = mock( RowAccessor.class );
 
         // when
         String result = column.selectFrom( row, 10 );

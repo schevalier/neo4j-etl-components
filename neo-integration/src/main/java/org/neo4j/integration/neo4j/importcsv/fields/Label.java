@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatter;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatter;
 
 class Label implements CsvField
 {

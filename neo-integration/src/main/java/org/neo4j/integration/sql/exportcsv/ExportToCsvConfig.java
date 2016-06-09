@@ -2,7 +2,7 @@ package org.neo4j.integration.sql.exportcsv;
 
 import java.nio.file.Path;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.util.Preconditions;
 

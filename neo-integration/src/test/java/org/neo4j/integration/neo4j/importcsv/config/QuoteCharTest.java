@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
+
 import static org.junit.Assert.assertEquals;
 
 public class QuoteCharTest

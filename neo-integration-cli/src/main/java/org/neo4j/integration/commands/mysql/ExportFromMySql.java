@@ -4,9 +4,9 @@ import java.util.concurrent.Callable;
 
 import org.neo4j.integration.environment.Environment;
 import org.neo4j.integration.neo4j.importcsv.ImportFromCsvCommand;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.ImportConfig;
 import org.neo4j.integration.neo4j.importcsv.config.Manifest;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;

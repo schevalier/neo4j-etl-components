@@ -3,6 +3,7 @@ package org.neo4j.integration.neo4j.importcsv.config;
 import java.nio.file.Path;
 import java.util.Collection;
 
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.process.CommandsSupplier;

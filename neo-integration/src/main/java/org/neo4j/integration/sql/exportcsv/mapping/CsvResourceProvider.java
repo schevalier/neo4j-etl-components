@@ -1,7 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.metadata.DatabaseObjectServiceProvider;
 import org.neo4j.integration.sql.metadata.Join;

@@ -1,9 +1,5 @@
 package org.neo4j.integration.neo4j.importcsv.fields;
 
-import java.io.Writer;
-
-import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
-
 public enum Neo4jDataType
 {
     Boolean( false ),

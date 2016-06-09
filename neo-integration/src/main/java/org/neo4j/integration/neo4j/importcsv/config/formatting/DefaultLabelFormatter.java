@@ -1,9 +1,32 @@
-package org.neo4j.integration.neo4j.importcsv.config;
+package org.neo4j.integration.neo4j.importcsv.config.formatting;
 
-public class DefaultPropertyFormatter implements Formatter
+
+import edu.washington.cs.knowitall.morpha.MorphaStemmer;
+import org.apache.commons.lang3.StringUtils;
+
+public class DefaultLabelFormatter implements Formatter
 {
     @Override
     public String format( String value )
+    {
+        return stemWords( toUpperCamelCase( value ) );
+    }
+
+    private String stemWords( String value )
+    {
+        String[] words = StringUtils.splitByCharacterTypeCamelCase( value );
+
+        StringBuilder builder = new StringBuilder();
+
+        for ( String word : words )
+        {
+            builder.append( StringUtils.capitalize( MorphaStemmer.stem( word.toLowerCase() ) ) );
+        }
+
+        return builder.toString();
+    }
+
+    private String toUpperCamelCase( String value )
     {
         StringBuilder results = new StringBuilder();
 
@@ -23,7 +46,7 @@ public class DefaultPropertyFormatter implements Formatter
             }
             else if ( index == 0 )
             {
-                results.append( String.valueOf( c ).toLowerCase() );
+                results.append( String.valueOf( c ).toUpperCase() );
                 index = index + 1;
             }
             else

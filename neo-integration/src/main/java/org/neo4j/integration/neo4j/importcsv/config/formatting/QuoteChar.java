@@ -1,9 +1,8 @@
-package org.neo4j.integration.neo4j.importcsv.config;
+package org.neo4j.integration.neo4j.importcsv.config.formatting;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +37,7 @@ public class QuoteChar
     private final Pattern pattern;
     private final String escaped;
 
-    QuoteChar( String quote, String argValue )
+    public QuoteChar( String quote, String argValue )
     {
         this.quote = quote;
         this.argValue = argValue;
@@ -51,7 +50,7 @@ public class QuoteChar
         return quote;
     }
 
-    String argValue()
+    public String argValue()
     {
         return argValue;
     }

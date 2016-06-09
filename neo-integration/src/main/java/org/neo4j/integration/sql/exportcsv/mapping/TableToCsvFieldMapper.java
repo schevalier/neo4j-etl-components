@@ -1,7 +1,7 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
-import org.neo4j.integration.neo4j.importcsv.config.QuoteChar;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.sql.metadata.Column;

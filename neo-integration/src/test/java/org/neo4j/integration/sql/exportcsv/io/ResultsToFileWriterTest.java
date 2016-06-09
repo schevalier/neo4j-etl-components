@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.neo4j.integration.neo4j.importcsv.config.Delimiter;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Delimiter;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.neo4j.integration.commands.DatabaseInspector;
 import org.neo4j.integration.commands.SchemaExport;
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;

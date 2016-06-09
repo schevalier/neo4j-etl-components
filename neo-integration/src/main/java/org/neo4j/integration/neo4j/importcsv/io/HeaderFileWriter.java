@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.neo4j.integration.neo4j.importcsv.config.Formatting;
+import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.util.Loggers;
 

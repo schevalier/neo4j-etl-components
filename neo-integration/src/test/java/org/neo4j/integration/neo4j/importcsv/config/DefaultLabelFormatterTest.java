@@ -2,6 +2,8 @@ package org.neo4j.integration.neo4j.importcsv.config;
 
 import org.junit.Test;
 
+import org.neo4j.integration.neo4j.importcsv.config.formatting.DefaultLabelFormatter;
+
 import static org.junit.Assert.assertEquals;
 
 public class DefaultLabelFormatterTest
