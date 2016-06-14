@@ -235,21 +235,22 @@ public class TableInfoAssemblerTest
         }
 
         public DatabaseClient build() throws Exception
-
         {
             StubQueryResults.Builder columnsResults = StubQueryResults.builder().columns( "COLUMN_NAME", "TYPE_NAME" );
-            columns.forEach( c -> columnsResults.addRow( c, "INT" ) );
+            columns.forEach( ( c ) -> columnsResults.addRow( c, "INT" ) );
 
             StubQueryResults.Builder primaryKeyResults = StubQueryResults.builder().columns( "COLUMN_NAME" );
-            primaryKey.forEach( primaryKeyResults::addRow );
+            primaryKey.forEach( ( rows ) -> primaryKeyResults.addRow( rows ) );
 
             StubQueryResults.Builder foreignKeyResults = StubQueryResults.builder()
                     .columns( "FK_NAME", "FKCOLUMN_NAME", "PKTABLE_SCHEM", "PKTABLE_NAME", "PKCOLUMN_NAME" );
+
             for ( int i = 0; i < foreignKeys.size(); i++ )
             {
-                List<String> foreignKeyElements = foreignKeys.get( i );
-                String fkName = format( "fk_%s", i );
-                foreignKeyElements.forEach( fk -> foreignKeyResults.addRow( fkName, fk, "javabase", "Example", "id" ) );
+                final int elementNumber = i;
+                String fkName = format( "fk_%s", elementNumber );
+                List<String> foreignKeyElements = foreignKeys.get( elementNumber );
+                foreignKeyElements.forEach( fk -> foreignKeyResults.addRow( fkName, fk, "javabase", "Example" + elementNumber, "id" ) );
             }
 
             when( databaseClient.columns( any() ) ).thenReturn( columnsResults.build() );
@@ -258,6 +259,5 @@ public class TableInfoAssemblerTest
 
             return databaseClient;
         }
-
     }
 }
