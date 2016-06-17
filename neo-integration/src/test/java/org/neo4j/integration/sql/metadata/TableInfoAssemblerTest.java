@@ -182,23 +182,23 @@ public class TableInfoAssemblerTest
         assertTrue( tableInfo.representsJoinTable() );
     }
 
-//    @Test
-//    public void shouldNotAddForeignKeyIfTargetTableIsExcluded() throws Exception
-//    {
-//        DatabaseClient databaseClient = new DatabaseClientBuilder()
-//                .addForeignKey( "fk_1" )
-//                .addForeignKey( "fk_2" )
-//                .addForeignKey( "fk_3" )
-//                .build();
-//
-//        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, "Example0" );
-//
-//        // when
-//        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
-//
-//        // then
-//        assertEquals( 2, tableInfo.foreignKeys().size() );
-//    }
+    @Test
+    public void shouldNotAddForeignKeyIfTargetTableIsExcluded() throws Exception
+    {
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
+                .addForeignKey( "fk_1" )
+                .addForeignKey( "fk_2" )
+                .addForeignKey( "fk_3" )
+                .build();
+
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, "Example0" );
+
+        // when
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
+
+        // then
+        assertEquals( 2, tableInfo.foreignKeys().size() );
+    }
 
     private String join( String... columns )
     {

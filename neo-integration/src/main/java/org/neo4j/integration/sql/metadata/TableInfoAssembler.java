@@ -92,20 +92,23 @@ public class TableInfoAssembler
                     }
                 } );
 
-                keyColumns.addAll( sourceColumns );
-
-                // We assume that for a composite foreign key, all parts of the key refer to the same target table
-                if ( targetColumns.stream().map( Column::table ).collect( Collectors.toSet() ).size() > 1 )
+                if( targetColumns.size() > 0 )
                 {
-                    throw new IllegalStateException(
-                            format( "Composite foreign key refers to more than one target table: %s",
-                                    foreignKeyGroup ) );
-                }
+                    keyColumns.addAll( sourceColumns );
 
-                TableName targetTable = targetColumns.get( 0 ).table();
-                keys.add( new JoinKey(
-                        new CompositeColumn( table, sourceColumns, ColumnRole.ForeignKey ),
-                        new CompositeColumn( targetTable, targetColumns, ColumnRole.PrimaryKey ) ) );
+                    // We assume that for a composite foreign key, all parts of the key refer to the same target table
+                    if ( targetColumns.stream().map( Column::table ).collect( Collectors.toSet() ).size() > 1 )
+                    {
+                        throw new IllegalStateException(
+                                format( "Composite foreign key refers to more than one target table: %s",
+                                        foreignKeyGroup ) );
+                    }
+
+                    TableName targetTable = targetColumns.get( 0 ).table();
+                    keys.add( new JoinKey(
+                            new CompositeColumn( table, sourceColumns, ColumnRole.ForeignKey ),
+                            new CompositeColumn( targetTable, targetColumns, ColumnRole.PrimaryKey ) ) );
+                }
             }
 
             return keys;
