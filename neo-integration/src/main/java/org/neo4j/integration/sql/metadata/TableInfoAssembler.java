@@ -80,7 +80,7 @@ public class TableInfoAssembler
 
                 foreignKeyGroup.forEach( fkRow ->
                 {
-                    if( !fkRow.get( "FKCOLUMN_NAME" ).equalsIgnoreCase( tablesToExclude )  )
+                    if( !fkRow.get( "PKTABLE_NAME" ).equalsIgnoreCase( tablesToExclude )  )
                     {
                         Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fkRow.get( "FKCOLUMN_NAME" ) ) );
 

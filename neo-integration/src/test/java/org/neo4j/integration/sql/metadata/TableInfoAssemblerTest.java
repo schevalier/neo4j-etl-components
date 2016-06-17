@@ -191,15 +191,13 @@ public class TableInfoAssemblerTest
 //                .addForeignKey( "fk_3" )
 //                .build();
 //
-//        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, "" );
+//        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, "Example0" );
 //
 //        // when
 //        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
 //
 //        // then
-//        assertFalse( tableInfo.primaryKey().isPresent() );
 //        assertEquals( 2, tableInfo.foreignKeys().size() );
-//        assertTrue( tableInfo.representsJoinTable() );
 //    }
 
     private String join( String... columns )
