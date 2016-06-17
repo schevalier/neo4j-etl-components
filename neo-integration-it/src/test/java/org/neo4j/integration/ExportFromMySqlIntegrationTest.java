@@ -3,6 +3,7 @@ package org.neo4j.integration;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +40,11 @@ import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 public class ExportFromMySqlIntegrationTest
 {
     private static final String tinyIntAs = "byte";
+    private static final String relationshipNameFrom = "table";
 
     private static final boolean exclude = true;
-    private static final String tablesToExclude = "Orphan_Table";
+    private static final String excludeOrphanTable = "Orphan_Table";
+    private static final String[] tablesToExclude = {"Orphan_Table", "Numeric_Table", "Leaf_Table"};
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -262,7 +265,7 @@ public class ExportFromMySqlIntegrationTest
 
         String response = neo4j.get().executeHttp(
                 NEO_TX_URI,
-                "MATCH (lt:" + tablesToExclude + ") RETURN lt" );
+                "MATCH (lt:" + excludeOrphanTable.replace( "_", "" ) + ") RETURN lt" );
 
         List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
         
@@ -279,20 +282,52 @@ public class ExportFromMySqlIntegrationTest
         options.put( "multiline-fields", "true" );
         objectMapper.writeValue( importToolOptions.toFile(), options );
 
-        NeoIntegrationCli.executeMainReturnSysOut(
-                new String[]{"mysql",
-                        "export",
-                        "--host", mySqlServer.get().ipAddress(),
-                        "--user", MySqlClient.Parameters.DBUser.value(),
-                        "--password", MySqlClient.Parameters.DBPassword.value(),
-                        "--database", database,
-                        "--import-tool", neo4j.get().binDirectory().toString(),
-                        "--options-file", importToolOptions.toString(),
-                        "--csv-directory", tempDirectory.get().toString(),
-                        "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                        "--tiny-int", tinyIntAs,
-                        "--relationship-name", "table",
-                        "--force",
-                        exclude ? "--exclude" : "", exclude ? tablesToExclude : "" } );
+        List<String> args = new ArrayList<String>(  );
+        args.add( "mysql" );
+        args.add( "export" );
+
+        args.add( "--host" );
+        args.add( mySqlServer.get().ipAddress() );
+
+        args.add( "--user" );
+        args.add( MySqlClient.Parameters.DBUser.value() );
+
+        args.add( "--password" );
+        args.add( MySqlClient.Parameters.DBPassword.value() );
+
+        args.add( "--database" );
+        args.add( database );
+
+        args.add( "--import-tool" );
+        args.add( neo4j.get().binDirectory().toString() );
+
+        args.add( "--options-file" );
+        args.add( importToolOptions.toString() );
+
+        args.add( "--csv-directory" );
+        args.add( tempDirectory.get().toString() );
+
+        args.add( "--destination" );
+        args.add( neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString() );
+
+        args.add( "--force" );
+        args.add( "--debug" );
+
+        args.add( "--tiny-int" );
+        args.add( tinyIntAs );
+
+        args.add( "--relationship-name" );
+        args.add( relationshipNameFrom );
+
+        if( exclude )
+        {
+            args.add( "--exclude" );
+            for( String tableToExclude: tablesToExclude )
+            {
+                args.add( tableToExclude );
+            }
+        }
+
+        NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[ 0 ] ) );
     }
 }

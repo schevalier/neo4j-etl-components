@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.github.rvesse.airline.annotations.Command;
@@ -108,7 +110,7 @@ public class CreateCsvResourcesCli implements Runnable
             description = "Specifies tables to exclude from the process.",
             title = "tinyIntAs")
     @MutuallyExclusiveWith(tag = "exc/inc")
-    private String tablesToExclude = "";
+    private List<String> tablesToExclude = new ArrayList<String>();
 
     @Override
     public void run()
@@ -137,7 +139,7 @@ public class CreateCsvResourcesCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude ) ).call();
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude.get(0) ) ).call();
         }
         catch ( Exception e )
         {

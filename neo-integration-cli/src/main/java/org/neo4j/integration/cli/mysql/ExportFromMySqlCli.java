@@ -1,8 +1,13 @@
 package org.neo4j.integration.cli.mysql;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.github.rvesse.airline.annotations.Arguments;
@@ -89,7 +94,7 @@ public class ExportFromMySqlCli implements Runnable
     @Required
     @Option(type = OptionType.COMMAND,
             name = {"--destination"},
-            description = "Path to destination store directory (this will overwrite any exiting directory).",
+            description = "Path to destination store directory.",
             title = "directory")
     private String destinationDirectory;
 
@@ -119,6 +124,13 @@ public class ExportFromMySqlCli implements Runnable
             description = "Print detailed diagnostic output.")
     private boolean debug = false;
 
+    @Option(type = OptionType.COMMAND,
+            name = {"--csv-resources"},
+            description = "Path to an existing CSV resources definitions file. " +
+                    "The name 'stdin' will cause the CSV resources definitions to be read from standard input.",
+            title = "file|stdin")
+    private String csvResourcesFile;
+
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--relationship-name", "--rel-name"},
@@ -136,22 +148,14 @@ public class ExportFromMySqlCli implements Runnable
     private String tinyIntAs = "byte";
 
     @SuppressWarnings("FieldCanBeLocal")
+    @Arguments(description = "Specifies tables to exclude from the process.",
+            title = "tablesToExclude")
     @Option(type = OptionType.COMMAND,
             name = {"--exclude", "--exc"},
             description = "Specifies tables to exclude from the process.",
-            title = "tinyIntAs")
+            title = "tablesToExclude")
     @MutuallyExclusiveWith(tag = "exc/inc")
-    private String tablesToExclude = "";
-
-    @Option(type = OptionType.COMMAND,
-            name = {"--csv-resources"},
-            description = "Path to an existing CSV resources definitions file. " +
-                    "The name 'stdin' will cause the CSV resources definitions to be read from standard input.",
-            title = "file|stdin")
-    @Arguments(description = "Path to an existing CSV resources definitions file. " +
-            "The name 'stdin' will cause the CSV resources definitions to be read from standard input.",
-            title = "file|stdin")
-    private String csvResourcesFile;
+    private List<String> tablesToExclude = new ArrayList<String>();
 
     @Override
     public void run()
@@ -210,7 +214,7 @@ public class ExportFromMySqlCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude ) );
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude.get( 0 ) ) );
         }
 
         return createCsvResources.call();
