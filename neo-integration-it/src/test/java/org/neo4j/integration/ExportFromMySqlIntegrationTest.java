@@ -44,7 +44,7 @@ public class ExportFromMySqlIntegrationTest
 
     private static final boolean exclude = true;
     private static final String excludeOrphanTable = "Orphan_Table";
-    private static final String[] tablesToExclude = {"Orphan_Table", "Numeric_Table", "Leaf_Table"};
+    private static final String[] tablesToExclude = {"Orphan_Table", "Leaf_Table"};
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
