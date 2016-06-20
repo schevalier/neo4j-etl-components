@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 public class TableInfoAssemblerTest
 {
-    String tablesToExclude = StringUtils.EMPTY;
+    List<String> tablesToExclude = new ArrayList<String>(  );
 
     @Test
     public void shouldReturnKeyCollectionWithPrimaryKey() throws Exception
@@ -185,13 +185,18 @@ public class TableInfoAssemblerTest
     @Test
     public void shouldNotAddForeignKeyIfTargetTableIsExcluded() throws Exception
     {
+        List<String> tablesToExclude = new ArrayList<String>(  );
+
         DatabaseClient databaseClient = new DatabaseClientBuilder()
                 .addForeignKey( "fk_1" )
                 .addForeignKey( "fk_2" )
                 .addForeignKey( "fk_3" )
                 .build();
 
-        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, "Example0" );
+        tablesToExclude.add( "Example0" );
+
+
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, tablesToExclude );
 
         // when
         TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );

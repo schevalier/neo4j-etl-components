@@ -8,16 +8,16 @@ public class FilterOptions
     private final TinyIntAs tinyIntAs;
     private final RelationshipNameFrom relationshipNameFrom;
 
-    private final String tablesToExclude;
+    private final List<String> tablesToExclude;
 
-    public static FilterOptions DEFAULT = new FilterOptions( TinyIntAs.BYTE, RelationshipNameFrom.TABLE_NAME, "" );
+    public static FilterOptions DEFAULT = new FilterOptions( TinyIntAs.BYTE, RelationshipNameFrom.TABLE_NAME, new ArrayList<String>(  ) );
 
-    public FilterOptions( String tinyIntAs, String relationshipNameFrom, String tablesToExclude )
+    public FilterOptions( String tinyIntAs, String relationshipNameFrom, List<String> tablesToExclude )
     {
         this( TinyIntAs.parse( tinyIntAs ), RelationshipNameFrom.parse( relationshipNameFrom ), tablesToExclude );
     }
 
-    private FilterOptions( TinyIntAs tinyIntAs, RelationshipNameFrom relationshipNameFrom, String tablesToExclude )
+    private FilterOptions( TinyIntAs tinyIntAs, RelationshipNameFrom relationshipNameFrom, List<String> tablesToExclude )
     {
         this.tinyIntAs = tinyIntAs;
         this.relationshipNameFrom = relationshipNameFrom;
@@ -34,7 +34,7 @@ public class FilterOptions
         return relationshipNameFrom;
     }
 
-    public String tablesToExclude()
+    public List<String> tablesToExclude()
     {
         return tablesToExclude;
     }

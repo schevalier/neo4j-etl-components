@@ -19,10 +19,10 @@ public class TableInfoAssembler
 {
     static final String SYNTHETIC_PRIMARY_KEY_NAME = "_ROW_INDEX_";
 
-    private final String tablesToExclude;
+    private final List<String> tablesToExclude;
     private final DatabaseClient databaseClient;
 
-    public TableInfoAssembler( DatabaseClient databaseClient, String tablesToExclude )
+    public TableInfoAssembler( DatabaseClient databaseClient, List<String> tablesToExclude )
     {
         this.databaseClient = databaseClient;
         this.tablesToExclude = tablesToExclude;
@@ -80,7 +80,7 @@ public class TableInfoAssembler
 
                 foreignKeyGroup.forEach( fkRow ->
                 {
-                    if( !fkRow.get( "PKTABLE_NAME" ).equalsIgnoreCase( tablesToExclude )  )
+                    if( !tablesToExclude.contains( fkRow.get( "PKTABLE_NAME" ) ) )
                     {
                         Column sourceColumn = columns.get( table.fullyQualifiedColumnName( fkRow.get( "FKCOLUMN_NAME" ) ) );
 

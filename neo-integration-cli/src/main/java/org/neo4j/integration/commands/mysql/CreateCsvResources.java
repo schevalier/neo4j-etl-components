@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,7 +47,7 @@ public class CreateCsvResources implements Callable<CsvResources>
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
     private final RelationshipNameResolver relationshipNameResolver;
-    private final String tablesToExclude;
+    private final List<String> tablesToExclude;
 
     public CreateCsvResources( OutputStream output,
                                ConnectionConfig connectionConfig,

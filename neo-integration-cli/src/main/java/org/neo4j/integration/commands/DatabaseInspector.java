@@ -2,6 +2,7 @@ package org.neo4j.integration.commands;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.metadata.Join;
@@ -13,11 +14,11 @@ import org.neo4j.integration.sql.metadata.TableName;
 
 public class DatabaseInspector
 {
-    private final String tablesToExclude;
+    private final List<String> tablesToExclude;
     private final DatabaseClient databaseClient;
     private final TableInfoAssembler tableInfoAssembler;
 
-    public DatabaseInspector( DatabaseClient databaseClient, String tablesToExclude )
+    public DatabaseInspector( DatabaseClient databaseClient, List<String> tablesToExclude )
     {
         this.databaseClient = databaseClient;
         this.tablesToExclude = tablesToExclude;
@@ -32,7 +33,7 @@ public class DatabaseInspector
 
         for ( TableName tableName : databaseClient.tableNames() )
         {
-            if( ! tableName.simpleName().equalsIgnoreCase( tablesToExclude ) )
+            if( !tablesToExclude.contains( tableName.simpleName() ) )
             {
                 buildSchema( tableName, tables, joins, joinTables );
             }
