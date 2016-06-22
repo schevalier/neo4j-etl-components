@@ -139,7 +139,7 @@ public class CreateCsvResourcesCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude ) ).call();
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude, false ) ).call();
         }
         catch ( Exception e )
         {

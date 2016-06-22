@@ -43,8 +43,8 @@ public class ExportFromMySqlIntegrationTest
     private static final String relationshipNameFrom = "table";
 
     private static final boolean exclude = true;
-    private static final String excludeOrphanTable = "Orphan_Table";
-    private static final String[] tablesToExclude = {"Orphan_Table", "Leaf_Table"};
+    private static final boolean excludeIncompleteJoinTables = false;
+    private static final String[] tablesToExclude = {"Orphan_Table", "Yet_Another_Orphan_Table", "Table_B"};
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -259,17 +259,28 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    public void shouldExcludeOrphanTable() throws Exception
+    public void shouldExcludeOrphanTables() throws Exception
     {
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
-        String response = neo4j.get().executeHttp(
-                NEO_TX_URI,
-                "MATCH (lt:" + excludeOrphanTable.replace( "_", "" ) + ") RETURN lt" );
-
+        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:OrphanTable) RETURN lt" );
         List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
-        
         assertThat( leaves.size(), is( exclude ? 0 : 1 ) );
+
+        response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:YetAnotherOrphanTable) RETURN lt" );
+        leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
+        assertThat( leaves.size(), is( exclude ? 0 : 1 ) );
+    }
+
+    @Test
+    public void shouldExcludeJoinTable() throws Exception
+    {
+        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+
+        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:JoinTable) RETURN lt" );
+        List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
+
+        assertThat( leaves.size(), is( exclude && excludeIncompleteJoinTables? 0 : 1 ) );
     }
 
     private static void exportFromMySqlToNeo4j( String database ) throws IOException

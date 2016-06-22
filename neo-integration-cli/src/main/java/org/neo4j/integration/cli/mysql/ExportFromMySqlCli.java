@@ -214,7 +214,7 @@ public class ExportFromMySqlCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude ) );
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude, false ) );
         }
 
         return createCsvResources.call();

@@ -179,7 +179,6 @@ public class DatabaseInspectorTest
         List<TableName> tableNames = schemaExport.tables().stream().map( Table::name ).collect( Collectors.toList() );
         Join join = schemaExport.joins().stream().findFirst().get();
 
-
         assertThat( tableNames, matchesCollection( asList( book, author ) ) );
         assertThat( join.tableNames(), hasItems( book, author ) );
         assertEquals( asList( "test.Book.author_first_name\0test.Book.author_last_name",
@@ -200,7 +199,6 @@ public class DatabaseInspectorTest
                 .addRow( "name", null, "Data" )
                 .addRow( "managerId", "Employee", "MUL" )
                 .build();
-
 
         QueryResults employeeResults = StubQueryResults.builder()
                 .columns( "COLUMN_NAME", "DATA_TYPE", "COLUMN_TYPE" )
@@ -238,13 +236,10 @@ public class DatabaseInspectorTest
         List<TableName> tableNames = schemaExport.tables().stream().map( Table::name ).collect( Collectors.toList() );
         Join join = schemaExport.joins().stream().findFirst().get();
 
-
         assertThat( tableNames, matchesCollection( singletonList( employee ) ) );
         assertThat( join.tableNames(), hasItems( employee ) );
-        assertEquals( asList( "test.Employee.managerId",
-                           "test.Employee.id",
-                        "test.Employee.id",
-                        "test.Employee.id" ),
+        assertEquals( asList(
+                "test.Employee.managerId", "test.Employee.id", "test.Employee.id", "test.Employee.id" ),
                 keyNames( join ) );
         assertTrue( schemaExport.joinTables().isEmpty() );
     }

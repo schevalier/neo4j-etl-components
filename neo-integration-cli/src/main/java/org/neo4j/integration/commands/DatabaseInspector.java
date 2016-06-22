@@ -27,8 +27,8 @@ public class DatabaseInspector
 
     public SchemaExport buildSchemaExport() throws Exception
     {
-        HashSet<Table> tables = new HashSet<>();
         HashSet<Join> joins = new HashSet<>();
+        HashSet<Table> tables = new HashSet<>();
         HashSet<JoinTable> joinTables = new HashSet<>();
 
         for ( TableName tableName : databaseClient.tableNames() )

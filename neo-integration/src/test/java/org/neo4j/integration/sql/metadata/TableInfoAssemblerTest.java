@@ -185,16 +185,15 @@ public class TableInfoAssemblerTest
     @Test
     public void shouldNotAddForeignKeyIfTargetTableIsExcluded() throws Exception
     {
+        // given
         List<String> tablesToExclude = new ArrayList<String>(  );
+        tablesToExclude.add( "Example0" );
 
         DatabaseClient databaseClient = new DatabaseClientBuilder()
                 .addForeignKey( "fk_1" )
                 .addForeignKey( "fk_2" )
                 .addForeignKey( "fk_3" )
                 .build();
-
-        tablesToExclude.add( "Example0" );
-
 
         TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, tablesToExclude );
 
