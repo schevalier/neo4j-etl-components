@@ -183,7 +183,7 @@ public class TableInfoAssemblerTest
     }
 
     @Test
-    public void shouldNotAddForeignKeyIfTargetTableIsExcluded() throws Exception
+    public void shouldNotAddForeignKeyIfTargetTableIsExcludedAndRepresentJoinTableWhenThirdForeignKeyIsExcluded() throws Exception
     {
         // given
         List<String> tablesToExclude = new ArrayList<String>(  );
@@ -202,6 +202,7 @@ public class TableInfoAssemblerTest
 
         // then
         assertEquals( 2, tableInfo.foreignKeys().size() );
+        assertTrue( tableInfo.representsJoinTable() );
     }
 
     private String join( String... columns )
