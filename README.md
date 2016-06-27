@@ -41,3 +41,28 @@ To run performance tests in locally,
 Ensure that you have the datasets imported in your local mysql instance. You could do this by uncommenting the bits in the code to download the sql file from S3.
 
 `mvn clean dependency:copy-dependencies integration-test -Dtest=PerformanceTestSuite -DfailIfNoTests=false -DPLATFORM=local`
+
+## CLI Usage
+
+To run the cli locally once you clone the project you'd have have install the neo-integration project locally,
+
+From the _neo-integration-root_ run maven install
+
+`mvn install -DPLATFORM=local`
+
+_PLATFORM=local_ is supplied only to speed the install process that runs tests, you can choose to _skipTests_.
+
+Once this is done, you can run maven package from _neo-integration-cli_ sub-project
+
+`mvn package`
+
+Once that has been successfully executed, the scripts are located in the _bin_ directory under _neo-integration-cli_
+
+Examples of command usage,
+
+```
+./neo-integration mysql export  --host 127.0.0.1 --user neo --password neo \
+--database javabase --destination /tmp/neo4j-enterprise-3.0.1/data/databases/graph.db/ \
+--import-tool /tmp/neo4j-enterprise-3.0.1/bin  --csv-directory ./  \
+--options-file ./import-tool-options.json --force --debug
+```
