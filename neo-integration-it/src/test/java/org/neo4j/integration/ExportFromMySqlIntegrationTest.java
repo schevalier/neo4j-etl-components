@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +40,6 @@ import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 
 public class ExportFromMySqlIntegrationTest
 {
-    private static final String tinyIntAs = "byte";
-    private static final String relationshipNameFrom = "table";
-
-    private static final boolean exclude = true;
-    private static final boolean excludeIncompleteJoinTables = false;
-    private static final String[] tablesToExclude = {"Orphan_Table", "Yet_Another_Orphan_Table", "Table_B"};
-
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
             new ResourceRule<>( TemporaryDirectory.temporaryDirectory() );
@@ -68,7 +62,7 @@ public class ExportFromMySqlIntegrationTest
     {
         MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
         client.execute( MySqlScripts.setupDatabaseScript().value() );
-        exportFromMySqlToNeo4j( "javabase" );
+        exportFromMySqlToNeo4j();
         neo4j.get().start();
     }
 
@@ -172,26 +166,6 @@ public class ExportFromMySqlIntegrationTest
     }
 
     @Test
-    public void shouldExportFromMySqlAndImportIntoGraphWithCorrectTinyIntConversion() throws Exception
-    {
-        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
-
-        String response = neo4j.get().executeHttp( NEO_TX_URI,
-                "MATCH (c:NumericTable) RETURN c" );
-
-        List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
-
-        if ( tinyIntAs.equals( "boolean" ) )
-        {
-            assertThat( numericFields.get( 0 ).values(), hasItems( true, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
-        }
-        else
-        {
-            assertThat( numericFields.get( 0 ).values(), hasItems( 1, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
-        }
-    }
-
-    @Test
     public void shouldExportFromMySqlAndImportIntoGraphForThreeTableJoinWithProperties() throws Exception
     {
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
@@ -247,7 +221,8 @@ public class ExportFromMySqlIntegrationTest
 
         String response = neo4j.get().executeHttp(
                 NEO_TX_URI,
-                "MATCH (t:Team)-[:STUDENT]-(s:Student) RETURN t.name AS team, s.username AS student ORDER BY student" );
+                "MATCH (t:Team)-[:STUDENT]-(s:Student) " +
+                "RETURN t.name AS team, s.username AS student ORDER BY student" );
 
         List<String> teams = JsonPath.read( response, "$.results[*].data[*].row[0]" );
         List<String> students = JsonPath.read( response, "$.results[*].data[*].row[1]" );
@@ -258,86 +233,30 @@ public class ExportFromMySqlIntegrationTest
         assertEquals( students, asList( "eve", "jim", "mark" ) );
     }
 
-    @Test
-    public void shouldExcludeOrphanTables() throws Exception
-    {
-        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
-
-        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:OrphanTable) RETURN lt" );
-        List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
-        assertThat( leaves.size(), is( exclude ? 0 : 1 ) );
-
-        response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:YetAnotherOrphanTable) RETURN lt" );
-        leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
-        assertThat( leaves.size(), is( exclude ? 0 : 1 ) );
-    }
-
-    @Test
-    public void shouldExcludeJoinTable() throws Exception
-    {
-        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
-
-        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:JoinTable) RETURN lt" );
-        List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
-
-        assertThat( leaves.size(), is( exclude && excludeIncompleteJoinTables? 0 : 1 ) );
-    }
-
-    private static void exportFromMySqlToNeo4j( String database ) throws IOException
+    private static void exportFromMySqlToNeo4j( ) throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
-        ObjectMapper objectMapper = new ObjectMapper();
         HashMap<Object, Object> options = new HashMap<>();
-        options.put( "delimiter", "\t" );
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> args = new ArrayList<String>(  );
+
         options.put( "quote", "`" );
+        options.put( "delimiter", "\t" );
         options.put( "multiline-fields", "true" );
         objectMapper.writeValue( importToolOptions.toFile(), options );
 
-        List<String> args = new ArrayList<String>(  );
-        args.add( "mysql" );
-        args.add( "export" );
+        args.addAll( Arrays.asList( "mysql", "export",
+                "--host", mySqlServer.get().ipAddress(),
+                "--user", MySqlClient.Parameters.DBUser.value(),
+                "--password", MySqlClient.Parameters.DBPassword.value(),
+                "--database", "javabase",
+                "--import-tool", neo4j.get().binDirectory().toString(),
+                "--options-file", importToolOptions.toString(),
+                "--csv-directory", tempDirectory.get().toString(),
+                "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
+                "--force" ) );
 
-        args.add( "--host" );
-        args.add( mySqlServer.get().ipAddress() );
-
-        args.add( "--user" );
-        args.add( MySqlClient.Parameters.DBUser.value() );
-
-        args.add( "--password" );
-        args.add( MySqlClient.Parameters.DBPassword.value() );
-
-        args.add( "--database" );
-        args.add( database );
-
-        args.add( "--import-tool" );
-        args.add( neo4j.get().binDirectory().toString() );
-
-        args.add( "--options-file" );
-        args.add( importToolOptions.toString() );
-
-        args.add( "--csv-directory" );
-        args.add( tempDirectory.get().toString() );
-
-        args.add( "--destination" );
-        args.add( neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString() );
-
-        args.add( "--force" );
-        args.add( "--debug" );
-
-        args.add( "--tiny-int" );
-        args.add( tinyIntAs );
-
-        args.add( "--relationship-name" );
-        args.add( relationshipNameFrom );
-
-        if( exclude )
-        {
-            args.add( "--exclude" );
-            for( String tableToExclude: tablesToExclude )
-            {
-                args.add( tableToExclude );
-            }
-        }
+//        args.add( "--debug" );
 
         NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[ 0 ] ) );
     }
