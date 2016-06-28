@@ -258,6 +258,6 @@ public class ExportFromMySqlIntegrationTest
 
 //        args.add( "--debug" );
 
-        NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[ 0 ] ) );
+        NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[args.size()] ) );
     }
 }

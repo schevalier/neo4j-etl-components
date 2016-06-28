@@ -1,6 +1,6 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FilterOptions
@@ -11,14 +11,28 @@ public class FilterOptions
     private final List<String> tablesToExclude;
     private final boolean excludeIncompleteJoinTables;
 
-    public static FilterOptions DEFAULT = new FilterOptions( TinyIntAs.BYTE, RelationshipNameFrom.TABLE_NAME, new ArrayList<String>(  ), false );
+    public static FilterOptions DEFAULT = new FilterOptions(
+            TinyIntAs.BYTE,
+            RelationshipNameFrom.TABLE_NAME,
+            Collections.EMPTY_LIST,
+            false );
 
-    public FilterOptions( String tinyIntAs, String relationshipNameFrom, List<String> tablesToExclude, boolean excludeIncompleteJoinTables )
+    public FilterOptions( String tinyIntAs,
+                          String relationshipNameFrom,
+                          List<String> tablesToExclude,
+                          boolean excludeIncompleteJoinTables )
     {
-        this( TinyIntAs.parse( tinyIntAs ), RelationshipNameFrom.parse( relationshipNameFrom ), tablesToExclude, excludeIncompleteJoinTables );
+        this(
+                TinyIntAs.parse( tinyIntAs ),
+                RelationshipNameFrom.parse( relationshipNameFrom ),
+                tablesToExclude,
+                excludeIncompleteJoinTables );
     }
 
-    private FilterOptions( TinyIntAs tinyIntAs, RelationshipNameFrom relationshipNameFrom, List<String> tablesToExclude, boolean excludeIncompleteJoinTables )
+    private FilterOptions( TinyIntAs tinyIntAs,
+                           RelationshipNameFrom relationshipNameFrom,
+                           List<String> tablesToExclude,
+                           boolean excludeIncompleteJoinTables )
     {
         this.tinyIntAs = tinyIntAs;
         this.relationshipNameFrom = relationshipNameFrom;
