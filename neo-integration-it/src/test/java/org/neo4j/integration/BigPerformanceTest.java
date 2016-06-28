@@ -40,7 +40,7 @@ public class BigPerformanceTest
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
-                    "mysql-integration-test",
+                    "mysql-integration-test-bperf",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.bigPerformanceStartupScript(),
                     tempDirectory.get(),

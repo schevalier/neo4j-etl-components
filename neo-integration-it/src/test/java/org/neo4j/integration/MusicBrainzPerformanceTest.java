@@ -40,7 +40,7 @@ public class MusicBrainzPerformanceTest
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
-                    "mysql-integration-test",
+                    "mysql-integration-test-mbrainz",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.musicBrainzPerformanceStartupScript(),
                     tempDirectory.get(),

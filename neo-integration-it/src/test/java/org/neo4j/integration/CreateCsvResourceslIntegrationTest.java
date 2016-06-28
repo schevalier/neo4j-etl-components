@@ -34,7 +34,7 @@ public class CreateCsvResourceslIntegrationTest
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
-                    "mysql-integration-test",
+                    "mysql-integration-test-create-csv",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
                     tempDirectory.get(), INTEGRATION ) );

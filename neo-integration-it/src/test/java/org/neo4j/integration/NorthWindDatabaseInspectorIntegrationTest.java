@@ -41,7 +41,7 @@ public class NorthWindDatabaseInspectorIntegrationTest
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
-                    "mysql-integration-test",
+                    "mysql-integration-test-nw",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
                     tempDirectory.get(), INTEGRATION ) );

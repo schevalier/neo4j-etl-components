@@ -47,7 +47,7 @@ public class ExportFromMySqlIntegrationTest
     @ClassRule
     public static final ResourceRule<Server> mySqlServer = new ResourceRule<>(
             ServerFixture.server(
-                    "mysql-integration-test",
+                    "mysql-integration-test-export",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
                     tempDirectory.get(), INTEGRATION ) );
