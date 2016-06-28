@@ -183,11 +183,34 @@ public class TableInfoAssemblerTest
     }
 
     @Test
+    public void shouldCreateCompositePrimaryKeyFromForeignKeysEvenWhenTargetTableIsExcluded() throws Exception
+    {
+        List<String> tablesToExclude = new ArrayList<String>(  );
+        tablesToExclude.add( "Example1" );
+
+        // given
+        DatabaseClient databaseClient = new DatabaseClientBuilder()
+                .addForeignKey( "fk_1" )
+                .addForeignKey( "fk_2" )
+                .setPrimaryKey( "fk_1, fk_2" )
+                .build();
+
+        TableInfoAssembler assembler = new TableInfoAssembler( databaseClient, tablesToExclude );
+
+        // when
+        TableInfo tableInfo = assembler.createTableInfo( new TableName( "javabase.Example" ) );
+
+        // then
+        assertTrue( tableInfo.primaryKey().isPresent() );
+        assertEquals( "javabase.Example.fk_1, fk_2", tableInfo.primaryKey().get().name() );
+    }
+
+    @Test
     public void shouldNotAddThirdForeignKeyAndRepresentJoinTableWhenTargetTableIsExcluded() throws Exception
     {
         // given
         List<String> tablesToExclude = new ArrayList<String>(  );
-        tablesToExclude.add( "Example0" );
+        tablesToExclude.add( "Example1" );
 
         DatabaseClient databaseClient = new DatabaseClientBuilder()
                 .addForeignKey( "fk_1" )
@@ -250,9 +273,9 @@ public class TableInfoAssemblerTest
 
             for ( int i = 0; i < foreignKeys.size(); i++ )
             {
-                final int elementNumber = i;
+                final int elementNumber = i + 1;
                 String fkName = format( "fk_%s", elementNumber );
-                List<String> foreignKeyElements = foreignKeys.get( elementNumber );
+                List<String> foreignKeyElements = foreignKeys.get( i );
                 foreignKeyElements.forEach( fk -> foreignKeyResults.addRow( fkName, fk, "javabase", "Example" + elementNumber, "id" ) );
             }
 
