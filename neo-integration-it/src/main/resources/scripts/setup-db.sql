@@ -5,66 +5,6 @@ CREATE DATABASE javabase
 GRANT ALL ON javabase.* TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
 
-CREATE TABLE javabase.Orphan_Table
-(
-  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  number   INT  NOT NULL
-);
-GRANT ALL ON javabase.Orphan_Table TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
-CREATE TABLE javabase.Yet_Another_Orphan_Table
-(
-  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  number   INT  NOT NULL
-);
-GRANT ALL ON javabase.Yet_Another_Orphan_Table TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
-CREATE TABLE javabase.Leaf_Table
-(
-  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  number   INT  NOT NULL
-);
-GRANT ALL ON javabase.Leaf_Table TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
-CREATE TABLE javabase.Points_To_Leaf_Table
-(
-  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  leafId   INT  NOT NULL,
-  FOREIGN KEY (leafId) REFERENCES javabase.Leaf_Table (id)
-);
-GRANT ALL ON javabase.Points_To_Leaf_Table TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
-CREATE TABLE javabase.Table_A
-(
-  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  number   INT  NOT NULL
-);
-GRANT ALL ON javabase.Table_A TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
-CREATE TABLE javabase.Table_B
-(
-  id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  number   INT  NOT NULL
-);
-GRANT ALL ON javabase.Table_B TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
-CREATE TABLE javabase.Join_Table
-(
-  id         INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  table_a_id INT  NOT NULL,
-  table_b_id INT  NOT NULL,
-  FOREIGN KEY (table_a_id) REFERENCES javabase.Table_A (id),
-  FOREIGN KEY (table_b_id) REFERENCES javabase.Table_B (id)
-);
-GRANT ALL ON javabase.Join_Table TO '<DBUser>'@'localhost'
-IDENTIFIED BY '<DBPassword>';
-
 CREATE TABLE javabase.Address
 (
   id       INT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -215,15 +155,6 @@ CREATE TABLE javabase.Team
 );
 GRANT ALL ON javabase.Team TO '<DBUser>'@'localhost'
 IDENTIFIED BY '<DBPassword>';
-
-INSERT INTO javabase.Orphan_Table ( number ) VALUES(321);
-INSERT INTO javabase.Yet_Another_Orphan_Table ( number ) VALUES(321);
-INSERT INTO javabase.Leaf_Table ( number ) VALUES(321);
-INSERT INTO javabase.Points_To_Leaf_Table (leafId) SELECT id FROM javabase.Leaf_Table WHERE javabase.Leaf_Table.number = 321;
-
-INSERT INTO javabase.Table_A ( number ) VALUES(321);
-INSERT INTO javabase.Table_B ( number ) VALUES(321);
-INSERT INTO javabase.Join_Table (table_a_id, table_b_id) VALUES(1, 1);
 
 INSERT INTO javabase.Address (postcode) VALUES ('AB12 1XY');
 INSERT INTO javabase.Address (postcode) VALUES ('XY98 9BA');
