@@ -183,7 +183,7 @@ public class TableInfoAssemblerTest
     }
 
     @Test
-    public void shouldNotAddForeignKeyIfTargetTableIsExcludedAndRepresentJoinTableWhenThirdForeignKeyIsExcluded() throws Exception
+    public void shouldNotAddThirdForeignKeyAndRepresentJoinTableWhenTargetTableIsExcluded() throws Exception
     {
         // given
         List<String> tablesToExclude = new ArrayList<String>(  );
