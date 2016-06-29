@@ -154,15 +154,15 @@ public class ExportFromMySqlCli implements Runnable
     @MutuallyExclusiveWith(tag = "exc/inc")
     private List<String> tablesToExclude = new ArrayList<String>();
 
-    @SuppressWarnings("FieldCanBeLocal")
-    @Arguments(description = "Specifies tables to include from the process.",
-            title = "tablesToInclude")
-    @Option(type = OptionType.COMMAND,
-            name = {"--include", "--inc"},
-            description = "Specifies tables to include from the process.",
-            title = "tablesToInclude")
-    @MutuallyExclusiveWith(tag = "exc/inc")
-    private List<String> tablesToInclude = new ArrayList<String>();
+//    @SuppressWarnings("FieldCanBeLocal")
+//    @Arguments(description = "Specifies tables to include from the process.",
+//            title = "tablesToInclude")
+//    @Option(type = OptionType.COMMAND,
+//            name = {"--include", "--inc"},
+//            description = "Specifies tables to include from the process.",
+//            title = "tablesToInclude")
+//    @MutuallyExclusiveWith(tag = "exc/inc")
+//    private List<String> tablesToInclude = new ArrayList<String>();
 
     @Override
     public void run()
