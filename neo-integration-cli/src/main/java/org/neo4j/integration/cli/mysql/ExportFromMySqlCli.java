@@ -1,11 +1,8 @@
 package org.neo4j.integration.cli.mysql;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -156,6 +153,16 @@ public class ExportFromMySqlCli implements Runnable
             title = "tablesToExclude")
     @MutuallyExclusiveWith(tag = "exc/inc")
     private List<String> tablesToExclude = new ArrayList<String>();
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Arguments(description = "Specifies tables to include from the process.",
+            title = "tablesToInclude")
+    @Option(type = OptionType.COMMAND,
+            name = {"--include", "--inc"},
+            description = "Specifies tables to include from the process.",
+            title = "tablesToInclude")
+    @MutuallyExclusiveWith(tag = "exc/inc")
+    private List<String> tablesToInclude = new ArrayList<String>();
 
     @Override
     public void run()
