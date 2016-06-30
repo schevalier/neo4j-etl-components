@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
@@ -37,27 +36,27 @@ public class ExportFromMySqlCli implements Runnable
     @Option(type = OptionType.COMMAND,
             name = {"-h", "--host"},
             description = "Host to use for connection to MySQL.",
-            title = "name")
+            title = "hostname")
     private String host = "localhost";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"-p", "--port"},
             description = "Port number to use for connection to MySQL.",
-            title = "#")
+            title = "port #")
     private int port = 3306;
 
     @Required
     @Option(type = OptionType.COMMAND,
             name = {"-u", "--user"},
             description = "User for login to MySQL.",
-            title = "name")
+            title = "username")
     private String user;
 
     @Option(type = OptionType.COMMAND,
             name = {"--password"},
             description = "Password for login to MySQL.",
-            title = "name")
+            title = "password")
     private String password;
 
     @Required
@@ -105,14 +104,14 @@ public class ExportFromMySqlCli implements Runnable
     @Option(type = OptionType.COMMAND,
             name = {"--delimiter"},
             description = "Delimiter to separate fields in CSV.",
-            title = "delimiter")
+            title = "character")
     private String delimiter;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--quote"},
             description = "Character to treat as quotation character for values in CSV data.",
-            title = "quote")
+            title = "character")
     private String quote;
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -131,38 +130,32 @@ public class ExportFromMySqlCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--relationship-name", "--rel-name"},
-            description = "Specifies whether to get the name for relationships from table names (table) or column " +
-                    "names (column). Table is default.",
-            title = "relationshipNameFrom")
+            description = "Specifies whether to get the name for relationships from table names or column names",
+            title = "table(default)|column")
     private String relationshipNameFrom = "table";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--tiny-int", "--tiny"},
-            description = "Specifies whether to get the convert TinyInts to byte (byte) or boolean (boolean). Byte is" +
-                    " default.",
-            title = "tinyIntAs")
+            description = "Specifies whether to get the convert TinyInts to byte or boolean",
+            title = "byte(default)|boolean")
     private String tinyIntAs = "byte";
 
     @SuppressWarnings("FieldCanBeLocal")
-    @Arguments(description = "Specifies tables to exclude from the process.",
-            title = "tablesToExclude")
     @Option(type = OptionType.COMMAND,
             name = {"--exclude", "--exc"},
             description = "Specifies tables to exclude from the process.",
-            title = "tablesToExclude")
+            title = "table1 table2 ...")
     @MutuallyExclusiveWith(tag = "exc/inc")
     private List<String> tablesToExclude = new ArrayList<String>();
 
-//    @SuppressWarnings("FieldCanBeLocal")
-//    @Arguments(description = "Specifies tables to include from the process.",
-//            title = "tablesToInclude")
-//    @Option(type = OptionType.COMMAND,
-//            name = {"--include", "--inc"},
-//            description = "Specifies tables to include from the process.",
-//            title = "tablesToInclude")
-//    @MutuallyExclusiveWith(tag = "exc/inc")
-//    private List<String> tablesToInclude = new ArrayList<String>();
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--include", "--inc"},
+            description = "Specifies tables to include in the process.",
+            title = "table1 table2 ...")
+    @MutuallyExclusiveWith(tag = "exc/inc")
+    private List<String> tablesToInclude = new ArrayList<String>();
 
     @Override
     public void run()
