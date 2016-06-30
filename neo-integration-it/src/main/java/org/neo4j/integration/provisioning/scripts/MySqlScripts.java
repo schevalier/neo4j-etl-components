@@ -36,6 +36,11 @@ public class MySqlScripts
         return createScript( "/scripts/northwind.sql" );
     }
 
+    public static Script exclusionScript()
+    {
+        return createScript( "/scripts/exclusion.sql" );
+    }
+
     private static Script createScript( String path )
     {
         return new Script()
