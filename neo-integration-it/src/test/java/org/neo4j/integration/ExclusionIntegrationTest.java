@@ -83,13 +83,16 @@ public class ExclusionIntegrationTest
     }
 
     @Test
-    public void shouldExcludeJoinTable() throws Exception
+    public void shouldExcludeTargetTableButNotJoinTable() throws Exception
     {
         assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
 
-        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:JoinTable) RETURN lt" );
+        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:TableB) RETURN lt" );
         List<String> leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
+        assertThat( leaves.size(), is( 0 ) );
 
+        response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (lt:JoinTable) RETURN lt" );
+        leaves = JsonPath.read( response, "$.results[*].data[*].row[0]" );
         assertThat( leaves.size(), is( 1 ) );
     }
 
@@ -109,20 +112,15 @@ public class ExclusionIntegrationTest
                 "--host", mySqlServer.get().ipAddress(),
                 "--user", MySqlClient.Parameters.DBUser.value(),
                 "--password", MySqlClient.Parameters.DBPassword.value(),
-                "--database", "javabase",
+                "--database", "exclusion",
                 "--import-tool", neo4j.get().binDirectory().toString(),
                 "--options-file", importToolOptions.toString(),
                 "--csv-directory", tempDirectory.get().toString(),
                 "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                "--force" ) );
+                "--force", "--debug" ) );
 
-            args.add( "--exclude" );
-            for( String tableToExclude: tablesToExclude )
-            {
-                args.add( tableToExclude );
-            }
-
-        args.add( "--debug" );
+        args.add( "--exclude" );
+        args.addAll( Arrays.asList( tablesToExclude ) );
 
         NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[args.size()] ) );
     }
