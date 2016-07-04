@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
@@ -104,6 +105,26 @@ public class CreateCsvResourcesCli implements Runnable
             title = "tinyIntAs")
     private String tinyIntAs = "byte";
 
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--exclude", "--exc"},
+            description = "Specifies tables to exclude from the process. All other tables will be included. This is mutually exclusive with include.",
+            title = "table1 table2 ...")
+    @MutuallyExclusiveWith(tag = "exc/inc")
+    private Boolean exclude = false;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Option(type = OptionType.COMMAND,
+            name = {"--include", "--inc"},
+            description = "Specifies tables to include in the process. Only these tables will be included. This is mutually exclusive with exclude.",
+            title = "table1 table2 ...")
+    @MutuallyExclusiveWith(tag = "exc/inc")
+    private Boolean include = false;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Arguments
+    private List<String> tables = new ArrayList<String>();
+
     @Override
     public void run()
     {
@@ -131,7 +152,7 @@ public class CreateCsvResourcesCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, tablesToExclude, false ) ).call();
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, tables, false ) ).call();
         }
         catch ( Exception e )
         {
