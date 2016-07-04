@@ -104,14 +104,6 @@ public class CreateCsvResourcesCli implements Runnable
             title = "tinyIntAs")
     private String tinyIntAs = "byte";
 
-    @SuppressWarnings("FieldCanBeLocal")
-    @Option(type = OptionType.COMMAND,
-            name = {"--exclude", "--exc"},
-            description = "Specifies tables to exclude from the process.",
-            title = "tinyIntAs")
-    @MutuallyExclusiveWith(tag = "exc/inc")
-    private List<String> tablesToExclude = new ArrayList<String>();
-
     @Override
     public void run()
     {
