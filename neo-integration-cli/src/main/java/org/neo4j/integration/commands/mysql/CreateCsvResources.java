@@ -6,9 +6,11 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -20,9 +22,11 @@ import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
 import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.ExclusionMode;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.SqlDataType;
+import org.neo4j.integration.sql.metadata.TableName;
 
 public class CreateCsvResources implements Callable<CsvResources>
 {
@@ -47,7 +51,7 @@ public class CreateCsvResources implements Callable<CsvResources>
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
     private final RelationshipNameResolver relationshipNameResolver;
-    private final List<String> tablesToExclude;
+    private final FilterOptions filterOptions;
 
     public CreateCsvResources( OutputStream output,
                                ConnectionConfig connectionConfig,
@@ -74,7 +78,7 @@ public class CreateCsvResources implements Callable<CsvResources>
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
-        this.tablesToExclude = filterOptions.tablesToExclude();
+        this.filterOptions = filterOptions;
         this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.relationshipNameFrom() );
 
         SqlDataType.TINYINT.setNeoDataType( filterOptions.tinyIntAs().neoDataType() );
@@ -85,10 +89,15 @@ public class CreateCsvResources implements Callable<CsvResources>
     {
         events.onCreatingCsvResourcesFile();
 
-        SchemaExport schemaExport =
-                new DatabaseInspector( new DatabaseClient( connectionConfig ), tablesToExclude ).buildSchemaExport();
-        CsvResources csvResources =
-                schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
+        DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
+
+        if( filterOptions.exclusionMode().equals( ExclusionMode.INCLUDE ))
+        {
+            filterOptions.invertTables( databaseClient.tableNames() );
+        }
+
+        SchemaExport schemaExport = new DatabaseInspector( databaseClient, filterOptions.tablesToExclude() ).buildSchemaExport();
+        CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
 
         try ( Writer writer = new OutputStreamWriter( output ) )
         {

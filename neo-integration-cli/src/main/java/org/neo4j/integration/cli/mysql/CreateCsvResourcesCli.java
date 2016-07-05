@@ -93,36 +93,30 @@ public class CreateCsvResourcesCli implements Runnable
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--relationship-name", "--rel-name"},
-            description = "Specifies whether to get the name for relationships from table names (table) or column " +
-                    "names (column). Table is default.",
-            title = "relationshipNameFrom")
+            description = "Specifies whether to get the name for relationships from table names or column names.",
+            title = "table(default)|column")
     private String relationshipNameFrom = "table";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
             name = {"--tiny-int"},
-            description = "Specifies whether to convert TinyInts to byte (byte) or boolean (boolean). Byte is default.",
-            title = "tinyIntAs")
+            description = "Specifies whether to convert TinyInts to byte or boolean",
+            title = "byte(default)|boolean")
     private String tinyIntAs = "byte";
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
-            name = {"--exclude", "--exc"},
-            description = "Specifies tables to exclude from the process. All other tables will be included. This is mutually exclusive with include.",
-            title = "table1 table2 ...")
-    @MutuallyExclusiveWith(tag = "exc/inc")
-    private Boolean exclude = false;
+            name = {"--exclusion-mode", "--exc"},
+            description = "Specifies how to handle table exclusion. Options are mutually exclusive." +
+                    "exclude: Excludes specified tables from the process. All other tables will be included." +
+                    "include: Includes specified tables only. All other tables will be excluded." +
+                    "none: All tables are included in the process.",
+            title = "exclude|include|none(default)")
+    private String exclusionMode = "none";
 
     @SuppressWarnings("FieldCanBeLocal")
-    @Option(type = OptionType.COMMAND,
-            name = {"--include", "--inc"},
-            description = "Specifies tables to include in the process. Only these tables will be included. This is mutually exclusive with exclude.",
+    @Arguments(description = "Tables to be excluded/included",
             title = "table1 table2 ...")
-    @MutuallyExclusiveWith(tag = "exc/inc")
-    private Boolean include = false;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    @Arguments
     private List<String> tables = new ArrayList<String>();
 
     @Override
@@ -152,7 +146,7 @@ public class CreateCsvResourcesCli implements Runnable
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, tables, false ) ).call();
+                    new FilterOptions( tinyIntAs, relationshipNameFrom, exclusionMode, tables, false ) ).call();
         }
         catch ( Exception e )
         {

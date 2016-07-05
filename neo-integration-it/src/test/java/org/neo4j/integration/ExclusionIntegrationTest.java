@@ -35,6 +35,7 @@ import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 public class ExclusionIntegrationTest
 {
     private static final String[] tablesToExclude = {"Orphan_Table", "Yet_Another_Orphan_Table", "Table_B"};
+//    private static final String[] tablesToInclude = {"Join_Table", "Table_A"};
 
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -117,9 +118,9 @@ public class ExclusionIntegrationTest
                 "--options-file", importToolOptions.toString(),
                 "--csv-directory", tempDirectory.get().toString(),
                 "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                "--force", "--debug" ) );
+                "--force", "--debug",
+                "--exc", "exclude" ) );
 
-        args.add( "--exclude" );
         args.addAll( Arrays.asList( tablesToExclude ) );
 
         NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[args.size()] ) );
