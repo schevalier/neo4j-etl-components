@@ -121,11 +121,11 @@ public class ExportFromMySqlCli implements Runnable
     private boolean debug = false;
 
     @Option(type = OptionType.COMMAND,
-            name = {"--csv-resources"},
-            description = "Path to an existing CSV resources definitions file. " +
+            name = {"--mapping-file"},
+            description = "Path to an existing metadata mapping file. " +
                     "The name 'stdin' will cause the CSV resources definitions to be read from standard input.",
             title = "file|stdin")
-    private String csvResourcesFile;
+    private String mappingFile;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
@@ -201,9 +201,9 @@ public class ExportFromMySqlCli implements Runnable
     {
         Callable<MetadataMappings> createCsvResources;
 
-        if ( StringUtils.isNotEmpty( csvResourcesFile ) )
+        if ( StringUtils.isNotEmpty( mappingFile ) )
         {
-            createCsvResources = GenerateMetadataMappingCli.csvResourcesFromFile( csvResourcesFile );
+            createCsvResources = GenerateMetadataMappingCli.csvResourcesFromFile( mappingFile );
         }
         else
         {

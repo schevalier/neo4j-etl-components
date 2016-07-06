@@ -40,6 +40,8 @@ public class ImportToolOptions
             File file = optionsFile.toFile();
             try
             {
+                Loggers.Default.log( Level.INFO,
+                        format( "Reading options from file %s.", optionsFile ) );
                 @SuppressWarnings("unchecked")
                 Map<String, String> options = objectMapper.readValue( file, HashMap.class );
                 return new ImportToolOptions( options );
