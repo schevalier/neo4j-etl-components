@@ -21,7 +21,7 @@ public class ExportToCsvCommand
     public ExportToCsvCommand( ExportToCsvConfig config, MetadataMappings metadataMappings )
     {
         this.config = Preconditions.requireNonNull( config, "ExportToCsvConfig" );
-        this.metadataMappings = Preconditions.requireNonNull( metadataMappings, "CsvResources" );
+        this.metadataMappings = Preconditions.requireNonNull( metadataMappings, "MetadataMappings" );
     }
 
     public Manifest execute() throws Exception

@@ -15,6 +15,7 @@ import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
+import org.neo4j.integration.commands.mysql.GenerateMetadataMapping;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
@@ -152,22 +153,22 @@ public class GenerateMetadataMappingCli implements Runnable
         }
     }
 
-    public static Callable<MetadataMappings> csvResourcesFromFile( String csvResourcesFile ) throws IOException
+    public static Callable<MetadataMappings> metadataMappingsFromFile( String mappingsFile ) throws IOException
     {
-        Callable<MetadataMappings> createCsvResources;
-        if ( csvResourcesFile.equalsIgnoreCase( "stdin" ) )
+        Callable<MetadataMappings> metadataMappings;
+        if ( mappingsFile.equalsIgnoreCase( "stdin" ) )
         {
             try ( Reader reader = new InputStreamReader( System.in );
                   BufferedReader buffer = new BufferedReader( reader ) )
             {
-                createCsvResources = org.neo4j.integration.commands.mysql.GenerateMetadataMapping.load( buffer );
+                metadataMappings = GenerateMetadataMapping.load( buffer );
             }
         }
         else
         {
-            createCsvResources = org.neo4j.integration.commands.mysql.GenerateMetadataMapping.load( csvResourcesFile );
+            metadataMappings = org.neo4j.integration.commands.mysql.GenerateMetadataMapping.load( mappingsFile );
         }
-        return createCsvResources;
+        return metadataMappings;
     }
 
 }

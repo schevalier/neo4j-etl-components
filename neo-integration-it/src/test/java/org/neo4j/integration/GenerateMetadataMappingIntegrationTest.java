@@ -53,11 +53,11 @@ public class GenerateMetadataMappingIntegrationTest
     @Test
     public void shouldGenerateMappingsFileSuccessfully() throws Exception
     {
-        String mapping = createCsvResources( "javabase" );
+        String mapping = createMetadataMappings( "javabase" );
         assertThat( mapping, containsString( "STUDENT_ID" ) );
     }
 
-    private static String createCsvResources( String database ) throws IOException
+    private static String createMetadataMappings( String database ) throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
         ObjectMapper objectMapper = new ObjectMapper();

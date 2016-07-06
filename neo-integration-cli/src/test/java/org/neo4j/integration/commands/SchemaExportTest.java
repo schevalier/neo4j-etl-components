@@ -52,7 +52,7 @@ public class SchemaExportTest
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
-            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ),
+            schemaExport.generateMetadataMappings( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ),
                     new RelationshipNameResolver( RelationshipNameFrom.TABLE_NAME ) );
 
             fail( "Expected IllegalStatException" );
@@ -92,7 +92,7 @@ public class SchemaExportTest
 
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
-            schemaExport.createCsvResources( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ), new
+            schemaExport.generateMetadataMappings( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ), new
                     RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ) );
 
             fail( "Expected IllegalStateException" );

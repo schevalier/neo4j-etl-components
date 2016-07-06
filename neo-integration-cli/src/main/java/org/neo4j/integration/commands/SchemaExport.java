@@ -29,9 +29,9 @@ public class SchemaExport
         this.joinTables = joinTables;
     }
 
-    public MetadataMappings createCsvResources( Formatting formatting,
-                                                DatabaseExportSqlSupplier sqlSupplier,
-                                                RelationshipNameResolver relationshipNameResolver )
+    public MetadataMappings generateMetadataMappings( Formatting formatting,
+                                                      DatabaseExportSqlSupplier sqlSupplier,
+                                                      RelationshipNameResolver relationshipNameResolver )
     {
         validate();
 

@@ -182,7 +182,7 @@ public class ExportFromMySqlCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( quote ) )
                     .build();
 
-            MetadataMappings metadataMappings = createCsvResources( connectionConfig, formatting );
+            MetadataMappings metadataMappings = createMetadataMappings( connectionConfig, formatting );
 
             new ExportFromMySql(
                     new ExportMySqlEventHandler(),
@@ -197,17 +197,17 @@ public class ExportFromMySqlCli implements Runnable
         }
     }
 
-    private MetadataMappings createCsvResources( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
+    private MetadataMappings createMetadataMappings( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
     {
-        Callable<MetadataMappings> createCsvResources;
+        Callable<MetadataMappings> generateMetadataMappings;
 
         if ( StringUtils.isNotEmpty( mappingFile ) )
         {
-            createCsvResources = GenerateMetadataMappingCli.csvResourcesFromFile( mappingFile );
+            generateMetadataMappings = GenerateMetadataMappingCli.metadataMappingsFromFile( mappingFile );
         }
         else
         {
-            createCsvResources = new GenerateMetadataMapping(
+            generateMetadataMappings = new GenerateMetadataMapping(
                     new GenerateMetadataMappingEventHandler(),
                     emptyOutputStream(),
                     connectionConfig,
@@ -216,7 +216,7 @@ public class ExportFromMySqlCli implements Runnable
                     new FilterOptions( tinyIntAs, relationshipNameFrom, exclusionMode, tables, false ) );
         }
 
-        return createCsvResources.call();
+        return generateMetadataMappings.call();
     }
 
     private OutputStream emptyOutputStream()
