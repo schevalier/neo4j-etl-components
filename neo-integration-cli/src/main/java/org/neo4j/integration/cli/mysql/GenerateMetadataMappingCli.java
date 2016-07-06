@@ -13,10 +13,8 @@ import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
-import com.github.rvesse.airline.annotations.restrictions.MutuallyExclusiveWith;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
-import org.neo4j.integration.commands.mysql.CreateCsvResources;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
@@ -26,8 +24,8 @@ import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
 
-@Command(name = "create-csv-resources", description = "Create MySQL to CSV mapping files.")
-public class CreateCsvResourcesCli implements Runnable
+@Command(name = "generate-metadata-mapping", description = "Create MySQL to Neo metadata mapping Json.")
+public class GenerateMetadataMappingCli implements Runnable
 {
     @SuppressWarnings("FieldCanBeLocal")
     @Option(type = OptionType.COMMAND,
@@ -140,8 +138,8 @@ public class CreateCsvResourcesCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( this.quote ) )
                     .build();
 
-            new CreateCsvResources(
-                    new CreateCsvResourcesEventHandler(),
+            new org.neo4j.integration.commands.mysql.GenerateMetadataMapping(
+                    new GenerateMetadataMappingEventHandler(),
                     System.out,
                     connectionConfig,
                     formatting,
@@ -162,12 +160,12 @@ public class CreateCsvResourcesCli implements Runnable
             try ( Reader reader = new InputStreamReader( System.in );
                   BufferedReader buffer = new BufferedReader( reader ) )
             {
-                createCsvResources = CreateCsvResources.load( buffer );
+                createCsvResources = org.neo4j.integration.commands.mysql.GenerateMetadataMapping.load( buffer );
             }
         }
         else
         {
-            createCsvResources = CreateCsvResources.load( csvResourcesFile );
+            createCsvResources = org.neo4j.integration.commands.mysql.GenerateMetadataMapping.load( csvResourcesFile );
         }
         return createCsvResources;
     }

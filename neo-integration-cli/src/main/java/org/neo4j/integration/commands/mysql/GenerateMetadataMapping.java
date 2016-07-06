@@ -6,11 +6,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Callable;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -26,9 +23,8 @@ import org.neo4j.integration.sql.exportcsv.mapping.ExclusionMode;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.SqlDataType;
-import org.neo4j.integration.sql.metadata.TableName;
 
-public class CreateCsvResources implements Callable<CsvResources>
+public class GenerateMetadataMapping implements Callable<CsvResources>
 {
     public static Callable<CsvResources> load( String uri )
     {
@@ -45,7 +41,7 @@ public class CreateCsvResources implements Callable<CsvResources>
         return () -> CsvResources.fromJson( root );
     }
 
-    private final CreateCsvResourcesEvents events;
+    private final GenerateMetadataMappingEvents events;
     private final OutputStream output;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
@@ -53,12 +49,12 @@ public class CreateCsvResources implements Callable<CsvResources>
     private final RelationshipNameResolver relationshipNameResolver;
     private final FilterOptions filterOptions;
 
-    public CreateCsvResources( OutputStream output,
-                               ConnectionConfig connectionConfig,
-                               Formatting formatting,
-                               DatabaseExportSqlSupplier sqlSupplier )
+    public GenerateMetadataMapping( OutputStream output,
+                                    ConnectionConfig connectionConfig,
+                                    Formatting formatting,
+                                    DatabaseExportSqlSupplier sqlSupplier )
     {
-        this( CreateCsvResourcesEvents.EMPTY,
+        this( GenerateMetadataMappingEvents.EMPTY,
                 output,
                 connectionConfig,
                 formatting,
@@ -66,12 +62,12 @@ public class CreateCsvResources implements Callable<CsvResources>
                 FilterOptions.DEFAULT );
     }
 
-    public CreateCsvResources( CreateCsvResourcesEvents events,
-                               OutputStream output,
-                               ConnectionConfig connectionConfig,
-                               Formatting formatting,
-                               DatabaseExportSqlSupplier sqlSupplier,
-                               FilterOptions filterOptions )
+    public GenerateMetadataMapping( GenerateMetadataMappingEvents events,
+                                    OutputStream output,
+                                    ConnectionConfig connectionConfig,
+                                    Formatting formatting,
+                                    DatabaseExportSqlSupplier sqlSupplier,
+                                    FilterOptions filterOptions )
     {
         this.events = events;
         this.output = output;
@@ -87,7 +83,7 @@ public class CreateCsvResources implements Callable<CsvResources>
     @Override
     public CsvResources call() throws Exception
     {
-        events.onCreatingCsvResourcesFile();
+        events.onGeneratingMetadataMapping();
 
         DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
 
@@ -105,7 +101,7 @@ public class CreateCsvResources implements Callable<CsvResources>
             writer.write( objectWriter.writeValueAsString( csvResources.toJson() ) );
         }
 
-        events.onCsvResourcesCreated();
+        events.onMetadataMappingGenerated();
 
         return csvResources;
     }

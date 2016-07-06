@@ -11,11 +11,10 @@ import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
-import com.github.rvesse.airline.annotations.restrictions.MutuallyExclusiveWith;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.commands.mysql.CreateCsvResources;
+import org.neo4j.integration.commands.mysql.GenerateMetadataMapping;
 import org.neo4j.integration.commands.mysql.ExportFromMySql;
 import org.neo4j.integration.environment.CsvDirectorySupplier;
 import org.neo4j.integration.environment.DestinationDirectorySupplier;
@@ -204,12 +203,12 @@ public class ExportFromMySqlCli implements Runnable
 
         if ( StringUtils.isNotEmpty( csvResourcesFile ) )
         {
-            createCsvResources = CreateCsvResourcesCli.csvResourcesFromFile( csvResourcesFile );
+            createCsvResources = GenerateMetadataMappingCli.csvResourcesFromFile( csvResourcesFile );
         }
         else
         {
-            createCsvResources = new CreateCsvResources(
-                    new CreateCsvResourcesEventHandler(),
+            createCsvResources = new GenerateMetadataMapping(
+                    new GenerateMetadataMappingEventHandler(),
                     emptyOutputStream(),
                     connectionConfig,
                     formatting,

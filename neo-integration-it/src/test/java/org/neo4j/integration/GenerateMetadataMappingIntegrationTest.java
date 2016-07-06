@@ -25,7 +25,7 @@ import static org.junit.Assert.assertThat;
 import static org.neo4j.integration.neo4j.Neo4j.NEO4J_VERSION;
 import static org.neo4j.integration.provisioning.platforms.TestType.INTEGRATION;
 
-public class CreateCsvResourceslIntegrationTest
+public class GenerateMetadataMappingIntegrationTest
 {
     @ClassRule
     public static final ResourceRule<Path> tempDirectory =
@@ -69,7 +69,7 @@ public class CreateCsvResourceslIntegrationTest
 
         return NeoIntegrationCli.executeMainReturnSysOut( new String[]{
                 "mysql",
-                "create-csv-resources",
+                "generate-metadata-mapping",
                 "--host", mySqlServer.get().ipAddress(),
                 "--user", MySqlClient.Parameters.DBUser.value(),
                 "--password", MySqlClient.Parameters.DBPassword.value(),
