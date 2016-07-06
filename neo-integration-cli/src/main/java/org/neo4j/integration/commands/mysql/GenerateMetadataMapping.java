@@ -18,27 +18,27 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.ExclusionMode;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 
-public class GenerateMetadataMapping implements Callable<CsvResources>
+public class GenerateMetadataMapping implements Callable<MetadataMappings>
 {
-    public static Callable<CsvResources> load( String uri )
+    public static Callable<MetadataMappings> load( String uri )
     {
         return () ->
         {
             JsonNode root = new ObjectMapper().readTree( Paths.get( uri ).toFile() );
-            return CsvResources.fromJson( root );
+            return MetadataMappings.fromJson( root );
         };
     }
 
-    public static Callable<CsvResources> load( Reader reader ) throws IOException
+    public static Callable<MetadataMappings> load( Reader reader ) throws IOException
     {
         JsonNode root = new ObjectMapper().readTree( reader );
-        return () -> CsvResources.fromJson( root );
+        return () -> MetadataMappings.fromJson( root );
     }
 
     private final GenerateMetadataMappingEvents events;
@@ -81,7 +81,7 @@ public class GenerateMetadataMapping implements Callable<CsvResources>
     }
 
     @Override
-    public CsvResources call() throws Exception
+    public MetadataMappings call() throws Exception
     {
         events.onGeneratingMetadataMapping();
 
@@ -93,16 +93,16 @@ public class GenerateMetadataMapping implements Callable<CsvResources>
         }
 
         SchemaExport schemaExport = new DatabaseInspector( databaseClient, filterOptions.tablesToExclude() ).buildSchemaExport();
-        CsvResources csvResources = schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
+        MetadataMappings metadataMappings = schemaExport.createCsvResources( formatting, sqlSupplier, relationshipNameResolver );
 
         try ( Writer writer = new OutputStreamWriter( output ) )
         {
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            writer.write( objectWriter.writeValueAsString( csvResources.toJson() ) );
+            writer.write( objectWriter.writeValueAsString( metadataMappings.toJson() ) );
         }
 
         events.onMetadataMappingGenerated();
 
-        return csvResources;
+        return metadataMappings;
     }
 }

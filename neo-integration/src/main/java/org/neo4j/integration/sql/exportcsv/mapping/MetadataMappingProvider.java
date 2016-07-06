@@ -8,15 +8,15 @@ import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
 import org.neo4j.integration.sql.metadata.Table;
 
-public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvResource>
+public class MetadataMappingProvider implements DatabaseObjectServiceProvider<MetadataMapping>
 {
     private final Formatting formatting;
     private final DatabaseExportSqlSupplier sqlSupplier;
     private RelationshipNameResolver relationshipNameResolver;
 
-    public CsvResourceProvider( Formatting formatting,
-                                DatabaseExportSqlSupplier sqlSupplier,
-                                RelationshipNameResolver relationshipNameResolver )
+    public MetadataMappingProvider( Formatting formatting,
+                                    DatabaseExportSqlSupplier sqlSupplier,
+                                    RelationshipNameResolver relationshipNameResolver )
     {
         this.formatting = formatting;
         this.sqlSupplier = sqlSupplier;
@@ -24,20 +24,20 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
     }
 
     @Override
-    public CsvResource tableService( Table table )
+    public MetadataMapping tableService( Table table )
     {
         ColumnToCsvFieldMappings mappings = new TableToCsvFieldMapper( formatting ).createMappings( table );
 
-        return new CsvResource( table.descriptor(), GraphObjectType.Node, sqlSupplier.sql( mappings ), mappings );
+        return new MetadataMapping( table.descriptor(), GraphObjectType.Node, sqlSupplier.sql( mappings ), mappings );
     }
 
     @Override
-    public CsvResource joinService( Join join )
+    public MetadataMapping joinService( Join join )
     {
         ColumnToCsvFieldMappings mappings = new JoinToCsvFieldMapper( formatting, relationshipNameResolver )
                 .createMappings( join );
 
-        return new CsvResource(
+        return new MetadataMapping(
                 join.descriptor(),
                 GraphObjectType.Relationship,
                 sqlSupplier.sql( mappings ),
@@ -45,12 +45,12 @@ public class CsvResourceProvider implements DatabaseObjectServiceProvider<CsvRes
     }
 
     @Override
-    public CsvResource joinTableService( JoinTable joinTable )
+    public MetadataMapping joinTableService( JoinTable joinTable )
     {
         ColumnToCsvFieldMappings mappings =
                 new JoinTableToCsvFieldMapper( formatting, relationshipNameResolver ).createMappings( joinTable );
 
-        return new CsvResource(
+        return new MetadataMapping(
                 joinTable.descriptor(),
                 GraphObjectType.Relationship,
                 sqlSupplier.sql( mappings ),

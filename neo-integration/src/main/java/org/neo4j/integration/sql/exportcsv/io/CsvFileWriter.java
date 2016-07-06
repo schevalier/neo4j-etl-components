@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
 import org.neo4j.integration.util.Loggers;
 
 import static java.lang.String.format;
@@ -26,7 +26,7 @@ public class CsvFileWriter
         this.resultsToFileWriter = new ResultsToFileWriter(config.formatting());
     }
 
-    public Path writeExportFile( CsvResource resource ) throws Exception
+    public Path writeExportFile( MetadataMapping resource ) throws Exception
     {
         Loggers.Default.log( Level.INFO,
                 format( "Writing CSV data for %s %s", resource.graphObjectType().name().toLowerCase(), resource.name() ) );

@@ -19,7 +19,7 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
@@ -152,9 +152,9 @@ public class GenerateMetadataMappingCli implements Runnable
         }
     }
 
-    public static Callable<CsvResources> csvResourcesFromFile( String csvResourcesFile ) throws IOException
+    public static Callable<MetadataMappings> csvResourcesFromFile( String csvResourcesFile ) throws IOException
     {
-        Callable<CsvResources> createCsvResources;
+        Callable<MetadataMappings> createCsvResources;
         if ( csvResourcesFile.equalsIgnoreCase( "stdin" ) )
         {
             try ( Reader reader = new InputStreamReader( System.in );

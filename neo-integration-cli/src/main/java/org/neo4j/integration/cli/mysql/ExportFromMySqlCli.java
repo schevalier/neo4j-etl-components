@@ -24,7 +24,7 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
@@ -182,11 +182,11 @@ public class ExportFromMySqlCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( quote ) )
                     .build();
 
-            CsvResources csvResources = createCsvResources( connectionConfig, formatting );
+            MetadataMappings metadataMappings = createCsvResources( connectionConfig, formatting );
 
             new ExportFromMySql(
                     new ExportMySqlEventHandler(),
-                    csvResources,
+                    metadataMappings,
                     connectionConfig,
                     formatting,
                     environment ).call();
@@ -197,9 +197,9 @@ public class ExportFromMySqlCli implements Runnable
         }
     }
 
-    private CsvResources createCsvResources( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
+    private MetadataMappings createCsvResources( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
     {
-        Callable<CsvResources> createCsvResources;
+        Callable<MetadataMappings> createCsvResources;
 
         if ( StringUtils.isNotEmpty( csvResourcesFile ) )
         {

@@ -12,7 +12,7 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 
@@ -25,7 +25,7 @@ class ResultsToFileWriter
         this.formatting = formatting;
     }
 
-    public void write( QueryResults results, Path file, CsvResource resource ) throws Exception
+    public void write( QueryResults results, Path file, MetadataMapping resource ) throws Exception
     {
         RowStrategy rowStrategy = RowStrategy.select( resource.graphObjectType() );
 

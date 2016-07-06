@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 
-public class CsvResource
+public class MetadataMapping
 {
-    public static CsvResource fromJson( JsonNode root )
+    public static MetadataMapping fromJson( JsonNode root )
     {
-        return new CsvResource(
+        return new MetadataMapping(
                 root.path( "name" ).textValue(),
                 GraphObjectType.valueOf( root.path( "graph-object-type" ).textValue() ),
                 root.path( "sql" ).textValue(),
@@ -22,10 +22,10 @@ public class CsvResource
     private final String sql;
     private final ColumnToCsvFieldMappings mappings;
 
-    public CsvResource( String name,
-                        GraphObjectType graphObjectType,
-                        String sql,
-                        ColumnToCsvFieldMappings mappings )
+    public MetadataMapping( String name,
+                            GraphObjectType graphObjectType,
+                            String sql,
+                            ColumnToCsvFieldMappings mappings )
     {
         this.name = name;
         this.graphObjectType = graphObjectType;

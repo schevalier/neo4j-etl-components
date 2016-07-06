@@ -15,7 +15,7 @@ import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
@@ -56,7 +56,7 @@ public class ResultsToFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
-        CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
 
         // when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -81,7 +81,7 @@ public class ResultsToFileWriterTest
                         columnUtil.compositeKeyColumn(
                                 table, asList( "first-name", "last-name" ), ColumnRole.PrimaryKey ) ) );
 
-        CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
 
         // when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -108,7 +108,7 @@ public class ResultsToFileWriterTest
                         new SimpleColumn( table, "username", ColumnRole.Data, SqlDataType.VARCHAR,
                                 ColumnValueSelectionStrategy.SelectColumnValue ) ) );
 
-        CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
 
         // when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -137,7 +137,7 @@ public class ResultsToFileWriterTest
                         columnUtil.column( table, "username", ColumnRole.Data ),
                         columnUtil.column( table, "age", ColumnRole.Data ) ) );
 
-        CsvResource resource = new CsvResource( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
 
         //when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -166,7 +166,7 @@ public class ResultsToFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
-        CsvResource resource = new CsvResource(
+        MetadataMapping resource = new MetadataMapping(
                 table.fullName(),
                 GraphObjectType.Relationship,
                 "SELECT ...",

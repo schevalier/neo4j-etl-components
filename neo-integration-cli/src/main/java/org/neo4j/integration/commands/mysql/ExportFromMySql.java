@@ -11,33 +11,33 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 
 public class ExportFromMySql implements Callable<Void>
 {
 
     private final ExportFromMySqlEvents events;
-    private final CsvResources csvResources;
+    private final MetadataMappings metadataMappings;
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final Environment environment;
 
-    public ExportFromMySql( CsvResources csvResources,
+    public ExportFromMySql( MetadataMappings metadataMappings,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
                             Environment environment )
     {
-        this( ExportFromMySqlEvents.EMPTY, csvResources, connectionConfig, formatting, environment );
+        this( ExportFromMySqlEvents.EMPTY, metadataMappings, connectionConfig, formatting, environment );
     }
 
     public ExportFromMySql( ExportFromMySqlEvents events,
-                            CsvResources csvResources,
+                            MetadataMappings metadataMappings,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
                             Environment environment )
     {
         this.events = events;
-        this.csvResources = csvResources;
+        this.metadataMappings = metadataMappings;
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.environment = environment;
@@ -54,7 +54,7 @@ public class ExportFromMySql implements Callable<Void>
 
         events.onExportingToCsv( environment.csvDirectory() );
 
-        Manifest manifest = new ExportToCsvCommand( config, csvResources ).execute();
+        Manifest manifest = new ExportToCsvCommand( config, metadataMappings ).execute();
 
         events.onCreatingNeo4jStore();
 

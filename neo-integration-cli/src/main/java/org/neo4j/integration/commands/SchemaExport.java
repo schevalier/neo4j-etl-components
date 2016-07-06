@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResourceProvider;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResources;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappingProvider;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinTable;
@@ -29,21 +29,21 @@ public class SchemaExport
         this.joinTables = joinTables;
     }
 
-    public CsvResources createCsvResources( Formatting formatting,
-                                            DatabaseExportSqlSupplier sqlSupplier,
-                                            RelationshipNameResolver relationshipNameResolver )
+    public MetadataMappings createCsvResources( Formatting formatting,
+                                                DatabaseExportSqlSupplier sqlSupplier,
+                                                RelationshipNameResolver relationshipNameResolver )
     {
         validate();
 
-        CsvResourceProvider csvResourceProvider =
-                new CsvResourceProvider( formatting, sqlSupplier, relationshipNameResolver );
-        CsvResources csvResources = new CsvResources();
+        MetadataMappingProvider metadataMappingProvider =
+                new MetadataMappingProvider( formatting, sqlSupplier, relationshipNameResolver );
+        MetadataMappings metadataMappings = new MetadataMappings();
 
-        tables.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );
-        joins.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );
-        joinTables.forEach( o -> csvResources.add( o.invoke( csvResourceProvider ) ) );
+        tables.forEach( o -> metadataMappings.add( o.invoke( metadataMappingProvider ) ) );
+        joins.forEach( o -> metadataMappings.add( o.invoke( metadataMappingProvider ) ) );
+        joinTables.forEach( o -> metadataMappings.add( o.invoke( metadataMappingProvider ) ) );
 
-        return csvResources;
+        return metadataMappings;
     }
 
     Collection<Table> tables()

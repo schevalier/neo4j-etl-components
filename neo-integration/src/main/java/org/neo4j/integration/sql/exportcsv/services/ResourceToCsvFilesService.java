@@ -6,7 +6,7 @@ import org.neo4j.integration.neo4j.importcsv.config.CsvFiles;
 import org.neo4j.integration.neo4j.importcsv.config.ManifestEntry;
 import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
-import org.neo4j.integration.sql.exportcsv.mapping.CsvResource;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
 
 public class ResourceToCsvFilesService
 {
@@ -19,7 +19,7 @@ public class ResourceToCsvFilesService
         this.csvFileWriter = csvFileWriter;
     }
 
-    public ManifestEntry exportToCsv( CsvResource resource ) throws Exception
+    public ManifestEntry exportToCsv( MetadataMapping resource ) throws Exception
     {
         Path headerFile = headerFileWriter.writeHeaderFile(
                 resource.graphObjectType().name(),
