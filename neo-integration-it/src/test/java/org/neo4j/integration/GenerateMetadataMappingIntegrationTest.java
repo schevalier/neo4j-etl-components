@@ -45,8 +45,7 @@ public class GenerateMetadataMappingIntegrationTest
                     "mysql-integration-test-create-csv",
                     DatabaseType.MySQL.defaultPort(),
                     MySqlScripts.startupScript(),
-                    tempDirectory.get(), INTEGRATION,
-                    "local" ) );
+                    tempDirectory.get(), INTEGRATION ) );
 
     @ClassRule
     public static final ResourceRule<Neo4j> neo4j =
