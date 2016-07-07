@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -20,10 +21,11 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
+import org.neo4j.integration.util.Loggers;
 
 @Command(name = "generate-metadata-mapping", description = "Create MySQL to Neo metadata mapping Json.")
 public class GenerateMetadataMappingCli implements Runnable
@@ -158,6 +160,7 @@ public class GenerateMetadataMappingCli implements Runnable
         Callable<MetadataMappings> metadataMappings;
         if ( mappingsFile.equalsIgnoreCase( "stdin" ) )
         {
+            Loggers.Default.log( Level.INFO, "Reading metadata mapping from stdin" );
             try ( Reader reader = new InputStreamReader( System.in );
                   BufferedReader buffer = new BufferedReader( reader ) )
             {
@@ -166,9 +169,9 @@ public class GenerateMetadataMappingCli implements Runnable
         }
         else
         {
-            metadataMappings = org.neo4j.integration.commands.mysql.GenerateMetadataMapping.load( mappingsFile );
+            Loggers.Default.log( Level.INFO, "Reading metadata mapping from file: "+ mappingsFile );
+            metadataMappings = GenerateMetadataMapping.load( mappingsFile );
         }
         return metadataMappings;
     }
-
 }

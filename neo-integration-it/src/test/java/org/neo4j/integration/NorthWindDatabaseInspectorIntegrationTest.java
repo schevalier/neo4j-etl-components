@@ -55,8 +55,8 @@ public class NorthWindDatabaseInspectorIntegrationTest
     {
         try
         {
-            LogManager.getLogManager().readConfiguration(
-                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
+//            LogManager.getLogManager().readConfiguration(
+//                    NeoIntegrationCli.class.getResourceAsStream( "/debug-logging.properties" ) );
             MySqlClient client = new MySqlClient( mySqlServer.get().ipAddress() );
             client.execute( MySqlScripts.northwindScript().value() );
             exportFromMySqlToNeo4j( "northwind" );

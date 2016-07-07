@@ -197,7 +197,8 @@ public class ExportFromMySqlCli implements Runnable
         }
     }
 
-    private MetadataMappings createMetadataMappings( ConnectionConfig connectionConfig, Formatting formatting ) throws Exception
+    private MetadataMappings createMetadataMappings( ConnectionConfig connectionConfig,
+                                                     Formatting formatting ) throws Exception
     {
         Callable<MetadataMappings> generateMetadataMappings;
 

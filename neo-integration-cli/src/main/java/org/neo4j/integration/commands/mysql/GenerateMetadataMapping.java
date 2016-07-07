@@ -18,9 +18,9 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
-import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.ExclusionMode;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
 import org.neo4j.integration.sql.metadata.SqlDataType;
 
@@ -92,8 +92,10 @@ public class GenerateMetadataMapping implements Callable<MetadataMappings>
             filterOptions.invertTables( databaseClient.tableNames() );
         }
 
-        SchemaExport schemaExport = new DatabaseInspector( databaseClient, filterOptions.tablesToExclude() ).buildSchemaExport();
-        MetadataMappings metadataMappings = schemaExport.generateMetadataMappings( formatting, sqlSupplier, relationshipNameResolver );
+        SchemaExport schemaExport = new DatabaseInspector( databaseClient, filterOptions.tablesToExclude() )
+                .buildSchemaExport();
+        MetadataMappings metadataMappings = schemaExport
+                .generateMetadataMappings( formatting, sqlSupplier, relationshipNameResolver );
 
         try ( Writer writer = new OutputStreamWriter( output ) )
         {
