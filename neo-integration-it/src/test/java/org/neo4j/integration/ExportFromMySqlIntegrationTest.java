@@ -233,6 +233,15 @@ public class ExportFromMySqlIntegrationTest
         assertEquals( students, asList( "eve", "jim", "mark" ) );
     }
 
+    @Test
+    public void shouldExportFromMySqlAndImportIntoGraphWithCorrectTinyIntConversion() throws Exception
+    {
+        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
+        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:NumericTable) RETURN c" );
+        List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
+        assertThat( numericFields.get( 0 ).values(), hasItems( true, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
+    }
+
     private static void exportFromMySqlToNeo4j( ) throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
@@ -254,6 +263,7 @@ public class ExportFromMySqlIntegrationTest
                 "--options-file", importToolOptions.toString(),
                 "--csv-directory", tempDirectory.get().toString(),
                 "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
+                "--tiny", "boolean",
                 "--force" ) );
 
 //        args.add( "--debug" );
