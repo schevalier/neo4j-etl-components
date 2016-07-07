@@ -141,7 +141,7 @@ public class GenerateMetadataMappingCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( this.quote ) )
                     .build();
 
-            new org.neo4j.integration.commands.mysql.GenerateMetadataMapping(
+            new GenerateMetadataMapping(
                     new GenerateMetadataMappingEventHandler(),
                     System.out,
                     connectionConfig,

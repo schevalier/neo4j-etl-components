@@ -2,6 +2,11 @@
 
 Integration with MySQL.
 
+## Prerequisites
+
+* [Maven] (https://maven.apache.org/)
+* [MySql] (https://www.mysql.com/)
+
 ## Integration Tests
 
 You can run the tests with a local MySQL instance, [Vagrant] (https://www.vagrantup.com/), or in AWS.
@@ -11,6 +16,8 @@ You will need a mysql user neo with password neo with admin privileges to run th
 To run the tests in AWS, you'll need an AWS IAM user.
 
 To run the tests using a local MySQL instance:
+
+Grant all privileges to the user _neo_ identified by password _neo_
 
 `mvn -DPLATFORM=local clean integration-test`
 
