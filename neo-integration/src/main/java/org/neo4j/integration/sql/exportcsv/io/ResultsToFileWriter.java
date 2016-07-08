@@ -45,15 +45,16 @@ class ResultsToFileWriter
                 {
                     for ( int i = 0; i < maxIndex; i++ )
                     {
-
                         writeFieldValueAndDelimiter(
-                                columns[i].selectFrom( results, rowIndex ),
+                                handleSpecialCaseForTinyInt( columns[i].selectFrom( results, rowIndex ),
+                                        columns[i].sqlDataType() ),
                                 writer,
                                 columns[i].useQuotes() );
                     }
 
                     writeFieldValueAndNewLine(
-                            columns[maxIndex].selectFrom( results, rowIndex ),
+                            handleSpecialCaseForTinyInt( columns[maxIndex].selectFrom( results, rowIndex ),
+                                    columns[maxIndex].sqlDataType() ),
                             writer,
                             columns[maxIndex].useQuotes() );
                 }
@@ -61,21 +62,13 @@ class ResultsToFileWriter
         }
     }
 
-    public String applyFilterStrategies( String value, SqlDataType sqlDataType )
+    public String handleSpecialCaseForTinyInt( String value, SqlDataType sqlDataType )
     {
         if ( sqlDataType.equals( SqlDataType.TINYINT ) && SqlDataType.TINYINT.toNeo4jDataType().equals( Neo4jDataType
                 .Boolean ) )
         {
-            if ( Integer.parseInt( value ) == 0 )
-            {
-                value = "false";
-            }
-            else
-            {
-                value = "true";
-            }
+            return Integer.parseInt( value ) == 0 ? "false" : "true";
         }
-
         return value;
     }
 

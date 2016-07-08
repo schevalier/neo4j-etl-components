@@ -143,7 +143,7 @@ public class ExportFromMySqlIntegrationTest
         assertThat( stringFields.get( 0 ).values(), hasItems(
                 "val-1", "mediumtext_field", "tinytext_field",
                 "char-field", "text_field", "varchar-field", "longtext_field" ) );
-        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, true ) );
     }
 
     @Test
@@ -162,7 +162,8 @@ public class ExportFromMySqlIntegrationTest
                 "1989-01-23 00:00:00.0",
                 "2038-01-19 03:14:07.0",
                 "1988-01-23" ) );
-        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
+        assertThat( numericFields.get( 0 ).size(), is( 8 ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 1, true ) );
     }
 
     @Test
@@ -222,7 +223,7 @@ public class ExportFromMySqlIntegrationTest
         String response = neo4j.get().executeHttp(
                 NEO_TX_URI,
                 "MATCH (t:Team)-[:STUDENT]-(s:Student) " +
-                "RETURN t.name AS team, s.username AS student ORDER BY student" );
+                        "RETURN t.name AS team, s.username AS student ORDER BY student" );
 
         List<String> teams = JsonPath.read( response, "$.results[*].data[*].row[0]" );
         List<String> students = JsonPath.read( response, "$.results[*].data[*].row[1]" );
@@ -242,12 +243,12 @@ public class ExportFromMySqlIntegrationTest
         assertThat( numericFields.get( 0 ).values(), hasItems( true, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
     }
 
-    private static void exportFromMySqlToNeo4j( ) throws IOException
+    private static void exportFromMySqlToNeo4j() throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
         HashMap<Object, Object> options = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        List<String> args = new ArrayList<String>(  );
+        List<String> args = new ArrayList<String>();
 
         options.put( "quote", "`" );
         options.put( "delimiter", "\t" );
@@ -259,6 +260,7 @@ public class ExportFromMySqlIntegrationTest
                 "--user", MySqlClient.Parameters.DBUser.value(),
                 "--password", MySqlClient.Parameters.DBPassword.value(),
                 "--database", "javabase",
+                "--tiny-int", "boolean",
                 "--import-tool", neo4j.get().binDirectory().toString(),
                 "--options-file", importToolOptions.toString(),
                 "--csv-directory", tempDirectory.get().toString(),
@@ -266,7 +268,7 @@ public class ExportFromMySqlIntegrationTest
                 "--tiny", "boolean",
                 "--force" ) );
 
-//        args.add( "--debug" );
+        args.add( "--debug" );
 
         NeoIntegrationCli.executeMainReturnSysOut( args.toArray( new String[args.size()] ) );
     }

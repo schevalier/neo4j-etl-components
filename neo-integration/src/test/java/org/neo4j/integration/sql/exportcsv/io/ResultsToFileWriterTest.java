@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
+import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
@@ -42,7 +43,7 @@ public class ResultsToFileWriterTest
     private final ResultsToFileWriter resultsToFileWriter = new ResultsToFileWriter( TAB_DELIMITER );
 
     @Test
-    public void shouldCreateCsvFile() throws Exception
+    public void shouldWriteCsvFile() throws Exception
     {
         // given
         QueryResults results = StubQueryResults.builder()
@@ -56,7 +57,8 @@ public class ResultsToFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
-        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...",
+                mappings );
 
         // when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -81,7 +83,8 @@ public class ResultsToFileWriterTest
                         columnUtil.compositeKeyColumn(
                                 table, asList( "first-name", "last-name" ), ColumnRole.PrimaryKey ) ) );
 
-        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...",
+                mappings );
 
         // when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -108,7 +111,8 @@ public class ResultsToFileWriterTest
                         new SimpleColumn( table, "username", ColumnRole.Data, SqlDataType.VARCHAR,
                                 ColumnValueSelectionStrategy.SelectColumnValue ) ) );
 
-        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...",
+                mappings );
 
         // when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -137,7 +141,8 @@ public class ResultsToFileWriterTest
                         columnUtil.column( table, "username", ColumnRole.Data ),
                         columnUtil.column( table, "age", ColumnRole.Data ) ) );
 
-        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...",
+                mappings );
 
         //when
         resultsToFileWriter.write( results, exportFile, resource );
@@ -178,5 +183,67 @@ public class ResultsToFileWriterTest
         // then
         List<String> contents = Files.readAllLines( exportFile );
         assertEquals( asList( "\"1\"\t\"user-1\"", "\"2\"\t", "\"3\"\t" ), contents );
+    }
+
+    @Test
+    public void shouldWriteTinyIntAsByte() throws Exception
+    {
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "id", "tiny_int_value" )
+                .addRow( "1", "1" )
+                .build();
+
+        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Byte );
+
+        when( mappings.columns() ).thenReturn(
+                asList(
+                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
+                        new SimpleColumn( table, "tiny_int_value", ColumnRole.Data, SqlDataType.TINYINT,
+                                ColumnValueSelectionStrategy.SelectColumnValue ) ) );
+
+        MetadataMapping resource = new MetadataMapping(
+                table.fullName(),
+                GraphObjectType.Node,
+                "SELECT ...",
+                mappings );
+
+        // when
+        resultsToFileWriter.write( results, exportFile, resource );
+
+        // then
+        List<String> contents = Files.readAllLines( exportFile );
+        assertEquals( asList( "\"1\"\t1" ), contents );
+    }
+
+    @Test
+    public void shouldWriteTinyIntAsBoolean() throws Exception
+    {
+        // given
+        QueryResults results = StubQueryResults.builder()
+                .columns( "id", "tiny_int_value" )
+                .addRow( "1", "1" )
+                .build();
+
+        when( mappings.columns() ).thenReturn(
+                asList(
+                        columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
+                        new SimpleColumn( table, "tiny_int_value", ColumnRole.Data, SqlDataType.TINYINT,
+                                ColumnValueSelectionStrategy.SelectColumnValue ) ) );
+
+        MetadataMapping resource = new MetadataMapping(
+                table.fullName(),
+                GraphObjectType.Node,
+                "SELECT ...",
+                mappings );
+
+        // when
+        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Boolean );
+
+        resultsToFileWriter.write( results, exportFile, resource );
+
+        // then
+        List<String> contents = Files.readAllLines( exportFile );
+        assertEquals( asList( "\"1\"\ttrue" ), contents );
     }
 }
