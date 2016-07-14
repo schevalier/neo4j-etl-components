@@ -18,6 +18,7 @@ import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
+import org.neo4j.integration.sql.exportcsv.mapping.TinyIntAs;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.TableName;
 import org.neo4j.integration.util.ResourceRule;
@@ -65,10 +66,11 @@ public class CsvFileWriterTest
                         columnUtil.keyColumn( table, "id", ColumnRole.PrimaryKey ),
                         columnUtil.column( table, "username", ColumnRole.Data ) ) );
 
-        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...", mappings );
+        MetadataMapping resource = new MetadataMapping( table.fullName(), GraphObjectType.Node, "SELECT ...",
+                mappings );
 
         // when
-        CsvFileWriter writer = new CsvFileWriter( config, databaseClient );
+        CsvFileWriter writer = new CsvFileWriter( config, databaseClient, new TinyIntResolver( TinyIntAs.BYTE ) );
         Path exportFile = writer.writeExportFile( resource );
 
         // then

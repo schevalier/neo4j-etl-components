@@ -239,7 +239,7 @@ public class ExportFromMySqlIntegrationTest
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
         HashMap<Object, Object> options = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         options.put( "quote", "`" );
         options.put( "delimiter", "\t" );

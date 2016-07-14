@@ -17,6 +17,7 @@ import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
+import org.neo4j.integration.sql.exportcsv.mapping.TinyIntAs;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.SimpleColumn;
@@ -40,7 +41,8 @@ public class ResultsToFileWriterTest
     private final ColumnToCsvFieldMappings mappings = mock( ColumnToCsvFieldMappings.class );
     private Path exportFile = tempDirectory.get().resolve( "export-file.csv" );
     private static final Formatting TAB_DELIMITER = Formatting.builder().delimiter( Delimiter.TAB ).build();
-    private final ResultsToFileWriter resultsToFileWriter = new ResultsToFileWriter( TAB_DELIMITER );
+    private final ResultsToFileWriter resultsToFileWriter = new ResultsToFileWriter( TAB_DELIMITER,
+            new TinyIntResolver( TinyIntAs.BYTE ) );
 
     @Test
     public void shouldWriteCsvFile() throws Exception
@@ -238,7 +240,9 @@ public class ResultsToFileWriterTest
                 mappings );
 
         // when
-        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Boolean );
+        ResultsToFileWriter resultsToFileWriter = new ResultsToFileWriter( TAB_DELIMITER,
+                new TinyIntResolver( TinyIntAs.BOOLEAN ) );
+
 
         resultsToFileWriter.write( results, exportFile, resource );
 

@@ -1,11 +1,11 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
-import org.neo4j.integration.sql.metadata.TableName;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import org.neo4j.integration.sql.metadata.TableName;
 
 public class FilterOptions
 {
@@ -79,11 +79,11 @@ public class FilterOptions
 
     public void invertTables( Collection<TableName> tableNames )
     {
-        List<String> invertedTablesToExclude = new ArrayList<String>(  );
+        List<String> invertedTablesToExclude = new ArrayList<String>();
 
-        for( TableName tableName : tableNames )
+        for ( TableName tableName : tableNames )
         {
-            if( !tablesToExclude.contains( tableName.simpleName() ) )
+            if ( !tablesToExclude.contains( tableName.simpleName() ) )
             {
                 invertedTablesToExclude.add( tableName.simpleName() );
             }
@@ -91,7 +91,7 @@ public class FilterOptions
 
         tablesToExclude.clear();
 
-        for( String tableName : invertedTablesToExclude )
+        for ( String tableName : invertedTablesToExclude )
         {
             tablesToExclude.add( tableName );
         }

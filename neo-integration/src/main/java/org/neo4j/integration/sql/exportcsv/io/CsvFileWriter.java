@@ -19,17 +19,18 @@ public class CsvFileWriter
     private final DatabaseClient databaseClient;
     private final ResultsToFileWriter resultsToFileWriter;
 
-    public CsvFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient )
+    public CsvFileWriter( ExportToCsvConfig config, DatabaseClient databaseClient, TinyIntResolver tinyIntResolver )
     {
         this.config = config;
         this.databaseClient = databaseClient;
-        this.resultsToFileWriter = new ResultsToFileWriter(config.formatting());
+        this.resultsToFileWriter = new ResultsToFileWriter( config.formatting(), tinyIntResolver );
     }
 
     public Path writeExportFile( MetadataMapping resource ) throws Exception
     {
         Loggers.Default.log( Level.INFO,
-                format( "Writing CSV data for %s %s", resource.graphObjectType().name().toLowerCase(), resource.name() ) );
+                format( "Writing CSV data for %s %s", resource.graphObjectType().name().toLowerCase(), resource.name
+                        () ) );
 
         Path exportFile = createExportFile( resource.name() );
 

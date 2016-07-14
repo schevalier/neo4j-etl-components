@@ -9,20 +9,20 @@ import java.nio.file.Path;
 import org.apache.commons.lang3.StringUtils;
 
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
-import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
 import org.neo4j.integration.sql.metadata.Column;
-import org.neo4j.integration.sql.metadata.SqlDataType;
 
 class ResultsToFileWriter
 {
+    private final TinyIntResolver tinyIntResolver;
     private Formatting formatting;
 
-    ResultsToFileWriter( Formatting formatting )
+    ResultsToFileWriter( Formatting formatting, TinyIntResolver tinyIntResolver )
     {
         this.formatting = formatting;
+        this.tinyIntResolver = tinyIntResolver;
     }
 
     public void write( QueryResults results, Path file, MetadataMapping resource ) throws Exception
@@ -46,30 +46,21 @@ class ResultsToFileWriter
                     for ( int i = 0; i < maxIndex; i++ )
                     {
                         writeFieldValueAndDelimiter(
-                                handleSpecialCaseForTinyInt( columns[i].selectFrom( results, rowIndex ),
+                                tinyIntResolver.handleSpecialCaseForTinyInt( columns[i].selectFrom( results, rowIndex ),
                                         columns[i].sqlDataType() ),
                                 writer,
                                 columns[i].useQuotes() );
                     }
 
                     writeFieldValueAndNewLine(
-                            handleSpecialCaseForTinyInt( columns[maxIndex].selectFrom( results, rowIndex ),
+                            tinyIntResolver.handleSpecialCaseForTinyInt( columns[maxIndex].selectFrom( results,
+                                    rowIndex ),
                                     columns[maxIndex].sqlDataType() ),
                             writer,
                             columns[maxIndex].useQuotes() );
                 }
             }
         }
-    }
-
-    public String handleSpecialCaseForTinyInt( String value, SqlDataType sqlDataType )
-    {
-        if ( sqlDataType.equals( SqlDataType.TINYINT ) && SqlDataType.TINYINT.toNeo4jDataType().equals( Neo4jDataType
-                .Boolean ) )
-        {
-            return Integer.parseInt( value ) == 0 ? "false" : "true";
-        }
-        return value;
     }
 
     private void writeFieldValueAndDelimiter( String value,

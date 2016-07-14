@@ -59,6 +59,7 @@ public enum SqlDataType
         this.neo4jDataType = neo4jDataType;
     }
 
+    /*You need to handle the tinyInt scenario always transform from TinyIntResolver*/
     public Neo4jDataType toNeo4jDataType()
     {
         return neo4jDataType;

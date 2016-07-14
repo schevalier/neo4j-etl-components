@@ -11,6 +11,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.IdType;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvCommand;
 import org.neo4j.integration.sql.exportcsv.ExportToCsvConfig;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 
 public class ExportFromMySql implements Callable<Void>
@@ -21,26 +22,35 @@ public class ExportFromMySql implements Callable<Void>
     private final ConnectionConfig connectionConfig;
     private final Formatting formatting;
     private final Environment environment;
+    private TinyIntResolver tinyIntResolver;
 
     public ExportFromMySql( MetadataMappings metadataMappings,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
-                            Environment environment )
+                            Environment environment,
+                            TinyIntResolver tinyIntResolver )
     {
-        this( ExportFromMySqlEvents.EMPTY, metadataMappings, connectionConfig, formatting, environment );
+        this( ExportFromMySqlEvents.EMPTY,
+                metadataMappings,
+                connectionConfig,
+                formatting,
+                environment,
+                tinyIntResolver );
     }
 
     public ExportFromMySql( ExportFromMySqlEvents events,
                             MetadataMappings metadataMappings,
                             ConnectionConfig connectionConfig,
                             Formatting formatting,
-                            Environment environment )
+                            Environment environment,
+                            TinyIntResolver tinyIntResolver )
     {
         this.events = events;
         this.metadataMappings = metadataMappings;
         this.connectionConfig = connectionConfig;
         this.formatting = formatting;
         this.environment = environment;
+        this.tinyIntResolver = tinyIntResolver;
     }
 
     @Override
@@ -54,7 +64,7 @@ public class ExportFromMySql implements Callable<Void>
 
         events.onExportingToCsv( environment.csvDirectory() );
 
-        Manifest manifest = new ExportToCsvCommand( config, metadataMappings ).execute();
+        Manifest manifest = new ExportToCsvCommand( config, metadataMappings, tinyIntResolver ).execute();
 
         events.onCreatingNeo4jStore();
 

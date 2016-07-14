@@ -18,14 +18,17 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.ExclusionMode;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
-import org.neo4j.integration.sql.metadata.SqlDataType;
 
 public class GenerateMetadataMapping implements Callable<MetadataMappings>
 {
+
+    private TinyIntResolver tinyIntResolver;
+
     public static Callable<MetadataMappings> load( String uri )
     {
         return () ->
@@ -52,14 +55,15 @@ public class GenerateMetadataMapping implements Callable<MetadataMappings>
     public GenerateMetadataMapping( OutputStream output,
                                     ConnectionConfig connectionConfig,
                                     Formatting formatting,
-                                    DatabaseExportSqlSupplier sqlSupplier )
+                                    DatabaseExportSqlSupplier sqlSupplier, TinyIntResolver tinyIntResolver )
     {
         this( GenerateMetadataMappingEvents.EMPTY,
                 output,
                 connectionConfig,
                 formatting,
                 sqlSupplier,
-                FilterOptions.DEFAULT );
+                FilterOptions.DEFAULT,
+                tinyIntResolver );
     }
 
     public GenerateMetadataMapping( GenerateMetadataMappingEvents events,
@@ -67,7 +71,7 @@ public class GenerateMetadataMapping implements Callable<MetadataMappings>
                                     ConnectionConfig connectionConfig,
                                     Formatting formatting,
                                     DatabaseExportSqlSupplier sqlSupplier,
-                                    FilterOptions filterOptions )
+                                    FilterOptions filterOptions, TinyIntResolver tinyIntResolver )
     {
         this.events = events;
         this.output = output;
@@ -76,8 +80,7 @@ public class GenerateMetadataMapping implements Callable<MetadataMappings>
         this.sqlSupplier = sqlSupplier;
         this.filterOptions = filterOptions;
         this.relationshipNameResolver = new RelationshipNameResolver( filterOptions.relationshipNameFrom() );
-
-        SqlDataType.TINYINT.setNeoDataType( filterOptions.tinyIntAs().neoDataType() );
+        this.tinyIntResolver = tinyIntResolver;
     }
 
     @Override
@@ -87,7 +90,7 @@ public class GenerateMetadataMapping implements Callable<MetadataMappings>
 
         DatabaseClient databaseClient = new DatabaseClient( connectionConfig );
 
-        if( filterOptions.exclusionMode().equals( ExclusionMode.INCLUDE ))
+        if ( filterOptions.exclusionMode().equals( ExclusionMode.INCLUDE ) )
         {
             filterOptions.invertTables( databaseClient.tableNames() );
         }

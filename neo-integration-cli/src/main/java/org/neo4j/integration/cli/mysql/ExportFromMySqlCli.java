@@ -14,8 +14,8 @@ import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import org.apache.commons.lang3.StringUtils;
 
-import org.neo4j.integration.commands.mysql.GenerateMetadataMapping;
 import org.neo4j.integration.commands.mysql.ExportFromMySql;
+import org.neo4j.integration.commands.mysql.GenerateMetadataMapping;
 import org.neo4j.integration.environment.CsvDirectorySupplier;
 import org.neo4j.integration.environment.DestinationDirectorySupplier;
 import org.neo4j.integration.environment.Environment;
@@ -24,8 +24,10 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
-import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
+import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
+import org.neo4j.integration.sql.exportcsv.mapping.TinyIntAs;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
 import org.neo4j.integration.util.CliRunner;
 
@@ -182,14 +184,15 @@ public class ExportFromMySqlCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( quote ) )
                     .build();
 
-            MetadataMappings metadataMappings = createMetadataMappings( connectionConfig, formatting );
+            TinyIntResolver tinyIntResolver = new TinyIntResolver( TinyIntAs.parse( tinyIntAs ) );
+            MetadataMappings metadataMappings = createMetadataMappings( connectionConfig, formatting, tinyIntResolver );
 
             new ExportFromMySql(
                     new ExportMySqlEventHandler(),
                     metadataMappings,
                     connectionConfig,
                     formatting,
-                    environment ).call();
+                    environment, tinyIntResolver ).call();
         }
         catch ( Exception e )
         {
@@ -198,7 +201,8 @@ public class ExportFromMySqlCli implements Runnable
     }
 
     private MetadataMappings createMetadataMappings( ConnectionConfig connectionConfig,
-                                                     Formatting formatting ) throws Exception
+                                                     Formatting formatting,
+                                                     TinyIntResolver tinyIntResolver ) throws Exception
     {
         Callable<MetadataMappings> generateMetadataMappings;
 
@@ -208,13 +212,16 @@ public class ExportFromMySqlCli implements Runnable
         }
         else
         {
+            final FilterOptions filterOptions = new FilterOptions( tinyIntAs, relationshipNameFrom, exclusionMode,
+                    tables, false );
             generateMetadataMappings = new GenerateMetadataMapping(
                     new GenerateMetadataMappingEventHandler(),
                     emptyOutputStream(),
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, exclusionMode, tables, false ) );
+                    filterOptions,
+                    tinyIntResolver );
         }
 
         return generateMetadataMappings.call();

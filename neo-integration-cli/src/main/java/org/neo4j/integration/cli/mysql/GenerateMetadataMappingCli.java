@@ -21,6 +21,7 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.ImportToolOptions;
 import org.neo4j.integration.sql.ConnectionConfig;
 import org.neo4j.integration.sql.DatabaseType;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.FilterOptions;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mysql.MySqlExportSqlSupplier;
@@ -141,13 +142,15 @@ public class GenerateMetadataMappingCli implements Runnable
                     .quote( importToolOptions.getQuoteCharacter( this.quote ) )
                     .build();
 
+            final FilterOptions filterOptions = new FilterOptions( tinyIntAs, relationshipNameFrom, exclusionMode,
+                    tables, false );
             new GenerateMetadataMapping(
                     new GenerateMetadataMappingEventHandler(),
                     System.out,
                     connectionConfig,
                     formatting,
                     new MySqlExportSqlSupplier(),
-                    new FilterOptions( tinyIntAs, relationshipNameFrom, exclusionMode, tables, false ) ).call();
+                    filterOptions, new TinyIntResolver( filterOptions.tinyIntAs() ) ).call();
         }
         catch ( Exception e )
         {
@@ -169,7 +172,7 @@ public class GenerateMetadataMappingCli implements Runnable
         }
         else
         {
-            Loggers.Default.log( Level.INFO, "Reading metadata mapping from file: "+ mappingsFile );
+            Loggers.Default.log( Level.INFO, "Reading metadata mapping from file: " + mappingsFile );
             metadataMappings = GenerateMetadataMapping.load( mappingsFile );
         }
         return metadataMappings;

@@ -7,6 +7,7 @@ import org.neo4j.integration.neo4j.importcsv.io.HeaderFileWriter;
 import org.neo4j.integration.process.Commands;
 import org.neo4j.integration.sql.DatabaseClient;
 import org.neo4j.integration.sql.exportcsv.io.CsvFileWriter;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMapping;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.services.ResourceToCsvFilesService;
@@ -17,11 +18,15 @@ public class ExportToCsvCommand
 {
     private final ExportToCsvConfig config;
     private final MetadataMappings metadataMappings;
+    private TinyIntResolver tinyIntResolver;
 
-    public ExportToCsvCommand( ExportToCsvConfig config, MetadataMappings metadataMappings )
+    public ExportToCsvCommand( ExportToCsvConfig config,
+                               MetadataMappings metadataMappings,
+                               TinyIntResolver tinyIntResolver )
     {
         this.config = Preconditions.requireNonNull( config, "ExportToCsvConfig" );
         this.metadataMappings = Preconditions.requireNonNull( metadataMappings, "MetadataMappings" );
+        this.tinyIntResolver = tinyIntResolver;
     }
 
     public Manifest execute() throws Exception
@@ -41,7 +46,7 @@ public class ExportToCsvCommand
         try ( DatabaseClient databaseClient = new DatabaseClient( config.connectionConfig() ) )
         {
             HeaderFileWriter headerFileWriter = new HeaderFileWriter( config.destination(), config.formatting() );
-            CsvFileWriter csvFileWriter = new CsvFileWriter( config, databaseClient );
+            CsvFileWriter csvFileWriter = new CsvFileWriter( config, databaseClient, tinyIntResolver );
             ResourceToCsvFilesService exportService = new ResourceToCsvFilesService( headerFileWriter, csvFileWriter );
 
             for ( MetadataMapping resource : metadataMappings )
