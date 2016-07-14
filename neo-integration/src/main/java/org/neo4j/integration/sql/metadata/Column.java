@@ -3,6 +3,7 @@ package org.neo4j.integration.sql.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.neo4j.integration.sql.RowAccessor;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
 import static java.lang.String.format;
@@ -45,7 +46,7 @@ public interface Column
 
     String aliasedColumn();
 
-    void addData( ColumnToCsvFieldMappings.Builder builder );
+    void addData( ColumnToCsvFieldMappings.Builder builder, TinyIntResolver tinyIntResolver );
 
     JsonNode toJson();
 

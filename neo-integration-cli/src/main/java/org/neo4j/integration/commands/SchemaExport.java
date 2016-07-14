@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappingProvider;
 import org.neo4j.integration.sql.exportcsv.mapping.MetadataMappings;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
@@ -31,12 +32,13 @@ public class SchemaExport
 
     public MetadataMappings generateMetadataMappings( Formatting formatting,
                                                       DatabaseExportSqlSupplier sqlSupplier,
-                                                      RelationshipNameResolver relationshipNameResolver )
+                                                      RelationshipNameResolver relationshipNameResolver,
+                                                      TinyIntResolver tinyIntResolver )
     {
         validate();
 
         MetadataMappingProvider metadataMappingProvider =
-                new MetadataMappingProvider( formatting, sqlSupplier, relationshipNameResolver );
+                new MetadataMappingProvider( formatting, sqlSupplier, relationshipNameResolver, tinyIntResolver );
         MetadataMappings metadataMappings = new MetadataMappings();
 
         tables.forEach( o -> metadataMappings.add( o.invoke( metadataMappingProvider ) ) );

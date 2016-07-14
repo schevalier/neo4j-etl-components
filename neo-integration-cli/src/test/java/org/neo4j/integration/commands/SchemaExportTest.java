@@ -8,8 +8,10 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
 import org.neo4j.integration.sql.exportcsv.DatabaseExportSqlSupplier;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameFrom;
 import org.neo4j.integration.sql.exportcsv.mapping.RelationshipNameResolver;
+import org.neo4j.integration.sql.exportcsv.mapping.TinyIntAs;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
 import org.neo4j.integration.sql.metadata.JoinKey;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.mock;
 public class SchemaExportTest
 {
     private final ColumnUtil columnUtil = new ColumnUtil();
+    private TinyIntResolver tinyIntResolver = new TinyIntResolver( TinyIntAs.BYTE );
 
     @Test
     public void shouldThrowExceptionIfParentOfJoinIsNotPresentInTables()
@@ -53,7 +56,7 @@ public class SchemaExportTest
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
             schemaExport.generateMetadataMappings( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ),
-                    new RelationshipNameResolver( RelationshipNameFrom.TABLE_NAME ) );
+                    new RelationshipNameResolver( RelationshipNameFrom.TABLE_NAME ), tinyIntResolver );
 
             fail( "Expected IllegalStatException" );
         }
@@ -93,7 +96,7 @@ public class SchemaExportTest
             SchemaExport schemaExport = new SchemaExport( tables, joins, Collections.<JoinTable>emptyList() );
 
             schemaExport.generateMetadataMappings( Formatting.DEFAULT, mock( DatabaseExportSqlSupplier.class ), new
-                    RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ) );
+                    RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ), tinyIntResolver );
 
             fail( "Expected IllegalStateException" );
         }

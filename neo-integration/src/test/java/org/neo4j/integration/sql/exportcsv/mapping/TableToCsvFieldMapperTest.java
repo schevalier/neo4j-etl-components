@@ -10,6 +10,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
 import org.neo4j.integration.sql.metadata.CompositeColumn;
@@ -27,6 +28,7 @@ public class TableToCsvFieldMapperTest
 {
 
     private final ColumnUtil columnUtil = new ColumnUtil();
+    private TinyIntResolver tinyIntResolver = new TinyIntResolver(TinyIntAs.BOOLEAN );
 
     @Test
     public void shouldCreatePrimaryKeyAndDataMappingsForTable()
@@ -45,7 +47,7 @@ public class TableToCsvFieldMapperTest
                         ColumnValueSelectionStrategy.SelectColumnValue ) )
                 .build();
 
-        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
+        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT, tinyIntResolver );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( table );
@@ -73,7 +75,7 @@ public class TableToCsvFieldMapperTest
                         ColumnRole.PrimaryKey ) )
                 .build();
 
-        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
+        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT, tinyIntResolver );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( table );
@@ -107,7 +109,7 @@ public class TableToCsvFieldMapperTest
                         ColumnRole.ForeignKey ) )
                 .build();
 
-        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT );
+        TableToCsvFieldMapper mapper = new TableToCsvFieldMapper( Formatting.DEFAULT, tinyIntResolver );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( table );

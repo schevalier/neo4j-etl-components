@@ -4,6 +4,7 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
@@ -16,11 +17,15 @@ class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTa
 {
     private final Formatting formatting;
     private final RelationshipNameResolver relationshipNameResolver;
+    private final TinyIntResolver tinyIntResolver;
 
-    JoinTableToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
+    JoinTableToCsvFieldMapper( Formatting formatting,
+                               RelationshipNameResolver relationshipNameResolver,
+                               TinyIntResolver tinyIntResolver )
     {
         this.formatting = formatting;
         this.relationshipNameResolver = relationshipNameResolver;
+        this.tinyIntResolver = tinyIntResolver;
     }
 
     @Override
@@ -49,18 +54,19 @@ class JoinTableToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<JoinTa
 
         builder.add( new ColumnToCsvFieldMapping( from, CsvField.relationshipType() ) );
 
-        addProperties( joinTable, builder );
+        addProperties( joinTable, builder, tinyIntResolver );
 
         return builder.build();
     }
 
-    private void addProperties( JoinTable joinTable, ColumnToCsvFieldMappings.Builder builder )
+    private void addProperties( JoinTable joinTable, ColumnToCsvFieldMappings.Builder builder, TinyIntResolver
+            tinyIntResolver )
     {
         for ( Column column : joinTable.columns() )
         {
             if ( column.role() == ColumnRole.PrimaryKey || column.role() == ColumnRole.Data )
             {
-                column.addData( builder );
+                column.addData( builder, tinyIntResolver );
             }
         }
     }

@@ -11,6 +11,7 @@ import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
 import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.Join;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class JoinTableToCsvFieldMapperTest
 {
     private ColumnUtil columnUtil = new ColumnUtil();
+    private TinyIntResolver tinyIntResolver = new TinyIntResolver(TinyIntAs.BYTE );
 
     @Test
     public void shouldCreateMappingsForJoinTableWithProperties()
@@ -53,7 +55,7 @@ public class JoinTableToCsvFieldMapperTest
                         .build() );
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper( Formatting.DEFAULT,
-                new RelationshipNameResolver( RelationshipNameFrom.TABLE_NAME ) );
+                new RelationshipNameResolver( RelationshipNameFrom.TABLE_NAME ), tinyIntResolver );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( joinTable );
@@ -98,7 +100,7 @@ public class JoinTableToCsvFieldMapperTest
 
         JoinTableToCsvFieldMapper mapper = new JoinTableToCsvFieldMapper(
                 Formatting.DEFAULT,
-                new RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ) );
+                new RelationshipNameResolver( RelationshipNameFrom.COLUMN_NAME ), tinyIntResolver );
 
         // when
         ColumnToCsvFieldMappings mappings = mapper.createMappings( joinTable );

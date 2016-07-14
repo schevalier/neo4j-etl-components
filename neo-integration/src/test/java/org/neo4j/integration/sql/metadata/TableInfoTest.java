@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import org.neo4j.integration.sql.RowAccessor;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.exportcsv.mapping.ColumnToCsvFieldMappings;
 
 import static java.util.Arrays.asList;
@@ -342,7 +343,7 @@ public class TableInfoTest
         }
 
         @Override
-        public void addData( ColumnToCsvFieldMappings.Builder builder )
+        public void addData( ColumnToCsvFieldMappings.Builder builder, TinyIntResolver tinyIntResolver )
         {
 
         }

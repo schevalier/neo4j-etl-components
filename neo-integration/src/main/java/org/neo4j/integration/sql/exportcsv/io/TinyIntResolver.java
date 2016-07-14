@@ -11,7 +11,6 @@ public class TinyIntResolver
     public TinyIntResolver( TinyIntAs tinyIntAs )
     {
         this.tinyIntAs = tinyIntAs;
-        SqlDataType.TINYINT.setNeoDataType( this.tinyIntAs.neoDataType() );
     }
 
     public String handleSpecialCaseForTinyInt( String value, SqlDataType sqlDataType )

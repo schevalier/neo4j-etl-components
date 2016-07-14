@@ -4,6 +4,7 @@ import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.QuoteChar;
 import org.neo4j.integration.neo4j.importcsv.fields.CsvField;
 import org.neo4j.integration.neo4j.importcsv.fields.IdSpace;
+import org.neo4j.integration.sql.exportcsv.io.TinyIntResolver;
 import org.neo4j.integration.sql.metadata.Column;
 import org.neo4j.integration.sql.metadata.ColumnRole;
 import org.neo4j.integration.sql.metadata.ColumnValueSelectionStrategy;
@@ -16,7 +17,8 @@ class JoinToCsvFieldMapper implements DatabaseObjectToCsvFieldMapper<Join>
     private final Formatting formatting;
     private RelationshipNameResolver relationshipNameResolver;
 
-    JoinToCsvFieldMapper( Formatting formatting, RelationshipNameResolver relationshipNameResolver )
+    JoinToCsvFieldMapper( Formatting formatting,
+                          RelationshipNameResolver relationshipNameResolver )
     {
         this.formatting = formatting;
         this.relationshipNameResolver = relationshipNameResolver;

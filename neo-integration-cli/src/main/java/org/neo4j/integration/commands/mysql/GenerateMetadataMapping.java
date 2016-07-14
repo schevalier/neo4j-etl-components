@@ -98,7 +98,7 @@ public class GenerateMetadataMapping implements Callable<MetadataMappings>
         SchemaExport schemaExport = new DatabaseInspector( databaseClient, filterOptions.tablesToExclude() )
                 .buildSchemaExport();
         MetadataMappings metadataMappings = schemaExport
-                .generateMetadataMappings( formatting, sqlSupplier, relationshipNameResolver );
+                .generateMetadataMappings( formatting, sqlSupplier, relationshipNameResolver, tinyIntResolver );
 
         try ( Writer writer = new OutputStreamWriter( output ) )
         {
