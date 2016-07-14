@@ -1,12 +1,11 @@
 package org.neo4j.integration.sql.exportcsv.mapping;
 
+import org.neo4j.integration.sql.metadata.TableName;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import org.neo4j.integration.sql.DatabaseClient;
-import org.neo4j.integration.sql.metadata.TableName;
 
 public class FilterOptions
 {

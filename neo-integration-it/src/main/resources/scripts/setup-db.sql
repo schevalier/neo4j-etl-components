@@ -208,9 +208,9 @@ INSERT INTO javabase.Person (username, addressId) SELECT
                                                   FROM javabase.Address
                                                   WHERE javabase.Address.postcode = 'ZZ1 0MN';
 
-INSERT INTO javabase.Numeric_Table (tinyint_field, smallint_field, mediumint_field, bigint_field,
+INSERT INTO javabase.Numeric_Table (id, tinyint_field, smallint_field, mediumint_field, bigint_field,
                                     float_field, double_field, decimal_field)
-VALUES (1, 123, 123, 123, 123.2, 12323434.45, 18.10);
+VALUES (2, 1, 123, 123, 123, 123.2, 12323434.45, 18.10);
 
 INSERT INTO javabase.String_Table (char_field, varchar_field, text_field, blob_field, tinytext_field, tinyblob_field,
                                    mediumtext_field, mediumblob_field, longtext_field, longblob_field,
@@ -229,7 +229,7 @@ INSERT INTO javabase.String_Table (char_field, varchar_field, text_field, blob_f
     'val-1',
     id
   FROM javabase.Numeric_Table
-  WHERE javabase.Numeric_Table.tinyint_field = 1;
+  WHERE javabase.Numeric_Table.id = 2;
 
 INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, time_field, year_field, numericId)
   SELECT
@@ -240,7 +240,7 @@ INSERT INTO javabase.Date_Table (date_field, datetime_field, timestamp_field, ti
     1987,
     id
   FROM javabase.Numeric_Table
-  WHERE javabase.Numeric_Table.tinyint_field = 1;
+  WHERE javabase.Numeric_Table.id = 2;
 
 INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Abraham', 'Silberschatz', 45);
 INSERT INTO javabase.Author (first_name, last_name, age) VALUES ('Andrew', 'Tanenbaum', 56);

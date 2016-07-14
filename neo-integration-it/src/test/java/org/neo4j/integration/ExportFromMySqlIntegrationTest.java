@@ -143,7 +143,7 @@ public class ExportFromMySqlIntegrationTest
         assertThat( stringFields.get( 0 ).values(), hasItems(
                 "val-1", "mediumtext_field", "tinytext_field",
                 "char-field", "text_field", "varchar-field", "longtext_field" ) );
-        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, true ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 2, 1 ) );
     }
 
     @Test
@@ -163,7 +163,7 @@ public class ExportFromMySqlIntegrationTest
                 "2038-01-19 03:14:07.0",
                 "1988-01-23" ) );
         assertThat( numericFields.get( 0 ).size(), is( 8 ) );
-        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 1, true ) );
+        assertThat( numericFields.get( 0 ).values(), hasItems( 123, 123, 123.2, 123, 18.10, 1.232343445E7, 2, 1 ) );
     }
 
     @Test
@@ -234,15 +234,6 @@ public class ExportFromMySqlIntegrationTest
         assertEquals( students, asList( "eve", "jim", "mark" ) );
     }
 
-    @Test
-    public void shouldExportFromMySqlAndImportIntoGraphWithCorrectTinyIntConversion() throws Exception
-    {
-        assertFalse( neo4j.get().containsImportErrorLog( Neo4j.DEFAULT_DATABASE ) );
-        String response = neo4j.get().executeHttp( NEO_TX_URI, "MATCH (c:NumericTable) RETURN c" );
-        List<Map<String, Object>> numericFields = JsonPath.read( response, "$.results[*].data[0].row[0]" );
-        assertThat( numericFields.get( 0 ).values(), hasItems( true, 123, 123.2, 123, 18.10, 1.232343445E7, 1 ) );
-    }
-
     private static void exportFromMySqlToNeo4j() throws IOException
     {
         Path importToolOptions = tempDirectory.get().resolve( "import-tool-options.json" );
@@ -260,12 +251,10 @@ public class ExportFromMySqlIntegrationTest
                 "--user", MySqlClient.Parameters.DBUser.value(),
                 "--password", MySqlClient.Parameters.DBPassword.value(),
                 "--database", "javabase",
-                "--tiny-int", "boolean",
                 "--import-tool", neo4j.get().binDirectory().toString(),
                 "--options-file", importToolOptions.toString(),
                 "--csv-directory", tempDirectory.get().toString(),
                 "--destination", neo4j.get().databasesDirectory().resolve( Neo4j.DEFAULT_DATABASE ).toString(),
-                "--tiny", "boolean",
                 "--force" ) );
 
         args.add( "--debug" );
