@@ -88,15 +88,4 @@ public class SqlDataTypeTest
         SqlDataType sqlDataType = SqlDataType.parse( "float" );
         assertThat( sqlDataType, is( sqlDataType.FLOAT ) );
     }
-
-    @Test
-    public void testSetDataTypeConversion() throws Exception
-    {
-        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Boolean );
-
-        assertThat( SqlDataType.TINYINT.toNeo4jDataType(), is( Neo4jDataType.Boolean ) );
-
-        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Byte );
-    }
-
 }

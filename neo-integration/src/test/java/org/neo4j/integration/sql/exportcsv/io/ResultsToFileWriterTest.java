@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.neo4j.integration.neo4j.importcsv.config.GraphObjectType;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Delimiter;
 import org.neo4j.integration.neo4j.importcsv.config.formatting.Formatting;
-import org.neo4j.integration.neo4j.importcsv.fields.Neo4jDataType;
 import org.neo4j.integration.sql.QueryResults;
 import org.neo4j.integration.sql.StubQueryResults;
 import org.neo4j.integration.sql.exportcsv.ColumnUtil;
@@ -195,8 +194,6 @@ public class ResultsToFileWriterTest
                 .columns( "id", "tiny_int_value" )
                 .addRow( "1", "1" )
                 .build();
-
-        SqlDataType.TINYINT.setNeoDataType( Neo4jDataType.Byte );
 
         when( mappings.columns() ).thenReturn(
                 asList(

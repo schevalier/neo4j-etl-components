@@ -65,11 +65,6 @@ public enum SqlDataType
         return neo4jDataType;
     }
 
-    public void setNeoDataType( Neo4jDataType neoDataType )
-    {
-        this.neo4jDataType = neoDataType;
-    }
-
     public boolean skipImport()
     {
         return BLOB == this || TINYBLOB == this || MEDIUMBLOB == this || LONGBLOB == this;
