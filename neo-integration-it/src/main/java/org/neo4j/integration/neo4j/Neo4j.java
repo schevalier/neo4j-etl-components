@@ -26,7 +26,7 @@ public class Neo4j implements AutoCloseable
 {
     public static final URI NEO_TX_URI = URI.create( "http://localhost:7474/db/data/transaction/commit" );
 
-    public static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_1;
+    public static final Neo4jVersion NEO4J_VERSION = Neo4jVersion.v3_0_3;
 
     public static final String DEFAULT_DATABASE = "graph.db";
 
