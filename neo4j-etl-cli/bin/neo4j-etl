@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+jar=$(find . -name neo4j-etl.jar)
+
+java -jar ${jar} "$@"
