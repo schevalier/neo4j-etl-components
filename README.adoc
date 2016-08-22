@@ -67,7 +67,7 @@ You can run the tests with
 * https://www.vagrantup.com/[Vagrant]
 * or in AWS.
 
-You will need a MySQL user `neo4j with password `neo4j` with admin privileges to run the tests.
+You will need a MySQL user `neo4j` with password `neo4j` with admin privileges to run the tests.
 
 To run the tests in AWS, you'll need an AWS IAM user.
 

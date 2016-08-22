@@ -508,21 +508,21 @@ It applies some simple rules for transforming the relational model.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_planned_for_the_future">Planned for the Future</h3>
+<h3 id="_plans_for_the_future">Plans for the Future</h3>
 <div class="ulist">
 <ul>
 <li>
 <p>UI tool to modify mappings - currently manual editing</p>
 </li>
 <li>
-<p>Custom Mapping Rules
+<p>Custom Mapping Rules<br>
 Transformations for names, data, links</p>
 </li>
 <li>
 <p>Online Synchronisation, Import into existing database - currently, only supporting initial import</p>
 </li>
 <li>
-<p>Exemplary integration into a 3rd party ETL pipeline (e.g. Nifi, Talend)</p>
+<p>Exemplary integration into a 3rd party ETL pipeline</p>
 </li>
 </ul>
 </div>
@@ -538,7 +538,7 @@ Transformations for names, data, links</p>
 <p>Partners providing data integration with Neo4j</p>
 </li>
 <li>
-<p>Enterprise developers building applicatiions based on well modeled relational data</p>
+<p>Enterprise developers building applications based on well modeled relational data</p>
 </li>
 </ul>
 </div>
@@ -548,10 +548,10 @@ Transformations for names, data, links</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Security</p>
+<p>Date and binary datatypes</p>
 </li>
 <li>
-<p>Date and binary datatypes</p>
+<p>Security (secure connections, handling of passwords, encrypting data?)</p>
 </li>
 </ul>
 </div>
@@ -559,7 +559,7 @@ Transformations for names, data, links</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_neo4j_etl_command_line_tool">neo4j-etl Command Line Tool</h2>
+<h2 id="neo4j-etl-cli">neo4j-etl Command Line Tool</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This is the command line tool you use to retrieve and map the metadata from your relational database.
@@ -847,44 +847,13 @@ OPTIONS
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_example_session_northwind">Example Session: Northwind</h3>
-<div class="paragraph">
-<p>This example session is based on the Northwind example dataset for MySQL.</p>
-</div>
-<div class="paragraph">
-<p>TODO &#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_example_session_employees">Example Session: Employees</h3>
-<div class="paragraph">
-<p>This example session is based on the Employees example dataset for MySQL.</p>
-</div>
-<div class="paragraph">
-<p>TODO &#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_example_session_musicbrainz">Example Session: MusicBrainz</h3>
-<div class="paragraph">
-<p>This example session is based on the MusicBrainz example dataset for Postgres.</p>
-</div>
-<div class="paragraph">
-<p>TODO &#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_examples">Examples</h3>
-
-</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_capabilities">Capabilities</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_inferring_schema_with_mapping_rules">Inferring Schema with Mapping Rules</h3>
+<h3 id="_inferring_schema_with_mapping_rules_generate_metadata_mapping">Inferring Schema with Mapping Rules (generate-metadata-mapping)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -894,23 +863,23 @@ OPTIONS
 <p>A <em>table</em> with a foreign key is treated as a <em>Join</em> and imported as a <em>node</em> with a <em>relationship</em></p>
 </li>
 <li>
-<p>Ex: <code><strong>Person</strong> &#8594; Address</code> is imported as <code>(Person)-[:ADDRESS_ID]-&gt;(Address)</code></p>
+<p>Ex: <code><strong>Person</strong> &#8594; Address</code> is imported as <code><strong>(Person)-[:ADDRESS_ID]&#8594;</strong>(Address)</code></p>
 </li>
 <li>
 <p>A <em>table</em> that has two foreign keys is imported as a <em>JoinTable</em> and imported as a <em>relationship</em></p>
 </li>
 <li>
-<p>Ex: <code>Student &#8592; Student_Course &#8594; Course</code> is imported as <br>
-<code>(Student) -[:STUDENT_COURSE]-&gt; (Course)</code></p>
+<p>Ex: <code>Student &#8592; <strong>Student_Course</strong> &#8594; Course</code> is imported as <br>
+<code>(Student) -[<strong>:STUDENT_COURSE</strong>]&#8594; (Course)</code></p>
 </li>
 <li>
 <p>A <em>table</em> that has more than two foreign keys is treated as an <em>intermediate node</em> and imported as <em>node with multiple relationships</em></p>
 </li>
 <li>
-<p>Ex: <code>Order_Detail &#8594; Shipping_Address, Order_Detail &#8594; Payment_Information, Order_Detail &#8594; Shipment_Instructions</code> is imported as,<br>
-<code>(Shipping_Address) -[:SHIPPING]-&gt; (Order_Detail)</code><br>
-<code>(Payment_Information) -[:PAYMENT]-&gt; (Order_Detail)</code><br>
-<code>(Shipment_Instructions) -[:SHIPMENT]-&gt; (Order_Detail)</code><br></p>
+<p>Ex: <code><strong>Order_Detail</strong> &#8594; Shipping_Address, <strong>Order_Detail</strong> &#8594; Payment_Information, <strong>Order_Detail</strong> &#8594; Shipment_Instructions</code> is imported as,<br>
+<code>(Shipping_Address) <strong>-[:SHIPPING]&#8594; (Order_Detail)</strong></code><br>
+<code>(Payment_Information) <strong>-[:PAYMENT]&#8594; (Order_Detail)</strong></code><br>
+<code>(Shipment_Instructions) <strong>-[:SHIPMENT]&#8594; (Order_Detail)</strong></code><br></p>
 </li>
 <li>
 <p>Resolve relationships through composite keys.</p>
@@ -939,10 +908,10 @@ OPTIONS
 <div class="ulist">
 <ul>
 <li>
-<p><code>--relationship-name=table</code> then a <code>Person&#8594;Address</code> will become <code>(Person)-[:ADDRESS]-&gt;(Address)</code></p>
+<p><code>--relationship-name=table</code> then a <code>Person&#8594;Address</code> will become <code>(Person)-[<strong>:ADDRESS</strong>]&#8594;(Address)</code></p>
 </li>
 <li>
-<p><code>--relationship-name=column</code> will become <code>(Person)-[:ADDRESS_ID]-&gt;(Address)</code></p>
+<p><code>--relationship-name=column</code> will become <code>(Person)-[<strong>:ADDRESS_ID</strong>]&#8594;(Address)</code></p>
 </li>
 </ul>
 </div>
@@ -951,10 +920,10 @@ OPTIONS
 <p>Filter tables that you want to include or exclude using <code>--include</code> and <code>--exclude</code></p>
 </li>
 <li>
-<p>TODO? Filter columns that you want to include or exclude using <code>--include</code> and <code>--exclude</code></p>
+<p>TODO: Filter columns that you want to include or exclude using <code>--include</code> and <code>--exclude</code></p>
 </li>
 <li>
-<p>TODO Retaining natural keys(marked as PrimaryKeys and ForeignKeys) as needed using &lt;TBA&gt; flag</p>
+<p>TODO: Retaining natural keys(marked as PrimaryKeys and ForeignKeys) as needed using &lt;TBA&gt; flag</p>
 <div class="ulist">
 <ul>
 <li>
@@ -976,23 +945,27 @@ OPTIONS
 </div>
 </div>
 <div class="sect2">
-<h3 id="_exporting_importing_data">Exporting/Importing Data</h3>
+<h3 id="_exporting_data_export">Exporting Data (export)</h3>
 <div class="ulist">
 <ul>
 <li>
 <p>Generate CSV files from relational source as outlined by <code>mappings.json</code></p>
-</li>
+<div class="ulist">
+<ul>
 <li>
-<p>TODO Use a streaming api that is more performant</p>
+<p>TODO: Use a streaming api that is more performant</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>Import CSV using <code>neo4j-import</code> providing the correct labels and rel-types and headers headers</p>
 </li>
 <li>
-<p>Build indexes automatically as part of import</p>
+<p>TODO: Build indexes automatically as part of import</p>
 </li>
 <li>
-<p>Missing ability to pass options to <code>neo4j-import</code> tool as a file instead of command line arguments</p>
+<p>TODO: Missing ability to pass options to <code>neo4j-import</code> tool as a file instead of command line arguments</p>
 </li>
 </ul>
 </div>
@@ -1002,7 +975,7 @@ OPTIONS
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-22 00:42:14 CEST
+Last updated 2016-08-22 12:01:05 CEST
 </div>
 </div>
 </body>

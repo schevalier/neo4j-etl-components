@@ -13,16 +13,16 @@ NOTE: For very large databases make sure to have enough disk-space for the CSV e
 
 .Simple Example Session
 ----
-export NEO4J_HOME=/Users/mh/v/neo4j-enterprise-3.0.4
+export NEO4J_HOME=/path/to/neo4j-enterprise-3.0.4
 
 mkdir -p /tmp/northwind
 
-./neo4j-etl mysql generate-metadata-mapping --database northwind --user root > /tmp/northwind/mapping.json
+./bin/neo4j-etl mysql generate-metadata-mapping --database northwind --user root > /tmp/northwind/mapping.json
 # Creating MySQL to CSV mappings...
 
 echo '{"multiline-fields":"true"}' > /tmp/northwind/options.json
 
-./neo4j-etl mysql export --database northwind --user root \
+./bin/neo4j-etl mysql export --database northwind --user root \
 --destination $NEO4J_HOME/data/databases/graph.db/ --import-tool $NEO4J_HOME/bin  \
 --csv-directory /tmp/northwind --mapping-file /tmp/northwind/mapping.json --options-file /tmp/northwind/options.json \
 --force --quote '"'
@@ -89,6 +89,8 @@ include::neo4j-etl-mysql-generate-metadata-mapping.txt[]
 include::neo4j-etl-mysql-export.txt[]
 ----
 
+////
+
 === Example Session: Northwind
 
 This example session is based on the Northwind example dataset for MySQL.
@@ -107,4 +109,4 @@ This example session is based on the MusicBrainz example dataset for Postgres.
 
 TODO ...
 
-
+////
