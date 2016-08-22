@@ -2,19 +2,9 @@
 
 Data import from relational databases to Neo4j.
 
-== Quick Build Instructions
+== Download & Install
 
-To run the cli locally once you cloned the project, build the `neo4j-etl` project locally.
-
-From the root directory, run:
-
-----
-git clone https://github.com/neo4j-contib/neo4j-etl-components
-cd neo4j-etl-components
-mvn clean package -DskipTests
-----
-
-Once that has been successfully executed, the scripts are located in the `neo-etl-cli/bin` directory.
+Download & unzip the latest `neo4j-etl-components.zip` from https://github.com/neo4j-contrib/neo4j-etl-components/releases
 
 == Examples of command usage:
 
@@ -35,13 +25,34 @@ Once that has been successfully executed, the scripts are located in the `neo-et
 
 For detailed usage see also the: http://neo4j-contrib.github.io/neo4j-etl-components#neo4j-etl-cli[tool documentation].
 
+== Quick Build Instructions
+
+To run the command line tool, once you cloned the project, build the project locally.
+
+From the root directory, run:
+
+----
+git clone https://github.com/neo4j-contrib/neo4j-etl-components
+cd neo4j-etl-components
+mvn clean package -DskipTests
+----
+
+Once that has been successfully executed, the scripts are located in the `neo-etl-cli/bin` directory.
+
 == License
 
-This tool is licensed under the GPLv3
+This tool is licensed under the https://www.gnu.org/licenses/gpl.txt[GPLv3].
 
 == Issues & Feedback & Contributions
 
-* You can raise link:issues[GitHub issues] or send
+* You can raise link:issues[GitHub issues] or send feedback to feedback@neo4j.com
+* Please also join our http://neo4j.com/slack[neo4j-users Slack] and ask in the  #help-import channel
+
+We're welcoming all contributions.
+
+* Please first raise an issue so that we can discuss your ideas and avoid duplicate work
+* Send your changes as a pull request 
+* Make sure to provide tests with your changes
 
 == Prerequisites
 
