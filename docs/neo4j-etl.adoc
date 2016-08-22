@@ -1,3 +1,4 @@
+[[neo4j-etl-cli]]
 == neo4j-etl Command Line Tool
 
 This is the command line tool you use to retrieve and map the metadata from your relational database.
